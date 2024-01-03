@@ -6,8 +6,8 @@ import {
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-
 import Register from "../pages/register";
+import Login from "../pages/login";
 import Logo from "../assets/karsetnont.png";
 
 const TabLogin = () => {
@@ -35,7 +35,9 @@ const TabLogin = () => {
             <Tab label="ลงทะเบียน" value="2" />
           </TabList>
         </Box>
-        <TabPanel value="">sfasfasfas</TabPanel>
+        <TabPanel value="1">
+          <Login />
+        </TabPanel>
         <TabPanel value="2">
           <Register />
         </TabPanel>
