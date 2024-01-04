@@ -10,15 +10,16 @@ import Register from "../pages/register";
 import Login from "../pages/login";
 import Logo from "../assets/karsetnont.png";
 
-const TabLogin = () => {
-    const [value, setValue] = React.useState("1");
+const TabLogin = (prop: { jwt_token: string, setJwt_token: React.Dispatch<React.SetStateAction<string>> }) => {
+  const [value, setValue] = React.useState("1");
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue);
-    };
-  
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
+
   return (
     <Box sx={{ width: "100%", typography: "body1", marginTop: 3 }}>
+      {prop.jwt_token}
       <div style={{ textAlign: "center" }}>
         <img src={Logo} height="auto" width="100px" />
       </div>
@@ -36,7 +37,7 @@ const TabLogin = () => {
           </TabList>
         </Box>
         <TabPanel value="1">
-          <Login />
+          <Login setJwt_token={prop.setJwt_token} />
         </TabPanel>
         <TabPanel value="2">
           <Register />

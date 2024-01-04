@@ -93,7 +93,7 @@ const Register = () => {
         if (response.data.same == false) {
           if (response.data.username) {
             setUsernameCheck(false);
-            
+
           } else if (response.data.email) {
             setEmailCheck(false);
           }
@@ -192,15 +192,6 @@ const Register = () => {
     if (data.get("tel") == "") {
       setTelValidate(false);
     }
-
-    // setUsername(data.get("username") as string);
-    // setEmail(data.get("email") as string);
-    // setPassword(data.get("password") as string);
-    // setComfirmPassword(data.get("comfirmPassword") as string);
-    // setFirstName(data.get("firstName") as string);
-    // setLastName(data.get("lastName") as string);
-    // setTel(data.get("tel") as string);
-
     if (
       usernameCheck &&
       emailCheck &&
@@ -264,10 +255,10 @@ const Register = () => {
                   username == "" && usernameCheck == false
                     ? "กรุณากรอก Username"
                     : "" || !usernameCheck
-                    ? "Username นี้มีผู้ใช้งานแล้ว"
-                    : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                    : ""
+                      ? "Username นี้มีผู้ใช้งานแล้ว"
+                      : "" || !usernameReg
+                        ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                        : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -286,13 +277,13 @@ const Register = () => {
                 autoComplete="email"
                 error={!emailCheck || !emailReg}
                 helperText={
-                    email == "" && emailCheck == false
+                  email == "" && emailCheck == false
                     ? "กรุณากรอก Email"
                     : "" || !emailCheck
-                    ? "Email นี้มีผู้ใช้งานแล้ว"
-                    : "" || !emailReg
-                    ? "กรุณากรอก Email ให้ถูกต้อง"
-                    : ""
+                      ? "Email นี้มีผู้ใช้งานแล้ว"
+                      : "" || !emailReg
+                        ? "กรุณากรอก Email ให้ถูกต้อง"
+                        : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -304,16 +295,16 @@ const Register = () => {
               <TextField
                 onChange={(event) => setPassword(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                    validatePassword(event)
-                    }
+                  validatePassword(event)
+                }
                 error={!passwordCheck}
                 fullWidth
                 helperText={
-                  (password == "" || password == null) && passwordCheck == false 
+                  (password == "" || password == null) && passwordCheck == false
                     ? "กรุณากรอกรหัสผ่าน"
                     : "" || !passwordCheck
-                    ? "ต้องมีตัวอักษร 8 ตัวขึ้นไป และมีตัวเลขอย่างน้อย 1 ตัว"
-                    : ""
+                      ? "ต้องมีตัวอักษร 8 ตัวขึ้นไป และมีตัวเลขอย่างน้อย 1 ตัว"
+                      : ""
                 }
                 id="password"
                 required
@@ -351,8 +342,8 @@ const Register = () => {
                   (comfirmPassword == "" || comfirmPassword == null) && comfirmPasswordCheck == false
                     ? "กรุณายืนยันรหัสผ่าน"
                     : "" || !comfirmPasswordCheck
-                    ? "รหัสผ่านไม่ตรงกัน"
-                    : ""
+                      ? "รหัสผ่านไม่ตรงกัน"
+                      : ""
                 }
                 id="comfirmPassword"
                 required
@@ -390,13 +381,13 @@ const Register = () => {
                 fullWidth
                 id="firstName"
                 label="ชื่อ"
-                error={ !firstNameValidate || !sameLang}
+                error={!firstNameValidate || !sameLang}
                 helperText={
-                    firstName == "" && firstNameValidate == false
+                  firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
                     : "" || !firstNameValidate
-                    ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : ""
+                      ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : ""
                 }
               />
             </Grid>
@@ -417,10 +408,10 @@ const Register = () => {
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
-                    ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : "" || !sameLang
-                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
-                    : ""
+                      ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : "" || !sameLang
+                        ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
+                        : ""
                 }
               />
             </Grid>
@@ -446,8 +437,8 @@ const Register = () => {
                   tel == "" && telValidate == false
                     ? "กรุณากรอกเบอร์โทรศัพท์"
                     : "" || !telValidate
-                    ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
-                    : ""
+                      ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
+                      : ""
                 }
               />
             </Grid>

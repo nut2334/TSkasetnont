@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import {
   Container,
@@ -15,13 +15,17 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Cookies from "universal-cookie";
 
-const Login = () => {
+const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>> }) => {
   const [username, setUsername] = React.useState("");
   const [usernameReg, setUsernameReg] = React.useState(true);
 
   const [password, setPassword] = React.useState("");
+  const [passwordCheck, setPasswordCheck] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(false);
+  const [isLoggedIn, setIsLogin] = React.useState(false);
 
   const url = "http://localhost:3001";
 
@@ -35,42 +39,74 @@ const Login = () => {
     event.preventDefault();
   };
 
+  const handelCheckboxChange = () => {
+    setRememberMe(!rememberMe);
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    setUsername(data.get("username") as string);
-    setPassword(data.get("password") as string);
-    if (usernameReg) {
+    if (password == "") {
+      setPasswordCheck(true);
+    }
+    if (username == "") {
+      setUsernameReg(false);
+    }
+
+    if (usernameReg && !passwordCheck) {
       const userData = {
         username: username,
         password: password,
       };
       console.log(userData);
-      fetch(url + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-          if (data.cookie) {
-            
-          }
-          else{
-            alert("Username หรือ Password ไม่ถูกต้อง");
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
+      const data = {
+        jwt_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UiLCJpYXQiOjE2MzI1NjQ1NzMsImV4cCI6MTY"
+      }
+      if (data.jwt_token) {
+        if (!rememberMe) {
+          prop.setJwt_token(data.jwt_token);
+          return;
+        }
+        const cookies = new Cookies();
+        cookies.set("jwt_token", data.jwt_token, {
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
         });
+      }
+      else {
+        alert("Username หรือ Password ไม่ถูกต้อง");
+      }
+      // fetch(url + "/login", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(userData),
+      // })
+      //   .then((response) => response.json())
+      //   .then((data) => {
+      //     console.log("Success:", data);
+      //     if (data.jwt_token) {
+      //       if (!rememberMe) {
+      //         prop.setJwt_token(data.jwt_token);
+      //         return;
+      //       }
+      //       const cookies = new Cookies();
+      //       cookies.set("jwt_token", data.jwt_token, {
+      //         expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
+      //       });
+      //     }
+      //     else {
+      //       alert("Username หรือ Password ไม่ถูกต้อง");
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error:", error);
+      //   });
     }
   };
 
   return (
     <Container component="main" maxWidth="xs">
+
       <Box
         sx={{
           marginTop: 1,
@@ -94,26 +130,27 @@ const Login = () => {
             label="Username"
             name="username"
             autoComplete="username"
-            error={!username || !usernameReg}
+            error={!usernameReg}
             helperText={
-              !username
+              username == "" && usernameReg == false
                 ? "กรุณากรอก Username"
                 : "" || !usernameReg
-                ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
-                : ""
+                  ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
+                  : ""
             }
             onChange={(event) => setUsername(event.target.value)}
             onBlur={() => {
               if (username) {
+                console.log(username);
                 setUsernameReg(/^[A-Za-z0-9]+$/.test(username));
               }
             }}
           />
           <TextField
             onChange={(event) => setPassword(event.target.value)}
-            error={!password}
+            error={passwordCheck}
             fullWidth
-            helperText={!password ? "กรุณากรอกรหัสผ่าน" : ""}
+            helperText={passwordCheck ? "กรุณากรอกรหัสผ่าน" : ""}
             id="password"
             required
             label="รหัสผ่าน"
@@ -141,7 +178,7 @@ const Login = () => {
             }}
           >
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value="remember" color="primary" checked={rememberMe} onChange={handelCheckboxChange} />}
               label="จดจำฉันไว้ในระบบ"
             />
             <NavLink
