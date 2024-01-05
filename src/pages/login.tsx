@@ -191,7 +191,7 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
               label="จดจำฉันไว้ในระบบ"
             />
             <NavLink
-              to="/Forgot"
+              to="/forgot"
               style={{ textDecoration: "none", color: "green" }}
             >
               ลืมรหัสผ่าน?
