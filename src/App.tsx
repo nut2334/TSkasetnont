@@ -4,6 +4,7 @@ import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
 import Forgot from "./pages/forgot";
 import Home from "./pages/home";
+import AddProduct from "./pages/addproduct";
 import "./App.css";
 import Cookies from "universal-cookie";
 import axios from "axios";
@@ -47,6 +48,7 @@ function App() {
           element={<TabProducts jwt_token={jwt_token} />}
         />
         {/* { username.role =="porka" && <Route path="/myproducts" element={<TabProducts jwt_token={jwt_token}/>} />} */}
+        <Route path="/addproduct" element={<AddProduct jwt_token={jwt_token} />} />
       </Routes>
     </BrowserRouter>
   );

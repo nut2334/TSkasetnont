@@ -21,25 +21,38 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
+import DropdownCatagory from "../components/dropdownCatagory";
 
-const AddProduct = () => {
+interface StandardProduct {
+  standard_id: string;
+  standard_name: string;
+  expire: boolean;
+}
+
+const AddProduct = (prop: { jwt_token: string }) => {
   const [productName, setProductName] = useState<string>("");
-  const [categories, setCategories] = useState([]);
+  const [checkProductName, setCheckProductName] = useState<boolean>(true);
+
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [productImage, setProductImage] = useState(null);
-  const [productVideo, setProductVideo] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([]);
+  const [checkCategory, setCheckCategory] = useState<boolean>(true);
+
+  const [productImage, setProductImage] = useState<File | null>(null);
+  const [productVideo, setProductVideo] = useState<File | null>(null);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedTypeDescription, setSelectedTypeDescription] =
     useState<string>("");
-  const [standardproducts, setStandardproducts] = useState([]);
+  const [standardproducts, setStandardproducts] = useState<StandardProduct[]>(
+    []
+  );
   const [selectedStandard, setSelectedStandard] = useState<string>("");
   const [isStandardDate, setIsStandardDate] = useState<boolean>(true);
+  const [standardName, setStandardName] = useState<string>("");
   const [standardNumber, setStandardNumber] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [certification, setCertification] = useState(null);
+  const [certification, setCertification] = useState<File | null>(null);
   const [openCertificationDialog, setOpenCertificationDialog] =
     useState<boolean>(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
@@ -81,15 +94,6 @@ const AddProduct = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch("http://localhost:3001/categories");
-      const data = await response.json();
-      setCategories(data);
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
       const response = await fetch("http://localhost:3001/standardproducts");
       const data = await response.json();
       setStandardproducts(data);
@@ -99,28 +103,33 @@ const AddProduct = () => {
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryName = event.target.value;
-    const selectedCategory = categories.find(
-      (option) => option.category_name === selectedCategoryName
-    );
-    setSelectedCategory(selectedCategory);
+    if (selectedCategoryName) {
+      setSelectedCategory(selectedCategoryName);
+    }
   };
 
-  const handleProductImageChange = (e) => {
-    setProductImage(e.target.files[0]);
+  const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setProductImage(e.target.files[0]);
+    }
   };
 
-  const handleProductVideoChange = (e) => {
-    setProductVideo(e.target.files[0]);
+  const handleProductVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setProductVideo(e.target.files[0]);
+    }
   };
 
   const handleAdditionalImagesChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const selectedImage = e.target.files[0];
-    if (additionalImages.length < 8) {
-      setAdditionalImages([...additionalImages, selectedImage]);
-    } else {
-      alert("ไม่สามารถเพิ่มรูปภาพเพิ่มเติมได้ รูปภาพไม่ควรเกิน 8 รูป");
+    if (e.target.files) {
+      const selectedImage = e.target.files[0];
+      if (additionalImages.length < 8) {
+        setAdditionalImages([...additionalImages, selectedImage]);
+      } else {
+        alert("ไม่สามารถเพิ่มรูปภาพเพิ่มเติมได้ รูปภาพไม่ควรเกิน 8 รูป");
+      }
     }
   };
 
@@ -144,9 +153,10 @@ const AddProduct = () => {
     const name = standardproducts.find(
       (option) => option.standard_name === selectedStandardName
     );
-    setSelectedStandard(name.standard_name);
-    console.log(name.expire);
-    setIsStandardDate(name.expire);
+    if (name) {
+      setSelectedStandard(name.standard_name);
+      setIsStandardDate(name.expire);
+    }
   };
 
   const handleDateChange = (date: any) => {
@@ -156,7 +166,9 @@ const AddProduct = () => {
   const handleCertificationChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setCertification(e.target.files[0]);
+    if (e.target.files) {
+      console.log(e.target.files[0]);
+    }
   };
 
   const handleRemoveCertification = () => {
@@ -171,29 +183,33 @@ const AddProduct = () => {
     const selectedStatus = reservation_status.find(
       (option) => option.statusName === selectedStatusName
     );
-    setSelectedStatus(selectedStatus);
+    if (selectedStatus) {
+      setSelectedStatus(selectedStatus.statusName);
+    }
   };
 
   const onSubmit = () => {
-    const formData = new FormData();
-    formData.append("productName", productName);
-    formData.append("categoryName", selectedCategory.category_name);
-    formData.append("productImage", productImage);
-    formData.append("productVideo", productVideo);
-    additionalImages.forEach((image) => {
-      formData.append("additionalImages", image);
-    });
-    formData.append("description", description);
-    formData.append("standardName", selectedStandard.standard_name);
-    formData.append("standardNumber", standardNumber);
-    formData.append("certification", certification);
-    formData.append("selectedDate", selectedDate);
-    formData.append("selectedType", selectedType.activityName);
-    formData.append("selectedTypeDescription", selectedTypeDescription);
-
-    axios.post("http://localhost:3001/addproduct", formData).then((res) => {
-      console.log(res);
-    });
+    // const formData = new FormData();
+    // formData.append("productName", productName);
+    // formData.append("categoryName", selectedCategory.category_name);
+    // formData.append("productImage", productImage);
+    // formData.append("productVideo", productVideo);
+    // additionalImages.forEach((image) => {
+    //   formData.append("additionalImages", image);
+    // });
+    // formData.append("description", description);
+    // formData.append("standardName", selectedStandard.standard_name);
+    // formData.append("standardNumber", standardNumber);
+    // formData.append("certification", certification);
+    // formData.append("selectedDate", selectedDate);
+    // formData.append("selectedType", selectedType.activityName);
+    // formData.append("selectedTypeDescription", selectedTypeDescription);
+    if (productName == "") {
+      setCheckProductName(false);
+    }
+    if(selectedCategory == ""){
+      setCheckCategory(false);
+    }
   };
 
   return (
@@ -224,31 +240,15 @@ const AddProduct = () => {
                 variant="outlined"
                 fullWidth
                 onChange={(e) => setProductName(e.target.value)}
+                error={!checkProductName}
+                helperText={!checkProductName && "กรุณากรอกชื่อสินค้า"}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                id="outlined-select-currency"
-                select
-                label="หมวดหมู่สินค้า"
-                defaultValue={
-                  categories.length > 0 ? categories[0].category_name : ""
-                }
-                fullWidth
-                onChange={handleCategoryChange}
-              >
-                {categories.map((option) => (
-                  <MenuItem
-                    key={option.category_id}
-                    value={option.category_name}
-                  >
-                    {option.category_name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <DropdownCatagory handleCategoryChange={handleCategoryChange} />
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h7">
+              <Typography>
                 <AddPhotoAlternateIcon
                   sx={{ marginRight: "5px" }}
                   color="primary"
@@ -278,7 +278,7 @@ const AddProduct = () => {
               )}
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h7">
+              <Typography>
                 <VideoFileIcon sx={{ marginRight: "5px" }} color="primary" />
                 วิดีโอ
               </Typography>
@@ -291,7 +291,6 @@ const AddProduct = () => {
                 <div style={{ marginTop: "10px" }}>
                   <video
                     src={URL.createObjectURL(productVideo)}
-                    alt="Product Video"
                     style={{ width: "100px", height: "100px" }}
                     controls
                   />
@@ -299,8 +298,7 @@ const AddProduct = () => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h7">
-                {" "}
+              <Typography >
                 <AddPhotoAlternateIcon
                   sx={{ marginRight: "5px" }}
                   color="primary"
@@ -385,7 +383,7 @@ const AddProduct = () => {
                     <TextField
                       id="standardName"
                       label="ชื่อมาตรฐาน"
-                      value={selectedStandard.standard_name || ""}
+                      onChange={(e) => setStandardName(e.target.value)}
                       fullWidth
                     />
                   </Grid>
@@ -399,7 +397,7 @@ const AddProduct = () => {
                   />
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="h7">ใบรับรอง</Typography>
+                  <Typography>ใบรับรอง</Typography>
                   <input
                     type="file"
                     accept="image/*"
@@ -445,26 +443,27 @@ const AddProduct = () => {
                   <MenuItem
                     key={activity.activityID}
                     value={activity.activityName}
-                    onClick={() => setSelectedType(activity)}
+                    onClick={() => setSelectedType(activity.activityName)}
                   >
                     {activity.activityName}
                   </MenuItem>
                 ))}
               </TextField>
             </Grid>
-            {selectedType && selectedType.activityID == "activity02" && (
+            {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
                 <Grid item xs={6}>
                   <TextField label="จองสินค้าผ่านเว็บไซต์" fullWidth select>
-                    {selectedType.description.map((option) => (
-                      <MenuItem
-                        key={option}
-                        value={option}
-                        onClick={() => setSelectedTypeDescription(option)}
-                      >
-                        {option}
-                      </MenuItem>
-                    ))}
+                    {web_activity[1].description &&
+                      web_activity[1].description.map((option) => (
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          onClick={() => setSelectedTypeDescription(option)}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={6}>
@@ -489,27 +488,26 @@ const AddProduct = () => {
                     ))}
                   </TextField>
                 </Grid>
-                {selectedStatus &&
-                  selectedStatus.statusID == "reservationOpenPeriod" && (
-                    <React.Fragment>
-                      <Grid item xs={6}>
-                        <Typography variant="subtitle1">
-                          วันเริ่มรับจอง
-                        </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker sx={{ width: "100%" }} />
-                        </LocalizationProvider>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="subtitle1">
-                          วันสิ้นสุดการจอง
-                        </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker sx={{ width: "100%" }} />
-                        </LocalizationProvider>
-                      </Grid>
-                    </React.Fragment>
-                  )}
+                {selectedStatus == "เปิดรับจองตามช่วงเวลา" && (
+                  <React.Fragment>
+                    <Grid item xs={6}>
+                      <Typography variant="subtitle1">
+                        วันเริ่มรับจอง
+                      </Typography>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker sx={{ width: "100%" }} />
+                      </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="subtitle1">
+                        วันสิ้นสุดการจอง
+                      </Typography>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker sx={{ width: "100%" }} />
+                      </LocalizationProvider>
+                    </Grid>
+                  </React.Fragment>
+                )}
                 <Grid item xs={12}>
                   <Divider />
                 </Grid>
@@ -553,7 +551,9 @@ const AddProduct = () => {
         >
           <DialogContent>
             <img
-              src={certification && URL.createObjectURL(certification)}
+              src={
+                certification != null ? URL.createObjectURL(certification) : ""
+              }
               alt="certificationImage"
               style={{ maxWidth: "100%", maxHeight: "400px" }}
             />
