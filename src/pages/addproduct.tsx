@@ -450,6 +450,26 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 ))}
               </TextField>
             </Grid>
+            {selectedType == "ประชาสัมพันธ์" && (
+              <React.Fragment>
+              <Grid item xs={4}>
+                <TextField
+                  id="outlined-basic"
+                  label="ราคา"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  id="outlined-basic"
+                  label="หน่วย"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              </React.Fragment>
+              )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
                 <Grid item xs={6}>

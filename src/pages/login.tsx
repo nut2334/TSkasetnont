@@ -18,7 +18,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
 
-const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>> }) => {
+const Login = (prop: {
+  setJwt_token: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [username, setUsername] = React.useState("");
   const [usernameReg, setUsernameReg] = React.useState(true);
 
@@ -42,7 +44,7 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
 
   const handelCheckboxChange = () => {
     setRememberMe(!rememberMe);
-  }
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,19 +89,16 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
-          if (data.jwt_token) {
-            if (!rememberMe) {
-              prop.setJwt_token(data.jwt_token);
-              setIsLogin(true);
-              return;
+          if (data.token) {
+            if (rememberMe) {
+              const cookies = new Cookies();
+              cookies.set("jwt_token", data.token, {
+                expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
+              });
             }
-            const cookies = new Cookies();
-            cookies.set("jwt_token", data.jwt_token, {
-              expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
-            });
+            prop.setJwt_token(data.token);
             setIsLogin(true);
-          }
-          else {
+          } else {
             alert("Username หรือ Password ไม่ถูกต้อง");
           }
         })
@@ -109,13 +108,10 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
     }
   };
   if (isLoggedIn) {
-    return (
-      <Navigate to="/" />
-    )
+    return <Navigate to="/" />;
   }
   return (
     <Container component="main" maxWidth="xs">
-
       <Box
         sx={{
           marginTop: 1,
@@ -144,8 +140,8 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
               username == "" && usernameReg == false
                 ? "กรุณากรอก Username"
                 : "" || !usernameReg
-                  ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
-                  : ""
+                ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
+                : ""
             }
             onChange={(event) => setUsername(event.target.value)}
             onBlur={() => {
@@ -187,7 +183,14 @@ const Login = (prop: { setJwt_token: React.Dispatch<React.SetStateAction<string>
             }}
           >
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" checked={rememberMe} onChange={handelCheckboxChange} />}
+              control={
+                <Checkbox
+                  value="remember"
+                  color="primary"
+                  checked={rememberMe}
+                  onChange={handelCheckboxChange}
+                />
+              }
               label="จดจำฉันไว้ในระบบ"
             />
             <NavLink

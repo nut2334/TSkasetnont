@@ -8,23 +8,29 @@ import AddProduct from "./pages/addproduct";
 import "./App.css";
 import Cookies from "universal-cookie";
 import axios from "axios";
+import Navbar from "./components/navbar";
+import {jwtDecode } from "jwt-decode";
 
 function App() {
   const [jwt_token, setJwt_token] = React.useState("");
-  const [username, setUsername] = React.useState({ role: "", username: "" });
+  const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
+
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
-    setJwt_token(cookie_jwt_token);
-    if (jwt_token) {
+    
+    if (typeof cookie_jwt_token !== "undefined") {
+      setJwt_token(cookie_jwt_token);
       axios
         .get("http://localhost:3001/login", {
           headers: {
             Authorization: `Bearer ${jwt_token}`,
           },
         })
-        .then((response) => {
-          setUsername(response.data.username);
+        .then(() => {
+          console.log("jwt_token is valid");
+          const jwt =jwtDecode(jwt_token) as {role:string, username:string};
+          // setDecodeJWT(jwt);
         })
         .catch(() => {
           cookies.remove("jwt_token");
@@ -32,8 +38,15 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if(jwt_token == "") return;console.log("useEffect jwt_token");
+    console.log(jwtDecode(jwt_token));
+    setDecodeJWT(jwtDecode(jwt_token));
+  }, [jwt_token]);
+
   return (
     <BrowserRouter>
+      <Navbar username={decodeJWT.username}/>
       <Routes>
         <Route path="/" element={<Home jwt_token={jwt_token} />} />
         <Route
