@@ -54,31 +54,12 @@ const Login = (prop: {
     if (username == "") {
       setUsernameReg(false);
     }
-
     if (usernameReg && !passwordCheck) {
       const userData = {
-        username: username,
+        username: username.trim(),
         password: password,
       };
       console.log(userData);
-      // const data = {
-      //   jwt_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UiLCJpYXQiOjE2MzI1NjQ1NzMsImV4cCI6MTY"
-      // }
-      // if (data.jwt_token) {
-      //   if (!rememberMe) {
-      //     prop.setJwt_token(data.jwt_token);
-      //     setIsLogin(true);
-      //     return;
-      //   }
-      //   const cookies = new Cookies();
-      //   cookies.set("jwt_token", data.jwt_token, {
-      //     expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
-      //   });
-      //   setIsLogin(true);
-      // }
-      // else {
-      //   alert("Username หรือ Password ไม่ถูกต้อง");
-      // }
       fetch(url + "/login", {
         method: "POST",
         headers: {

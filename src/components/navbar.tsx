@@ -20,14 +20,10 @@ interface Page {
     path: string;
 }
 
-const Navbar = (prop:{username:string}) => {
+const Navbar = (prop:{role:string}) => {
     const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
-  const pages = [
-    { name: "แผนที่", path: "/Map" },
-    { name: "ราคากลาง", path: "/Price" },
-  ];
   const settings = [
-    { name: "เข้าสู่ระบบ", path: "/Login" },
+    { name: "เข้าสู่ระบบ", path: "/login" },
     { name: "สมัครสมาชิก", path: "/Register" },
     { name: "ลืมรหัสผ่าน", path: "/Forgot" },
   ];
@@ -51,14 +47,10 @@ const Navbar = (prop:{username:string}) => {
     };
 
     useEffect(() => {
-        console.log(prop.username);
-        if(prop.username == "heartza524"){
-            setVisiblePages([{name: "ราคากลาง", path: "/Price"},{name: "แผนที่", path: "/Map"}]);
+        if(prop.role == "admins"){
+            setVisiblePages([{name: "จัดการสมาชิก", path: "/ManageUser"},{name: "ข้อมูลเกษตรกร", path: "/DataFarmer"},{name: "การตั้งค่า", path: "/Setting"}]);
         }
-        else if(prop.username == "member"){
-            setVisiblePages([{name: "แผนที่", path: "/Map"}]);
-        }
-    }, [prop.username]);
+    }, [prop.role]);
 
   return (
     <React.Fragment>
@@ -70,8 +62,10 @@ const Navbar = (prop:{username:string}) => {
           color: "#129549",
         }}
       >
+        
         <Container maxWidth="xl">
           <Toolbar disableGutters>
+            {/* computer */}
             <IconButton sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
               <img
                 src={require("../assets/karsetnont.png")}
@@ -130,6 +124,7 @@ const Navbar = (prop:{username:string}) => {
                 ))}
               </Menu>
             </Box>
+            {/* phone */}
             <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
               <img
                 src={require("../assets/karsetnont.png")}

@@ -46,7 +46,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar username={decodeJWT.username}/>
+      <Navbar role={decodeJWT.role}/>
       <Routes>
         <Route path="/" element={<Home jwt_token={jwt_token} />} />
         <Route
