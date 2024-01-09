@@ -30,7 +30,7 @@ function App() {
         .then(() => {
           console.log("jwt_token is valid");
           const jwt =jwtDecode(jwt_token) as {role:string, username:string};
-          // setDecodeJWT(jwt);
+          setDecodeJWT(jwt);
         })
         .catch(() => {
           cookies.remove("jwt_token");
@@ -56,12 +56,12 @@ function App() {
           }
         />
         <Route path="/forgot" element={<Forgot/>} />
-        <Route
+        {/* <Route
           path="/myproducts"
           element={<TabProducts jwt_token={jwt_token} />}
-        />
-        {/* { username.role =="porka" && <Route path="/myproducts" element={<TabProducts jwt_token={jwt_token}/>} />} */}
-        <Route path="/addproduct" element={<AddProduct jwt_token={jwt_token} />} />
+        /> */}
+        { decodeJWT.role =="farmer" && <Route path="/myproducts" element={<TabProducts jwt_token={jwt_token}/>} />}
+        <Route path="/addproduct" element={<AddProduct jwt_token={jwt_token} username={decodeJWT.username}/>} />
       </Routes>
     </BrowserRouter>
   );

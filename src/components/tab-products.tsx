@@ -6,6 +6,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore'
 import PieChartIcon from '@mui/icons-material/PieChart'
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder'
+import Myproducts from '../pages/myproducts'
 
 const TabProducts = (prop: { jwt_token: string }) => {
     const [value, setValue] = React.useState("1");
@@ -37,7 +38,7 @@ const TabProducts = (prop: { jwt_token: string }) => {
                         />
                     </TabList>
                 </Box>
-                <TabPanel value="1">fghfgjhfgj</TabPanel>
+                <TabPanel value="1"><Myproducts/></TabPanel>
                 <TabPanel value="2">8796</TabPanel>
                 <TabPanel value="3">87678678</TabPanel>
             </TabContext>

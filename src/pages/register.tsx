@@ -14,8 +14,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
-const Register = () => {
+const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}) => {
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
   const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
@@ -45,6 +46,8 @@ const Register = () => {
 
   const [tel, setTel] = React.useState<string>("");
   const [telValidate, setTelValidate] = React.useState<boolean>(true);
+
+  const[isRegister,setIsRegister] = React.useState<boolean>(false);
 
   const onBlurUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     const userData = {
@@ -218,13 +221,17 @@ const Register = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Success:", data);
+         setIsRegister(true);
         })
         .catch((error) => {
           console.error("Error:", error);
         });
     }
   };
+  if(isRegister){
+    prop.setValue("1");
+    return <Navigate to="/login" />
+  }
   return (
     <Container component="main" maxWidth="xs">
       <Box

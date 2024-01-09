@@ -29,13 +29,10 @@ interface StandardProduct {
   expire: boolean;
 }
 
-const AddProduct = (prop: { jwt_token: string }) => {
+const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
-
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [checkCategory, setCheckCategory] = useState<boolean>(true);
-
   const [productImage, setProductImage] = useState<File | null>(null);
   const [productVideo, setProductVideo] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
@@ -51,12 +48,21 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [isStandardDate, setIsStandardDate] = useState<boolean>(true);
   const [standardName, setStandardName] = useState<string>("");
   const [standardNumber, setStandardNumber] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [exp, setExp] = useState(null);
   const [certification, setCertification] = useState<File | null>(null);
   const [openCertificationDialog, setOpenCertificationDialog] =
     useState<boolean>(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [price, setPrice] = useState<number>(0);
+  const [unit, setUnit] = useState<string>("");
+  const [shippingCostList, setShippingCostList] = useState<any[]>([]);
+  const [stock, setStock] = useState<number>(0);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [deposit, setDeposit] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(0);
+  const [shippingCost, setShippingCost] = useState<number>(0);
 
   const reservation_status = [
     {
@@ -83,12 +89,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
       activityName: "จองสินค้าผ่านเว็บไซต์",
       description: [
         "เก็บข้อมูลการติดต่อของลูกค้าเพียงอย่างเดียว",
-        "เกษตรกรและลูกค้าสามารถถนัดหมายวันเวลาได้",
+        "เกษตรกรและลูกค้าสามารถนัดหมายวันเวลาได้",
       ],
     },
     {
       activityID: "activity03",
-      activityName: "สินค้าจัดส่งไปรษณีย์",
+      activityName: "สินค้าจัดส่งพัสดุ",
     },
   ];
 
@@ -159,8 +165,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
     }
   };
 
-  const handleDateChange = (date: any) => {
-    setSelectedDate(date);
+  const handleExpChange = (date: any) => {
+    console.log(date);
+    setExp(date);
   };
 
   const handleCertificationChange = (
@@ -188,27 +195,74 @@ const AddProduct = (prop: { jwt_token: string }) => {
     }
   };
 
+  const addShippingCost = () => {
+    setShippingCostList([
+      ...shippingCostList,
+      { amount: 0, unit: "", price: 0 },
+    ]);
+  };
+  const deleteShippingCost = () => {
+    const updatedCost = [...shippingCostList];
+    updatedCost.pop();
+    setShippingCostList(updatedCost);
+  };
   const onSubmit = () => {
-    // const formData = new FormData();
-    // formData.append("productName", productName);
-    // formData.append("categoryName", selectedCategory.category_name);
-    // formData.append("productImage", productImage);
-    // formData.append("productVideo", productVideo);
-    // additionalImages.forEach((image) => {
-    //   formData.append("additionalImages", image);
-    // });
-    // formData.append("description", description);
-    // formData.append("standardName", selectedStandard.standard_name);
-    // formData.append("standardNumber", standardNumber);
-    // formData.append("certification", certification);
-    // formData.append("selectedDate", selectedDate);
-    // formData.append("selectedType", selectedType.activityName);
-    // formData.append("selectedTypeDescription", selectedTypeDescription);
     if (productName == "") {
       setCheckProductName(false);
     }
-    if(selectedCategory == ""){
-      setCheckCategory(false);
+    if (checkProductName) {
+      axios.post("http://localhost:3001/addproduct", {
+        //jwt_token
+        jwt_token: prop.jwt_token,
+        //username
+        username: prop.username,
+        //ชื่อสินค้า
+        productName: productName,
+        //หมวดหมู่สินค้า
+        category: selectedCategory,
+        //รายละเอียดสินค้า
+        description: description,
+        //รูปปก
+        productImage: productImage,
+        //วิดีโอ
+        productVideo: productVideo,
+        //รูปเพิ่มเติม
+        additionalImages: additionalImages,
+        //มาตรฐานที่ได้รับ
+        selectedStandard: selectedStandard,
+        //ชื่อมาตรฐาน
+        standardName: standardName,
+        //หมายเลขมาตรฐาน
+        standardNumber: standardNumber,
+        //ใบรับรอง
+        certification: certification,
+        //วันหมดอายุ
+        exp: exp,
+        //รูปแบบสินค้า
+        selectedType: selectedType,
+        //ราคา
+        price: price,
+        //หน่วย
+        unit: unit,
+        //คลังสินค้า
+        stock: stock,
+        //จำนวนสินค้าตอนคำนวณราคาจัดส่ง
+        amount: amount,
+        //ค่าส่ง 1 หน่วย
+        shippingCost: shippingCost,
+        //รายการค่าส่งอื่นๆ
+        shippingCostList: shippingCostList,
+        //การจองบนเว็บไซต์(ถ้ามีอันนี้ไม่ต้องมี selectedType)
+        selectedTypeDescription: selectedTypeDescription,
+        //สถานะการจอง
+        selectedStatus: selectedStatus,
+        //วันเริ่มรับจอง
+        startDate: startDate,
+        //วันสิ้นสุดการจอง
+        endDate: endDate,
+        //ราคามัดจำ
+        deposit: deposit,
+      });
     }
   };
 
@@ -242,10 +296,22 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 onChange={(e) => setProductName(e.target.value)}
                 error={!checkProductName}
                 helperText={!checkProductName && "กรุณากรอกชื่อสินค้า"}
+                required
               />
             </Grid>
             <Grid item xs={6}>
               <DropdownCatagory handleCategoryChange={handleCategoryChange} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                id="description"
+                label="รายละเอียดสินค้า"
+                type="text"
+                multiline
+                fullWidth
+                rows={4}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </Grid>
             <Grid item xs={6}>
               <Typography>
@@ -298,7 +364,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Typography >
+              <Typography>
                 <AddPhotoAlternateIcon
                   sx={{ marginRight: "5px" }}
                   color="primary"
@@ -341,17 +407,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   ))}
                 </div>
               </Container>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                id="description"
-                label="รายละเอียดสินค้า"
-                type="text"
-                multiline
-                fullWidth
-                rows={4}
-                onChange={(e) => setDescription(e.target.value)}
-              />
             </Grid>
             <Grid item xs={12}>
               <Divider />
@@ -427,7 +482,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
                         sx={{ width: "100%" }}
-                        onChange={handleDateChange}
+                        onChange={handleExpChange}
                       />
                     </LocalizationProvider>
                   </Grid>
@@ -437,6 +492,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
               </React.Fragment>
             )}
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
             <Grid item xs={6}>
               <TextField select fullWidth label="รูปแบบสินค้า">
                 {web_activity.map((activity) => (
@@ -452,24 +510,26 @@ const AddProduct = (prop: { jwt_token: string }) => {
             </Grid>
             {selectedType == "ประชาสัมพันธ์" && (
               <React.Fragment>
-              <Grid item xs={4}>
-                <TextField
-                  id="outlined-basic"
-                  label="ราคา"
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField
-                  id="outlined-basic"
-                  label="หน่วย"
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    id="outlined-basic"
+                    label="ราคา"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setPrice(parseInt(e.target.value))}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                  />
+                </Grid>
               </React.Fragment>
-              )}
+            )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
                 <Grid item xs={6}>
@@ -492,6 +552,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     label="ราคามัดจำ"
                     variant="outlined"
                     fullWidth
+                    onChange={(e) => setDeposit(parseInt(e.target.value))}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -515,7 +576,10 @@ const AddProduct = (prop: { jwt_token: string }) => {
                         วันเริ่มรับจอง
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker sx={{ width: "100%" }} />
+                        <DatePicker
+                          sx={{ width: "100%" }}
+                          onChange={(e: any) => setStartDate(e)}
+                        />
                       </LocalizationProvider>
                     </Grid>
                     <Grid item xs={6}>
@@ -523,7 +587,10 @@ const AddProduct = (prop: { jwt_token: string }) => {
                         วันสิ้นสุดการจอง
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker sx={{ width: "100%" }} />
+                        <DatePicker
+                          sx={{ width: "100%" }}
+                          onChange={(e: any) => setEndDate(e)}
+                        />
                       </LocalizationProvider>
                     </Grid>
                   </React.Fragment>
@@ -533,6 +600,132 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
               </React.Fragment>
             )}
+            {selectedType == "สินค้าจัดส่งพัสดุ" && (
+              <React.Fragment>
+                <Grid item xs={4}>
+                  <TextField
+                    id="outlined-basic"
+                    label="ราคา"
+                    variant="outlined"
+                    onChange={(e) => setPrice(parseInt(e.target.value))}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setUnit(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    id="outlined-basic"
+                    label="จำนวนคลังสินค้า"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setStock(parseInt(e.target.value))}
+                  />
+                </Grid>
+                <Grid item xs={6}></Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-disabled"
+                    label="จำนวน"
+                    variant="outlined"
+                    fullWidth
+                    defaultValue={1}
+                    disabled
+                    onChange={(e) => setAmount(parseInt(e.target.value))}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    fullWidth
+                    disabled
+                    value={unit}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-basic"
+                    label="ค่าส่ง"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setShippingCost(parseInt(e.target.value))}
+                  />
+                </Grid>
+                <Grid item xs={1}>
+                  <Button variant="contained" onClick={addShippingCost}>
+                    +
+                  </Button>
+                </Grid>
+                <Grid item xs={5}></Grid>
+                {shippingCostList.map((cost, index) => (
+                  <React.Fragment>
+                    <Grid item xs={2}>
+                      <TextField
+                        id="outlined-basic"
+                        label="จำนวน"
+                        variant="outlined"
+                        fullWidth
+                        key={index}
+                        onChange={(e) => {
+                          const updatedCost = [...shippingCostList];
+                          updatedCost[index].amount = parseInt(e.target.value);
+                          setShippingCostList(updatedCost);
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <TextField
+                        id="outlined-basic"
+                        label="หน่วย"
+                        variant="outlined"
+                        fullWidth
+                        value={unit}
+                        key={index}
+                        disabled
+                        onChange={(e) => {
+                          const updatedCost = [...shippingCostList];
+                          updatedCost[index].unit = e.target.value;
+                          setShippingCostList(updatedCost);
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <TextField
+                        id="outlined-basic"
+                        label="ค่าส่ง"
+                        variant="outlined"
+                        fullWidth
+                        value={cost.price}
+                        key={index}
+                        onChange={(e) => {
+                          const updatedCost = [...shippingCostList];
+                          updatedCost[index].price = parseInt(e.target.value);
+                          setShippingCostList(updatedCost);
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Button variant="contained" onClick={deleteShippingCost}>
+                        -
+                      </Button>
+                    </Grid>
+                    <Grid item xs={5}></Grid>
+                  </React.Fragment>
+                ))}
+              </React.Fragment>
+            )}
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
           </Grid>
           <Button onClick={onSubmit} variant="contained">
             ยืนยัน

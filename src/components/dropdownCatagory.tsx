@@ -30,6 +30,7 @@ const DropdownCatagory = (prop:{handleCategoryChange:(event: React.ChangeEvent<H
                 }
                 fullWidth
                 onChange={prop.handleCategoryChange}
+                required
               >
                 {categories.map((option) => (
                   <MenuItem

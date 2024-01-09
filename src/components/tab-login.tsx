@@ -37,10 +37,10 @@ const TabLogin = (prop: { jwt_token: string, setJwt_token: React.Dispatch<React.
           </TabList>
         </Box>
         <TabPanel value="1">
-          <Login setJwt_token={prop.setJwt_token} />
+          <Login setJwt_token={prop.setJwt_token}/>
         </TabPanel>
         <TabPanel value="2">
-          <Register />
+          <Register setValue={setValue}/>
         </TabPanel>
       </TabContext>
     </Box>
