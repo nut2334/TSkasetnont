@@ -166,8 +166,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   };
 
   const handleExpChange = (date: any) => {
-    console.log(date);
-    setExp(date);
+    setExp(date.format("YYYY-MM-DD"));
   };
 
   const handleCertificationChange = (
@@ -578,7 +577,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          onChange={(e: any) => setStartDate(e)}
+                          onChange={(e: any) => setStartDate(e.format("YYYY-MM-DD"))}
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -589,7 +588,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          onChange={(e: any) => setEndDate(e)}
+                          onChange={(e: any) => setEndDate(e.format("YYYY-MM-DD"))}
                         />
                       </LocalizationProvider>
                     </Grid>
