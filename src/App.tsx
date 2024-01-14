@@ -9,7 +9,7 @@ import "./App.css";
 import Cookies from "universal-cookie";
 import axios from "axios";
 import Navbar from "./components/navbar";
-import {jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 function App() {
   const [jwt_token, setJwt_token] = React.useState("");
@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
-    
+
     if (typeof cookie_jwt_token !== "undefined") {
       setJwt_token(cookie_jwt_token);
       axios
@@ -29,7 +29,10 @@ function App() {
         })
         .then(() => {
           console.log("jwt_token is valid");
-          const jwt =jwtDecode(jwt_token) as {role:string, username:string};
+          const jwt = jwtDecode(jwt_token) as {
+            role: string;
+            username: string;
+          };
           setDecodeJWT(jwt);
         })
         .catch(() => {
@@ -39,14 +42,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if(jwt_token == "") return;console.log("useEffect jwt_token");
+    if (jwt_token == "") return;
+    console.log("useEffect jwt_token");
     console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
 
   return (
     <BrowserRouter>
-      <Navbar role={decodeJWT.role}/>
+      <Navbar role={decodeJWT.role} />
       <Routes>
         <Route path="/" element={<Home jwt_token={jwt_token} />} />
         <Route
@@ -55,13 +59,18 @@ function App() {
             <TabLogin jwt_token={jwt_token} setJwt_token={setJwt_token} />
           }
         />
-        <Route path="/forgot" element={<Forgot/>} />
+        <Route path="/forgot" element={<Forgot />} />
         <Route
           path="/myproducts"
           element={<TabProducts jwt_token={jwt_token} />}
         />
         {/* { decodeJWT.role =="farmer" && <Route path="/myproducts" element={<TabProducts jwt_token={jwt_token}/>} />} */}
-        <Route path="/addproduct" element={<AddProduct jwt_token={jwt_token} username={decodeJWT.username}/>} />
+        <Route
+          path="/addproduct"
+          element={
+            <AddProduct jwt_token={jwt_token} username={decodeJWT.username} />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
