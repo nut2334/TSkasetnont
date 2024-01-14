@@ -18,21 +18,20 @@ function App() {
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
-
+    const ip = process.env.REACT_APP_IP ? process.env.REACT_APP_IP : "localhost";
+    const port = process.env.REACT_APP_PORT ? process.env.REACT_APP_PORT : "3000";
+    console.log(`${ip}:${port}`);
     if (typeof cookie_jwt_token !== "undefined") {
       setJwt_token(cookie_jwt_token);
       axios
-        .get("http://localhost:3001/login", {
+        .get(`${ip}:${port}/login`, {
           headers: {
             Authorization: `Bearer ${jwt_token}`,
           },
         })
         .then(() => {
           console.log("jwt_token is valid");
-          const jwt = jwtDecode(jwt_token) as {
-            role: string;
-            username: string;
-          };
+          const jwt = jwtDecode(jwt_token) as { role: string, username: string };
           setDecodeJWT(jwt);
         })
         .catch(() => {
@@ -42,8 +41,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (jwt_token == "") return;
-    console.log("useEffect jwt_token");
+    if (jwt_token == "") return; console.log("useEffect jwt_token");
     console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
@@ -65,12 +63,7 @@ function App() {
           element={<TabProducts jwt_token={jwt_token} />}
         />
         {/* { decodeJWT.role =="farmer" && <Route path="/myproducts" element={<TabProducts jwt_token={jwt_token}/>} />} */}
-        <Route
-          path="/addproduct"
-          element={
-            <AddProduct jwt_token={jwt_token} username={decodeJWT.username} />
-          }
-        />
+        <Route path="/addproduct" element={<AddProduct jwt_token={jwt_token} username={decodeJWT.username} />} />
       </Routes>
     </BrowserRouter>
   );
