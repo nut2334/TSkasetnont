@@ -17,6 +17,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = (prop: {
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
@@ -60,31 +61,25 @@ const Login = (prop: {
         password: password,
       };
       console.log(userData);
-      fetch(url + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-          if (data.token) {
+      axios
+        .post(`${url}/login`, userData)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.token) {
             if (rememberMe) {
               const cookies = new Cookies();
-              cookies.set("jwt_token", data.token, {
+              cookies.set("jwt_token", res.data.token, {
                 expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
               });
             }
-            prop.setJwt_token(data.token);
+            prop.setJwt_token(res.data.token);
             setIsLogin(true);
           } else {
             alert("Username หรือ Password ไม่ถูกต้อง");
           }
         })
-        .catch((error) => {
-          console.error("Error:", error);
+        .catch((err) => {
+          console.log(err);
         });
     }
   };

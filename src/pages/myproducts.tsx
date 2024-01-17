@@ -1,11 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Container, Grid, Button, Card, CardMedia, CardContent, Typography, CardActions } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 
-const Myproducts = () => {
+const Myproducts = (prop:{username:string}) => {
     const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    useEffect(() => {
+       axios.post("http://localhost:3001/myproducts", {
+          username: prop.username,
+        }).then((response) => {
+          console.log(response.data);
+        });
+    }, [])
   return (
     <Container component="main" maxWidth="md">
     <Grid container spacing={2}>

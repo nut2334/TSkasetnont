@@ -14,43 +14,62 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import Cookies from "universal-cookie";
 
 interface Page {
-    name: string;
-    path: string;
+  name: string;
+  path: string;
 }
 
-const Navbar = (prop:{role:string}) => {
-    const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
+const Navbar = (prop: {
+  role: string;
+  username: string;
+  setJwt_token: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
   const settings = [
-    { name: "เข้าสู่ระบบ", path: "/login" },
-    { name: "สมัครสมาชิก", path: "/Register" },
-    { name: "ลืมรหัสผ่าน", path: "/Forgot" },
+    { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },
+    { name: "ออกจากระบบ", path: "/" },
   ];
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-        null
-    );
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-        null
-    );
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
-    };
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+    null
+  );
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
+    null
+  );
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = (name: string, path: string) => {
+    const cookies = new Cookies();
+    setAnchorElUser(null);
+    if (name == "ออกจากระบบ" && path == "/") {
+      console.log("logout");
+      prop.setJwt_token("");
+      if (cookies.get("jwt_token")) {
+        cookies.remove("jwt_token");
+      }
+    }
+  };
 
-    useEffect(() => {
-        if(prop.role == "admins"){
-            setVisiblePages([{name: "จัดการสมาชิก", path: "/ManageUser"},{name: "ข้อมูลเกษตรกร", path: "/DataFarmer"},{name: "การตั้งค่า", path: "/Setting"}]);
-        }
-    }, [prop.role]);
+  useEffect(() => {
+    if (prop.role == "admins") {
+      setVisiblePages([
+        { name: "จัดการสมาชิก", path: "/manageuser" },
+        { name: "ข้อมูลเกษตรกร", path: "/dataFarmer" },
+        { name: "การตั้งค่า", path: "/setting" },
+      ]);
+    }
+    if (prop.role == "") {
+      setVisiblePages([]);
+    }
+  }, [prop.role]);
 
   return (
     <React.Fragment>
@@ -62,7 +81,6 @@ const Navbar = (prop:{role:string}) => {
           color: "#129549",
         }}
       >
-        
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             {/* computer */}
@@ -89,6 +107,7 @@ const Navbar = (prop:{role:string}) => {
                 ของเด็ดเกษตรนนท์
               </Typography>
             </NavLink>
+            {/* phone */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -147,6 +166,7 @@ const Navbar = (prop:{role:string}) => {
             >
               ของเด็ดเกษตรนนท์
             </Typography>
+            {/* computer */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {visiblePages.map((page, index) => (
                 <NavLink to={page.path} style={{ textDecoration: "none" }}>
@@ -162,21 +182,53 @@ const Navbar = (prop:{role:string}) => {
                 </NavLink>
               ))}
             </Box>
-
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton
-                  onClick={handleOpenUserMenu}
-                  sx={{ p: 0 }}
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="primary-search-account-menu"
-                  aria-haspopup="true"
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-              </Tooltip>
+              {/* computer */}
+              <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+                {!prop.role && (
+                  <NavLink to="/login" style={{ textDecoration: "none" }}>
+                    <Button startIcon={<AccountCircle />}>เข้าสู่ระบบ</Button>
+                  </NavLink>
+                )}
+                {prop.role && (
+                  <Button
+                    startIcon={<AccountCircle />}
+                    onClick={handleOpenUserMenu}
+                  >
+                    {prop.username}
+                  </Button>
+                )}
+              </Box>
+              {/* phone */}
+              <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+                {!prop.role && (
+                  <NavLink to="/Login" style={{ textDecoration: "none" }}>
+                    <Tooltip title="เข้าสู่ระบบ">
+                      <IconButton
+                        size="large"
+                        aria-label="account of current user"
+                        aria-controls="menu-appbar"
+                        aria-haspopup="true"
+                      >
+                        <AccountCircle />
+                      </IconButton>
+                    </Tooltip>
+                  </NavLink>
+                )}
+                {prop.role && (
+                  <Tooltip title={prop.role}>
+                    <IconButton
+                      size="large"
+                      aria-label="account of current user"
+                      aria-controls="menu-appbar"
+                      aria-haspopup="true"
+                      onClick={handleOpenUserMenu}
+                    >
+                      <AccountCircle />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
               <Menu
                 sx={{ mt: "45px" }}
                 id="menu-appbar"
@@ -194,16 +246,18 @@ const Navbar = (prop:{role:string}) => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting, index) => (
-                  <MenuItem key={index} onClick={handleCloseUserMenu}>
-                    <NavLink
-                      to={setting.path}
-                      style={{ textDecoration: "none" }}
+                  <NavLink to={setting.path} style={{ textDecoration: "none" }}>
+                    <MenuItem
+                      key={index}
+                      onClick={() =>
+                        handleCloseUserMenu(setting.name, setting.path)
+                      }
                     >
                       <Typography textAlign="center" sx={{ color: "black" }}>
                         {setting.name}
                       </Typography>
-                    </NavLink>
-                  </MenuItem>
+                    </MenuItem>
+                  </NavLink>
                 ))}
               </Menu>
             </Box>
