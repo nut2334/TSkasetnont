@@ -12,6 +12,7 @@ import axios from "axios";
 import Navbar from "./components/navbar";
 import { jwtDecode } from "jwt-decode";
 import * as config from "./config/config";
+import ManageUser from "./pages/manageuser";
 
 function App() {
   const ip = config.ip;
@@ -40,18 +41,19 @@ function App() {
           };
           setDecodeJWT(jwt);
         })
-        // .catch(() => {
-        //   console.log("jwt_token catch");
-        //   cookies.remove("jwt_token");
-        // });
+      // .catch(() => {
+      //   console.log("jwt_token catch");
+      //   cookies.remove("jwt_token");
+      // });
     }
   }, []);
 
   useEffect(() => {
     if (jwt_token == "") {
       console.log("useEffect jwt_token");
-      setDecodeJWT({ role: "", username: "" });
-      return};
+      setDecodeJWT({ role: "admins", username: "admins" });
+      return
+    };
     console.log("useEffect jwt_token");
     console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
@@ -59,7 +61,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar role={decodeJWT.role} username={decodeJWT.username} setJwt_token={setJwt_token}/>
+      <Navbar role={decodeJWT.role} username={decodeJWT.username} setJwt_token={setJwt_token} />
       <Routes>
         <Route path="/" element={<Home jwt_token={jwt_token} />} />
         <Route
@@ -84,7 +86,10 @@ function App() {
           />
         )}
         {decodeJWT.role == "admins" && (
-          <Route path="/manageuser" element={<AddUser/>} />
+          <React.Fragment>
+            <Route path="/adduser" element={<AddUser />} />
+            <Route path="/manageuser" element={<ManageUser />} />
+          </React.Fragment>
         )}
       </Routes>
     </BrowserRouter>
