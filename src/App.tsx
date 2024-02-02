@@ -4,14 +4,17 @@ import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
 import Forgot from "./pages/forgot";
 import Home from "./pages/home";
-import AddProduct from "./pages/addproduct";
-import AddUser from "./pages/adduser";
+import Product from "./pages/farmer/product";
+import AddUser from "./pages/admin/adduser";
+import SettingAdmin from "./pages/admin/setting";
 import "./App.css";
 import Cookies from "universal-cookie";
 import axios from "axios";
 import Navbar from "./components/navbar";
 import { jwtDecode } from "jwt-decode";
 import * as config from "./config/config";
+import { ThemeProvider } from "@emotion/react";
+import theme from "./themeMui";
 
 function App() {
   const ip = config.ip;
@@ -39,11 +42,11 @@ function App() {
             username: string;
           };
           setDecodeJWT(jwt);
-        })
-        // .catch(() => {
-        //   console.log("jwt_token catch");
-        //   cookies.remove("jwt_token");
-        // });
+        });
+      // .catch(() => {
+      //   console.log("jwt_token catch");
+      //   cookies.remove("jwt_token");
+      // });
     }
   }, []);
 
@@ -51,43 +54,62 @@ function App() {
     if (jwt_token == "") {
       console.log("useEffect jwt_token");
       setDecodeJWT({ role: "", username: "" });
-      return};
+      return;
+    }
     console.log("useEffect jwt_token");
     console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
 
   return (
-    <BrowserRouter>
-      <Navbar role={decodeJWT.role} username={decodeJWT.username} setJwt_token={setJwt_token}/>
-      <Routes>
-        <Route path="/" element={<Home jwt_token={jwt_token} />} />
-        <Route
-          path="/login"
-          element={
-            <TabLogin jwt_token={jwt_token} setJwt_token={setJwt_token} />
-          }
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <Navbar
+          role={decodeJWT.role}
+          username={decodeJWT.username}
+          setJwt_token={setJwt_token}
         />
-        <Route path="/forgot" element={<Forgot />} />
-        {decodeJWT.role == "farmer" && (
+        <Routes>
+          <Route path="/" element={<Home jwt_token={jwt_token} />} />
           <Route
-            path="/myproducts"
-            element={<TabProducts jwt_token={jwt_token} username={decodeJWT.username} />}
-          />
-        )}
-        {decodeJWT.role == "farmer" && (
-          <Route
-            path="/addproduct"
+            path="/login"
             element={
-              <AddProduct jwt_token={jwt_token} username={decodeJWT.username} />
+              <TabLogin jwt_token={jwt_token} setJwt_token={setJwt_token} />
             }
           />
-        )}
-        {decodeJWT.role == "admins" && (
-          <Route path="/manageuser" element={<AddUser/>} />
-        )}
-      </Routes>
-    </BrowserRouter>
+          <Route path="/forgot" element={<Forgot />} />
+          {decodeJWT.role == "farmers" && (
+            <React.Fragment>
+              <Route
+                path="/myproducts"
+                element={
+                  <TabProducts
+                    jwt_token={jwt_token}
+                    username={decodeJWT.username}
+                  />
+                }
+              />
+              <Route
+                path="/addproduct"
+                element={
+                  <Product
+                    jwt_token={jwt_token}
+                    username={decodeJWT.username}
+                  />
+                }
+              />
+            </React.Fragment>
+          )}
+
+          {decodeJWT.role == "admins" && (
+            <React.Fragment>
+              <Route path="/manageuser" element={<AddUser />} />
+              <Route path="/setting" element={<SettingAdmin />} />
+            </React.Fragment>
+          )}
+        </Routes>{" "}
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

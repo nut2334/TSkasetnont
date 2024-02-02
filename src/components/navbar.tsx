@@ -66,6 +66,13 @@ const Navbar = (prop: {
         { name: "การตั้งค่า", path: "/setting" },
       ]);
     }
+    if (prop.role == "farmers") {
+      setVisiblePages([
+        { name: "จัดการสินค้า", path: "/myproducts" },
+        { name: "วิเคราะห์สินค้า", path: "/analyze" },
+        { name: "ประวัติการซื้อขาย", path: "/history" },
+      ]);
+    }
     if (prop.role == "") {
       setVisiblePages([]);
     }

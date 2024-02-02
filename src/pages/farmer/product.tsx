@@ -12,6 +12,7 @@ import {
   Avatar,
   TextField,
   Divider,
+  InputAdornment,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,7 +22,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
-import DropdownCatagory from "../components/dropdownCatagory";
+import DropdownCatagory from "../../components/dropdownCatagory";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 interface StandardProduct {
   standard_id: string;
@@ -29,7 +31,7 @@ interface StandardProduct {
   expire: boolean;
 }
 
-const AddProduct = (prop: { jwt_token: string; username: string }) => {
+const Product = (prop: { jwt_token: string; username: string }) => {
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -251,8 +253,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         shippingCost: shippingCost,
         //รายการค่าส่งอื่นๆ
         shippingCostList: shippingCostList,
-        //การจองบนเว็บไซต์(ถ้ามีอันนี้ไม่ต้องมี selectedType)
-        selectedTypeDescription: selectedTypeDescription,
         //สถานะการจอง
         selectedStatus: selectedStatus,
         //วันเริ่มรับจอง
@@ -486,13 +486,89 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     </LocalizationProvider>
                   </Grid>
                 )}
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
               </React.Fragment>
             )}
             <Grid item xs={12}>
+              <Button variant="contained" onClick={addShippingCost}>
+                + เพิ่มมาตรฐาน
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
               <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Grid
+                container
+                sx={{
+                  border: 1,
+                }}
+              >
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    คำอธิบายรูปแบบสินค้า
+                  </Typography>
+                </Grid>
+                <Grid item xs={4} sx={{ borderRight: 1 }}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                    }}
+                  >
+                    ประชาสัมพันธ์
+                  </Typography>
+                  <Typography>
+                    สินค้าที่เกษตรกรประชาสัมพันธ์เพื่อเป็นการโฆษณาสินค้า
+                  </Typography>
+                </Grid>
+                <Grid item xs={4} sx={{ borderRight: 1 }}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                    }}
+                  >
+                    จองสินค้าผ่านเว็บไซต์
+                  </Typography>
+                  {/* <Typography>
+                    เก็บข้อมูลการติดต่อของลูกค้าเพียงอย่างเดียว
+                  </Typography> */}
+                  <Typography>
+                    เป็นการเก็บข้อมูลที่สมาชิกระบุจำนวนที่ต้องการจอง
+                    และช่องทางการติดต่อ
+                  </Typography>
+                  {/* <Typography>
+                    เกษตรกรและลูกค้าสามารถนัดหมายวันเวลาได้
+                  </Typography>
+                  <Typography>
+                    เป็นการเก็บข้อมูลที่สมาชิกระบุจำนวนที่ต้องการจอง
+                    ช่องทางการติดต่อ
+                    เกษตรกรและสมาชิกสามารถนัดหมายวันเวลาภายในเว็บไซต์ได้
+                  </Typography> */}
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                    }}
+                  >
+                    สินค้าจัดส่งพัสดุ
+                  </Typography>
+                  <Typography>
+                    สินค้าที่เกษตรกรจัดส่งพัสดุให้กับลูกค้า ต้องระบุจำนวนสินค้า
+                    หากสมาชิกสั่งซื้อสินค้าจะต้องระบุหมายเลขพัสดุเมื่อทำการจัดส่งแล้ว
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>
+                    หากไม่ต้องการให้สมาชิกสั่งซื้อสินค้า โปรดเลือกประชาสัมพันธ์
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={6}>
               <TextField select fullWidth label="รูปแบบสินค้า">
@@ -531,20 +607,25 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
-                <Grid item xs={6}>
-                  <TextField label="จองสินค้าผ่านเว็บไซต์" fullWidth select>
-                    {web_activity[1].description &&
-                      web_activity[1].description.map((option) => (
-                        <MenuItem
-                          key={option}
-                          value={option}
-                          onClick={() => setSelectedTypeDescription(option)}
-                        >
-                          {option}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Grid>
+                {/* <Grid item xs={6}>
+                  <FormControl>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="female"
+                      name="radio-buttons-group"
+                    >
+                      {web_activity[1].description &&
+                        web_activity[1].description.map((option) => (
+                          <FormControlLabel
+                            value={option}
+                            control={<Radio />}
+                            label={option}
+                            onClick={() => setSelectedTypeDescription(option)}
+                          />
+                        ))}
+                    </RadioGroup>
+                  </FormControl>
+                </Grid> */}
                 <Grid item xs={6}>
                   <TextField
                     id="outlined-basic"
@@ -577,7 +658,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          onChange={(e: any) => setStartDate(e.format("YYYY-MM-DD"))}
+                          onChange={(e: any) =>
+                            setStartDate(e.format("YYYY-MM-DD"))
+                          }
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -588,7 +671,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          onChange={(e: any) => setEndDate(e.format("YYYY-MM-DD"))}
+                          onChange={(e: any) =>
+                            setEndDate(e.format("YYYY-MM-DD"))
+                          }
                         />
                       </LocalizationProvider>
                     </Grid>
@@ -632,12 +717,19 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 <Grid item xs={2}>
                   <TextField
                     id="outlined-disabled"
-                    label="จำนวน"
+                    label="กรัม"
                     variant="outlined"
                     fullWidth
-                    defaultValue={1}
+                    defaultValue={0}
                     disabled
                     onChange={(e) => setAmount(parseInt(e.target.value))}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ArrowForwardIosIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={2}>
@@ -670,7 +762,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     <Grid item xs={2}>
                       <TextField
                         id="outlined-basic"
-                        label="จำนวน"
+                        label="กรัม"
                         variant="outlined"
                         fullWidth
                         key={index}
@@ -678,6 +770,13 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                           const updatedCost = [...shippingCostList];
                           updatedCost[index].amount = parseInt(e.target.value);
                           setShippingCostList(updatedCost);
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <ArrowForwardIosIcon />
+                            </InputAdornment>
+                          ),
                         }}
                       />
                     </Grid>
@@ -792,4 +891,4 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   );
 };
 
-export default AddProduct;
+export default Product;
