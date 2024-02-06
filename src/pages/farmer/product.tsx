@@ -212,9 +212,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       setCheckProductName(false);
     }
     if (checkProductName) {
-      axios.post("http://localhost:3001/addproduct", {
-        //jwt_token
-        jwt_token: prop.jwt_token,
+      const data = {
         //username
         username: prop.username,
         //ชื่อสินค้า
@@ -261,6 +259,12 @@ const Product = (prop: { jwt_token: string; username: string }) => {
         endDate: endDate,
         //ราคามัดจำ
         deposit: deposit,
+      };
+      console.log(data);
+      axios.post("http://localhost:3001/addproduct", data, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
       });
     }
   };
