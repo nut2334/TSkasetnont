@@ -212,55 +212,96 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       setCheckProductName(false);
     }
     if (checkProductName) {
-      const data = {
-        //username
-        username: prop.username,
-        //ชื่อสินค้า
-        productName: productName,
-        //หมวดหมู่สินค้า
-        category: selectedCategory,
-        //รายละเอียดสินค้า
-        description: description,
-        //รูปปก
-        productImage: productImage,
-        //วิดีโอ
-        productVideo: productVideo,
-        //รูปเพิ่มเติม
-        additionalImages: additionalImages,
-        //มาตรฐานที่ได้รับ
-        selectedStandard: selectedStandard,
-        //ชื่อมาตรฐาน
-        standardName: standardName,
-        //หมายเลขมาตรฐาน
-        standardNumber: standardNumber,
-        //ใบรับรอง
-        certification: certification,
-        //วันหมดอายุ
-        exp: exp,
-        //รูปแบบสินค้า
-        selectedType: selectedType,
-        //ราคา
-        price: price,
-        //หน่วย
-        unit: unit,
-        //คลังสินค้า
-        stock: stock,
-        //จำนวนสินค้าตอนคำนวณราคาจัดส่ง
-        amount: amount,
-        //ค่าส่ง 1 หน่วย
-        shippingCost: shippingCost,
-        //รายการค่าส่งอื่นๆ
-        shippingCostList: shippingCostList,
-        //สถานะการจอง
-        selectedStatus: selectedStatus,
-        //วันเริ่มรับจอง
-        startDate: startDate,
-        //วันสิ้นสุดการจอง
-        endDate: endDate,
-        //ราคามัดจำ
-        deposit: deposit,
-      };
-      console.log(data);
+      // const data = {
+      //   //username
+      //   username: prop.username,
+      //   //ชื่อสินค้า
+      //   productName: productName,
+      //   //หมวดหมู่สินค้า
+      //   category: selectedCategory,
+      //   //รายละเอียดสินค้า
+      //   description: description,
+      //   //รูปปก
+      //   productImage: productImage,
+      //   //วิดีโอ
+      //   productVideo: productVideo,
+      //   //รูปเพิ่มเติม
+      //   additionalImages: additionalImages,
+      //   //มาตรฐานที่ได้รับ
+      //   selectedStandard: selectedStandard,
+      //   //ชื่อมาตรฐาน
+      //   standardName: standardName,
+      //   //หมายเลขมาตรฐาน
+      //   standardNumber: standardNumber,
+      //   //ใบรับรอง
+      //   certification: certification,
+      //   //วันหมดอายุ
+      //   exp: exp,
+      //   //รูปแบบสินค้า
+      //   selectedType: selectedType,
+      //   //ราคา
+      //   price: price,
+      //   //หน่วย
+      //   unit: unit,
+      //   //คลังสินค้า
+      //   stock: stock,
+      //   //จำนวนสินค้าตอนคำนวณราคาจัดส่ง
+      //   amount: amount,
+      //   //ค่าส่ง 1 หน่วย
+      //   shippingCost: shippingCost,
+      //   //รายการค่าส่งอื่นๆ
+      //   shippingCostList: shippingCostList,
+      //   //สถานะการจอง
+      //   selectedStatus: selectedStatus,
+      //   //วันเริ่มรับจอง
+      //   startDate: startDate,
+      //   //วันสิ้นสุดการจอง
+      //   endDate: endDate,
+      //   //ราคามัดจำ
+      //   deposit: deposit,
+      // };
+      // console.log(data);
+      const data = new FormData();
+      data.append("username", prop.username);
+      data.append("productName", productName);
+      data.append("category", selectedCategory);
+      data.append("description", description);
+      if (productImage) {
+        data.append("productImage", productImage);
+      }
+      if (productVideo) {
+        data.append("productVideo", productVideo);
+      }
+      additionalImages.forEach((image) => {
+        data.append("additionalImages", image);
+      });
+      data.append("selectedStandard", selectedStandard);
+      data.append("standardName", standardName);
+      data.append("standardNumber", standardNumber);
+      if (certification) {
+        data.append("certification", certification);
+      }
+      if (exp) {
+        data.append("exp", exp);
+      }
+      data.append("selectedType", selectedType);
+      data.append("price", price.toString());
+      data.append("unit", unit);
+      data.append("stock", stock.toString());
+      data.append("amount", amount.toString());
+      data.append("shippingCost", shippingCost.toString());
+      shippingCostList.forEach((cost) => {
+        data.append("shippingCostList", cost);
+      });
+      data.append("selectedStatus", selectedStatus);
+      if (startDate) {
+        data.append("startDate", startDate);
+      }
+      if (endDate) {
+        data.append("endDate", endDate);
+      }
+      data.append("deposit", deposit.toString());
+
       axios.post("http://localhost:3001/addproduct", data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
