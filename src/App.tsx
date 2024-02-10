@@ -16,6 +16,7 @@ import * as config from "./config/config";
 import ManageUser from "./pages/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
+import ListProduct from "./pages/listproduct";
 
 
 function App() {
@@ -34,16 +35,22 @@ function App() {
       axios
         .get(`http://${ip}:${port}/login`, {
           headers: {
-            Authorization: `Bearer ${jwt_token}`,
+            Authorization: `Bearer ${cookie_jwt_token}`,
           },
         })
-        .then(() => {
-          console.log("jwt_token is valid");
-          const jwt = jwtDecode(jwt_token) as {
-            role: string;
-            username: string;
-          };
-          setDecodeJWT(jwt);
+        .then((res) => {
+          let {isValid, newToken} = res.data;
+          if (isValid) {
+            const jwt = jwtDecode(newToken) as {
+              role: string;
+              username: string;
+            };
+            setJwt_token(newToken);
+            setDecodeJWT(jwt);
+          }
+          else {
+            cookies.remove("jwt_token");
+          }
         });
 
       // .catch(() => {
@@ -82,6 +89,7 @@ function App() {
             }
           />
           <Route path="/forgot" element={<Forgot />} />
+          <Route path="/listproduct" element={<ListProduct />} />
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
