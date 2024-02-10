@@ -9,12 +9,13 @@ import {
   InputAdornment,
   IconButton,
   Button,
+  MenuItem,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import * as config from "../config/config";
+import * as config from "../../config/config";
 
 const AddUser = () => {
   const ip = config.ip;
@@ -42,7 +43,10 @@ const AddUser = () => {
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
 
-  const [allrole, setAllrole] = React.useState<string[]>([]);
+  const [allrole, setAllrole] = React.useState<[{ role: string }]>([
+    { role: "" },
+  ]);
+  const [role, setRole] = React.useState<string>("");
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -98,7 +102,7 @@ const AddUser = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://${ip}:${port}/users`)
+      .get(`http://${ip}:${port}/role`)
       .then((res) => {
         if (res.data) {
           setAllrole(res.data);
@@ -150,8 +154,10 @@ const AddUser = () => {
       firstName: firstName,
       lastName: lastName,
       tel: tel,
+      role: role,
     };
-    axios.post(`http://${ip}:${port}/user/register`, data).then((res) => {
+    console.log(data);
+    axios.post(`http://${ip}:${port}/adduser`, data).then((res) => {
       console.log(res.data);
     });
   };
@@ -371,19 +377,23 @@ const AddUser = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              {/* <TextField
+              <TextField
                 fullWidth
                 id="role"
                 label="ตำแหน่ง"
                 name="role"
                 select
                 required
-              />
-              {allrole.map((role) => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))} */}
+                onChange={(event: React.FocusEvent<HTMLInputElement>) =>
+                  setRole(event.target.value)
+                }
+              >
+                {allrole.map((data) => (
+                  <MenuItem key={data.role} value={data.role}>
+                    {data.role}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
           </Grid>
           <Button
