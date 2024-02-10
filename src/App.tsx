@@ -51,7 +51,7 @@ function App() {
   useEffect(() => {
     if (jwt_token == "") {
       console.log("useEffect jwt_token");
-      setDecodeJWT({ role: "admins", username: "admins" });
+      setDecodeJWT({ role: "", username: "" });
       return
     };
     console.log("useEffect jwt_token");
