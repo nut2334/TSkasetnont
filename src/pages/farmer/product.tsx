@@ -24,6 +24,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import AddStandard from "../../components/addstandard";
 
 interface StandardProduct {
   standard_id: string;
@@ -41,20 +42,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedTypeDescription, setSelectedTypeDescription] =
-    useState<string>("");
-  const [standardproducts, setStandardproducts] = useState<StandardProduct[]>(
-    []
-  );
-  const [selectedStandard, setSelectedStandard] = useState<string>("");
-  const [isStandardDate, setIsStandardDate] = useState<boolean>(true);
-  const [standardName, setStandardName] = useState<string>("");
-  const [standardNumber, setStandardNumber] = useState<string>("");
-  const [exp, setExp] = useState(null);
-  const [certification, setCertification] = useState<File | null>(null);
-  const [openCertificationDialog, setOpenCertificationDialog] =
-    useState<boolean>(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
@@ -63,8 +50,22 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [deposit, setDeposit] = useState<number>(0);
-  const [amount, setAmount] = useState<number>(0);
+  const [weight, setWeight] = useState<number>(0);
   const [shippingCost, setShippingCost] = useState<number>(0);
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+
+  const [selectedStandard, setSelectedStandard] = React.useState<
+    {
+      standard_id: string;
+      standard_name: string;
+      standard_number: string;
+      standard_expire: Date;
+      standard_cercification: File;
+    }[]
+  >([]);
+  useEffect(() => {
+    console.log(selectedStandard);
+  }, [selectedStandard]);
 
   const reservation_status = [
     {
@@ -99,15 +100,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       activityName: "สินค้าจัดส่งพัสดุ",
     },
   ];
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:3001/standardproducts");
-      const data = await response.json();
-      setStandardproducts(data);
-    };
-    fetchData();
-  }, []);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryName = event.target.value;
@@ -156,34 +148,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
     setOpenDialog(false);
   };
 
-  const handleStandardChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedStandardName = event.target.value;
-    const name = standardproducts.find(
-      (option) => option.standard_name === selectedStandardName
-    );
-    if (name) {
-      setSelectedStandard(name.standard_name);
-      setIsStandardDate(name.expire);
-    }
-  };
-
-  const handleExpChange = (date: any) => {
-    setExp(date.format("YYYY-MM-DD"));
-  };
-
-  const handleCertificationChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (e.target.files) {
-      console.log(e.target.files[0]);
-    }
-  };
-
-  const handleRemoveCertification = () => {
-    setCertification(null);
-    setOpenCertificationDialog(false);
-  };
-
   const handleReservationStatusChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -212,95 +176,57 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       setCheckProductName(false);
     }
     if (checkProductName) {
-      // const data = {
-      //   //username
-      //   username: prop.username,
-      //   //ชื่อสินค้า
-      //   productName: productName,
-      //   //หมวดหมู่สินค้า
-      //   category: selectedCategory,
-      //   //รายละเอียดสินค้า
-      //   description: description,
-      //   //รูปปก
-      //   productImage: productImage,
-      //   //วิดีโอ
-      //   productVideo: productVideo,
-      //   //รูปเพิ่มเติม
-      //   additionalImages: additionalImages,
-      //   //มาตรฐานที่ได้รับ
-      //   selectedStandard: selectedStandard,
-      //   //ชื่อมาตรฐาน
-      //   standardName: standardName,
-      //   //หมายเลขมาตรฐาน
-      //   standardNumber: standardNumber,
-      //   //ใบรับรอง
-      //   certification: certification,
-      //   //วันหมดอายุ
-      //   exp: exp,
-      //   //รูปแบบสินค้า
-      //   selectedType: selectedType,
-      //   //ราคา
-      //   price: price,
-      //   //หน่วย
-      //   unit: unit,
-      //   //คลังสินค้า
-      //   stock: stock,
-      //   //จำนวนสินค้าตอนคำนวณราคาจัดส่ง
-      //   amount: amount,
-      //   //ค่าส่ง 1 หน่วย
-      //   shippingCost: shippingCost,
-      //   //รายการค่าส่งอื่นๆ
-      //   shippingCostList: shippingCostList,
-      //   //สถานะการจอง
-      //   selectedStatus: selectedStatus,
-      //   //วันเริ่มรับจอง
-      //   startDate: startDate,
-      //   //วันสิ้นสุดการจอง
-      //   endDate: endDate,
-      //   //ราคามัดจำ
-      //   deposit: deposit,
-      // };
-      // console.log(data);
       const data = new FormData();
+      //username
       data.append("username", prop.username);
+      //ชื่อสินค้า
       data.append("productName", productName);
+      //หมวดหมู่สินค้า
       data.append("category", selectedCategory);
+      //รายละเอียดสินค้า
       data.append("description", description);
+      //รูปปก
       if (productImage) {
         data.append("productImage", productImage);
       }
+      //วิดีโอ
       if (productVideo) {
         data.append("productVideo", productVideo);
       }
+      //รูปเพิ่มเติม
       additionalImages.forEach((image) => {
         data.append("additionalImages", image);
       });
-      data.append("selectedStandard", selectedStandard);
-      data.append("standardName", standardName);
-      data.append("standardNumber", standardNumber);
-      if (certification) {
-        data.append("certification", certification);
-      }
-      if (exp) {
-        data.append("exp", exp);
-      }
+      //รูปแบบสินค้า
       data.append("selectedType", selectedType);
+      //ราคา
       data.append("price", price.toString());
+      //หน่วย
       data.append("unit", unit);
+      //คลังสินค้า
       data.append("stock", stock.toString());
-      data.append("amount", amount.toString());
+      //น้ำหนักสินค้า
+      data.append("weight", weight.toString());
+      //ค่าส่ง 1 หน่วย
       data.append("shippingCost", shippingCost.toString());
+      //รายการค่าส่งอื่นๆ
       shippingCostList.forEach((cost) => {
         data.append("shippingCostList", cost);
       });
+      //สถานะการจอง
       data.append("selectedStatus", selectedStatus);
+      //วันเริ่มรับจอง
       if (startDate) {
         data.append("startDate", startDate);
       }
+      //วันสิ้นสุดการจอง
       if (endDate) {
         data.append("endDate", endDate);
       }
+      //ราคามัดจำ
       data.append("deposit", deposit.toString());
+      //มาตรฐานสินค้า
+      data.append("selectedStandard", JSON.stringify(selectedStandard));
 
       axios.post("http://localhost:3001/addproduct", data, {
         headers: {
@@ -325,9 +251,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
           <Avatar sx={{ m: 1, bgcolor: "green" }}>
             <AddBusinessIcon />
           </Avatar>
-          <Typography component="h1" variant="h5">
-            เพิ่มสินค้า
-          </Typography>
+          <Typography variant="h5">เพิ่มสินค้า</Typography>
         </Box>
         <form>
           <Grid container spacing={2} sx={{ marginBottom: 1 }}>
@@ -455,88 +379,11 @@ const Product = (prop: { jwt_token: string; username: string }) => {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            {/*มาตรฐานที่ได้รับ*/}
-            <Grid item xs={6}>
-              <TextField
-                id="outlined-select-currency"
-                select
-                label="มาตรฐานที่ได้รับ"
-                value={selectedStandard ? selectedStandard : ""}
-                onChange={handleStandardChange}
-                fullWidth
-              >
-                {standardproducts.map((option) => (
-                  <MenuItem
-                    key={option.standard_id}
-                    value={option.standard_name}
-                  >
-                    {option.standard_name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            {selectedStandard != "ไม่มี" && selectedStandard && (
-              <React.Fragment>
-                {selectedStandard == "อื่นๆ" && (
-                  <Grid item xs={6}>
-                    <TextField
-                      id="standardName"
-                      label="ชื่อมาตรฐาน"
-                      onChange={(e) => setStandardName(e.target.value)}
-                      fullWidth
-                    />
-                  </Grid>
-                )}
-                <Grid item xs={6}>
-                  <TextField
-                    id="standardNumber"
-                    label="หมายเลข"
-                    onChange={(e) => setStandardNumber(e.target.value)}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography>ใบรับรอง</Typography>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCertificationChange}
-                  />
-                  {certification && (
-                    <div style={{ marginTop: "10px" }}>
-                      <img
-                        src={URL.createObjectURL(certification)}
-                        alt="certificationImage"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          cursor: "pointer",
-                          objectFit: "cover",
-                          objectPosition: "center",
-                        }}
-                        onClick={() => setOpenCertificationDialog(true)}
-                      />
-                    </div>
-                  )}
-                </Grid>
-                {/*ถ้ามีวันหมดอายุ*/}
-                {isStandardDate && (
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle1">วันหมดอายุ</Typography>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        sx={{ width: "100%" }}
-                        onChange={handleExpChange}
-                      />
-                    </LocalizationProvider>
-                  </Grid>
-                )}
-              </React.Fragment>
-            )}
             <Grid item xs={12}>
-              <Button variant="contained" onClick={addShippingCost}>
-                + เพิ่มมาตรฐาน
-              </Button>
+              <AddStandard
+                setSelectedStandard={setSelectedStandard}
+                selectedStandard={selectedStandard}
+              />
             </Grid>
             <Grid item xs={12}>
               <Divider />
@@ -579,21 +426,11 @@ const Product = (prop: { jwt_token: string; username: string }) => {
                   >
                     จองสินค้าผ่านเว็บไซต์
                   </Typography>
-                  {/* <Typography>
-                    เก็บข้อมูลการติดต่อของลูกค้าเพียงอย่างเดียว
-                  </Typography> */}
+
                   <Typography>
                     เป็นการเก็บข้อมูลที่สมาชิกระบุจำนวนที่ต้องการจอง
                     และช่องทางการติดต่อ
                   </Typography>
-                  {/* <Typography>
-                    เกษตรกรและลูกค้าสามารถนัดหมายวันเวลาได้
-                  </Typography>
-                  <Typography>
-                    เป็นการเก็บข้อมูลที่สมาชิกระบุจำนวนที่ต้องการจอง
-                    ช่องทางการติดต่อ
-                    เกษตรกรและสมาชิกสามารถนัดหมายวันเวลาภายในเว็บไซต์ได้
-                  </Typography> */}
                 </Grid>
                 <Grid item xs={4}>
                   <Typography
@@ -652,25 +489,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
             )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
-                {/* <Grid item xs={6}>
-                  <FormControl>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="female"
-                      name="radio-buttons-group"
-                    >
-                      {web_activity[1].description &&
-                        web_activity[1].description.map((option) => (
-                          <FormControlLabel
-                            value={option}
-                            control={<Radio />}
-                            label={option}
-                            onClick={() => setSelectedTypeDescription(option)}
-                          />
-                        ))}
-                    </RadioGroup>
-                  </FormControl>
-                </Grid> */}
                 <Grid item xs={6}>
                   <TextField
                     id="outlined-basic"
@@ -767,7 +585,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
                     fullWidth
                     defaultValue={0}
                     disabled
-                    onChange={(e) => setAmount(parseInt(e.target.value))}
+                    onChange={(e) => setWeight(parseInt(e.target.value))}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -892,37 +710,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
             </Button>
             <Button
               onClick={() => handleRemoveAdditionalImage(currentImageIndex)}
-              color="secondary"
-              variant="contained"
-              startIcon={<DeleteIcon />}
-            >
-              ลบรูปภาพ
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={openCertificationDialog}
-          onClose={() => setOpenCertificationDialog(false)}
-        >
-          <DialogContent>
-            <img
-              src={
-                certification != null ? URL.createObjectURL(certification) : ""
-              }
-              alt="certificationImage"
-              style={{ maxWidth: "100%", maxHeight: "400px" }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setOpenCertificationDialog(false)}
-              color="primary"
-            >
-              ปิด
-            </Button>
-            <Button
-              onClick={handleRemoveCertification}
               color="secondary"
               variant="contained"
               startIcon={<DeleteIcon />}
