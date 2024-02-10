@@ -27,6 +27,10 @@ const Navbar = (prop: {
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
+  const defaultPages = [
+    { name: "สินค้า", path: "/listproduct" },
+  ];
+
   const settings = [
     { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },
     { name: "ออกจากระบบ", path: "/" },
@@ -61,6 +65,7 @@ const Navbar = (prop: {
   useEffect(() => {
     if (prop.role == "admins") {
       setVisiblePages([
+        ...defaultPages,
         { name: "จัดการสมาชิก", path: "/manageuser" },
         { name: "ข้อมูลเกษตรกร", path: "/dataFarmer" },
         { name: "การตั้งค่า", path: "/setting" },
@@ -68,13 +73,14 @@ const Navbar = (prop: {
     }
     if (prop.role == "farmers") {
       setVisiblePages([
+        ...defaultPages,
         { name: "จัดการสินค้า", path: "/myproducts" },
         { name: "วิเคราะห์สินค้า", path: "/analyze" },
         { name: "ประวัติการซื้อขาย", path: "/history" },
       ]);
     }
     if (prop.role == "") {
-      setVisiblePages([]);
+      setVisiblePages(defaultPages);
     }
   }, [prop.role]);
 
