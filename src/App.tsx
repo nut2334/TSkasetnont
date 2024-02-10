@@ -13,8 +13,10 @@ import axios from "axios";
 import Navbar from "./components/navbar";
 import { jwtDecode } from "jwt-decode";
 import * as config from "./config/config";
+import ManageUser from "./pages/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
+
 
 function App() {
   const ip = config.ip;
@@ -43,6 +45,7 @@ function App() {
           };
           setDecodeJWT(jwt);
         });
+
       // .catch(() => {
       //   console.log("jwt_token catch");
       //   cookies.remove("jwt_token");
@@ -56,6 +59,7 @@ function App() {
       setDecodeJWT({ role: "", username: "" });
       return;
     }
+
     console.log("useEffect jwt_token");
     console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
@@ -103,8 +107,9 @@ function App() {
 
           {decodeJWT.role == "admins" && (
             <React.Fragment>
-              <Route path="/manageuser" element={<AddUser />} />
               <Route path="/setting" element={<SettingAdmin />} />
+              <Route path="/adduser" element={<AddUser />} />
+              <Route path="/manageuser" element={<ManageUser />} />
             </React.Fragment>
           )}
         </Routes>{" "}
