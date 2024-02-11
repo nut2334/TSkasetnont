@@ -25,7 +25,7 @@ import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AddStandard from "../../components/addstandard";
-import {reservation_status,web_activity} from "../../config/dataDropdown";
+import { reservation_status, web_activity } from "../../config/dataDropdown";
 
 interface StandardProduct {
   standard_id: string;
@@ -69,9 +69,9 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   }, [selectedStandard]);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedCategoryName = event.target.value;
-    if (selectedCategoryName) {
-      setSelectedCategory(selectedCategoryName);
+    const selectedCategoryId = event.target.value;
+    if (selectedCategoryId) {
+      setSelectedCategory(selectedCategoryId);
     }
   };
 
@@ -651,9 +651,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
                 ))}
               </React.Fragment>
             )}
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
           </Grid>
           <Button onClick={onSubmit} variant="contained">
             ยืนยัน
