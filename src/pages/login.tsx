@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   Container,
@@ -22,14 +22,15 @@ import axios from "axios";
 const Login = (prop: {
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [username, setUsername] = React.useState("");
-  const [usernameReg, setUsernameReg] = React.useState(true);
+  const [username, setUsername] = useState("");
+  const [usernameReg, setUsernameReg] =useState(true);
 
-  const [password, setPassword] = React.useState("");
-  const [passwordCheck, setPasswordCheck] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [rememberMe, setRememberMe] = React.useState(false);
-  const [isLoggedIn, setIsLogin] = React.useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState(false);
+  const [showPassword, setShowPassword] =useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoggedIn, setIsLogin] = useState(false);
+  const [error,setError]= useState(false);
 
   const url = "http://localhost:3001";
 
@@ -74,12 +75,10 @@ const Login = (prop: {
             }
             prop.setJwt_token(res.data.token);
             setIsLogin(true);
-          } else {
-            alert("Username หรือ Password ไม่ถูกต้อง");
           }
         })
         .catch((err) => {
-          console.log(err);
+          setError(true);
         });
     }
   };
@@ -111,13 +110,13 @@ const Login = (prop: {
             label="Username"
             name="username"
             autoComplete="username"
-            error={!usernameReg}
+            error={!usernameReg || error}
             helperText={
               username == "" && usernameReg == false
                 ? "กรุณากรอก Username"
                 : "" || !usernameReg
                 ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
-                : ""
+                : "" 
             }
             onChange={(event) => setUsername(event.target.value)}
             onBlur={() => {
@@ -129,12 +128,14 @@ const Login = (prop: {
           />
           <TextField
             onChange={(event) => setPassword(event.target.value)}
-            error={passwordCheck}
+            error={passwordCheck || error}
             fullWidth
-            helperText={passwordCheck ? "กรุณากรอกรหัสผ่าน" : ""}
+            helperText={passwordCheck ? "กรุณากรอกรหัสผ่าน" : "" || error
+            ? "Username หรือ Password ไม่ถูกต้อง"
+            : ""}
             id="password"
             required
-            label="รหัสผ่าน"
+            label="Password"
             variant="outlined"
             type={showPassword ? "text" : "password"}
             InputProps={{
