@@ -90,10 +90,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
     {
       activityID: "activity02",
       activityName: "จองสินค้าผ่านเว็บไซต์",
-      description: [
-        "เก็บข้อมูลการติดต่อของลูกค้าเพียงอย่างเดียว",
-        "เกษตรกรและลูกค้าสามารถนัดหมายวันเวลาได้",
-      ],
     },
     {
       activityID: "activity03",
@@ -102,9 +98,9 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   ];
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedCategoryName = event.target.value;
-    if (selectedCategoryName) {
-      setSelectedCategory(selectedCategoryName);
+    const selectedCategoryId = event.target.value;
+    if (selectedCategoryId) {
+      setSelectedCategory(selectedCategoryId);
     }
   };
 
@@ -684,9 +680,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
                 ))}
               </React.Fragment>
             )}
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
           </Grid>
           <Button onClick={onSubmit} variant="contained">
             ยืนยัน

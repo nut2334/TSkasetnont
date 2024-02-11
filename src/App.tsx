@@ -13,11 +13,10 @@ import axios from "axios";
 import Navbar from "./components/navbar";
 import { jwtDecode } from "jwt-decode";
 import * as config from "./config/config";
-import ManageUser from "./pages/manageuser";
+import ManageUser from "./pages/admin/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
 import ListProduct from "./pages/listproduct";
-
 
 function App() {
   const ip = config.ip;
@@ -39,7 +38,7 @@ function App() {
           },
         })
         .then((res) => {
-          let {isValid, newToken} = res.data;
+          let { isValid, newToken } = res.data;
           if (isValid) {
             const jwt = jwtDecode(newToken) as {
               role: string;
@@ -47,8 +46,7 @@ function App() {
             };
             setJwt_token(newToken);
             setDecodeJWT(jwt);
-          }
-          else {
+          } else {
             cookies.remove("jwt_token");
           }
         });
