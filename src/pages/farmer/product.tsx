@@ -25,6 +25,7 @@ import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AddStandard from "../../components/addstandard";
+import {reservation_status,web_activity} from "../../config/dataDropdown";
 
 interface StandardProduct {
   standard_id: string;
@@ -66,40 +67,6 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   useEffect(() => {
     console.log(selectedStandard);
   }, [selectedStandard]);
-
-  const reservation_status = [
-    {
-      statusID: "reservationOpenAlways",
-      statusName: "เปิดรับจองตลอด",
-    },
-    {
-      statusID: "reservationOpenPeriod",
-      statusName: "เปิดรับจองตามช่วงเวลา",
-    },
-    {
-      statusID: "reservationClose",
-      statusName: "ปิดรับจอง",
-    },
-  ];
-
-  const web_activity = [
-    {
-      activityID: "activity01",
-      activityName: "ประชาสัมพันธ์",
-    },
-    {
-      activityID: "activity02",
-      activityName: "จองสินค้าผ่านเว็บไซต์",
-      description: [
-        "เก็บข้อมูลการติดต่อของลูกค้าเพียงอย่างเดียว",
-        "เกษตรกรและลูกค้าสามารถนัดหมายวันเวลาได้",
-      ],
-    },
-    {
-      activityID: "activity03",
-      activityName: "สินค้าจัดส่งพัสดุ",
-    },
-  ];
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryName = event.target.value;
