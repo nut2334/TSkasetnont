@@ -15,7 +15,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import * as config from "../../config/config";
+import * as config from "../config/config";
 
 const AddUser = () => {
   const ip = config.ip;
@@ -43,9 +43,9 @@ const AddUser = () => {
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
 
-  const [allrole, setAllrole] = React.useState<[{ role: string }]>([
-    { role: "" },
-  ]);
+  const [allrole, setAllrole] = React.useState<
+    [{ role_id: string; role_name: string }]
+  >([{ role_id: "", role_name: "" }]);
   const [role, setRole] = React.useState<string>("");
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -389,8 +389,8 @@ const AddUser = () => {
                 }
               >
                 {allrole.map((data) => (
-                  <MenuItem key={data.role} value={data.role}>
-                    {data.role}
+                  <MenuItem key={data.role_id} value={data.role_id}>
+                    {data.role_name}
                   </MenuItem>
                 ))}
               </TextField>

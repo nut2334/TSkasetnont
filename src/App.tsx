@@ -5,7 +5,7 @@ import TabProducts from "./components/tab-products";
 import Forgot from "./pages/forgot";
 import Home from "./pages/home";
 import Product from "./pages/farmer/product";
-import AddUser from "./pages/admin/adduser";
+import AddUser from "./pages/adduser";
 import SettingAdmin from "./pages/admin/setting";
 import "./App.css";
 import Cookies from "universal-cookie";

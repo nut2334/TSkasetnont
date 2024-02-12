@@ -16,7 +16,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 
-const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}) => {
+const Register = (prop: {
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
   const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
@@ -47,7 +49,7 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
   const [tel, setTel] = React.useState<string>("");
   const [telValidate, setTelValidate] = React.useState<boolean>(true);
 
-  const[isRegister,setIsRegister] = React.useState<boolean>(false);
+  const [isRegister, setIsRegister] = React.useState<boolean>(false);
 
   const onBlurUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     const userData = {
@@ -93,11 +95,12 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
       })
       .then((response) => {
         console.log(response.data);
-        if (response.data.same == false) {
+        if (response.data.exist == true) {
           if (response.data.username) {
             setUsernameCheck(false);
-
-          } else if (response.data.email) {
+          }
+          if (response.data.email) {
+            console.log("email");
             setEmailCheck(false);
           }
         } else {
@@ -182,7 +185,10 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
     if (data.get("password") == "" || data.get("password") == null) {
       setPasswordCheck(false);
     }
-    if (data.get("comfirmPassword") == "" || data.get("comfirmPassword") == null) {
+    if (
+      data.get("comfirmPassword") == "" ||
+      data.get("comfirmPassword") == null
+    ) {
       setComfirmPasswordCheck(false);
     }
     if (data.get("firstName") == "") {
@@ -221,16 +227,16 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
       })
         .then((response) => response.json())
         .then((data) => {
-         setIsRegister(true);
+          setIsRegister(true);
         })
         .catch((error) => {
           console.error("Error:", error);
         });
     }
   };
-  if(isRegister){
+  if (isRegister) {
     prop.setValue("1");
-    return <Navigate to="/login" />
+    return <Navigate to="/login" />;
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -262,10 +268,10 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   username == "" && usernameCheck == false
                     ? "กรุณากรอก Username"
                     : "" || !usernameCheck
-                      ? "Username นี้มีผู้ใช้งานแล้ว"
-                      : "" || !usernameReg
-                        ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                        : ""
+                    ? "Username นี้มีผู้ใช้งานแล้ว"
+                    : "" || !usernameReg
+                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                    : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -287,10 +293,10 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   email == "" && emailCheck == false
                     ? "กรุณากรอก Email"
                     : "" || !emailCheck
-                      ? "Email นี้มีผู้ใช้งานแล้ว"
-                      : "" || !emailReg
-                        ? "กรุณากรอก Email ให้ถูกต้อง"
-                        : ""
+                    ? "Email นี้มีผู้ใช้งานแล้ว"
+                    : "" || !emailReg
+                    ? "กรุณากรอก Email ให้ถูกต้อง"
+                    : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -310,8 +316,8 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   (password == "" || password == null) && passwordCheck == false
                     ? "กรุณากรอกรหัสผ่าน"
                     : "" || !passwordCheck
-                      ? "ต้องมีตัวอักษร 8 ตัวขึ้นไป และมีตัวเลขอย่างน้อย 1 ตัว"
-                      : ""
+                    ? "ต้องมีตัวอักษร 8 ตัวขึ้นไป และมีตัวเลขอย่างน้อย 1 ตัว"
+                    : ""
                 }
                 id="password"
                 required
@@ -346,11 +352,12 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                 error={!comfirmPasswordCheck}
                 fullWidth
                 helperText={
-                  (comfirmPassword == "" || comfirmPassword == null) && comfirmPasswordCheck == false
+                  (comfirmPassword == "" || comfirmPassword == null) &&
+                  comfirmPasswordCheck == false
                     ? "กรุณายืนยันรหัสผ่าน"
                     : "" || !comfirmPasswordCheck
-                      ? "รหัสผ่านไม่ตรงกัน"
-                      : ""
+                    ? "รหัสผ่านไม่ตรงกัน"
+                    : ""
                 }
                 id="comfirmPassword"
                 required
@@ -393,8 +400,8 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
                     : "" || !firstNameValidate
-                      ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                      : ""
+                    ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                    : ""
                 }
               />
             </Grid>
@@ -415,10 +422,10 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
-                      ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                      : "" || !sameLang
-                        ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
-                        : ""
+                    ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                    : "" || !sameLang
+                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
+                    : ""
                 }
               />
             </Grid>
@@ -444,8 +451,8 @@ const Register = (prop: {setValue: React.Dispatch<React.SetStateAction<string>>}
                   tel == "" && telValidate == false
                     ? "กรุณากรอกเบอร์โทรศัพท์"
                     : "" || !telValidate
-                      ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
-                      : ""
+                    ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
+                    : ""
                 }
               />
             </Grid>
