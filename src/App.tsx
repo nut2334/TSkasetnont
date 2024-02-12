@@ -17,6 +17,7 @@ import ManageUser from "./pages/admin/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
 import ListProduct from "./pages/listproduct";
+import Shop from "./pages/shop";
 
 function App() {
   const ip = config.ip;
@@ -50,11 +51,6 @@ function App() {
             cookies.remove("jwt_token");
           }
         });
-
-      // .catch(() => {
-      //   console.log("jwt_token catch");
-      //   cookies.remove("jwt_token");
-      // });
     }
   }, []);
 
@@ -88,6 +84,7 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
+          <Route path="/shop" element={<Shop />}/>
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
