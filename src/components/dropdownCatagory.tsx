@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { TextField, MenuItem } from "@mui/material";
 import axios from "axios";
+import * as config from "../config/config";
 
 interface Category {
   category_id: string;
@@ -11,11 +12,13 @@ interface Category {
 const DropdownCatagory = (prop: {
   handleCategoryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
+  const apiCategories = config.getApiEndpoint("categories", "GET");
+
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get("http://localhost:3001/categories");
+      const response = await axios.get(apiCategories);
       const data: Category[] = await response.data;
       setCategories(data);
     };

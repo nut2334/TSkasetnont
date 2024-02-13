@@ -6,6 +6,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
+import * as config from "../config/config";
 
 const SetDataStandard = (prop: {
   index: number;
@@ -41,6 +42,7 @@ const SetDataStandard = (prop: {
     standard_cercification: File;
   }[];
 }) => {
+  const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const [standardData, setStandardData] = React.useState<
     [
       {
@@ -66,7 +68,7 @@ const SetDataStandard = (prop: {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3001/standardproducts").then((response) => {
+    axios.get(apiStandard).then((response) => {
       setStandardData(response.data);
     });
   }, []);

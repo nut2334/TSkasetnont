@@ -26,6 +26,7 @@ import DropdownCatagory from "../../components/dropdownCatagory";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
+import * as config from "../../config/config";
 
 interface StandardProduct {
   standard_id: string;
@@ -34,6 +35,7 @@ interface StandardProduct {
 }
 
 const Product = (prop: { jwt_token: string; username: string }) => {
+  const apiCategories = config.getApiEndpoint("categories", "GET");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -195,7 +197,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       //มาตรฐานสินค้า
       data.append("selectedStandard", JSON.stringify(selectedStandard));
 
-      axios.post("http://localhost:3001/addproduct", data, {
+      axios.post(apiCategories, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },

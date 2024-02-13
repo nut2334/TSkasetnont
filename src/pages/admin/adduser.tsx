@@ -15,11 +15,14 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import * as config from "../config/config";
+import * as config from "../../config/config";
 
 const AddUser = () => {
-  const ip = config.ip;
-  const port = config.port;
+  const apiAddUser = config.getApiEndpoint("adduser", "POST");
+  const apiRole = config.getApiEndpoint("role", "GET");
+  const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
+  const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
+
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
   const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
@@ -69,7 +72,7 @@ const AddUser = () => {
 
   const onBlurUsername = (event: React.FocusEvent<HTMLInputElement>) => {
     axios
-      .post(`http://${ip}:${port}/checkinguser/`, {
+      .post(apiCheckinguser, {
         username: event.target.value,
       })
       .then((res) => {
@@ -86,7 +89,7 @@ const AddUser = () => {
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
     axios
-      .post(`http://${ip}:${port}/checkingemail/`, {
+      .post(apiCheckingemail, {
         email: event.target.value,
       })
       .then((res) => {
@@ -102,7 +105,7 @@ const AddUser = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://${ip}:${port}/role`)
+      .get(apiRole)
       .then((res) => {
         if (res.data) {
           setAllrole(res.data);
@@ -141,12 +144,6 @@ const AddUser = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const ip = process.env.REACT_APP_IP
-      ? process.env.REACT_APP_IP
-      : "localhost";
-    const port = process.env.REACT_APP_PORT
-      ? process.env.REACT_APP_PORT
-      : "3000";
     const data = {
       username: username,
       email: email,
@@ -157,7 +154,7 @@ const AddUser = () => {
       role: role,
     };
     console.log(data);
-    axios.post(`http://${ip}:${port}/adduser`, data).then((res) => {
+    axios.post(apiAddUser, data).then((res) => {
       console.log(res.data);
     });
   };

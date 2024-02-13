@@ -10,10 +10,13 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import * as config from "../../config/config";
 
 const Forgot = () => {
   const [email, setEmail] = React.useState("");
   const [isSubmit, setIsSubmit] = React.useState(false);
+
+  const apiForgot = config.getApiEndpoint("forgot", "POST");
 
   const handleSubmit = () => {
     if (typeof email !== "string" || email.trim() === "") {
@@ -21,7 +24,7 @@ const Forgot = () => {
       return;
     }
     axios
-      .post("http://localhost:3001/forgot", {
+      .post(apiForgot, {
         email: email,
       })
       .then(() => {

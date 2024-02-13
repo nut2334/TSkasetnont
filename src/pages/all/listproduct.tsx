@@ -129,6 +129,9 @@ const mockProduct = [
 ] as ProductInterface[];
 
 const ListProduct = () => {
+  const apiCategories = config.getApiEndpoint("categories", "GET");
+  const apiProducts = config.getApiEndpoint("products", "GET");
+
   const [searchContent, setSearchContent] = React.useState("");
   const [sortBy, setSortBy] = React.useState<"date" | "price" | "viewed">(
     "date"
@@ -147,15 +150,11 @@ const ListProduct = () => {
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
   const [hasMore, setHasMore] = React.useState(true);
 
-  const ip = config.ip;
-  const port = config.port;
   useEffect(() => {
-    axios.get(`http://${ip}:${port}/categories`).then((res) => {
+    axios.get(apiCategories).then((res) => {
       console.log(res.data);
       setAllCategory(res.data);
     });
-
-    // check is param is already set
 
     let paramsCategory = searchParams.get("category");
     let paramsSort = searchParams.get("sort");
@@ -213,7 +212,7 @@ const ListProduct = () => {
     });
 
     axios
-      .get(`http://${ip}:${port}/products`, {
+      .get(apiProducts, {
         params: {
           ["category"]: selectedCategory.category_id,
           ["page"]: page,

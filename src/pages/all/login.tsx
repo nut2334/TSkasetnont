@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   Container,
@@ -18,21 +18,22 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
+import * as config from "../../config/config";
 
 const Login = (prop: {
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [username, setUsername] = useState("");
-  const [usernameReg, setUsernameReg] =useState(true);
+  const [usernameReg, setUsernameReg] = useState(true);
 
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState(false);
-  const [showPassword, setShowPassword] =useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoggedIn, setIsLogin] = useState(false);
-  const [error,setError]= useState(false);
+  const [error, setError] = useState(false);
 
-  const url = "http://localhost:3001";
+  const apiLogin = config.getApiEndpoint("login", "POST");
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -63,7 +64,7 @@ const Login = (prop: {
       };
       console.log(userData);
       axios
-        .post(`${url}/login`, userData)
+        .post(apiLogin, userData)
         .then((res) => {
           console.log(res.data);
           if (res.data.token) {
@@ -116,7 +117,7 @@ const Login = (prop: {
                 ? "กรุณากรอก Username"
                 : "" || !usernameReg
                 ? "ห้ามเป็นภาษาไทย และอักขระพิเศษ"
-                : "" 
+                : ""
             }
             onChange={(event) => setUsername(event.target.value)}
             onBlur={() => {
@@ -130,9 +131,13 @@ const Login = (prop: {
             onChange={(event) => setPassword(event.target.value)}
             error={passwordCheck || error}
             fullWidth
-            helperText={passwordCheck ? "กรุณากรอกรหัสผ่าน" : "" || error
-            ? "Username หรือ Password ไม่ถูกต้อง"
-            : ""}
+            helperText={
+              passwordCheck
+                ? "กรุณากรอกรหัสผ่าน"
+                : "" || error
+                ? "Username หรือ Password ไม่ถูกต้อง"
+                : ""
+            }
             id="password"
             required
             label="Password"

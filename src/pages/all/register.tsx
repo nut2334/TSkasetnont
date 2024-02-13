@@ -15,6 +15,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import * as config from "../../config/config";
 
 const Register = (prop: {
   setValue: React.Dispatch<React.SetStateAction<string>>;
@@ -80,11 +81,11 @@ const Register = (prop: {
   };
 
   const sendToBackend = (jsonData: { username?: string; email?: string }) => {
-    let api = "http://localhost:3001";
+    let api = "";
     if (jsonData.hasOwnProperty("username")) {
-      api = api + "/checkinguser";
+      api = config.getApiEndpoint("checkingusername", "POST");
     } else if (jsonData.hasOwnProperty("email")) {
-      api = api + "/checkingemail";
+      api = config.getApiEndpoint("checkingemail", "POST");
     }
     console.log(api);
     axios

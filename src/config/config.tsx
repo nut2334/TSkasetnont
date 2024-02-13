@@ -1,2 +1,13 @@
-export const ip = process.env.REACT_APP_IP ? process.env.REACT_APP_IP : "localhost";
-export const port = process.env.REACT_APP_PORT ? process.env.REACT_APP_PORT : "3000";
+export const ip = process.env.REACT_APP_IP
+  ? process.env.REACT_APP_IP
+  : "localhost";
+export const port = process.env.REACT_APP_PORT
+  ? process.env.REACT_APP_PORT
+  : "3000";
+export function getApiEndpoint(endpoint: string, method: string) {
+  if (process.env.REACT_APP_DEVELOPMENT === "false") {
+    return `https://${ip}:${port}/endpoint.php?endpoint=${endpoint}&method=${method}`;
+  } else {
+    return `http://${ip}:${port}/${endpoint}`;
+  }
+}
