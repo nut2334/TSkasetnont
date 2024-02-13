@@ -17,7 +17,7 @@ import ManageUser from "./pages/admin/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
 import ListProduct from "./pages/all/listproduct";
-import Shop from "./pages/all/shop";
+import SigleProduct from "./pages/all/singleproduct";
 
 function App() {
   const ip = config.ip;
@@ -84,7 +84,7 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/shop" element={<SigleProduct />} />
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
