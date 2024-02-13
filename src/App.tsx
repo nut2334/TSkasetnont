@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
-import Forgot from "./pages/forgot";
-import Home from "./pages/home";
+import Forgot from "./pages/all/forgot";
+import Home from "./pages/all/home";
 import Product from "./pages/farmer/product";
 import AddUser from "./pages/adduser";
 import SettingAdmin from "./pages/admin/setting";
@@ -16,8 +16,8 @@ import * as config from "./config/config";
 import ManageUser from "./pages/admin/manageuser";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
-import ListProduct from "./pages/listproduct";
-import Shop from "./pages/shop";
+import ListProduct from "./pages/all/listproduct";
+import Shop from "./pages/all/shop";
 
 function App() {
   const ip = config.ip;
@@ -84,7 +84,7 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop" element={<Shop />}/>
+          <Route path="/shop" element={<Shop />} />
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route

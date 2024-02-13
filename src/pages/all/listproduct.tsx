@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import SearchBar from "../components/searchbar";
+import SearchBar from "../../components/searchbar";
 import { styled, alpha } from "@mui/material/styles";
 import { Typography, TextField, MenuItem } from "@mui/material";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 
-import * as config from "../config/config";
+import * as config from "../../config/config";
 import axios from "axios";
 
 const SearchSection = styled("div")`
