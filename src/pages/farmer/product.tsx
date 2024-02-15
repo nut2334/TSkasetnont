@@ -35,7 +35,7 @@ interface StandardProduct {
 }
 
 const Product = (prop: { jwt_token: string; username: string }) => {
-  const apiCategories = config.getApiEndpoint("categories", "GET");
+  const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -151,6 +151,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       //ชื่อสินค้า
       data.append("productName", productName);
       //หมวดหมู่สินค้า
+      console.log(selectedCategory);
       data.append("category", selectedCategory);
       //รายละเอียดสินค้า
       data.append("description", description);
@@ -163,9 +164,10 @@ const Product = (prop: { jwt_token: string; username: string }) => {
         data.append("productVideo", productVideo);
       }
       //รูปเพิ่มเติม
-      additionalImages.forEach((image) => {
-        data.append("additionalImages", image);
-      });
+      console.log(additionalImages);
+      if(additionalImages.length>0){
+        data.append("additionalImages", new Blob ([JSON.stringify(additionalImages)], {type:"application/json"}));
+      }
       //รูปแบบสินค้า
       data.append("selectedType", selectedType);
       //ราคา
@@ -197,7 +199,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       //มาตรฐานสินค้า
       data.append("selectedStandard", JSON.stringify(selectedStandard));
 
-      axios.post(apiCategories, data, {
+      axios.post(apiAddProduct, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
