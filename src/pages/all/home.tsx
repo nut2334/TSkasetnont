@@ -5,9 +5,11 @@ import "leaflet/dist/leaflet.css";
 import SearchBar from "../../components/searchbar";
 
 const Home = (prop: { jwt_token: string }) => {
+  const [searchContent, setSearchContent] = React.useState("");
   return (
     <div>
-      <SearchBar placeholder="ค้นหา" setSearchContent={console.log} />
+      <SearchBar placeholder="ค้นหา" setSearchContent={setSearchContent} />
+      <div>{searchContent}</div>
       <MapContainer
         center={[13.736717, 100.523186]}
         zoom={13}

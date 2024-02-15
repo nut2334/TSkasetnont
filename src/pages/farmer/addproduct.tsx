@@ -48,7 +48,13 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
-  const [shippingCostList, setShippingCostList] = useState<any[]>([]);
+  const [shippingCostList, setShippingCostList] = useState<
+    {
+      amount: number;
+      unit: string;
+      price: number;
+    }[]
+  >([]);
   const [stock, setStock] = useState<number>(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -130,10 +136,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   };
 
   const addShippingCost = () => {
-    setShippingCostList([
-      ...shippingCostList,
-      { amount: 0, unit: "", price: 0 },
-    ]);
+    const updatedCost = [...shippingCostList];
+    updatedCost.push({ amount: 0, unit: "", price: 0 });
+    setShippingCostList(updatedCost);
   };
   const deleteShippingCost = () => {
     const updatedCost = [...shippingCostList];
@@ -181,7 +186,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       data.append("shippingCost", shippingCost.toString());
       //รายการค่าส่งอื่นๆ
       shippingCostList.forEach((cost) => {
-        data.append("shippingCostList", cost);
+        data.append("shippingCostList", JSON.stringify(cost));
       });
       //สถานะการจอง
       data.append("selectedStatus", selectedStatus);
