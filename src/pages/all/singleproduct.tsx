@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Fade } from "react-slideshow-image";
+import { useParams } from "react-router-dom";
 import "react-slideshow-image/dist/styles.css";
 import "./shop.css";
 import {
@@ -15,6 +16,8 @@ import {
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
+import axios from "axios";
+import * as config from "../../config/config";
 
 interface ProductInterface {
   product_id: string;
@@ -25,6 +28,23 @@ interface ProductInterface {
   product_category: string;
   product_date: Date;
   product_viewed: number;
+}
+
+interface FullProductInterface {
+  product_id: string;
+  product_name: string;
+  product_description: string;
+  product_category: string;
+  product_stock: number;
+  product_price: number;
+  unit: string;
+  product_image: string;
+  product_video: string | null;
+  additional_image: string[];
+  certificate: string[];
+  product_viewed: number;
+  campaign_id: string;
+  last_modified: Date;
 }
 const mockProduct = [
   {
@@ -82,6 +102,27 @@ const mockProduct = [
 const SigleProduct = () => {
   const [amount, setAmount] = React.useState(1);
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
+  const [product, setProduct] = React.useState<FullProductInterface>({
+    product_id: "",
+    product_name: "",
+    product_description: "",
+    product_category: "",
+    product_stock: 0,
+    product_price: 0,
+    unit: "",
+    product_image: "",
+    product_video: "",
+    additional_image: [],
+    certificate: [],
+    product_viewed: 0,
+    campaign_id: "",
+    last_modified: new Date()
+  });
+  const [productImage, setProductImage] = React.useState<string>("");
+  const { productid } = useParams<{ productid: string }>();
+
+
+
   const images = [
     "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
     "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
@@ -90,7 +131,13 @@ const SigleProduct = () => {
 
   useEffect(() => {
     setShowProduct(mockProduct);
+    const apiSingleProduct = config.getApiEndpoint(`getproduct/${productid}`, "get");
+    axios.get(apiSingleProduct).then((response) => {
+      console.log(response.data);
+      setProduct(response.data);
+    });
   }, []);
+
 
   const add = () => {
     setAmount(amount + 1);
@@ -105,7 +152,7 @@ const SigleProduct = () => {
     <Container component="main" maxWidth="lg">
       <Fade autoplay={false}>
         <div className="each-slide-effect">
-          <div style={{ backgroundImage: `url(${images[0]})` }}>
+          <div style={{ backgroundImage: `url(${config.getApiEndpoint(`getimage/${product.product_image.split("/").pop()}`, "get")})` }}>
             <span>Slide 1</span>
           </div>
         </div>
@@ -120,10 +167,10 @@ const SigleProduct = () => {
           </div>
         </div>
       </Fade>
-      <Typography variant="h4">Product Name</Typography>
-      <Typography variant="h6">Price: 1000</Typography>
-      <Typography variant="h6">Description: </Typography>
-      <Typography variant="body1">View</Typography>
+      <Typography variant="h4">{product.product_name}</Typography>
+      <Typography variant="h6">Price: {product.product_price}</Typography>
+      <Typography variant="h6">Description: {product.product_description}</Typography>
+      <Typography variant="body1">View: {product.product_viewed}</Typography>
       <Stack
         direction="row"
         spacing={2}

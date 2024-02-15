@@ -84,7 +84,7 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop" element={<SigleProduct />} />
+          <Route path="/shop/:productid" element={<SigleProduct />} />
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
