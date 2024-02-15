@@ -11,7 +11,7 @@ import {
   CardContent,
   CardActions,
 } from "@mui/material";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 
 import * as config from "../../config/config";
 import axios from "axios";
@@ -67,11 +67,11 @@ interface CateagoryInterface {
 interface ProductInterface {
   product_id: string;
   product_name: string;
-  product_price: number;
+  price: number;
   product_image: string;
   product_description: string;
   product_category: string;
-  product_date: Date;
+  last_modified: Date;
   product_viewed: number;
 }
 
@@ -79,58 +79,58 @@ const mockProduct = [
   {
     product_id: "1",
     product_name: "product1",
-    product_price: 100,
+    price: 100,
     product_image: "https://source.unsplash.com/random?wallpapers",
     product_description: "description1",
     product_category: "category1",
-    product_date: new Date(),
+    last_modified: new Date(),
     product_viewed: 100,
   },
   {
     product_id: "2",
     product_name: "product2",
-    product_price: 200,
+    price: 200,
     product_image: "https://source.unsplash.com/random?wallpapers",
     product_description: "description2",
     product_category: "category2",
-    product_date: new Date(),
+    last_modified: new Date(),
     product_viewed: 200,
   },
   {
     product_id: "3",
     product_name: "product3",
-    product_price: 300,
+    price: 300,
     product_image: "https://source.unsplash.com/random?wallpapers",
     product_description: "description3",
     product_category: "category3",
-    product_date: new Date(),
+    last_modified: new Date(),
     product_viewed: 300,
   },
   {
     product_id: "4",
     product_name: "product4",
-    product_price: 400,
+    price: 400,
     product_image: "https://source.unsplash.com/random?wallpapers",
     product_description: "description4",
     product_category: "category4",
-    product_date: new Date(),
+    last_modified: new Date(),
     product_viewed: 400,
   },
   {
     product_id: "5",
     product_name: "product5",
-    product_price: 500,
+    price: 500,
     product_image: "https://source.unsplash.com/random?wallpapers",
     product_description: "description5",
     product_category: "category5",
-    product_date: new Date(),
+    last_modified: new Date(),
     product_viewed: 500,
   },
 ] as ProductInterface[];
 
 const ListProduct = () => {
   const apiCategories = config.getApiEndpoint("categories", "GET");
-  const apiProducts = config.getApiEndpoint("products", "GET");
+  const apiProducts = config.getApiEndpoint("getproducts", "GET");
 
   const [searchContent, setSearchContent] = React.useState("");
   const [sortBy, setSortBy] = React.useState<"date" | "price" | "viewed">(
@@ -152,7 +152,6 @@ const ListProduct = () => {
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
-      console.log(res.data);
       setAllCategory(res.data);
     });
 
@@ -210,6 +209,7 @@ const ListProduct = () => {
       ["order"]: order,
       ["page"]: page,
     });
+    console.log(selectedCategory.category_id);
 
     axios
       .get(apiProducts, {
@@ -219,6 +219,8 @@ const ListProduct = () => {
         },
       })
       .then((res) => {
+        console.log(res.data);
+
         setShowProduct(res.data.products);
         setHasMore(res.data.hasMore);
       })
@@ -315,7 +317,7 @@ const ListProduct = () => {
                       // 16:9
                       pt: "56.25%",
                     }}
-                    image={product.product_image}
+                    image={`${config.getApiEndpoint(`getimage/${product.product_image.split("/").pop()}`, "get")}`}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
@@ -324,10 +326,11 @@ const ListProduct = () => {
                     <Typography>{product.product_description}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Typography>ราคา : {product.product_price}</Typography>
+                    <Typography>ราคา : {product.price}</Typography>
 
-                    <Button size="small">View</Button>
-                    <Button size="small">Edit</Button>
+                    <Link to={`/shop/${product.product_id}`}>
+                      <Button size="small">View</Button>
+                    </Link>
                   </CardActions>
                 </Card>
               </Grid>
