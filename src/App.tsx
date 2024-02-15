@@ -20,20 +20,17 @@ import ListProduct from "./pages/all/listproduct";
 import SigleProduct from "./pages/all/singleproduct";
 
 function App() {
-  const ip = config.ip;
-  const port = config.port;
-
+  const apiLogin = config.getApiEndpoint("login", "GET");
   const [jwt_token, setJwt_token] = React.useState("");
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
 
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
-    console.log(`${ip}:${port}`);
     if (typeof cookie_jwt_token !== "undefined") {
       setJwt_token(cookie_jwt_token);
       axios
-        .get(`http://${ip}:${port}/login`, {
+        .get(apiLogin, {
           headers: {
             Authorization: `Bearer ${cookie_jwt_token}`,
           },

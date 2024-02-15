@@ -23,7 +23,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
@@ -50,7 +49,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [unit, setUnit] = useState<string>("");
   const [shippingCostList, setShippingCostList] = useState<
     {
-      amount: number;
+      weight: number;
       unit: string;
       price: number;
     }[]
@@ -135,16 +134,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }
   };
 
-  const addShippingCost = () => {
-    const updatedCost = [...shippingCostList];
-    updatedCost.push({ amount: 0, unit: "", price: 0 });
-    setShippingCostList(updatedCost);
-  };
-  const deleteShippingCost = () => {
-    const updatedCost = [...shippingCostList];
-    updatedCost.pop();
-    setShippingCostList(updatedCost);
-  };
+  const addShippingCost = () => {};
+  const deleteShippingCost = () => {};
   const onSubmit = () => {
     if (productName == "") {
       setCheckProductName(false);
@@ -185,6 +176,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       //ค่าส่ง 1 หน่วย
       data.append("shippingCost", shippingCost.toString());
       //รายการค่าส่งอื่นๆ
+      console.log(shippingCostList);
       shippingCostList.forEach((cost) => {
         data.append("shippingCostList", JSON.stringify(cost));
       });
@@ -522,143 +514,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 </Grid>
               </React.Fragment>
             )}
-            {selectedType == "สินค้าจัดส่งพัสดุ" && (
-              <React.Fragment>
-                <Grid item xs={4}>
-                  <TextField
-                    id="outlined-basic"
-                    label="ราคา"
-                    variant="outlined"
-                    onChange={(e) => setPrice(parseInt(e.target.value))}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    id="outlined-basic"
-                    label="หน่วย"
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => setUnit(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    id="outlined-basic"
-                    label="จำนวนคลังสินค้า"
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => setStock(parseInt(e.target.value))}
-                  />
-                </Grid>
-                <Grid item xs={6}></Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    id="outlined-disabled"
-                    label="กรัม"
-                    variant="outlined"
-                    fullWidth
-                    defaultValue={0}
-                    disabled
-                    onChange={(e) => setWeight(parseInt(e.target.value))}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <ArrowForwardIosIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    id="outlined-basic"
-                    label="หน่วย"
-                    variant="outlined"
-                    fullWidth
-                    disabled
-                    value={unit}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    id="outlined-basic"
-                    label="ค่าส่ง"
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => setShippingCost(parseInt(e.target.value))}
-                  />
-                </Grid>
-                <Grid item xs={1}>
-                  <Button variant="contained" onClick={addShippingCost}>
-                    +
-                  </Button>
-                </Grid>
-                <Grid item xs={5}></Grid>
-                {shippingCostList.map((cost, index) => (
-                  <React.Fragment>
-                    <Grid item xs={2}>
-                      <TextField
-                        id="outlined-basic"
-                        label="กรัม"
-                        variant="outlined"
-                        fullWidth
-                        key={index}
-                        onChange={(e) => {
-                          const updatedCost = [...shippingCostList];
-                          updatedCost[index].amount = parseInt(e.target.value);
-                          setShippingCostList(updatedCost);
-                        }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <ArrowForwardIosIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={2}>
-                      <TextField
-                        id="outlined-basic"
-                        label="หน่วย"
-                        variant="outlined"
-                        fullWidth
-                        value={unit}
-                        key={index}
-                        disabled
-                        onChange={(e) => {
-                          const updatedCost = [...shippingCostList];
-                          updatedCost[index].unit = e.target.value;
-                          setShippingCostList(updatedCost);
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={2}>
-                      <TextField
-                        id="outlined-basic"
-                        label="ค่าส่ง"
-                        variant="outlined"
-                        fullWidth
-                        value={cost.price}
-                        key={index}
-                        onChange={(e) => {
-                          const updatedCost = [...shippingCostList];
-                          updatedCost[index].price = parseInt(e.target.value);
-                          setShippingCostList(updatedCost);
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={1}>
-                      <Button variant="contained" onClick={deleteShippingCost}>
-                        -
-                      </Button>
-                    </Grid>
-                    <Grid item xs={5}></Grid>
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
-            )}
+            {selectedType == "สินค้าจัดส่งพัสดุ" && <>hi</>}
           </Grid>
           <Button onClick={onSubmit} variant="contained">
             ยืนยัน
