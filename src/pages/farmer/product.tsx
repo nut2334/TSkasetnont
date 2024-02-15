@@ -151,6 +151,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       //ชื่อสินค้า
       data.append("productName", productName);
       //หมวดหมู่สินค้า
+      console.log(selectedCategory);
       data.append("category", selectedCategory);
       //รายละเอียดสินค้า
       data.append("description", description);
@@ -163,9 +164,10 @@ const Product = (prop: { jwt_token: string; username: string }) => {
         data.append("productVideo", productVideo);
       }
       //รูปเพิ่มเติม
-      additionalImages.forEach((image) => {
-        data.append("additionalImages", image);
-      });
+      console.log(additionalImages);
+      if(additionalImages.length>0){
+        data.append("additionalImages", new Blob ([JSON.stringify(additionalImages)], {type:"application/json"}));
+      }
       //รูปแบบสินค้า
       data.append("selectedType", selectedType);
       //ราคา
