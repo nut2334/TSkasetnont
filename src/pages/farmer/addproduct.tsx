@@ -34,7 +34,7 @@ interface StandardProduct {
   expire: boolean;
 }
 
-const Product = (prop: { jwt_token: string; username: string }) => {
+const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
@@ -164,10 +164,9 @@ const Product = (prop: { jwt_token: string; username: string }) => {
         data.append("productVideo", productVideo);
       }
       //รูปเพิ่มเติม
-      console.log(additionalImages);
-      if(additionalImages.length>0){
-        data.append("additionalImages", new Blob ([JSON.stringify(additionalImages)], {type:"application/json"}));
-      }
+      additionalImages.forEach((image) => {
+        data.append("additionalImages", image);
+      });
       //รูปแบบสินค้า
       data.append("selectedType", selectedType);
       //ราคา
@@ -691,4 +690,4 @@ const Product = (prop: { jwt_token: string; username: string }) => {
   );
 };
 
-export default Product;
+export default AddProduct;

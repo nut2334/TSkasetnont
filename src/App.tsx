@@ -4,7 +4,7 @@ import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
 import Forgot from "./pages/all/forgot";
 import Home from "./pages/all/home";
-import Product from "./pages/farmer/product";
+import AddProduct from "./pages/farmer/addproduct";
 import AddUser from "./pages/admin/adduser";
 import SettingAdmin from "./pages/admin/setting";
 import "./App.css";
@@ -99,7 +99,7 @@ function App() {
               <Route
                 path="/addproduct"
                 element={
-                  <Product
+                  <AddProduct
                     jwt_token={jwt_token}
                     username={decodeJWT.username}
                   />

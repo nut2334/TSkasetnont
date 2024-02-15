@@ -2,10 +2,12 @@ import React, { useRef, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import SearchBar from "../../components/searchbar";
 
 const Home = (prop: { jwt_token: string }) => {
   return (
     <div>
+      <SearchBar placeholder="ค้นหา" setSearchContent={console.log} />
       <MapContainer
         center={[13.736717, 100.523186]}
         zoom={13}
