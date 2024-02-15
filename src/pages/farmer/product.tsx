@@ -35,7 +35,7 @@ interface StandardProduct {
 }
 
 const Product = (prop: { jwt_token: string; username: string }) => {
-  const apiCategories = config.getApiEndpoint("categories", "GET");
+  const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -197,7 +197,7 @@ const Product = (prop: { jwt_token: string; username: string }) => {
       //มาตรฐานสินค้า
       data.append("selectedStandard", JSON.stringify(selectedStandard));
 
-      axios.post(apiCategories, data, {
+      axios.post(apiAddProduct, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
