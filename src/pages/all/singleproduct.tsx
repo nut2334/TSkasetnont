@@ -116,12 +116,9 @@ const SigleProduct = () => {
     certificate: [],
     product_viewed: 0,
     campaign_id: "",
-    last_modified: new Date()
+    last_modified: new Date(),
   });
-  const [productImage, setProductImage] = React.useState<string>("");
   const { productid } = useParams<{ productid: string }>();
-
-
 
   const images = [
     "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
@@ -131,7 +128,10 @@ const SigleProduct = () => {
 
   useEffect(() => {
     setShowProduct(mockProduct);
-    const apiSingleProduct = config.getApiEndpoint(`getproduct/${productid}`, "get");
+    const apiSingleProduct = config.getApiEndpoint(
+      `getproduct/${productid}`,
+      "get"
+    );
     axios.get(apiSingleProduct).then((response) => {
       console.log(response.data);
       setProduct(response.data);
@@ -149,7 +149,6 @@ const SigleProduct = () => {
 
   }, []);
 
-
   const add = () => {
     setAmount(amount + 1);
   };
@@ -163,7 +162,14 @@ const SigleProduct = () => {
     <Container component="main" maxWidth="lg">
       <Fade autoplay={false}>
         <div className="each-slide-effect">
-          <div style={{ backgroundImage: `url(${config.getApiEndpoint(`getimage/${product.product_image.split("/").pop()}`, "get")})` }}>
+          <div
+            style={{
+              backgroundImage: `url(${config.getApiEndpoint(
+                `getimage/${product.product_image.split("/").pop()}`,
+                "get"
+              )})`,
+            }}
+          >
             <span>Slide 1</span>
           </div>
         </div>
@@ -180,7 +186,9 @@ const SigleProduct = () => {
       </Fade>
       <Typography variant="h4">{product.product_name}</Typography>
       <Typography variant="h6">Price: {product.product_price}</Typography>
-      <Typography variant="h6">Description: {product.product_description}</Typography>
+      <Typography variant="h6">
+        Description: {product.product_description}
+      </Typography>
       <Typography variant="body1">View: {product.product_viewed}</Typography>
       <Stack
         direction="row"

@@ -27,9 +27,7 @@ const Navbar = (prop: {
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
-  const defaultPages = [
-    { name: "สินค้า", path: "/listproduct" },
-  ];
+  const defaultPages = [{ name: "สินค้า", path: "/listproduct" }];
 
   const settings = [
     { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },
@@ -54,7 +52,6 @@ const Navbar = (prop: {
     const cookies = new Cookies();
     setAnchorElUser(null);
     if (name == "ออกจากระบบ" && path == "/") {
-      console.log("logout");
       prop.setJwt_token("");
       if (cookies.get("jwt_token")) {
         cookies.remove("jwt_token");
