@@ -41,6 +41,7 @@ const SetDataStandard = (prop: {
     standard_expire: Date;
     standard_cercification: File;
   }[];
+  setCercificationImage: React.Dispatch<React.SetStateAction<File[]>>;
 }) => {
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const [standardData, setStandardData] = React.useState<

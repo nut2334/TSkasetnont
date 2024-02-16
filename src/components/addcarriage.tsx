@@ -152,7 +152,11 @@ const AddCarriage = () => {
       </React.Fragment>
     ))}*/}
       {carriageList.map((cost, index) => (
-        <></>
+        <>
+          <TextField label="น้ำหนัก" type="number" />
+          <TextField label="หน่วย" defaultValue="" />
+          <TextField label="ค่าส่ง" type="number" />
+        </>
       ))}
     </>
   );

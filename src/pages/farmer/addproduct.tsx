@@ -27,12 +27,6 @@ import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 
-interface StandardProduct {
-  standard_id: string;
-  standard_name: string;
-  expire: boolean;
-}
-
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
@@ -47,21 +41,10 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
-  const [shippingCostList, setShippingCostList] = useState<
-    {
-      weight: number;
-      unit: string;
-      price: number;
-    }[]
-  >([]);
-  const [stock, setStock] = useState<number>(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [deposit, setDeposit] = useState<number>(0);
-  const [weight, setWeight] = useState<number>(0);
-  const [shippingCost, setShippingCost] = useState<number>(0);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-
   const [selectedStandard, setSelectedStandard] = React.useState<
     {
       standard_id: string;
@@ -71,6 +54,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       standard_cercification: File;
     }[]
   >([]);
+  const [cercificationImage, setCercificationImage] = useState<File[]>([]);
+  const [stock, setStock] = useState<number>(0);
+
   useEffect(() => {
     console.log(selectedStandard);
   }, [selectedStandard]);
@@ -133,9 +119,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       setSelectedStatus(selectedStatus.statusName);
     }
   };
-
-  const addShippingCost = () => {};
-  const deleteShippingCost = () => {};
   const onSubmit = () => {
     if (productName == "") {
       setCheckProductName(false);
@@ -163,7 +146,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       additionalImages.forEach((image) => {
         data.append("additionalImages", image);
       });
-      //รูปแบบสินค้า
+      //รูปแบบการเก็บข้อมูล
       data.append("selectedType", selectedType);
       //ราคา
       data.append("price", price.toString());
@@ -171,15 +154,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       data.append("unit", unit);
       //คลังสินค้า
       data.append("stock", stock.toString());
-      //น้ำหนักสินค้า
-      data.append("weight", weight.toString());
-      //ค่าส่ง 1 หน่วย
-      data.append("shippingCost", shippingCost.toString());
-      //รายการค่าส่งอื่นๆ
-      console.log(shippingCostList);
-      shippingCostList.forEach((cost) => {
-        data.append("shippingCostList", JSON.stringify(cost));
-      });
       //สถานะการจอง
       data.append("selectedStatus", selectedStatus);
       //วันเริ่มรับจอง
@@ -194,7 +168,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       data.append("deposit", deposit.toString());
       //มาตรฐานสินค้า
       data.append("selectedStandard", JSON.stringify(selectedStandard));
-
+      //ใบรับรองมาตรฐานสินค้า
       axios.post(apiAddProduct, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
@@ -350,6 +324,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               <AddStandard
                 setSelectedStandard={setSelectedStandard}
                 selectedStandard={selectedStandard}
+                setCercificationImage={setCercificationImage}
               />
             </Grid>
             <Grid item xs={12}>
@@ -514,7 +489,37 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 </Grid>
               </React.Fragment>
             )}
-            {selectedType == "สินค้าจัดส่งพัสดุ" && <>hi</>}
+            {selectedType == "สินค้าจัดส่งพัสดุ" && (
+              <>
+                <Grid item xs={4}>
+                  <TextField
+                    id="outlined-basic"
+                    label="ราคา"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setPrice(parseInt(e.target.value))}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    id="outlined-basic"
+                    label="จำนวนคลังสินค้า"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setStock(parseInt(e.target.value))}
+                  />
+                </Grid>
+              </>
+            )}
           </Grid>
           <Button onClick={onSubmit} variant="contained">
             ยืนยัน
