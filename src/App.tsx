@@ -44,10 +44,12 @@ function App() {
             };
             setJwt_token(newToken);
             setDecodeJWT(jwt);
-          } else {
-            cookies.remove("jwt_token");
-            setJwt_token("");
           }
+        })
+        .catch(() => {
+          alert("Token หมดอายุ กรุณาเข้าสู่ระบบใหม่");
+          cookies.remove("jwt_token");
+          setJwt_token("");
         });
     }
   }, []);
