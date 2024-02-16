@@ -27,13 +27,13 @@ const SearchSection = styled("div")`
 
 interface sortInterface {
   title: string;
-  type: "date" | "price" | "viewed";
+  type: "last_modified" | "price" | "view_count";
 }
 
 const sortType = [
   {
     title: "สินค้าล่าสุด",
-    type: "date",
+    type: "last_modified",
   },
   {
     title: "ราคา",
@@ -41,7 +41,7 @@ const sortType = [
   },
   {
     title: "ยอดเข้าชม",
-    type: "viewed",
+    type: "view_count",
   },
 ] as sortInterface[];
 
@@ -132,8 +132,8 @@ const ListProduct = () => {
   const apiProducts = config.getApiEndpoint("getproducts", "GET");
 
   const [searchContent, setSearchContent] = React.useState("");
-  const [sortBy, setSortBy] = React.useState<"date" | "price" | "viewed">(
-    "date"
+  const [sortBy, setSortBy] = React.useState<"last_modified" | "price" | "view_count">(
+    "last_modified"
   );
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
   const [allCategory, setAllCategory] = React.useState<CateagoryInterface[]>(
@@ -142,7 +142,7 @@ const ListProduct = () => {
   const [selectedCategory, setSelectedCategory] =
     React.useState<CateagoryInterface>({
       category_id: "",
-      category_name: "all",
+      category_name: "ทั้งหมด",
     });
   const [page, setPage] = React.useState("0");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -151,7 +151,10 @@ const ListProduct = () => {
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
-      setAllCategory(res.data);
+      setAllCategory([{
+        category_id: "",
+        category_name: "ทั้งหมด",
+      }, ...res.data]);
     });
 
     let paramsCategory = searchParams.get("category");
@@ -176,7 +179,7 @@ const ListProduct = () => {
     }
 
     if (paramsSort) {
-      setSortBy(searchParams.get("sort") as "date" | "price" | "viewed");
+      setSortBy(searchParams.get("sort") as "last_modified" | "price" | "view_count");
     }
 
     if (paramsOrder) {
@@ -203,18 +206,21 @@ const ListProduct = () => {
     }
 
     setSearchParams({
+      ["search"]: searchContent,
       ["category"]: selectedCategory.category_id,
       ["sort"]: sortBy,
       ["order"]: order,
       ["page"]: page,
     });
-    console.log(selectedCategory.category_id);
 
     axios
       .get(apiProducts, {
         params: {
+          ["search"]: searchContent,
           ["category"]: selectedCategory.category_id,
           ["page"]: page,
+          ["sort"]: sortBy,
+          ["order"]: order,
         },
       })
       .then((res) => {
@@ -228,16 +234,16 @@ const ListProduct = () => {
 
         setShowProduct(mockProduct);
       });
-  }, [selectedCategory, page]);
+  }, [selectedCategory, page, sortBy, order, searchContent]);
 
-  useEffect(() => {
-    setSearchParams({
-      ["category"]: selectedCategory.category_id,
-      ["sort"]: sortBy,
-      ["order"]: order,
-      ["page"]: page,
-    });
-  }, [searchContent, sortBy, order]);
+  // useEffect(() => {
+  //   setSearchParams({
+  //     ["category"]: selectedCategory.category_id,
+  //     ["sort"]: sortBy,
+  //     ["order"]: order,
+  //     ["page"]: page,
+  //   });
+  // }, [searchContent, sortBy, order]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
