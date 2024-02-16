@@ -46,6 +46,7 @@ function App() {
             setDecodeJWT(jwt);
           } else {
             cookies.remove("jwt_token");
+            setJwt_token("");
           }
         });
     }
@@ -57,9 +58,6 @@ function App() {
       setDecodeJWT({ role: "", username: "" });
       return;
     }
-
-    console.log("useEffect jwt_token");
-    console.log(jwtDecode(jwt_token));
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
 
