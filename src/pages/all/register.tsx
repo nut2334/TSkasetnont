@@ -83,7 +83,7 @@ const Register = (prop: {
   const sendToBackend = (jsonData: { username?: string; email?: string }) => {
     let api = "";
     if (jsonData.hasOwnProperty("username")) {
-      api = config.getApiEndpoint("checkingusername", "POST");
+      api = config.getApiEndpoint("checkinguser", "POST");
     } else if (jsonData.hasOwnProperty("email")) {
       api = config.getApiEndpoint("checkingemail", "POST");
     }
