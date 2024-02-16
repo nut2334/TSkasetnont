@@ -136,6 +136,17 @@ const SigleProduct = () => {
       console.log(response.data);
       setProduct(response.data);
     });
+
+    // update product view
+
+    const apiUpdateView = config.getApiEndpoint(`updateview/${productid}`, "get");
+    axios.get(apiUpdateView).then((response) => {
+      console.log(response.data);
+    })
+      .catch((error) => {
+        console.log(error);
+      });
+
   }, []);
 
   const add = () => {
