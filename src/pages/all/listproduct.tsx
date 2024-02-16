@@ -206,16 +206,17 @@ const ListProduct = () => {
     }
 
     setSearchParams({
+      ["search"]: searchContent,
       ["category"]: selectedCategory.category_id,
       ["sort"]: sortBy,
       ["order"]: order,
       ["page"]: page,
     });
-    console.log(selectedCategory.category_id);
 
     axios
       .get(apiProducts, {
         params: {
+          ["search"]: searchContent,
           ["category"]: selectedCategory.category_id,
           ["page"]: page,
           ["sort"]: sortBy,
@@ -233,7 +234,7 @@ const ListProduct = () => {
 
         setShowProduct(mockProduct);
       });
-  }, [selectedCategory, page, sortBy, order]);
+  }, [selectedCategory, page, sortBy, order, searchContent]);
 
   // useEffect(() => {
   //   setSearchParams({
