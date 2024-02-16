@@ -11,8 +11,7 @@ import {
   CardContent,
   CardActions,
 } from "@mui/material";
-import { useSearchParams, Link } from "react-router-dom";
-
+import { useSearchParams, Link, NavLink } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
 
@@ -304,35 +303,40 @@ const ListProduct = () => {
           <Grid container spacing={4}>
             {showProduct.map((product, index) => (
               <Grid item key={index} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardMedia
-                    component="div"
+                <NavLink to={`/shop/${product.product_id}`}>
+                  <Card
                     sx={{
-                      // 16:9
-                      pt: "56.25%",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
-                    image={`${config.getApiEndpoint(`getimage/${product.product_image.split("/").pop()}`, "get")}`}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {product.product_name}
-                    </Typography>
-                    <Typography>{product.product_description}</Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Typography>ราคา : {product.price}</Typography>
+                  >
+                    <CardMedia
+                      component="div"
+                      sx={{
+                        // 16:9
+                        pt: "56.25%",
+                      }}
+                      image={`${config.getApiEndpoint(
+                        `getimage/${product.product_image.split("/").pop()}`,
+                        "get"
+                      )}`}
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {product.product_name}
+                      </Typography>
+                      <Typography>{product.product_description}</Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Typography>ราคา : {product.price}</Typography>
 
-                    <Link to={`/shop/${product.product_id}`}>
-                      <Button size="small">View</Button>
-                    </Link>
-                  </CardActions>
-                </Card>
+                      <Link to={`/shop/${product.product_id}`}>
+                        <Button size="small">View</Button>
+                      </Link>
+                    </CardActions>
+                  </Card>
+                </NavLink>
               </Grid>
             ))}
           </Grid>
