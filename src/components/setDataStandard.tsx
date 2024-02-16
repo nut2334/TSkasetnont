@@ -26,8 +26,8 @@ const SetDataStandard = (prop: {
         standard_id: string;
         standard_name: string;
         standard_number: string;
-        standard_expire: Date;
-        standard_cercification: File;
+        standard_expire: Date | undefined;
+        standard_cercification: File | undefined;
       }[]
     >
   >;
@@ -38,10 +38,9 @@ const SetDataStandard = (prop: {
     standard_id: string;
     standard_name: string;
     standard_number: string;
-    standard_expire: Date;
-    standard_cercification: File;
+    standard_expire: Date | undefined;
+    standard_cercification: File | undefined;
   }[];
-  setCercificationImage: React.Dispatch<React.SetStateAction<File[]>>;
 }) => {
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const [standardData, setStandardData] = React.useState<
@@ -76,15 +75,13 @@ const SetDataStandard = (prop: {
 
   useEffect(() => {
     const list = [...prop.selectStandard];
-    if (standardExpire != undefined && standardCercification != undefined) {
-      list[prop.index] = {
-        standard_id: standardId,
-        standard_name: standardName,
-        standard_number: standardNumber,
-        standard_expire: standardExpire,
-        standard_cercification: standardCercification,
-      };
-    }
+    list[prop.index] = {
+      standard_id: standardId,
+      standard_name: standardName,
+      standard_number: standardNumber,
+      standard_expire: standardExpire,
+      standard_cercification: standardCercification,
+    };
     prop.setSelectedStandard(list);
   }, [standardId, standardNumber, standardExpire, standardCercification]);
 

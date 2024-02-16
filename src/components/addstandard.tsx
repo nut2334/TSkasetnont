@@ -9,8 +9,8 @@ const AddStandard = (prop: {
         standard_id: string;
         standard_name: string;
         standard_number: string;
-        standard_expire: Date;
-        standard_cercification: File;
+        standard_expire: Date | undefined;
+        standard_cercification: File | undefined;
       }[]
     >
   >;
@@ -18,10 +18,9 @@ const AddStandard = (prop: {
     standard_id: string;
     standard_name: string;
     standard_number: string;
-    standard_expire: Date;
-    standard_cercification: File;
+    standard_expire: Date | undefined;
+    standard_cercification: File | undefined;
   }[];
-  setCercificationImage: React.Dispatch<React.SetStateAction<File[]>>;
 }) => {
   const [standardList, setStandardList] = React.useState<
     {
@@ -39,7 +38,6 @@ const AddStandard = (prop: {
           setSelectedStandard={prop.setSelectedStandard}
           option={option}
           selectStandard={prop.selectedStandard}
-          setCercificationImage={prop.setCercificationImage}
         />
       ))}
     </React.Fragment>

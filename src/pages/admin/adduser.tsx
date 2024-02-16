@@ -153,7 +153,6 @@ const AddUser = () => {
       tel: tel,
       role: role,
     };
-    console.log(data);
     axios.post(apiAddUser, data).then((res) => {
       console.log(res.data);
     });

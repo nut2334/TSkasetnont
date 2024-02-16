@@ -24,6 +24,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import AddStandard from "../../components/addstandard";
+import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 
@@ -50,11 +51,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       standard_id: string;
       standard_name: string;
       standard_number: string;
-      standard_expire: Date;
-      standard_cercification: File;
+      standard_expire: Date | undefined;
+      standard_cercification: File | undefined;
     }[]
   >([]);
-  const [cercificationImage, setCercificationImage] = useState<File[]>([]);
+  const [dataCarriage, setDataCarriage] = useState<
+    {
+      weight: number;
+      price: number;
+    }[]
+  >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
 
   useEffect(() => {
@@ -167,8 +173,19 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       //ราคามัดจำ
       data.append("deposit", deposit.toString());
       //มาตรฐานสินค้า
+      console.log(selectedStandard);
       data.append("selectedStandard", JSON.stringify(selectedStandard));
       //ใบรับรองมาตรฐานสินค้า
+      selectedStandard.forEach((standard) => {
+        if (standard.standard_cercification) {
+          data.append("cercificationImage", standard.standard_cercification);
+        } else {
+          data.append("cercificationImage", "");
+        }
+      });
+      //ค่าส่ง
+      data.append("dataCarriage", JSON.stringify(dataCarriage));
+
       axios.post(apiAddProduct, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
@@ -176,6 +193,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       });
     }
   };
+  useEffect(() => {
+    //console.log(dataCarriage);
+  }, [dataCarriage]);
 
   return (
     <React.Fragment>
@@ -324,7 +344,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               <AddStandard
                 setSelectedStandard={setSelectedStandard}
                 selectedStandard={selectedStandard}
-                setCercificationImage={setCercificationImage}
               />
             </Grid>
             <Grid item xs={12}>
@@ -454,6 +473,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     ))}
                   </TextField>
                 </Grid>
+
                 {selectedStatus == "เปิดรับจองตามช่วงเวลา" && (
                   <React.Fragment>
                     <Grid item xs={6}>
@@ -518,6 +538,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     onChange={(e) => setStock(parseInt(e.target.value))}
                   />
                 </Grid>
+                <AddCarriage unit={unit} setDataCarriage={setDataCarriage} />
               </>
             )}
           </Grid>
