@@ -24,6 +24,7 @@ import Modal from "@mui/material/Modal";
 import ShareIcon from "@mui/icons-material/Share";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import { RWebShare } from "react-web-share";
 
 import {
   FacebookShareButton,
@@ -280,7 +281,16 @@ const SigleProduct = () => {
           </LineShareButton>
         </Stack>
         <Stack>
-          <ShareIcon />
+          <RWebShare
+            data={{
+              text: product.product_description,
+              url: window.location.href,
+              title: "ของเด็ดเกษตรนนท์",
+            }}
+            onClick={() => console.log("shared successfully!")}
+          >
+            <ShareIcon />
+          </RWebShare>
         </Stack>
       </Stack>
       <Divider
