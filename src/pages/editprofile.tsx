@@ -17,10 +17,9 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
-import { NavLink } from "react-router-dom";
 
 const AddUser = (prop: { jwt_token: string }) => {
-  const apiAddUser = config.getApiEndpoint("adduser", "POST");
+  const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
@@ -129,8 +128,8 @@ const AddUser = (prop: { jwt_token: string }) => {
         console.log(res.data);
         setUsername(res.data.username);
         setEmail(res.data.email);
-        setFirstName(res.data.first_name);
-        setLastName(res.data.last_name);
+        setFirstName(res.data.firstname);
+        setLastName(res.data.lastname);
         setTel(res.data.phone);
       })
       .catch((err) => {
@@ -169,19 +168,22 @@ const AddUser = (prop: { jwt_token: string }) => {
     const data = {
       username: username,
       email: email,
-      password: password,
-      firstName: firstName,
-      lastName: lastName,
-      tel: tel,
-      role: role,
+      firstname: firstName,
+      lastname: lastName,
+      phone: tel,
     };
-    axios.post(apiAddUser, data).then((res) => {
-      console.log(res.data);
-    });
+    console.log(data);
+    axios
+      .post(apiUpdateInfo, data, {
+        headers: { Authorization: `Bearer ${prop.jwt_token}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
   };
 
   return (
-    <Container component="main" maxWidth="xs" sx={{ marginTop: 8 }}>
+    <Container component="main" maxWidth="xs" sx={{ marginTop: 3 }}>
       <Box
         sx={{
           marginTop: 0,

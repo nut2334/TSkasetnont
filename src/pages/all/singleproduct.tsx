@@ -325,24 +325,40 @@ const SigleProduct = () => {
             sx={{ marginTop: 2, marginBottom: 5 }}
             justifyContent="end"
           >
-            <Stack>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddShoppingCartIcon />}
-              >
-                หยิบใส่ตะกร้า
-              </Button>
-            </Stack>
-            <Stack>
-              <Button
-                variant="contained"
-                color="secondary"
-                startIcon={<PointOfSaleIcon />}
-              >
-                ซื้อสินค้า
-              </Button>
-            </Stack>
+            {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
+              <Stack>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<PointOfSaleIcon />}
+                >
+                  จองสินค้า
+                </Button>
+              </Stack>
+            )}
+            {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+              <>
+                <Stack>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<AddShoppingCartIcon />}
+                  >
+                    หยิบใส่ตะกร้า
+                  </Button>
+                </Stack>
+
+                <Stack>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<PointOfSaleIcon />}
+                  >
+                    ซื้อสินค้า
+                  </Button>
+                </Stack>
+              </>
+            )}
           </Stack>
         </>
       )}
