@@ -22,6 +22,14 @@ import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import ShareIcon from "@mui/icons-material/Share";
+import {
+  FacebookShareButton,
+  LineShareButton,
+  FacebookIcon,
+  LineIcon,
+} from "react-share";
 
 interface ProductInterface {
   product_id: string;
@@ -31,7 +39,7 @@ interface ProductInterface {
   product_description: string;
   product_category: string;
   product_date: Date;
-  product_viewed: number;
+  view_count: number;
 }
 
 interface FullProductInterface {
@@ -40,68 +48,16 @@ interface FullProductInterface {
   product_description: string;
   product_category: string;
   product_stock: number;
-  product_price: number;
+  price: number;
   unit: string;
   product_image: string;
   product_video: string | null;
   additional_image: string;
   certificate: string[];
-  product_viewed: number;
+  view_count: number;
   campaign_id: string;
   last_modified: Date;
 }
-const mockProduct = [
-  {
-    product_id: "1",
-    product_name: "product1",
-    product_price: 100,
-    product_image: "https://source.unsplash.com/random?wallpapers",
-    product_description: "description1",
-    product_category: "category1",
-    product_date: new Date(),
-    product_viewed: 100,
-  },
-  {
-    product_id: "2",
-    product_name: "product2",
-    product_price: 200,
-    product_image: "https://source.unsplash.com/random?wallpapers",
-    product_description: "description2",
-    product_category: "category2",
-    product_date: new Date(),
-    product_viewed: 200,
-  },
-  {
-    product_id: "3",
-    product_name: "product3",
-    product_price: 300,
-    product_image: "https://source.unsplash.com/random?wallpapers",
-    product_description: "description3",
-    product_category: "category3",
-    product_date: new Date(),
-    product_viewed: 300,
-  },
-  {
-    product_id: "4",
-    product_name: "product4",
-    product_price: 400,
-    product_image: "https://source.unsplash.com/random?wallpapers",
-    product_description: "description4",
-    product_category: "category4",
-    product_date: new Date(),
-    product_viewed: 400,
-  },
-  {
-    product_id: "5",
-    product_name: "product5",
-    product_price: 500,
-    product_image: "https://source.unsplash.com/random?wallpapers",
-    product_description: "description5",
-    product_category: "category5",
-    product_date: new Date(),
-    product_viewed: 500,
-  },
-] as ProductInterface[];
 
 const SigleProduct = () => {
   const carousel = useRef<AliceCarousel>(null);
@@ -113,13 +69,13 @@ const SigleProduct = () => {
     product_description: "",
     product_category: "",
     product_stock: 0,
-    product_price: 0,
+    price: 0,
     unit: "",
     product_image: "",
     product_video: "",
     additional_image: "",
     certificate: [],
-    product_viewed: 0,
+    view_count: 0,
     campaign_id: "",
     last_modified: new Date(),
   });
@@ -131,7 +87,6 @@ const SigleProduct = () => {
   ];
 
   useEffect(() => {
-    setShowProduct(mockProduct);
     const apiSingleProduct = config.getApiEndpoint(
       `getproduct/${productid}`,
       "get"
@@ -229,23 +184,38 @@ const SigleProduct = () => {
               "get"
             )}`}
             className="sliderimg"
-            style={{ width: "100%", height: "auto" }}
+            style={{
+              width: "100%",
+              height: "250px",
+              objectFit: "cover",
+            }}
           />
           {product.additional_image &&
             JSON.parse(product.additional_image.replace("\\", "")).map(
-              (image: string) => (
+              (image: string, index: number) => (
                 <img
+                  className="sliderimg"
+                  style={{
+                    width: "100%",
+                    height: "250px",
+                    objectFit: "cover",
+                  }}
                   src={`${config.getApiEndpoint(
                     `getimage/${image.split("/").pop()}`,
                     "get"
                   )}`}
-                  className="sliderimg"
-                  style={{ width: "100%", height: "auto" }}
                 />
               )
             )}
           {product.product_video && (
-            <video width="100%" height="auto" controls>
+            <video
+              controls
+              style={{
+                width: "100%",
+                height: "250px",
+                objectFit: "cover",
+              }}
+            >
               <source
                 src={`${config.getApiEndpoint(
                   `getimage/${product.product_video.split("/").pop()}`,
@@ -259,11 +229,51 @@ const SigleProduct = () => {
       </Box>
 
       <Typography variant="h4">{product.product_name}</Typography>
-      <Typography variant="h6">Price: {product.product_price}</Typography>
-      <Typography variant="h6">
-        Description: {product.product_description}
+      <Typography
+        variant="h6"
+        sx={{
+          color: "green",
+        }}
+      >
+        {product.price} บาท
       </Typography>
-      <Typography variant="body1">View: {product.product_viewed}</Typography>
+
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          cursor: "pointer",
+        }}
+        marginLeft={2}
+        justifyContent="flex-end"
+      >
+        <Stack>
+          <RemoveRedEyeIcon />
+        </Stack>
+        <Stack>
+          <Typography variant="body1">{product.view_count}</Typography>
+        </Stack>
+
+        <Stack>
+          <FacebookShareButton url={window.location.href}>
+            <FacebookIcon
+              style={{ borderRadius: "100%", width: 30, height: "auto" }}
+            />
+          </FacebookShareButton>
+        </Stack>
+        <Stack>
+          <LineShareButton url={window.location.href}>
+            <LineIcon
+              style={{ borderRadius: "100%", width: 30, height: "auto" }}
+            />
+          </LineShareButton>
+        </Stack>
+        <Stack>
+          <ShareIcon />
+        </Stack>
+      </Stack>
+
+      <Typography variant="h6">{product.product_description}</Typography>
       <Stack
         direction="row"
         spacing={2}

@@ -64,7 +64,7 @@ const Navbar = (prop: {
       setVisiblePages([
         ...defaultPages,
         { name: "จัดการสมาชิก", path: "/manageuser" },
-        { name: "ข้อมูลเกษตรกร", path: "/dataFarmer" },
+        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
         { name: "การตั้งค่า", path: "/setting" },
       ]);
     }
@@ -147,9 +147,11 @@ const Navbar = (prop: {
                 }}
               >
                 {visiblePages.map((page, index) => (
-                  <MenuItem key={index} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page.name}</Typography>
-                  </MenuItem>
+                  <NavLink to={page.path} style={{ textDecoration: "none" }}>
+                    <MenuItem key={index} onClick={handleCloseNavMenu}>
+                      <Typography textAlign="center">{page.name}</Typography>
+                    </MenuItem>
+                  </NavLink>
                 ))}
               </Menu>
             </Box>
