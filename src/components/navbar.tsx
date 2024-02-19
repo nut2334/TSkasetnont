@@ -174,6 +174,7 @@ const Navbar = (prop: {
                 fontWeight: 700,
                 textDecoration: "none",
                 color: "black",
+                fontSize: 20,
               }}
             >
               ของเด็ดเกษตรนนท์

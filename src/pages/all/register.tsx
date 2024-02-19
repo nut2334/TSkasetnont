@@ -89,7 +89,6 @@ const Register = (prop: {
     } else if (jsonData.hasOwnProperty("email")) {
       api = config.getApiEndpoint("checkingemail", "POST");
     }
-    console.log(api);
     axios
       .post(api, jsonData, {
         headers: {

@@ -8,11 +8,8 @@ import {
   Typography,
   Stack,
   Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
   Box,
+  Divider,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
@@ -23,8 +20,11 @@ import "react-alice-carousel/lib/alice-carousel.css";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import Modal from '@mui/material/Modal';
+import Modal from "@mui/material/Modal";
 import ShareIcon from "@mui/icons-material/Share";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+
 import {
   FacebookShareButton,
   LineShareButton,
@@ -41,6 +41,7 @@ interface ProductInterface {
   product_category: string;
   product_date: Date;
   view_count: number;
+  selectedType: string;
 }
 
 interface FullProductInterface {
@@ -48,7 +49,7 @@ interface FullProductInterface {
   product_name: string;
   product_description: string;
   product_category: string;
-  product_stock: number;
+  stock: number;
   price: number;
   unit: string;
   product_image: string;
@@ -58,18 +59,18 @@ interface FullProductInterface {
   view_count: number;
   campaign_id: string;
   last_modified: Date;
+  selectedType: string;
 }
 
 const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: "50%",
   maxHeight: "70%",
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
-
 };
 const SigleProduct = () => {
   const carousel = useRef<AliceCarousel>(null);
@@ -80,7 +81,7 @@ const SigleProduct = () => {
     product_name: "",
     product_description: "",
     product_category: "",
-    product_stock: 0,
+    stock: 0,
     price: 0,
     unit: "",
     product_image: "",
@@ -90,10 +91,10 @@ const SigleProduct = () => {
     view_count: 0,
     campaign_id: "",
     last_modified: new Date(),
+    selectedType: "",
   });
   const { productid } = useParams<{ productid: string }>();
   const [showFullImage, setShowFullImage] = useState("");
-
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -149,26 +150,28 @@ const SigleProduct = () => {
       />
     );
     if (product.additional_image) {
-      slides.push(JSON.parse(product.additional_image.replace("\\", "")).map(
-        (image: string, index: number) => (
-          <img
-            className="sliderimg"
-            style={{
-              width: "100%",
-              height: "250px",
-              objectFit: "cover",
-            }}
-            src={`${config.getApiEndpoint(
-              `getimage/${image.split("/").pop()}`,
-              "get"
-            )}`}
-            draggable="false"
-            onClick={() => {
-              setShowFullImage(image);
-            }}
-          />
+      slides.push(
+        JSON.parse(product.additional_image.replace("\\", "")).map(
+          (image: string) => (
+            <img
+              className="sliderimg"
+              style={{
+                width: "100%",
+                height: "250px",
+                objectFit: "cover",
+              }}
+              src={`${config.getApiEndpoint(
+                `getimage/${image.split("/").pop()}`,
+                "get"
+              )}`}
+              draggable="false"
+              onClick={() => {
+                setShowFullImage(image);
+              }}
+            />
+          )
         )
-      ));
+      );
     }
     if (product.product_video) {
       slides.push(
@@ -191,11 +194,11 @@ const SigleProduct = () => {
       );
     }
 
-    return [].concat(...slides);;
-  }
+    return [].concat(...slides);
+  };
   return (
     <Container component="main" maxWidth="lg">
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <ArrowBackIosNewIcon
             sx={{
@@ -230,12 +233,10 @@ const SigleProduct = () => {
             infinite
             ref={carousel}
           >
-
             {GenerateSlide()}
           </AliceCarousel>
         </Box>
       </Box>
-
 
       <Typography variant="h4">{product.product_name}</Typography>
       <Typography
@@ -244,7 +245,7 @@ const SigleProduct = () => {
           color: "green",
         }}
       >
-        {product.price} บาท
+        {product.price} บาท/{product.unit}
       </Typography>
 
       <Stack
@@ -259,6 +260,7 @@ const SigleProduct = () => {
         <Stack>
           <RemoveRedEyeIcon />
         </Stack>
+
         <Stack>
           <Typography variant="body1">{product.view_count}</Typography>
         </Stack>
@@ -281,65 +283,70 @@ const SigleProduct = () => {
           <ShareIcon />
         </Stack>
       </Stack>
-
-      <Typography variant="h6">{product.product_description}</Typography>
-      <Stack
-        direction="row"
-        spacing={2}
+      <Divider
         sx={{
-          cursor: "pointer",
-          paddingTop: "5px",
+          marginBottom: 2,
+          marginTop: 1,
         }}
-        marginLeft={2}
-      >
-        <Stack>
-          {amount == 1 && <DoNotDisturbOnIcon color="info" />}
-          {amount > 1 && (
-            <DoNotDisturbOnIcon color="secondary" onClick={subtract} />
-          )}
-        </Stack>
-        <Stack>
-          <Typography>{amount}</Typography>
-        </Stack>
-        <Stack>
-          <AddCircleIcon color="secondary" onClick={add} />
-        </Stack>
-      </Stack>
-      <Button variant="contained" color="primary">
-        Add to Cart
-      </Button>
-      {showProduct.map((product, index) => (
-        <Grid item key={index} xs={12} sm={6} md={4}>
-          <Card
+      />
+      <Typography variant="h6">{product.product_description}</Typography>
+      {product.selectedType !== "ประชาสัมพันธ์" && (
+        <>
+          <Stack
+            direction="row"
+            spacing={2}
             sx={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
+              cursor: "pointer",
+              paddingTop: "5px",
             }}
+            marginLeft={2}
           >
-            <CardMedia
-              component="div"
-              sx={{
-                // 16:9
-                pt: "56.25%",
-              }}
-              image={product.product_image}
-            />
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {product.product_name}
-              </Typography>
-              <Typography>{product.product_description}</Typography>
-            </CardContent>
-            <CardActions>
-              <Typography>ราคา : {product.product_price}</Typography>
+            <Stack>
+              {amount == 1 && <DoNotDisturbOnIcon color="info" />}
+              {amount > 1 && (
+                <DoNotDisturbOnIcon color="secondary" onClick={subtract} />
+              )}
+            </Stack>
+            <Stack>
+              <Typography>{amount}</Typography>
+            </Stack>
+            <Stack>
+              <AddCircleIcon color="secondary" onClick={add} />
+            </Stack>
 
-              <Button size="small">View</Button>
-              <Button size="small">Edit</Button>
-            </CardActions>
-          </Card>
-        </Grid>
-      ))}
+            <Typography>
+              มีสินค้าทั้งหมด {product.stock} {product.unit}
+            </Typography>
+          </Stack>
+
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ marginTop: 2, marginBottom: 5 }}
+            justifyContent="end"
+          >
+            <Stack>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddShoppingCartIcon />}
+              >
+                หยิบใส่ตะกร้า
+              </Button>
+            </Stack>
+            <Stack>
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<PointOfSaleIcon />}
+              >
+                ซื้อสินค้า
+              </Button>
+            </Stack>
+          </Stack>
+        </>
+      )}
+
       <Modal
         open={showFullImage != ""}
         onClose={() => setShowFullImage("")}
@@ -351,7 +358,6 @@ const SigleProduct = () => {
             style={{
               width: "100%",
               height: "70%",
-
             }}
             src={`${config.getApiEndpoint(
               `getimage/${showFullImage.split("/").pop()}`,
