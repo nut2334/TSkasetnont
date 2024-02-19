@@ -115,7 +115,7 @@ function App() {
             <React.Fragment>
               <Route path="/setting" element={<SettingAdmin />} />
               <Route path="/adduser" element={<AddUser />} />
-              <Route path="/manageuser" element={<ManageUser />} />
+              <Route path="/manageuser" element={<ManageUser jwt_token={jwt_token} />} />
             </React.Fragment>
           )}
         </Routes>{" "}

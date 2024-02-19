@@ -18,12 +18,13 @@ import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
 
-const AddUser = (prop: { jwt_token: string }) => {
+const EditProfile = (prop: { jwt_token: string, admin?: { username: string, role: string } }) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
+  const apiUpdateInfoadmin = config.getApiEndpoint("updateinfoadmin", "GET");
 
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
@@ -118,24 +119,48 @@ const AddUser = (prop: { jwt_token: string }) => {
       });
   }, []);
   useEffect(() => {
-    axios
-      .get(apiGetinfo, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setUsername(res.data.username);
-        setEmail(res.data.email);
-        setFirstName(res.data.firstname);
-        setLastName(res.data.lastname);
-        setTel(res.data.phone);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (!prop.admin) {
+      axios
+        .get(apiGetinfo, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setUsername(res.data.username);
+          setEmail(res.data.email);
+          setFirstName(res.data.firstname);
+          setLastName(res.data.lastname);
+          setTel(res.data.phone);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    else {
+      const { username, role } = prop.admin;
+      const apiGetAdmininfo = config.getApiEndpoint(`getuseradmin/${role}/${username}`, "GET");
+
+      axios
+        .get(apiGetAdmininfo, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          setUsername(res.data.username);
+          setEmail(res.data.email);
+          setFirstName(res.data.firstname);
+          setLastName(res.data.lastname);
+          setTel(res.data.phone);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }, []);
+
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
     const passwordRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -165,16 +190,26 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = {
+    var data = {
       username: username,
       email: email,
       firstname: firstName,
       lastname: lastName,
       phone: tel,
+    } as {
+      username: string;
+      email: string;
+      firstname: string;
+      lastname: string;
+      phone: string;
+      role?: string;
     };
-    console.log(data);
+    if (prop.admin) {
+      data = { ...data, role: prop.admin.role };
+    }
+
     axios
-      .post(apiUpdateInfo, data, {
+      .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
         headers: { Authorization: `Bearer ${prop.jwt_token}` },
       })
       .then((res) => {
@@ -214,10 +249,10 @@ const AddUser = (prop: { jwt_token: string }) => {
                   username == "" && usernameCheck == false
                     ? "กรุณากรอก Username"
                     : "" || !usernameCheck
-                    ? "Username นี้มีผู้ใช้งานแล้ว"
-                    : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                    : ""
+                      ? "Username นี้มีผู้ใช้งานแล้ว"
+                      : "" || !usernameReg
+                        ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                        : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -239,8 +274,8 @@ const AddUser = (prop: { jwt_token: string }) => {
                   email == "" && emailCheck == false
                     ? "กรุณากรอก Email"
                     : "" || !emailReg
-                    ? "กรุณากรอก Email ให้ถูกต้อง"
-                    : ""
+                      ? "กรุณากรอก Email ให้ถูกต้อง"
+                      : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -265,8 +300,8 @@ const AddUser = (prop: { jwt_token: string }) => {
                   firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
                     : "" || !firstNameValidate
-                    ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : ""
+                      ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : ""
                 }
               />
             </Grid>
@@ -287,10 +322,10 @@ const AddUser = (prop: { jwt_token: string }) => {
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
-                    ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : "" || !sameLang
-                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
-                    : ""
+                      ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : "" || !sameLang
+                        ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
+                        : ""
                 }
               />
             </Grid>
@@ -316,8 +351,8 @@ const AddUser = (prop: { jwt_token: string }) => {
                   tel == "" && telValidate == false
                     ? "กรุณากรอกเบอร์โทรศัพท์"
                     : "" || !telValidate
-                    ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
-                    : ""
+                      ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
+                      : ""
                 }
               />
             </Grid>
@@ -339,4 +374,4 @@ const AddUser = (prop: { jwt_token: string }) => {
   );
 };
 
-export default AddUser;
+export default EditProfile;
