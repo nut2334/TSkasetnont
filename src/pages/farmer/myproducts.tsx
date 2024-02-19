@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Grid,
@@ -15,16 +15,27 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import * as config from "../../config/config";
 
+interface ProductInterface {
+  product_id: string;
+  product_name: string;
+  price: number;
+  product_image: string;
+  product_description: string;
+  product_category: string;
+  last_modified: Date;
+  product_viewed: number;
+}
 const Myproducts = (prop: { username: string }) => {
-  const apiMyproducts = config.getApiEndpoint("myproducts", "POST");
+  const [allProduct, setAllProduct] = useState<ProductInterface[]>([])
   const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   useEffect(() => {
+    const apiMyproducts = config.getApiEndpoint(`myproducts/${prop.username}`, "POST");
     axios
-      .post(apiMyproducts, {
-        username: prop.username,
-      })
-      .then((response) => {
+      .get(apiMyproducts)
+      .then((response: any) => {
         console.log(response.data);
+
+        setAllProduct(response.data)
       });
   }, []);
   return (
@@ -49,8 +60,8 @@ const Myproducts = (prop: { username: string }) => {
       <Container sx={{ py: 8 }} maxWidth="md">
         {/* End hero unit */}
         <Grid container spacing={4}>
-          {cards.map((card) => (
-            <Grid item key={card} xs={12} sm={6} md={4}>
+          {allProduct && allProduct.map((product, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
               <Card
                 sx={{
                   height: "100%",
@@ -64,19 +75,24 @@ const Myproducts = (prop: { username: string }) => {
                     // 16:9
                     pt: "56.25%",
                   }}
-                  image="https://source.unsplash.com/random?wallpapers"
+                  image={`${config.getApiEndpoint(
+                    `getimage/${product.product_image.split("/").pop()}`,
+                    "get"
+                  )}`}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h5" component="h2">
-                    Heading
+                    {product.product_name}
                   </Typography>
                   <Typography>
-                    This is a media card. You can use this section to describe
-                    the content.
+                    {product.product_description}
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small">View</Button>
+                  <NavLink to={"/shop/" + product.product_id}>
+                    <Button size="small">View</Button>
+
+                  </NavLink>
                   <Button size="small">Edit</Button>
                 </CardActions>
               </Card>
