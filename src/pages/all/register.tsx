@@ -13,13 +13,15 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import axios from "axios";
 import { Navigate } from "react-router-dom";
 import * as config from "../../config/config";
+import axios from "axios";
 
 const Register = (prop: {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+  const apiRegister = config.getApiEndpoint("register", "POST");
+
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
   const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
@@ -174,7 +176,6 @@ const Register = (prop: {
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    const url = "http://localhost:3001";
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     if (data.get("username") == "") {
@@ -219,19 +220,13 @@ const Register = (prop: {
         lastName: lastName,
         tel: tel,
       };
-      fetch(url + "/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
+      axios
+        .post(apiRegister, userData)
+        .then((response) => {
           setIsRegister(true);
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.log(error);
         });
     }
   };

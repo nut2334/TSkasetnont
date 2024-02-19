@@ -18,6 +18,7 @@ import { ThemeProvider } from "@emotion/react";
 import theme from "./themeMui";
 import ListProduct from "./pages/all/listproduct";
 import SigleProduct from "./pages/all/singleproduct";
+import EditProfile from "./pages/editprofile";
 
 function App() {
   const apiLogin = config.getApiEndpoint("login", "GET");
@@ -81,6 +82,12 @@ function App() {
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
           <Route path="/shop/:productid" element={<SigleProduct />} />
+          {decodeJWT.role && (
+            <Route
+              path="/editprofile"
+              element={<EditProfile jwt_token={jwt_token} />}
+            />
+          )}
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
