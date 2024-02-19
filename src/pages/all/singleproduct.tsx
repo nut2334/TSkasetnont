@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { Fade } from "react-slideshow-image";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "react-slideshow-image/dist/styles.css";
 import "./shop.css";
@@ -13,11 +12,16 @@ import {
   CardMedia,
   CardContent,
   CardActions,
+  Box,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import axios from "axios";
 import * as config from "../../config/config";
+import AliceCarousel from "react-alice-carousel";
+import "react-alice-carousel/lib/alice-carousel.css";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 interface ProductInterface {
   product_id: string;
@@ -40,7 +44,7 @@ interface FullProductInterface {
   unit: string;
   product_image: string;
   product_video: string | null;
-  additional_image: string[];
+  additional_image: string;
   certificate: string[];
   product_viewed: number;
   campaign_id: string;
@@ -100,9 +104,10 @@ const mockProduct = [
 ] as ProductInterface[];
 
 const SigleProduct = () => {
-  const [amount, setAmount] = React.useState(1);
-  const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
-  const [product, setProduct] = React.useState<FullProductInterface>({
+  const carousel = useRef<AliceCarousel>(null);
+  const [amount, setAmount] = useState(1);
+  const [showProduct, setShowProduct] = useState<ProductInterface[]>([]);
+  const [product, setProduct] = useState<FullProductInterface>({
     product_id: "",
     product_name: "",
     product_description: "",
@@ -112,14 +117,13 @@ const SigleProduct = () => {
     unit: "",
     product_image: "",
     product_video: "",
-    additional_image: [],
+    additional_image: "",
     certificate: [],
     product_viewed: 0,
     campaign_id: "",
     last_modified: new Date(),
   });
   const { productid } = useParams<{ productid: string }>();
-
   const images = [
     "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
     "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
@@ -137,16 +141,18 @@ const SigleProduct = () => {
       setProduct(response.data);
     });
 
-    // update product view
-
-    const apiUpdateView = config.getApiEndpoint(`updateview/${productid}`, "get");
-    axios.get(apiUpdateView).then((response) => {
-      console.log(response.data);
-    })
+    const apiUpdateView = config.getApiEndpoint(
+      `updateview/${productid}`,
+      "get"
+    );
+    axios
+      .get(apiUpdateView)
+      .then((response) => {
+        console.log(response.data);
+      })
       .catch((error) => {
         console.log(error);
       });
-
   }, []);
 
   const add = () => {
@@ -160,30 +166,98 @@ const SigleProduct = () => {
 
   return (
     <Container component="main" maxWidth="lg">
-      <Fade autoplay={false}>
-        <div className="each-slide-effect">
-          <div
-            style={{
-              backgroundImage: `url(${config.getApiEndpoint(
-                `getimage/${product.product_image.split("/").pop()}`,
-                "get"
-              )})`,
-            }}
-          >
-            <span>Slide 1</span>
-          </div>
-        </div>
-        <div className="each-slide-effect">
-          <div style={{ backgroundImage: `url(${images[1]})` }}>
-            <span>Slide 2</span>
-          </div>
-        </div>
-        <div className="each-slide-effect">
-          <div style={{ backgroundImage: `url(${images[2]})` }}>
-            <span>Slide 3</span>
-          </div>
-        </div>
-      </Fade>
+      <Box display={{ xs: "flex", lg: "none" }}>
+        <ArrowBackIosNewIcon
+          sx={{
+            position: "absolute",
+            top: "22%",
+            zIndex: 1,
+            backgroundColor: "white",
+            left: 20,
+            padding: 1,
+          }}
+          onClick={(e) => carousel?.current?.slidePrev(e)}
+        />
+        <ArrowForwardIosIcon
+          sx={{
+            position: "absolute",
+            zIndex: 1,
+            backgroundColor: "white",
+            top: "22%",
+            right: 20,
+            padding: 1,
+          }}
+          onClick={(e) => carousel?.current?.slideNext(e)}
+        />
+      </Box>
+      <Box display={{ xs: "none", lg: "flex" }}>
+        <ArrowBackIosNewIcon
+          sx={{
+            position: "absolute",
+            top: "30%",
+            zIndex: 1,
+            backgroundColor: "gray",
+            color: "white",
+            left: 20,
+            padding: 1,
+          }}
+          onClick={(e) => carousel?.current?.slidePrev(e)}
+        />
+        <ArrowForwardIosIcon
+          sx={{
+            position: "absolute",
+            zIndex: 1,
+            top: "30%",
+            backgroundColor: "gray",
+            color: "white",
+            right: 20,
+            padding: 1,
+          }}
+          onClick={(e) => carousel?.current?.slideNext(e)}
+        />
+      </Box>
+      <Box display={{ xs: "flex" }}>
+        <AliceCarousel
+          key="carousel"
+          mouseTracking
+          disableButtonsControls
+          ref={carousel}
+        >
+          <img
+            src={`${config.getApiEndpoint(
+              `getimage/${product.product_image.split("/").pop()}`,
+              "get"
+            )}`}
+            className="sliderimg"
+            style={{ width: "100%", height: "auto" }}
+          />
+          {product.additional_image &&
+            JSON.parse(product.additional_image.replace("\\", "")).map(
+              (image: string) => (
+                <img
+                  src={`${config.getApiEndpoint(
+                    `getimage/${image.split("/").pop()}`,
+                    "get"
+                  )}`}
+                  className="sliderimg"
+                  style={{ width: "100%", height: "auto" }}
+                />
+              )
+            )}
+          {product.product_video && (
+            <video width="100%" height="auto" controls>
+              <source
+                src={`${config.getApiEndpoint(
+                  `getimage/${product.product_video.split("/").pop()}`,
+                  "get"
+                )}`}
+                type="video/mp4"
+              />
+            </video>
+          )}
+        </AliceCarousel>
+      </Box>
+
       <Typography variant="h4">{product.product_name}</Typography>
       <Typography variant="h6">Price: {product.product_price}</Typography>
       <Typography variant="h6">
