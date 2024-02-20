@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -10,6 +10,7 @@ import {
   IconButton,
   Button,
   MenuItem,
+  Divider,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -17,6 +18,23 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
+import { on } from "events";
+import { isPropertyAccessOrQualifiedName } from "typescript";
+
+interface province {
+  id: string;
+  name_th: string;
+  amphure: amphure[];
+}
+interface amphure {
+  id: string;
+  name_th: string;
+  tambon: tambon[];
+}
+interface tambon {
+  id: string;
+  name_th: string;
+}
 
 const AddUser = (prop: { jwt_token: string }) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
@@ -25,33 +43,43 @@ const AddUser = (prop: { jwt_token: string }) => {
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
 
-  const [username, setUsername] = React.useState<string>("");
-  const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
-  const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
-  const [email, setEmail] = React.useState<string>("");
-  const [emailCheck, setEmailCheck] = React.useState<boolean>(true);
-  const [emailReg, setEmailReg] = React.useState<boolean>(true);
-  const [password, setPassword] = React.useState<string>("");
-  const [passwordCheck, setPasswordCheck] = React.useState<boolean>(true);
-  const [comfirmPassword, setComfirmPassword] = React.useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
+  const [usernameReg, setUsernameReg] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>("");
+  const [emailCheck, setEmailCheck] = useState<boolean>(true);
+  const [emailReg, setEmailReg] = useState<boolean>(true);
+  const [password, setPassword] = useState<string>("");
+  const [passwordCheck, setPasswordCheck] = useState<boolean>(true);
+  const [passwordNew, setPasswordNew] = useState<string>("");
+  const [comfirmPassword, setComfirmPassword] = useState<string>("");
   const [comfirmPasswordCheck, setComfirmPasswordCheck] =
-    React.useState<boolean>(true);
-  const [firstName, setFirstName] = React.useState<string>("");
-  const [firstNameValidate, setFirstNameValidate] =
-    React.useState<boolean>(true);
-  const [lastName, setLastName] = React.useState<string>("");
-  const [lastNameValidate, setLastNameValidate] = React.useState<boolean>(true);
-  const [sameLang, setSameLang] = React.useState<boolean>(true);
+    useState<boolean>(true);
+  const [firstName, setFirstName] = useState<string>("");
+  const [firstNameValidate, setFirstNameValidate] = useState<boolean>(true);
+  const [lastName, setLastName] = useState<string>("");
+  const [lastNameValidate, setLastNameValidate] = useState<boolean>(true);
+  const [sameLang, setSameLang] = useState<boolean>(true);
   const [tel, setTel] = React.useState<string>("");
-  const [telValidate, setTelValidate] = React.useState<boolean>(true);
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [telValidate, setTelValidate] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
 
-  const [allrole, setAllrole] = React.useState<
+  const [allrole, setAllrole] = useState<
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
-  const [role, setRole] = React.useState<string>("");
+  const [role, setRole] = useState<string>("");
+  const [storeName, setStoreName] = useState<string>("");
+
+  const [provinces, setProvinces] = useState<province[]>([]);
+  const [amphures, setAmphures] = useState<amphure[]>([]);
+  const [tambons, setTambons] = useState<tambon[]>([]);
+  const [selected, setSelected] = useState({
+    province_id: undefined,
+    amphure_id: undefined,
+    tambon_id: undefined,
+  });
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -131,10 +159,22 @@ const AddUser = (prop: { jwt_token: string }) => {
         setFirstName(res.data.firstname);
         setLastName(res.data.lastname);
         setTel(res.data.phone);
+        setStoreName(res.data.farmerstorename);
       })
       .catch((err) => {
         console.log(err);
       });
+  }, []);
+  useEffect(() => {
+    (() => {
+      fetch(
+        "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          setProvinces(result);
+        });
+    })();
   }, []);
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -181,6 +221,9 @@ const AddUser = (prop: { jwt_token: string }) => {
         console.log(res.data);
       });
   };
+  const onChangeHandle = (id: string) => {
+    setAmphures(provinces[parseInt(id)].amphure);
+  };
 
   return (
     <Container component="main" maxWidth="xs" sx={{ marginTop: 3 }}>
@@ -196,10 +239,15 @@ const AddUser = (prop: { jwt_token: string }) => {
           <CreateIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          แก้ไขข้อมูลส่วนตัว
+          แก้ไขข้อมูล
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Divider textAlign="left">
+                <Typography>ข้อมูลส่วนตัว</Typography>
+              </Divider>
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 disabled
@@ -294,6 +342,63 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
               />
             </Grid>
+
+            <Grid item xs={12}>
+              <Divider textAlign="left">
+                <Typography>ข้อมูลร้านค้า</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="ชื่อร้านค้า"
+                fullWidth
+                value={storeName}
+                onChange={(event) => setStoreName(event.target.value)}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                select
+                label="จังหวัด"
+                fullWidth
+                onChange={(event) => {
+                  console.log(event);
+                  onChangeHandle(event.target.value);
+                }}
+              >
+                {provinces.map((province: province) => (
+                  <MenuItem value={province.id}>{province.name_th}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                label="เขต/อำเภอ"
+                fullWidth
+                onChange={(event) => {
+                  let tambon = amphures.filter(
+                    (amphure) => amphure.id == event.target.value
+                  )[0].tambon;
+                  setTambons(tambon);
+                }}
+              >
+                {amphures.map((amphure: amphure) => (
+                  <MenuItem value={amphure.id}>{amphure.name_th}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField select label="แขวง/ตำบล" fullWidth>
+                {tambons.map((tambon: tambon) => (
+                  <MenuItem value={tambon.id}>{tambon.name_th}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="รหัสไปรษณีย์" fullWidth />
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 value={tel}
@@ -321,18 +426,110 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
               />
             </Grid>
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 2 }}
+                style={{ color: "#fff" }}
+              >
+                ยืนยัน
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Divider textAlign="left">
+                <Typography>รหัสผ่าน</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="password"
+                label="รหัสผ่านเดิม"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
+                  validatePassword(event)
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="comfirmPassword"
+                label="รหัสผ่านใหม่"
+                value={comfirmPassword}
+                onChange={(event) => setPasswordNew(event.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowComfirmPassword}
+                        onMouseDown={handleMouseDownComfirmPassword}
+                      >
+                        {showComfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="ยืนยันรหัสผ่านใหม่"
+                type={showComfirmPassword ? "text" : "password"}
+                value={comfirmPassword}
+                onChange={(event) => setComfirmPassword(event.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowComfirmPassword}
+                        onMouseDown={handleMouseDownComfirmPassword}
+                      >
+                        {showComfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button color="primary" variant="contained" fullWidth>
+                เปลี่ยนรหัสผ่าน
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
           </Grid>
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2 }}
-            style={{ color: "#fff" }}
-          >
-            ยืนยัน
-          </Button>
         </Box>
       </Box>
     </Container>

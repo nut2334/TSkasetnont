@@ -150,7 +150,8 @@ const SigleProduct = () => {
         draggable="false"
       />
     );
-    if (product.additional_image) {
+    if (product.additional_image != "null" && product.additional_image != "") {
+      console.log(product.additional_image);
       slides.push(
         JSON.parse(product.additional_image.replace("\\", "")).map(
           (image: string) => (
