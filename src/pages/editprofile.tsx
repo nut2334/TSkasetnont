@@ -36,12 +36,16 @@ interface tambon {
   name_th: string;
 }
 
-const AddUser = (prop: { jwt_token: string }) => {
+const EditProfile = (prop: {
+  jwt_token: string;
+  admin?: { username: string; role: string };
+}) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
+  const apiUpdateInfoadmin = config.getApiEndpoint("updateinfoadmin", "GET");
 
   const [username, setUsername] = useState<string>("");
   const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
@@ -146,24 +150,48 @@ const AddUser = (prop: { jwt_token: string }) => {
       });
   }, []);
   useEffect(() => {
-    axios
-      .get(apiGetinfo, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setUsername(res.data.username);
-        setEmail(res.data.email);
-        setFirstName(res.data.firstname);
-        setLastName(res.data.lastname);
-        setTel(res.data.phone);
-        setStoreName(res.data.farmerstorename);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (!prop.admin) {
+      axios
+        .get(apiGetinfo, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setUsername(res.data.username);
+          setEmail(res.data.email);
+          setFirstName(res.data.firstname);
+          setLastName(res.data.lastname);
+          setTel(res.data.phone);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      const { username, role } = prop.admin;
+      const apiGetAdmininfo = config.getApiEndpoint(
+        `getuseradmin/${role}/${username}`,
+        "GET"
+      );
+
+      axios
+        .get(apiGetAdmininfo, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          setUsername(res.data.username);
+          setEmail(res.data.email);
+          setFirstName(res.data.firstname);
+          setLastName(res.data.lastname);
+          setTel(res.data.phone);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }, []);
   useEffect(() => {
     (() => {
@@ -205,16 +233,26 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = {
+    var data = {
       username: username,
       email: email,
       firstname: firstName,
       lastname: lastName,
       phone: tel,
+    } as {
+      username: string;
+      email: string;
+      firstname: string;
+      lastname: string;
+      phone: string;
+      role?: string;
     };
-    console.log(data);
+    if (prop.admin) {
+      data = { ...data, role: prop.admin.role };
+    }
+
     axios
-      .post(apiUpdateInfo, data, {
+      .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
         headers: { Authorization: `Bearer ${prop.jwt_token}` },
       })
       .then((res) => {
@@ -536,4 +574,4 @@ const AddUser = (prop: { jwt_token: string }) => {
   );
 };
 
-export default AddUser;
+export default EditProfile;
