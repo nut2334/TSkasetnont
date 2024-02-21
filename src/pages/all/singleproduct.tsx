@@ -64,7 +64,6 @@ interface FullProductInterface {
   selectedType: string;
 }
 
-
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -75,7 +74,7 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
 };
-const SigleProduct = (prop:{
+const SigleProduct = (prop: {
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
 }) => {
@@ -246,7 +245,7 @@ const SigleProduct = (prop:{
       </Box>
 
       <Typography variant="h4">{product.product_name}</Typography>
-     
+
       <Typography
         variant="h6"
         sx={{
@@ -255,8 +254,6 @@ const SigleProduct = (prop:{
       >
         {product.price} บาท/{product.unit}
       </Typography>
-     
-      
 
       <Stack
         direction="row"
@@ -332,12 +329,13 @@ const SigleProduct = (prop:{
             <Stack>
               <AddCircleIcon color="secondary" onClick={add} />
             </Stack>
-                {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
-                  <Stack>
-                    <Typography>
-                      มีสินค้าทั้งหมด {product.stock} {product.unit}
-                    </Typography>
-                  </Stack>)}
+            {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+              <Stack>
+                <Typography>
+                  มีสินค้าทั้งหมด {product.stock} {product.unit}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
 
           <Stack
@@ -348,14 +346,14 @@ const SigleProduct = (prop:{
           >
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <Stack>
-                <NavLink to="/reservation/">
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<PointOfSaleIcon />}
-                >
-                  จองสินค้า
-                </Button>
+                <NavLink to={`/reservation/${product.product_id}`}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<PointOfSaleIcon />}
+                  >
+                    จองสินค้า
+                  </Button>
                 </NavLink>
               </Stack>
             )}
@@ -372,10 +370,15 @@ const SigleProduct = (prop:{
                         amount: amount,
                         product_name: product.product_name,
                         price: product.price,
-                        
                       };
-                      prop.cartList.find((item) => item.product_id == product.product_id);
-                      if (typeof prop.cartList.find((item) => item.product_id == product.product_id) !== "undefined") {
+                      prop.cartList.find(
+                        (item) => item.product_id == product.product_id
+                      );
+                      if (
+                        typeof prop.cartList.find(
+                          (item) => item.product_id == product.product_id
+                        ) !== "undefined"
+                      ) {
                         let index = prop.cartList.findIndex(
                           (item) => item.product_id == product.product_id
                         );

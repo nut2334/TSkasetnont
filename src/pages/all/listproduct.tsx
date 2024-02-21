@@ -132,9 +132,9 @@ const ListProduct = () => {
   const apiProducts = config.getApiEndpoint("getproducts", "GET");
 
   const [searchContent, setSearchContent] = React.useState("");
-  const [sortBy, setSortBy] = React.useState<"last_modified" | "price" | "view_count">(
-    "last_modified"
-  );
+  const [sortBy, setSortBy] = React.useState<
+    "last_modified" | "price" | "view_count"
+  >("last_modified");
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
   const [allCategory, setAllCategory] = React.useState<CateagoryInterface[]>(
     []
@@ -151,10 +151,13 @@ const ListProduct = () => {
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
-      setAllCategory([{
-        category_id: "",
-        category_name: "ทั้งหมด",
-      }, ...res.data]);
+      setAllCategory([
+        {
+          category_id: "",
+          category_name: "ทั้งหมด",
+        },
+        ...res.data,
+      ]);
     });
 
     let paramsCategory = searchParams.get("category");
@@ -179,7 +182,9 @@ const ListProduct = () => {
     }
 
     if (paramsSort) {
-      setSortBy(searchParams.get("sort") as "last_modified" | "price" | "view_count");
+      setSortBy(
+        searchParams.get("sort") as "last_modified" | "price" | "view_count"
+      );
     }
 
     if (paramsOrder) {
