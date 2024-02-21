@@ -15,6 +15,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Cookies from "universal-cookie";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 interface Page {
   name: string;
@@ -195,8 +196,11 @@ const Navbar = (prop: {
                 </NavLink>
               ))}
             </Box>
+            {prop.role == "members" && <NavLink to = "/listcart" 
+            ><ShoppingCartIcon/></NavLink>}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
+              
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {!prop.role && (
                   <NavLink to="/login" style={{ textDecoration: "none" }}>
