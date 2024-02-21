@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import "react-slideshow-image/dist/styles.css";
 import "./shop.css";
 import {
@@ -32,6 +32,7 @@ import {
   FacebookIcon,
   LineIcon,
 } from "react-share";
+import { Cart } from "../../App";
 
 interface ProductInterface {
   product_id: string;
@@ -63,6 +64,7 @@ interface FullProductInterface {
   selectedType: string;
 }
 
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -73,7 +75,10 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
 };
-const SigleProduct = () => {
+const SigleProduct = (prop:{
+  setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
+  cartList: Cart[];
+}) => {
   const carousel = useRef<AliceCarousel>(null);
   const [amount, setAmount] = useState(1);
   const [showProduct, setShowProduct] = useState<ProductInterface[]>([]);
@@ -150,7 +155,7 @@ const SigleProduct = () => {
         draggable="false"
       />
     );
-    if (product.additional_image != "null" && product.additional_image != "") {
+    if (product.additional_image) {
       console.log(product.additional_image);
       slides.push(
         JSON.parse(product.additional_image.replace("\\", "")).map(
@@ -241,6 +246,7 @@ const SigleProduct = () => {
       </Box>
 
       <Typography variant="h4">{product.product_name}</Typography>
+     
       <Typography
         variant="h6"
         sx={{
@@ -249,6 +255,8 @@ const SigleProduct = () => {
       >
         {product.price} บาท/{product.unit}
       </Typography>
+     
+      
 
       <Stack
         direction="row"
@@ -324,10 +332,12 @@ const SigleProduct = () => {
             <Stack>
               <AddCircleIcon color="secondary" onClick={add} />
             </Stack>
-
-            <Typography>
-              มีสินค้าทั้งหมด {product.stock} {product.unit}
-            </Typography>
+                {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+                  <Stack>
+                    <Typography>
+                      มีสินค้าทั้งหมด {product.stock} {product.unit}
+                    </Typography>
+                  </Stack>)}
           </Stack>
 
           <Stack
@@ -338,6 +348,7 @@ const SigleProduct = () => {
           >
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <Stack>
+                <NavLink to="/reservation/">
                 <Button
                   variant="contained"
                   color="secondary"
@@ -345,6 +356,7 @@ const SigleProduct = () => {
                 >
                   จองสินค้า
                 </Button>
+                </NavLink>
               </Stack>
             )}
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
@@ -354,6 +366,26 @@ const SigleProduct = () => {
                     variant="contained"
                     color="secondary"
                     startIcon={<AddShoppingCartIcon />}
+                    onClick={() => {
+                      let cart: Cart = {
+                        product_id: product.product_id,
+                        amount: amount,
+                        product_name: product.product_name,
+                        price: product.price,
+                        
+                      };
+                      prop.cartList.find((item) => item.product_id == product.product_id);
+                      if (typeof prop.cartList.find((item) => item.product_id == product.product_id) !== "undefined") {
+                        let index = prop.cartList.findIndex(
+                          (item) => item.product_id == product.product_id
+                        );
+                        let newCart = [...prop.cartList];
+                        newCart[index].amount += amount;
+                        prop.setCartList(newCart);
+                      } else {
+                        prop.setCartList([...prop.cartList, cart]);
+                      }
+                    }}
                   >
                     หยิบใส่ตะกร้า
                   </Button>

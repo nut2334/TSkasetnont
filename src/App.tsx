@@ -19,11 +19,21 @@ import theme from "./themeMui";
 import ListProduct from "./pages/all/listproduct";
 import SigleProduct from "./pages/all/singleproduct";
 import EditProfile from "./pages/editprofile";
+import ListCart from "./pages/member/listcart";
+import Reserve from "./pages/member/reserve";
+
+export interface Cart {
+  product_id: string;
+  amount: number;
+  product_name: string;
+  price: number;
+}
 
 function App() {
   const apiLogin = config.getApiEndpoint("login", "GET");
   const [jwt_token, setJwt_token] = React.useState("");
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
+  const [cartList, setCartList] = React.useState<Cart[]>([ ]);
 
   useEffect(() => {
     const cookies = new Cookies();
@@ -81,13 +91,13 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop/:productid" element={<SigleProduct />} />
-          {decodeJWT.role && (
-            <Route
-              path="/editprofile"
-              element={<EditProfile jwt_token={jwt_token} />}
-            />
-          )}
+          <Route path="/shop/:productid" element={<SigleProduct setCartList={setCartList} cartList={cartList} />}/>
+            {decodeJWT.role && (
+              <Route
+                path="/editprofile"
+                element={<EditProfile jwt_token={jwt_token} />}
+              />
+            )}
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
@@ -118,7 +128,19 @@ function App() {
               <Route path="/manageuser" element={<ManageUser jwt_token={jwt_token} />} />
             </React.Fragment>
           )}
-        </Routes>{" "}
+          {decodeJWT.role == "members" && (
+            <>
+            <Route
+              path="/listcart"
+              element={<ListCart cartList={cartList} jwt_token={jwt_token}/>}
+            />
+            <Route
+            path="/reservation/:productid"
+            element={<Reserve/>}
+            />
+            </>
+          )}
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   );

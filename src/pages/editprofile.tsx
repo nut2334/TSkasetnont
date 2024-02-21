@@ -239,6 +239,7 @@ const EditProfile = (prop: {
       firstname: firstName,
       lastname: lastName,
       phone: tel,
+      
     } as {
       username: string;
       email: string;
@@ -288,6 +289,8 @@ const EditProfile = (prop: {
             </Grid>
             <Grid item xs={12}>
               <TextField
+
+                variant="filled"
                 disabled
                 value={username}
                 name="username"
