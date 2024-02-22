@@ -48,7 +48,7 @@ const themeMui = createTheme({
   },
 });
 
-const Link = styled(NavLink)`
+export const NavLinkk = styled(NavLink)`
   text-decoration: none;
   &:hover {
     text-decoration: none;

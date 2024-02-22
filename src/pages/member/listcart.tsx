@@ -8,6 +8,7 @@ import axios from "axios";
 import * as config from "../../config/config";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Grid from "@mui/material/Grid";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 
 const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
   const apiCheckOut = config.getApiEndpoint("checkout", "POST");
@@ -19,6 +20,7 @@ const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
           return (
             <>
               <Box
+                marginBottom={2}
                 sx={{
                   border: 1,
                   width: "100%",
@@ -34,10 +36,10 @@ const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
                   <Grid item xs={1}>
                     <Typography>จำนวน {cart.amount}</Typography>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={11}>
                     <Typography>{cart.price} บาท</Typography>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={1}>
                     <Button
                       onClick={() => {
                         console.log(cart);
@@ -48,11 +50,12 @@ const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
                   </Grid>
                 </Grid>
               </Box>
-              <Divider />
             </>
           );
         })}
         <Button
+          startIcon={<PointOfSaleIcon />}
+          variant="contained"
           onClick={() => {
             console.log(prop.cartList);
             axios.post(
