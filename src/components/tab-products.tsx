@@ -39,7 +39,7 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
           </TabList>
         </Box>
         <TabPanel value="1">
-          <Myproducts username={prop.username} />
+          <Myproducts jwt_token={prop.jwt_token} username={prop.username} />
         </TabPanel>
         <TabPanel value="2">8796</TabPanel>
         <TabPanel value="3">87678678</TabPanel>

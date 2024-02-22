@@ -57,9 +57,11 @@ const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
             console.log(prop.cartList);
             axios.post(
               apiCheckOut,
-              prop.cartList.map((cart) => {
-                return { product_id: cart.product_id, amount: cart.amount };
-              }),
+              {
+                cartList: prop.cartList.map((cart) => {
+                  return { product_id: cart.product_id, amount: cart.amount };
+                })
+              },
               {
                 headers: {
                   Authorization: `Bearer ${prop.jwt_token}`,
