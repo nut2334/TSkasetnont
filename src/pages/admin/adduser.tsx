@@ -50,6 +50,7 @@ const AddUser = () => {
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
   const [role, setRole] = React.useState<string>("");
+  const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -153,6 +154,10 @@ const AddUser = () => {
       tel: tel,
       role: role,
     };
+    if (role == "") {
+      setRoleCheck(false);
+      return;
+    }
     axios.post(apiAddUser, data).then((res) => {
       console.log(res.data);
     });
@@ -374,6 +379,8 @@ const AddUser = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={!roleCheck}
+                helperText={roleCheck == false ? "กรุณาเลือกตำแหน่ง" : ""}
                 fullWidth
                 id="role"
                 label="ตำแหน่ง"
