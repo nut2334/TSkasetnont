@@ -25,7 +25,7 @@ interface ProductInterface {
   last_modified: Date;
   product_viewed: number;
 }
-const Myproducts = (prop: { username: string }) => {
+const Myproducts = (prop: { jwt_token: string, username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([])
   const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   useEffect(() => {
@@ -91,9 +91,20 @@ const Myproducts = (prop: { username: string }) => {
                 <CardActions>
                   <NavLink to={"/shop/" + product.product_id}>
                     <Button size="small">View</Button>
-
                   </NavLink>
                   <Button size="small">Edit</Button>
+                  <Button size="small" onClick={() => {
+                    const apiDeleteProduct = config.getApiEndpoint(`deleteproduct/${product.product_id}`, "POST");
+                    axios.delete(apiDeleteProduct,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                      }
+                    ).then((response: any) => {
+                      console.log(response.data);
+                    });
+                  }}>Delete</Button>
                 </CardActions>
               </Card>
             </Grid>

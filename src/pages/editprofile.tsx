@@ -19,7 +19,15 @@ import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
 import { jwtDecode } from "jwt-decode";
-import { isPropertyAccessOrQualifiedName } from "typescript";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { Icon, IconOptions, LatLng, LatLngLiteral } from "leaflet";
+
+const iconMarker = new Icon({
+  iconUrl: require('../assets/icon.svg').default,
+  iconSize: [50, 50],
+  iconAnchor: [25, 50],
+  popupAnchor: [0, -40],
+});
 
 interface province {
   id: string;
@@ -36,6 +44,7 @@ interface tambon {
   name_th: string;
   zip_code: number;
 }
+
 
 const EditProfile = (prop: {
   jwt_token: string;
@@ -80,6 +89,7 @@ const EditProfile = (prop: {
   const [provinces, setProvinces] = useState<province[]>([]);
   const [amphures, setAmphures] = useState<amphure[]>([]);
   const [tambons, setTambons] = useState<tambon[]>([]);
+  const [address, setAddress] = useState<string>("");
   const [selected, setSelected] = useState<
     {
       province_name_th: string
@@ -94,6 +104,9 @@ const EditProfile = (prop: {
   const [zipCode, setZipCode] = useState<number>();
   const [facebookLink, setFacebookLink] = useState<string>("");
   const [lineId, setLineId] = useState<string>("");
+  const [position, setPosition] = useState<LatLngLiteral>();
+
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -160,61 +173,100 @@ const EditProfile = (prop: {
       });
   }, []);
   useEffect(() => {
-    if (!prop.admin) {
-      axios
-        .get(apiGetinfo, {
-          headers: {
-            Authorization: `Bearer ${prop.jwt_token}`,
-          },
-        })
-        .then((res) => {
-          console.log(res.data);
-          setUsername(res.data.username);
-          setEmail(res.data.email);
-          setFirstName(res.data.firstname);
-          setLastName(res.data.lastname);
-          setTel(res.data.phone);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      const { username, role } = prop.admin;
-      const apiGetAdmininfo = config.getApiEndpoint(
-        `getuseradmin/${role}/${username}`,
-        "GET"
-      );
-
-      axios
-        .get(apiGetAdmininfo, {
-          headers: {
-            Authorization: `Bearer ${prop.jwt_token}`,
-          },
-        })
-        .then((res) => {
-          setUsername(res.data.username);
-          setEmail(res.data.email);
-          setFirstName(res.data.firstname);
-          setLastName(res.data.lastname);
-          setTel(res.data.phone);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, []);
-  useEffect(() => {
-    (() => {
-      fetch(
+    (async () => {
+      let dataProvinces = await axios.get(
         "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
       )
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
+      let provinces = dataProvinces.data as province[]
 
-          setProvinces(result);
-        });
-    })();
+      if (!prop.admin) {
+        axios
+          .get(apiGetinfo, {
+            headers: {
+              Authorization: `Bearer ${prop.jwt_token}`,
+            },
+          })
+          .then((res) => {
+            setUsername(res.data.username);
+            setEmail(res.data.email);
+            setFirstName(res.data.firstname);
+            setLastName(res.data.lastname);
+            setTel(res.data.phone);
+            setSelected({
+              province_name_th: res.data.province,
+              amphure_name_th: res.data.amphure,
+              tambon_name_th: res.data.tambon,
+            });
+            let amphures
+            if (res.data.province) {
+              amphures = provinces.filter((province) => province.name_th == res.data.province)[0].amphure;
+              setAmphures(amphures);
+            }
+
+            if (res.data.amphure && amphures) {
+              setTambons(amphures.filter((amphures) => amphures.name_th == res.data.amphure)[0].tambon);
+            }
+
+            setProvinces(provinces);
+            setAddress(res.data.address);
+            setZipCode(res.data.zipcode);
+            setStoreName(res.data.farmerstorename);
+            setFacebookLink(res.data.facebooklink);
+            setLineId(res.data.lineid);
+            setPosition({ lat: res.data.lat, lng: res.data.lng });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        const { username, role } = prop.admin;
+        const apiGetAdmininfo = config.getApiEndpoint(
+          `getuseradmin/${role}/${username}`,
+          "GET"
+        );
+
+        axios
+          .get(apiGetAdmininfo, {
+            headers: {
+              Authorization: `Bearer ${prop.jwt_token}`,
+            },
+          })
+          .then((res) => {
+            setUsername(res.data.username);
+            setEmail(res.data.email);
+            setFirstName(res.data.firstname);
+            setLastName(res.data.lastname);
+            setTel(res.data.phone);
+            setSelected({
+              province_name_th: res.data.province,
+              amphure_name_th: res.data.amphure,
+              tambon_name_th: res.data.tambon,
+            });
+            let amphures
+            if (res.data.province) {
+              amphures = provinces.filter((province) => province.name_th == res.data.province)[0].amphure;
+              setAmphures(amphures);
+            }
+
+            if (res.data.amphure && amphures) {
+              setTambons(amphures.filter((amphures) => amphures.name_th == res.data.amphure)[0].tambon);
+            }
+
+            setProvinces(provinces);
+            setAddress(res.data.address);
+            setZipCode(res.data.zipcode);
+            setStoreName(res.data.farmerstorename);
+            setFacebookLink(res.data.facebooklink);
+            setLineId(res.data.lineid);
+            setPosition({ lat: res.data.lat, lng: res.data.lng });
+          }
+          )
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    })()
+
   }, []);
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -251,7 +303,7 @@ const EditProfile = (prop: {
       firstname: firstName,
       lastname: lastName,
       phone: tel,
-      
+
     } as {
       username: string;
       email: string;
@@ -263,6 +315,12 @@ const EditProfile = (prop: {
       amphure?: string;
       tambon?: string;
       role?: string;
+      lat?: number;
+      lng?: number;
+      facebooklink?: string;
+      lineid?: string;
+      address?: string;
+      zipcode?: number;
     };
     if (prop.admin) {
       data = { ...data, role: prop.admin.role };
@@ -277,6 +335,12 @@ const EditProfile = (prop: {
         province: selected.province_name_th,
         amphure: selected.amphure_name_th,
         tambon: selected.tambon_name_th,
+        lat: position?.lat,
+        lng: position?.lng,
+        facebooklink: facebookLink,
+        lineid: lineId,
+        address: address,
+        zipcode: zipCode,
       };
     }
 
@@ -287,10 +351,35 @@ const EditProfile = (prop: {
       .then((res) => {
         console.log(res.data);
       });
+
   };
 
+  const CreateMarker = () => {
+
+    useMapEvents({
+      // locate latlng on click
+      click(e) {
+        setPosition(e.latlng)
+      },
+    })
+
+    return position === null ? null : (
+      <Marker position={position ? position : {
+        lat: 13.736717,
+        lng: 100.523186
+      } as LatLngLiteral}
+        icon={iconMarker}
+      >
+        <Popup>You are here</Popup>
+      </Marker>
+    );
+  }
+
+  // useMapEvent('click', (e) => {
+  //   console.log(e.latlng);
+  // });
   return (
-    <Container component="main" maxWidth="xs" sx={{ marginTop: 3 }}>
+    <Container component="main" maxWidth="lg" sx={{ marginTop: 3, position: 'relative' }}>
       <Box
         sx={{
           marginTop: 0,
@@ -477,6 +566,7 @@ const EditProfile = (prop: {
                     select
                     label="จังหวัด"
                     fullWidth
+                    value={selected.province_name_th}
                     onChange={(event) => {
                       setAmphures(provinces.filter((province) => province.name_th == event.target.value)[0].amphure);
 
@@ -489,7 +579,6 @@ const EditProfile = (prop: {
                   >
                     {provinces.map((province: province) => (
                       <MenuItem value={province.name_th}
-                        selected={province.name_th == selected.province_name_th}
                       >{province.name_th}</MenuItem>
                     ))}
                   </TextField>
@@ -499,6 +588,7 @@ const EditProfile = (prop: {
                     select
                     label="เขต/อำเภอ"
                     fullWidth
+                    value={selected.amphure_name_th}
                     onChange={(event) => {
                       setTambons(amphures.filter((amphures) => amphures.name_th == event.target.value)[0].tambon);
 
@@ -512,23 +602,23 @@ const EditProfile = (prop: {
                   >
                     {amphures.map((amphure: amphure) => (
                       <MenuItem value={amphure.name_th}
-                        selected={amphure.name_th == selected.amphure_name_th}
                       >{amphure.name_th}</MenuItem>
                     ))}
                   </TextField>
                 </Grid>}
 
                 {tambons.length > 0 && <Grid item xs={12}>
-                  <TextField select label="แขวง/ตำบล" fullWidth onChange={(event) => {
-                    setSelected({
-                      ...selected,
-                      tambon_name_th: event.target.value ? event.target.value : selected.tambon_name_th,
-                    });
-                    setZipCode(tambons[0].zip_code);
-                  }}>
+                  <TextField select label="แขวง/ตำบล" fullWidth
+                    value={selected.tambon_name_th}
+                    onChange={(event) => {
+                      setSelected({
+                        ...selected,
+                        tambon_name_th: event.target.value ? event.target.value : selected.tambon_name_th,
+                      });
+                      setZipCode(tambons[0].zip_code);
+                    }}>
                     {tambons.map((tambon: tambon) => (
                       <MenuItem value={tambon.name_th}
-                        selected={tambon.name_th == selected.tambon_name_th}
                       >{tambon.name_th}</MenuItem>
                     ))}
                   </TextField>
@@ -537,8 +627,21 @@ const EditProfile = (prop: {
                   {zipCode && <TextField label="รหัสไปรษณีย์" fullWidth disabled value={zipCode} />}
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField fullWidth multiline rows={4} label="ที่อยู่" />
+                  <TextField fullWidth multiline rows={4} label="ที่อยู่" value={address} onChange={
+                    (event) => {
+                      setAddress(event.target.value);
+                    }
+                  } />
                 </Grid>
+                <MapContainer
+                  center={[13.736717, 100.523186]}
+                  zoom={13}
+                  scrollWheelZoom={true}
+                  style={{ height: "100vh", width: "100%" }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <CreateMarker />
+                </MapContainer>
               </>
             }
             <Grid item xs={12}>
