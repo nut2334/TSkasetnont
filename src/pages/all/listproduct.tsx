@@ -11,9 +11,10 @@ import {
   CardContent,
   CardActions,
 } from "@mui/material";
-import { useSearchParams, Link, NavLink } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
+import { NavLink } from "react-router-dom";
 
 const SearchSection = styled("div")`
   display: flex;
@@ -314,7 +315,12 @@ const ListProduct = () => {
           <Grid container spacing={4}>
             {showProduct.map((product, index) => (
               <Grid item key={index} xs={12} sm={6} md={4}>
-                <NavLink to={`/shop/${product.product_id}`}>
+                <NavLink
+                  to={`/shop/${product.product_id}`}
+                  style={{
+                    textDecoration: "none",
+                  }}
+                >
                   <Card
                     sx={{
                       height: "100%",
