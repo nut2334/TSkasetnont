@@ -94,7 +94,8 @@ const AddUser = () => {
         email: event.target.value,
       })
       .then((res) => {
-        if (res.data) {
+        console.log(res.data);
+        if (res.data.exist == true) {
           setEmailCheck(false);
         } else {
           setEmailCheck(true);
