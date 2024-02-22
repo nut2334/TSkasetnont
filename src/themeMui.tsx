@@ -1,8 +1,11 @@
+import styled from "@emotion/styled";
 import { createTheme } from "@mui/material/styles";
+import { NavLink } from "react-router-dom";
 
 const themeMui = createTheme({
   typography: {
     fontFamily: "Kanit",
+    fontSize: 16,
     h3: {
       fontWeight: 600,
     },
@@ -44,5 +47,12 @@ const themeMui = createTheme({
     },
   },
 });
+
+const Link = styled(NavLink)`
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
+`;
 
 export default themeMui;
