@@ -8,10 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Button, Container, Grid, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { NavLink } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
@@ -21,6 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { jwtDecode } from "jwt-decode";
 
 interface userInterface {
   id: string;
@@ -32,16 +30,19 @@ interface userInterface {
   role: string;
 }
 const ManageUser = (prop: { jwt_token: string }) => {
-  const [users, setUsers] = React.useState<userInterface[]>([]);
-  const [filteredUsers, setFilteredUsers] = React.useState<userInterface[]>([]);
-  const [searchUser, setSearchUser] = React.useState<string>("");
+  const [users, setUsers] = useState<userInterface[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<userInterface[]>([]);
+  const [searchUser, setSearchUser] = useState<string>("");
+  const [searchUsername, setSearchUsername] = useState<string>("");
   const [role, setRole] = useState("");
+  const [currentRole, setCurrentRole] = useState("");
   const [allRole, setAllrole] = useState<
     {
       role_id: string;
       role_name: string;
     }[]
   >([{ role_id: "all", role_name: "ทั้งหมด" }]);
+
   const [editingUser, setEditingUser] = useState<{
     username: string;
     role: string;
@@ -49,7 +50,8 @@ const ManageUser = (prop: { jwt_token: string }) => {
 
   useEffect(() => {
     const apiFetchUsers = config.getApiEndpoint("users", "GET");
-
+    const jwtD = jwtDecode(prop.jwt_token) as { role: string };
+    setCurrentRole(jwtD.role);
     axios
       .get(apiFetchUsers, {
         headers: {
@@ -97,6 +99,11 @@ const ManageUser = (prop: { jwt_token: string }) => {
         user.firstname.includes(searchUser)
       );
     }
+    if (searchUsername !== "") {
+      filteredUsers = filteredUsers.filter((user) =>
+        user.username.includes(searchUsername)
+      );
+    }
     setFilteredUsers(filteredUsers);
   };
 
@@ -116,18 +123,35 @@ const ManageUser = (prop: { jwt_token: string }) => {
         <>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography component="h1" variant="h5">
-                จัดการสมาชิก
-              </Typography>
+              {currentRole != "tambons" && (
+                <Typography component="h1" variant="h5">
+                  จัดการสมาชิก
+                </Typography>
+              )}
+              {currentRole == "tambons" && (
+                <Typography component="h1" variant="h5">
+                  จัดการเกษตรกร
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={6}>
               <TextField
                 id="name"
-                label="ชื่อสมาชิก"
+                label="ชื่อ"
                 variant="outlined"
                 fullWidth
                 onChange={(event) =>
                   setSearchUser(event.target.value as string)
+                }
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Username"
+                variant="outlined"
+                fullWidth
+                onChange={(event) =>
+                  setSearchUsername(event.target.value as string)
                 }
               />
             </Grid>
@@ -203,20 +227,20 @@ const ManageUser = (prop: { jwt_token: string }) => {
                     <TableCell align="center">
                       <RemoveRedEyeIcon
                         sx={{
-                          color: "green",
+                          color: "#36AE7C",
                           cursor: "pointer",
                         }}
                       />
                       <EditIcon
                         sx={{
-                          color: "darkorange",
+                          color: "#F9D923",
                           cursor: "pointer",
                         }}
                         onClick={() => editUser(user.username, user.role)}
                       />
                       <DeleteIcon
                         sx={{
-                          color: "red",
+                          color: "#EB5353",
                           cursor: "pointer",
                         }}
                         onClick={() => deleteUser(user.username, user.role)}

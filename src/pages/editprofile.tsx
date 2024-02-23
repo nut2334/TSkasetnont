@@ -797,39 +797,42 @@ const EditProfile = (prop: {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                type={showPasswordNew ? "text" : "password"}
-                fullWidth
-                label="รหัสผ่านใหม่"
-                value={passwordNew}
-                onChange={(event) => {
-                  setPasswordNew(event.target.value);
-                }}
-                onBlur={validatePassword}
-                error={!passwordCheck}
-                helperText={
-                  passwordNew == "" && passwordCheck == false
-                    ? "กรุณากรอกรหัสผ่าน"
-                    : "" || !passwordCheck
-                    ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
-                    : ""
-                }
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPasswordNew}
-                        onMouseDown={handleMouseDownPasswordNew}
-                      >
-                        {showPasswordNew ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+            {!prop.admin && (
+              <Grid item xs={12}>
+                <TextField
+                  type={showPasswordNew ? "text" : "password"}
+                  fullWidth
+                  label="รหัสผ่านใหม่"
+                  value={passwordNew}
+                  onChange={(event) => {
+                    setPasswordNew(event.target.value);
+                  }}
+                  onBlur={validatePassword}
+                  error={!passwordCheck}
+                  helperText={
+                    passwordNew == "" && passwordCheck == false
+                      ? "กรุณากรอกรหัสผ่าน"
+                      : "" || !passwordCheck
+                      ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                      : ""
+                  }
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPasswordNew}
+                          onMouseDown={handleMouseDownPasswordNew}
+                        >
+                          {showPasswordNew ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+            )}
+
             <Grid item xs={12}>
               <TextField
                 fullWidth

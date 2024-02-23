@@ -148,6 +148,14 @@ function App() {
               <Route path="/reservation/:productid" element={<Reserve />} />
             </>
           )}
+          {decodeJWT.role == "tambons" && (
+            <>
+              <Route
+                path="/managefarmer"
+                element={<ManageUser jwt_token={jwt_token} />}
+              />
+            </>
+          )}
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
