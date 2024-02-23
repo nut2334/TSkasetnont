@@ -12,11 +12,14 @@ import {
 import axios from "axios";
 import * as config from "../../config/config";
 import CreateIcon from "@mui/icons-material/Create";
-import Hue from "@uiw/react-color-hue";
-import { CirclePicker } from "react-color";
-import FmdGoodIcon from "@mui/icons-material/FmdGood";
+import AddIcon from '@mui/icons-material/Add';
+import {
+  BlockPicker, RGBColor
+} from "react-color";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
-const SettingAdmin = () => {
+const SettingAdmin = (prop: { jwt_token: string }) => {
   const [category, setCategory] = React.useState<
     {
       category_id: string;
@@ -28,16 +31,31 @@ const SettingAdmin = () => {
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [textColor, setTextColor] = useState<string>("");
-  const [bgColor, setBgColor] = useState<string>("");
-
-  const [hsva, setHsva] = useState({ h: 0, s: 0, v: 68, a: 1 });
+  const [bgColor, setBgColor] = useState<RGBColor>({ r: 0, g: 0, b: 0, a: 1 });
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
       setCategory(res.data);
     });
   }, []);
+  useEffect(() => {
+    if (isDark(bgColor)) {
+      setTextColor("white");
+    }
+    else {
+      setTextColor("black");
+    }
+  }, [bgColor]);
+
+  const isDark = (color: RGBColor) => {
+    var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
+    if (luma < 128) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
   const handleEdit = (id: string) => {
-    console.log(id);
     setId(id);
     setName(
       category.filter((cat) => {
@@ -45,6 +63,43 @@ const SettingAdmin = () => {
       })[0].category_name
     );
   };
+
+  const handleSubmit = () => {
+    let body = {
+      category_id: id,
+      category_name: name,
+      bgcolor: JSON.stringify(bgColor),
+    };
+
+    axios
+      .post(config.getApiEndpoint("categories", "POST"), body, {
+        headers: {
+          "Authorization": `Bearer ${prop.jwt_token}`,
+        }
+      })
+      .then((res) => {
+        console.log(res);
+        axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
+          setCategory(res.data);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  const showSwal = () => {
+    console.log("1");
+
+    withReactContent(Swal).fire({
+      title: <i>Input something</i>,
+      input: 'text',
+      inputLabel: 'Your category name',
+      preConfirm: () => {
+        setId(Swal.getInput()?.value || '')
+      },
+    })
+  }
 
   return (
     <Container
@@ -66,6 +121,7 @@ const SettingAdmin = () => {
         </Grid>
         <Grid item xs={12}>
           {category.map((cat) => {
+            let bgcolor = cat.bgcolor ? JSON.parse(cat.bgcolor) : { r: 235, g: 235, b: 235, a: 1 } as { r: number, g: number, b: number, a: number };
             if (cat.category_id !== "OTHER") {
               return (
                 <Chip
@@ -74,11 +130,11 @@ const SettingAdmin = () => {
                   onDelete={() => {
                     handleEdit(cat.category_id);
                   }}
-                  deleteIcon={<CreateIcon />}
+                  deleteIcon={<CreateIcon sx={{ fill: isDark(bgcolor) ? "white" : "black" }} />}
                   sx={{
                     margin: "5px",
-                    backgroundColor: cat.bgcolor,
-                    color: cat.textcolor,
+                    backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                    color: isDark(bgcolor) ? "white" : "black",
                   }}
                 />
               );
@@ -92,6 +148,13 @@ const SettingAdmin = () => {
               );
             }
           })}
+          <Chip
+            label={<AddIcon sx={{ paddingTop: '5px' }} />}
+            onClick={
+              showSwal
+            }
+            sx={{ margin: "5px", position: "relative" }}
+          />
         </Grid>
         <Grid item xs={12}>
           <Divider>
@@ -100,45 +163,39 @@ const SettingAdmin = () => {
         </Grid>
         {id && (
           <>
-            <Box>
-              <Chip
-                label={name}
-                sx={{
-                  margin: "5px",
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  fontSize: "20px",
-                }}
-              />
+            <Box sx={{ display: 'flex', textAlign: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Chip
+                  label={name}
+                  sx={{
+                    marginBottom: "10px",
+                    backgroundColor: `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`,
+                    color: textColor,
+                    fontSize: "20px",
+                  }}
+                />
+                <BlockPicker
+                  color={bgColor}
+                  onChange={(color) => {
+                    setBgColor(color.rgb);
+                  }}
+                />
+              </Box>
+              <Box>
+                <TextField
+                  value={name}
+                  id="outlined-basic"
+                  label="ชื่อหมวดหมู่"
+                  variant="outlined"
+                  fullWidth
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
+                />
 
-              <TextField
-                value={name}
-                id="outlined-basic"
-                label="ชื่อหมวดหมู่"
-                variant="outlined"
-                fullWidth
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-              />
+                <Button variant="contained" onClick={handleSubmit}>บันทึก</Button>
+              </Box>
 
-              <Typography>สีตัวอักษร</Typography>
-              <CirclePicker
-                color={textColor}
-                onChange={(color) => {
-                  setTextColor(color.hex);
-                }}
-              />
-
-              <Typography>สีพื้นหลัง</Typography>
-              <Hue
-                hue={hsva.h}
-                onChange={(newHue) => {
-                  setHsva({ ...hsva, ...newHue });
-                }}
-              />
-
-              <Button variant="contained">บันทึก</Button>
             </Box>
           </>
         )}

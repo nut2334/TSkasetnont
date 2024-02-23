@@ -128,7 +128,7 @@ function App() {
 
           {decodeJWT.role == "admins" && (
             <React.Fragment>
-              <Route path="/setting" element={<SettingAdmin />} />
+              <Route path="/setting" element={<SettingAdmin jwt_token={jwt_token} />} />
               <Route
                 path="/adduser"
                 element={<AddUser jwt_token={jwt_token} />}
