@@ -33,7 +33,7 @@ function App() {
   const apiLogin = config.getApiEndpoint("login", "GET");
   const [jwt_token, setJwt_token] = React.useState("");
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
-  const [cartList, setCartList] = React.useState<Cart[]>([ ]);
+  const [cartList, setCartList] = React.useState<Cart[]>([]);
 
   useEffect(() => {
     const cookies = new Cookies();
@@ -91,13 +91,18 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop/:productid" element={<SigleProduct setCartList={setCartList} cartList={cartList} />}/>
-            {decodeJWT.role && (
-              <Route
-                path="/editprofile"
-                element={<EditProfile jwt_token={jwt_token} />}
-              />
-            )}
+          <Route
+            path="/shop/:productid"
+            element={
+              <SigleProduct setCartList={setCartList} cartList={cartList} />
+            }
+          />
+          {decodeJWT.role && (
+            <Route
+              path="/editprofile"
+              element={<EditProfile jwt_token={jwt_token} />}
+            />
+          )}
           {decodeJWT.role == "farmers" && (
             <React.Fragment>
               <Route
@@ -124,20 +129,23 @@ function App() {
           {decodeJWT.role == "admins" && (
             <React.Fragment>
               <Route path="/setting" element={<SettingAdmin />} />
-              <Route path="/adduser" element={<AddUser />} />
-              <Route path="/manageuser" element={<ManageUser jwt_token={jwt_token} />} />
+              <Route
+                path="/adduser"
+                element={<AddUser jwt_token={jwt_token} />}
+              />
+              <Route
+                path="/manageuser"
+                element={<ManageUser jwt_token={jwt_token} />}
+              />
             </React.Fragment>
           )}
           {decodeJWT.role == "members" && (
             <>
-            <Route
-              path="/listcart"
-              element={<ListCart cartList={cartList} jwt_token={jwt_token}/>}
-            />
-            <Route
-            path="/reservation/:productid"
-            element={<Reserve/>}
-            />
+              <Route
+                path="/listcart"
+                element={<ListCart cartList={cartList} jwt_token={jwt_token} />}
+              />
+              <Route path="/reservation/:productid" element={<Reserve />} />
             </>
           )}
         </Routes>

@@ -16,8 +16,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../../config/config";
+import Swal from "sweetalert2";
 
-const AddUser = () => {
+const AddUser = (prop: { jwt_token: string }) => {
   const apiAddUser = config.getApiEndpoint("adduser", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
@@ -39,7 +40,6 @@ const AddUser = () => {
     React.useState<boolean>(true);
   const [lastName, setLastName] = React.useState<string>("");
   const [lastNameValidate, setLastNameValidate] = React.useState<boolean>(true);
-  const [sameLang, setSameLang] = React.useState<boolean>(true);
   const [tel, setTel] = React.useState<string>("");
   const [telValidate, setTelValidate] = React.useState<boolean>(true);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
@@ -54,6 +54,19 @@ const AddUser = () => {
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  useEffect(() => {
+    axios
+      .get(apiRole)
+      .then((res) => {
+        if (res.data) {
+          setAllrole(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -77,7 +90,7 @@ const AddUser = () => {
         username: event.target.value,
       })
       .then((res) => {
-        if (res.data) {
+        if (res.data.exist == true) {
           setUsernameCheck(false);
         } else {
           setUsernameCheck(true);
@@ -89,12 +102,24 @@ const AddUser = () => {
   };
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
+    const userData = {
+      email: event.target.value,
+    };
+    const emailRegExp = new RegExp(
+      "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$"
+    );
+    if (emailRegExp.test(userData.email)) {
+      setEmailReg(true);
+      sendToBackend(userData);
+    } else {
+      setEmailReg(false);
+    }
+  };
+
+  const sendToBackend = (userData: { email: string }) => {
     axios
-      .post(apiCheckingemail, {
-        email: event.target.value,
-      })
+      .post(apiCheckingemail, userData)
       .then((res) => {
-        console.log(res.data);
         if (res.data.exist == true) {
           setEmailCheck(false);
         } else {
@@ -105,18 +130,6 @@ const AddUser = () => {
         console.log(err);
       });
   };
-  useEffect(() => {
-    axios
-      .get(apiRole)
-      .then((res) => {
-        if (res.data) {
-          setAllrole(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
     const passwordRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -128,7 +141,7 @@ const AddUser = () => {
   };
 
   const checkLang = (event: React.FocusEvent<HTMLInputElement>) => {
-    const langRegExp = /^[a-zA-Zก-๙]+$/;
+    const langRegExp = /^[a-zA-Zก-๏\s]+$/;
     if (langRegExp.test(event.target.value)) {
       if (event.target.id == "firstName") {
         setFirstNameValidate(true);
@@ -155,20 +168,40 @@ const AddUser = () => {
       tel: tel,
       role: role,
     };
+    console.log(data);
     if (role == "") {
       setRoleCheck(false);
       return;
     }
-    axios.post(apiAddUser, data).then((res) => {
-      console.log(res.data);
-    });
+    axios
+      .post(apiAddUser, data, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        Swal.fire({
+          icon: "success",
+          title: "เพิ่มเจ้าหน้าที่สำเร็จ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "เพิ่มเจ้าหน้าที่ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
-          marginTop: 0,
+          marginTop: 8,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -319,7 +352,7 @@ const AddUser = () => {
                 fullWidth
                 id="firstName"
                 label="ชื่อ"
-                error={!firstNameValidate || !sameLang}
+                error={!firstNameValidate}
                 helperText={
                   firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
@@ -340,14 +373,12 @@ const AddUser = () => {
                 label="นามสกุล"
                 name="lastName"
                 autoComplete="family-name"
-                error={!lastNameValidate || !sameLang}
+                error={!lastNameValidate}
                 helperText={
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
                     ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : "" || !sameLang
-                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
                     : ""
                 }
               />
@@ -388,9 +419,10 @@ const AddUser = () => {
                 name="role"
                 select
                 required
-                onChange={(event: React.FocusEvent<HTMLInputElement>) =>
-                  setRole(event.target.value)
-                }
+                onChange={(event: React.FocusEvent<HTMLInputElement>) => {
+                  setRole(event.target.value);
+                  setRoleCheck(true);
+                }}
               >
                 {allrole.map((data) => (
                   <MenuItem key={data.role_id} value={data.role_id}>

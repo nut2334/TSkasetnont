@@ -19,11 +19,17 @@ import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
 import { jwtDecode } from "jwt-decode";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 import { Icon, IconOptions, LatLng, LatLngLiteral } from "leaflet";
 
 const iconMarker = new Icon({
-  iconUrl: require('../assets/icon.svg').default,
+  iconUrl: require("../assets/icon.svg").default,
   iconSize: [50, 50],
   iconAnchor: [25, 50],
   popupAnchor: [0, -40],
@@ -44,7 +50,6 @@ interface tambon {
   name_th: string;
   zip_code: number;
 }
-
 
 const EditProfile = (prop: {
   jwt_token: string;
@@ -79,6 +84,7 @@ const EditProfile = (prop: {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
+  const [showPasswordNew, setShowPasswordNew] = useState<boolean>(false);
 
   const [allrole, setAllrole] = useState<
     [{ role_id: string; role_name: string }]
@@ -90,13 +96,11 @@ const EditProfile = (prop: {
   const [amphures, setAmphures] = useState<amphure[]>([]);
   const [tambons, setTambons] = useState<tambon[]>([]);
   const [address, setAddress] = useState<string>("");
-  const [selected, setSelected] = useState<
-    {
-      province_name_th: string
-      amphure_name_th: string
-      tambon_name_th: string
-    }
-  >({
+  const [selected, setSelected] = useState<{
+    province_name_th: string;
+    amphure_name_th: string;
+    tambon_name_th: string;
+  }>({
     province_name_th: "",
     amphure_name_th: "",
     tambon_name_th: "",
@@ -105,7 +109,6 @@ const EditProfile = (prop: {
   const [facebookLink, setFacebookLink] = useState<string>("");
   const [lineId, setLineId] = useState<string>("");
   const [position, setPosition] = useState<LatLngLiteral>();
-
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -122,6 +125,14 @@ const EditProfile = (prop: {
   };
 
   const handleMouseDownComfirmPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+  const handleClickShowPasswordNew = () => {
+    setShowPasswordNew(!showPasswordNew);
+  };
+  const handleMouseDownPasswordNew = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
@@ -176,8 +187,8 @@ const EditProfile = (prop: {
     (async () => {
       let dataProvinces = await axios.get(
         "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
-      )
-      let provinces = dataProvinces.data as province[]
+      );
+      let provinces = dataProvinces.data as province[];
 
       if (!prop.admin) {
         axios
@@ -197,14 +208,20 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
-            let amphures
+            let amphures;
             if (res.data.province) {
-              amphures = provinces.filter((province) => province.name_th == res.data.province)[0].amphure;
+              amphures = provinces.filter(
+                (province) => province.name_th == res.data.province
+              )[0].amphure;
               setAmphures(amphures);
             }
 
             if (res.data.amphure && amphures) {
-              setTambons(amphures.filter((amphures) => amphures.name_th == res.data.amphure)[0].tambon);
+              setTambons(
+                amphures.filter(
+                  (amphures) => amphures.name_th == res.data.amphure
+                )[0].tambon
+              );
             }
 
             setProvinces(provinces);
@@ -242,14 +259,20 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
-            let amphures
+            let amphures;
             if (res.data.province) {
-              amphures = provinces.filter((province) => province.name_th == res.data.province)[0].amphure;
+              amphures = provinces.filter(
+                (province) => province.name_th == res.data.province
+              )[0].amphure;
               setAmphures(amphures);
             }
 
             if (res.data.amphure && amphures) {
-              setTambons(amphures.filter((amphures) => amphures.name_th == res.data.amphure)[0].tambon);
+              setTambons(
+                amphures.filter(
+                  (amphures) => amphures.name_th == res.data.amphure
+                )[0].tambon
+              );
             }
 
             setProvinces(provinces);
@@ -259,14 +282,12 @@ const EditProfile = (prop: {
             setFacebookLink(res.data.facebooklink);
             setLineId(res.data.lineid);
             setPosition({ lat: res.data.lat, lng: res.data.lng });
-          }
-          )
+          })
           .catch((err) => {
             console.log(err);
           });
       }
-    })()
-
+    })();
   }, []);
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -303,7 +324,6 @@ const EditProfile = (prop: {
       firstname: firstName,
       lastname: lastName,
       phone: tel,
-
     } as {
       username: string;
       email: string;
@@ -326,9 +346,12 @@ const EditProfile = (prop: {
       data = { ...data, role: prop.admin.role };
     }
 
-    if (jwtDecode<{
-      role: string;
-    }>(prop.jwt_token).role == "farmers" || prop.admin?.role == "farmers") {
+    if (
+      jwtDecode<{
+        role: string;
+      }>(prop.jwt_token).role == "farmers" ||
+      prop.admin?.role == "farmers"
+    ) {
       data = {
         ...data,
         farmerstorename: storeName,
@@ -351,35 +374,58 @@ const EditProfile = (prop: {
       .then((res) => {
         console.log(res.data);
       });
-
+  };
+  const changePassword = () => {
+    if (passwordNew == comfirmPassword) {
+      axios
+        .post(
+          config.getApiEndpoint("changepassword", "POST"),
+          {
+            username: username,
+            oldpassword: password,
+            newpassword: passwordNew,
+          },
+          {
+            headers: { Authorization: `Bearer ${prop.jwt_token}` },
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+        });
+    }
   };
 
   const CreateMarker = () => {
-
     useMapEvents({
       // locate latlng on click
       click(e) {
-        setPosition(e.latlng)
+        setPosition(e.latlng);
       },
-    })
+    });
 
     return position === null ? null : (
-      <Marker position={position ? position : {
-        lat: 13.736717,
-        lng: 100.523186
-      } as LatLngLiteral}
+      <Marker
+        position={
+          position
+            ? position
+            : ({
+                lat: 13.736717,
+                lng: 100.523186,
+              } as LatLngLiteral)
+        }
         icon={iconMarker}
       >
         <Popup>You are here</Popup>
       </Marker>
     );
-  }
+  };
 
-  // useMapEvent('click', (e) => {
-  //   console.log(e.latlng);
-  // });
   return (
-    <Container component="main" maxWidth="lg" sx={{ marginTop: 3, position: 'relative' }}>
+    <Container
+      component="main"
+      maxWidth="lg"
+      sx={{ marginTop: 3, position: "relative" }}
+    >
       <Box
         sx={{
           marginTop: 0,
@@ -403,7 +449,6 @@ const EditProfile = (prop: {
             </Grid>
             <Grid item xs={12}>
               <TextField
-
                 variant="filled"
                 disabled
                 value={username}
@@ -417,10 +462,10 @@ const EditProfile = (prop: {
                   username == "" && usernameCheck == false
                     ? "กรุณากรอก Username"
                     : "" || !usernameCheck
-                      ? "Username นี้มีผู้ใช้งานแล้ว"
-                      : "" || !usernameReg
-                        ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                        : ""
+                    ? "Username นี้มีผู้ใช้งานแล้ว"
+                    : "" || !usernameReg
+                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                    : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -442,8 +487,8 @@ const EditProfile = (prop: {
                   email == "" && emailCheck == false
                     ? "กรุณากรอก Email"
                     : "" || !emailReg
-                      ? "กรุณากรอก Email ให้ถูกต้อง"
-                      : ""
+                    ? "กรุณากรอก Email ให้ถูกต้อง"
+                    : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -468,8 +513,8 @@ const EditProfile = (prop: {
                   firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
                     : "" || !firstNameValidate
-                      ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                      : ""
+                    ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                    : ""
                 }
               />
             </Grid>
@@ -490,10 +535,10 @@ const EditProfile = (prop: {
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
-                      ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                      : "" || !sameLang
-                        ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
-                        : ""
+                    ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                    : "" || !sameLang
+                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
+                    : ""
                 }
               />
             </Grid>
@@ -519,15 +564,15 @@ const EditProfile = (prop: {
                   tel == "" && telValidate == false
                     ? "กรุณากรอกเบอร์โทรศัพท์"
                     : "" || !telValidate
-                      ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
-                      : ""
-
+                    ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
+                    : ""
                 }
               />
             </Grid>
             {(jwtDecode<{
               role: string;
-            }>(prop.jwt_token).role == "farmers" || prop.admin?.role == "farmers") &&
+            }>(prop.jwt_token).role == "farmers" ||
+              prop.admin?.role == "farmers") && (
               <>
                 <Grid item xs={12}>
                   <Divider textAlign="left">
@@ -568,70 +613,106 @@ const EditProfile = (prop: {
                     fullWidth
                     value={selected.province_name_th}
                     onChange={(event) => {
-                      setAmphures(provinces.filter((province) => province.name_th == event.target.value)[0].amphure);
+                      setAmphures(
+                        provinces.filter(
+                          (province) => province.name_th == event.target.value
+                        )[0].amphure
+                      );
 
                       setSelected({
-                        province_name_th: event.target.value ? event.target.value : selected.province_name_th,
+                        province_name_th: event.target.value
+                          ? event.target.value
+                          : selected.province_name_th,
                         amphure_name_th: "",
                         tambon_name_th: "",
                       });
                     }}
                   >
                     {provinces.map((province: province) => (
-                      <MenuItem value={province.name_th}
-                      >{province.name_th}</MenuItem>
+                      <MenuItem value={province.name_th}>
+                        {province.name_th}
+                      </MenuItem>
                     ))}
                   </TextField>
                 </Grid>
-                {amphures.length > 0 && <Grid item xs={12}>
+                {amphures.length > 0 && (
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="เขต/อำเภอ"
+                      fullWidth
+                      value={selected.amphure_name_th}
+                      onChange={(event) => {
+                        setTambons(
+                          amphures.filter(
+                            (amphures) => amphures.name_th == event.target.value
+                          )[0].tambon
+                        );
+
+                        setSelected({
+                          ...selected,
+                          amphure_name_th: event.target.value
+                            ? event.target.value
+                            : selected.amphure_name_th,
+                          tambon_name_th: "",
+                        });
+                      }}
+                    >
+                      {amphures.map((amphure: amphure) => (
+                        <MenuItem value={amphure.name_th}>
+                          {amphure.name_th}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                )}
+
+                {tambons.length > 0 && (
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="แขวง/ตำบล"
+                      fullWidth
+                      value={selected.tambon_name_th}
+                      onChange={(event) => {
+                        setSelected({
+                          ...selected,
+                          tambon_name_th: event.target.value
+                            ? event.target.value
+                            : selected.tambon_name_th,
+                        });
+                        setZipCode(tambons[0].zip_code);
+                      }}
+                    >
+                      {tambons.map((tambon: tambon) => (
+                        <MenuItem value={tambon.name_th}>
+                          {tambon.name_th}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                )}
+                <Grid item xs={12}>
+                  {zipCode && (
+                    <TextField
+                      label="รหัสไปรษณีย์"
+                      fullWidth
+                      disabled
+                      value={zipCode}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={12}>
                   <TextField
-                    select
-                    label="เขต/อำเภอ"
                     fullWidth
-                    value={selected.amphure_name_th}
+                    multiline
+                    rows={4}
+                    label="ที่อยู่"
+                    value={address}
                     onChange={(event) => {
-                      setTambons(amphures.filter((amphures) => amphures.name_th == event.target.value)[0].tambon);
-
-                      setSelected({
-                        ...selected,
-                        amphure_name_th: event.target.value ? event.target.value : selected.amphure_name_th,
-                        tambon_name_th: "",
-                      });
-
-                    }}
-                  >
-                    {amphures.map((amphure: amphure) => (
-                      <MenuItem value={amphure.name_th}
-                      >{amphure.name_th}</MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>}
-
-                {tambons.length > 0 && <Grid item xs={12}>
-                  <TextField select label="แขวง/ตำบล" fullWidth
-                    value={selected.tambon_name_th}
-                    onChange={(event) => {
-                      setSelected({
-                        ...selected,
-                        tambon_name_th: event.target.value ? event.target.value : selected.tambon_name_th,
-                      });
-                      setZipCode(tambons[0].zip_code);
-                    }}>
-                    {tambons.map((tambon: tambon) => (
-                      <MenuItem value={tambon.name_th}
-                      >{tambon.name_th}</MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>}
-                <Grid item xs={12}>
-                  {zipCode && <TextField label="รหัสไปรษณีย์" fullWidth disabled value={zipCode} />}
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField fullWidth multiline rows={4} label="ที่อยู่" value={address} onChange={
-                    (event) => {
                       setAddress(event.target.value);
-                    }
-                  } />
+                    }}
+                  />
                 </Grid>
                 <MapContainer
                   center={[13.736717, 100.523186]}
@@ -643,7 +724,7 @@ const EditProfile = (prop: {
                   <CreateMarker />
                 </MapContainer>
               </>
-            }
+            )}
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -689,24 +770,20 @@ const EditProfile = (prop: {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                type={showPasswordNew ? "text" : "password"}
                 fullWidth
-                id="comfirmPassword"
                 label="รหัสผ่านใหม่"
-                value={comfirmPassword}
+                value={passwordNew}
                 onChange={(event) => setPasswordNew(event.target.value)}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={handleClickShowComfirmPassword}
-                        onMouseDown={handleMouseDownComfirmPassword}
+                        onClick={handleClickShowPasswordNew}
+                        onMouseDown={handleMouseDownPasswordNew}
                       >
-                        {showComfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
+                        {showPasswordNew ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -740,7 +817,12 @@ const EditProfile = (prop: {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button color="primary" variant="contained" fullWidth>
+              <Button
+                color="primary"
+                variant="contained"
+                fullWidth
+                onChange={changePassword}
+              >
                 เปลี่ยนรหัสผ่าน
               </Button>
             </Grid>
