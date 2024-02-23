@@ -381,7 +381,6 @@ const EditProfile = (prop: {
         .post(
           config.getApiEndpoint("changepassword", "POST"),
           {
-            username: username,
             oldpassword: password,
             newpassword: passwordNew,
           },
