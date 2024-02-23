@@ -15,7 +15,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Cookies from "universal-cookie";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 interface Page {
   name: string;
@@ -65,7 +65,6 @@ const Navbar = (prop: {
       setVisiblePages([
         ...defaultPages,
         { name: "จัดการสมาชิก", path: "/manageuser" },
-        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
         { name: "การตั้งค่า", path: "/setting" },
       ]);
     }
@@ -75,6 +74,13 @@ const Navbar = (prop: {
         { name: "จัดการสินค้า", path: "/myproducts" },
         { name: "วิเคราะห์สินค้า", path: "/analyze" },
         { name: "ประวัติการซื้อขาย", path: "/history" },
+      ]);
+    }
+    if (prop.role == "tambons") {
+      setVisiblePages([
+        ...defaultPages,
+        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
+        { name: "จัดการเกษตรกร", path: "/managefarmer" },
       ]);
     }
     if (prop.role == "") {
@@ -196,11 +202,14 @@ const Navbar = (prop: {
                 </NavLink>
               ))}
             </Box>
-            {prop.role == "members" && <NavLink to = "/listcart" 
-            ><ShoppingCartIcon/></NavLink>}
+            {prop.role == "members" && (
+              <NavLink to="/listcart">
+                <ShoppingCartIcon />
+              </NavLink>
+            )}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
-              
+
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {!prop.role && (
                   <NavLink to="/login" style={{ textDecoration: "none" }}>
