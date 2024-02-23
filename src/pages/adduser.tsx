@@ -15,8 +15,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import * as config from "../../config/config";
-import { AdduserSuccess, AdduserFail } from "../../components/popup";
+import * as config from "../config/config";
+import { AdduserSuccess, AdduserFail } from "../components/popup";
 
 const AddUser = (prop: { jwt_token: string }) => {
   const apiAddUser = config.getApiEndpoint("adduser", "POST");

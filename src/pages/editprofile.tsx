@@ -89,7 +89,7 @@ const EditProfile = (prop: {
   const [allrole, setAllrole] = useState<
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
-  const [role, setRole] = useState<string>("");
+  const [role, setRole] = useState<string>();
   const [storeName, setStoreName] = useState<string>("");
 
   const [provinces, setProvinces] = useState<province[]>([]);
@@ -171,7 +171,10 @@ const EditProfile = (prop: {
         console.log(err);
       });
   };
+
   useEffect(() => {
+    const currentRole = jwtDecode(prop.jwt_token) as { role: string };
+    setRole(currentRole.role);
     axios
       .get(apiRole)
       .then((res) => {
@@ -189,6 +192,7 @@ const EditProfile = (prop: {
         "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
       );
       let provinces = dataProvinces.data as province[];
+      console.log(provinces);
 
       if (!prop.admin) {
         axios
@@ -696,7 +700,6 @@ const EditProfile = (prop: {
                     </TextField>
                   </Grid>
                 )}
-
                 {tambons.length > 0 && (
                   <Grid item xs={12}>
                     <TextField
@@ -732,6 +735,106 @@ const EditProfile = (prop: {
                     />
                   )}
                 </Grid>
+                <MapContainer
+                  center={[13.736717, 100.523186]}
+                  zoom={13}
+                  scrollWheelZoom={true}
+                  style={{ height: "100vh", width: "100%" }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <CreateMarker />
+                </MapContainer>
+              </>
+            )}
+
+            {role == "members" ||
+              (prop.admin?.role == "members" && provinces && (
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="จังหวัด"
+                      fullWidth
+                      value={selected.province_name_th}
+                      onChange={(event) => {
+                        setAmphures(
+                          provinces.filter(
+                            (province) => province.name_th == event.target.value
+                          )[0].amphure
+                        );
+
+                        setSelected({
+                          province_name_th: event.target.value
+                            ? event.target.value
+                            : selected.province_name_th,
+                          amphure_name_th: "",
+                          tambon_name_th: "",
+                        });
+                      }}
+                    ></TextField>
+                  </Grid>
+                  {amphures.length > 0 && (
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        label="เขต/อำเภอ"
+                        fullWidth
+                        value={selected.amphure_name_th}
+                        onChange={(event) => {
+                          setTambons(
+                            amphures.filter(
+                              (amphures) =>
+                                amphures.name_th == event.target.value
+                            )[0].tambon
+                          );
+
+                          setSelected({
+                            ...selected,
+                            amphure_name_th: event.target.value
+                              ? event.target.value
+                              : selected.amphure_name_th,
+                            tambon_name_th: "",
+                          });
+                        }}
+                      ></TextField>
+                    </Grid>
+                  )}
+                  {tambons.length > 0 && (
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        label="แขวง/ตำบล"
+                        fullWidth
+                        value={selected.tambon_name_th}
+                        onChange={(event) => {
+                          setSelected({
+                            ...selected,
+                            tambon_name_th: event.target.value
+                              ? event.target.value
+                              : selected.tambon_name_th,
+                          });
+                          setZipCode(tambons[0].zip_code);
+                        }}
+                      ></TextField>
+                    </Grid>
+                  )}
+                  <Grid item xs={12}>
+                    {zipCode && (
+                      <TextField
+                        label="รหัสไปรษณีย์"
+                        fullWidth
+                        disabled
+                        value={zipCode}
+                      />
+                    )}
+                  </Grid>
+                </>
+              ))}
+
+            {role == "farmers" ||
+              prop.admin?.role == "farmers" ||
+              role == "members" ||
+              (prop.admin?.role == "members" && (
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -744,17 +847,7 @@ const EditProfile = (prop: {
                     }}
                   />
                 </Grid>
-                <MapContainer
-                  center={[13.736717, 100.523186]}
-                  zoom={13}
-                  scrollWheelZoom={true}
-                  style={{ height: "100vh", width: "100%" }}
-                >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <CreateMarker />
-                </MapContainer>
-              </>
-            )}
+              ))}
             <Grid item xs={12}>
               <Button
                 type="submit"
