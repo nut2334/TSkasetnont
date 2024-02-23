@@ -16,14 +16,13 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../../config/config";
-import Swal from "sweetalert2";
+import { AdduserSuccess, AdduserFail } from "../../components/popup";
 
 const AddUser = (prop: { jwt_token: string }) => {
   const apiAddUser = config.getApiEndpoint("adduser", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
-
   const [username, setUsername] = React.useState<string>("");
   const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
   const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
@@ -45,12 +44,12 @@ const AddUser = (prop: { jwt_token: string }) => {
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
-
   const [allrole, setAllrole] = React.useState<
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
   const [role, setRole] = React.useState<string>("");
   const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -180,20 +179,10 @@ const AddUser = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        Swal.fire({
-          icon: "success",
-          title: "เพิ่มเจ้าหน้าที่สำเร็จ",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        AdduserSuccess();
       })
       .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "เพิ่มเจ้าหน้าที่ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        AdduserFail();
       });
   };
 

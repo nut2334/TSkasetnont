@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import CreateIcon from "@mui/icons-material/Create";
@@ -26,7 +25,8 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-import { Icon, IconOptions, LatLng, LatLngLiteral } from "leaflet";
+import { Icon, LatLngLiteral } from "leaflet";
+import { EdituserSuccess, EdituserFail } from "../components/popup";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -383,6 +383,11 @@ const EditProfile = (prop: {
       })
       .then((res) => {
         console.log(res.data);
+        EdituserSuccess();
+      })
+      .catch((err) => {
+        console.log(err);
+        EdituserFail();
       });
   };
   const changePassword = () => {
