@@ -298,6 +298,16 @@ const EditProfile = (prop: {
       setPasswordCheck(false);
     }
   };
+  const validatePasswordComfirm = (
+    event: React.FocusEvent<HTMLInputElement>
+  ) => {
+    const passwordRegExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (passwordRegExp.test(event.target.value)) {
+      setComfirmPasswordCheck(true);
+    } else {
+      setComfirmPasswordCheck(false);
+    }
+  };
 
   const checkLang = (event: React.FocusEvent<HTMLInputElement>) => {
     const langRegExp = /^[a-zA-Zก-๙]+$/;
@@ -748,10 +758,9 @@ const EditProfile = (prop: {
                 label="รหัสผ่านเดิม"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                  validatePassword(event)
-                }
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -773,7 +782,18 @@ const EditProfile = (prop: {
                 fullWidth
                 label="รหัสผ่านใหม่"
                 value={passwordNew}
-                onChange={(event) => setPasswordNew(event.target.value)}
+                onChange={(event) => {
+                  setPasswordNew(event.target.value);
+                }}
+                onBlur={validatePassword}
+                error={!passwordCheck}
+                helperText={
+                  passwordNew == "" && passwordCheck == false
+                    ? "กรุณากรอกรหัสผ่าน"
+                    : "" || !passwordCheck
+                    ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                    : ""
+                }
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -792,10 +812,21 @@ const EditProfile = (prop: {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                error={!comfirmPasswordCheck}
+                helperText={
+                  comfirmPassword == "" && comfirmPasswordCheck == false
+                    ? "กรุณากรอกรหัสผ่าน"
+                    : "" || !comfirmPasswordCheck
+                    ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                    : ""
+                }
                 label="ยืนยันรหัสผ่านใหม่"
                 type={showComfirmPassword ? "text" : "password"}
                 value={comfirmPassword}
-                onChange={(event) => setComfirmPassword(event.target.value)}
+                onChange={(event) => {
+                  setComfirmPassword(event.target.value);
+                }}
+                onBlur={validatePasswordComfirm}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">

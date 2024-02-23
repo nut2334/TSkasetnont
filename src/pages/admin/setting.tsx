@@ -4,13 +4,21 @@ import { Container, Divider, Grid, Typography } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
 import CreateIcon from "@mui/icons-material/Create";
-import { SketchPicker } from "react-color";
+import { CirclePicker } from "react-color";
 
 const SettingAdmin = () => {
   const [category, setCategory] = React.useState<
     {
       category_id: string;
       category_name: string;
+      color: string;
+    }[]
+  >([]);
+  const [editCategory, setEditCategory] = React.useState<
+    {
+      category_id: string;
+      category_name: string;
+      color: string;
     }[]
   >([]);
   useEffect(() => {
@@ -18,8 +26,9 @@ const SettingAdmin = () => {
       setCategory(res.data);
     });
   }, []);
-  const handleDelete = () => {
-    console.info("You clicked the delete icon.");
+  const handleEdit = () => {
+    console.log(category);
+    setEditCategory(category);
   };
 
   return (
@@ -47,10 +56,9 @@ const SettingAdmin = () => {
                 <Chip
                   key={cat.category_id}
                   label={cat.category_name}
-                  onDelete={handleDelete}
+                  onDelete={handleEdit}
                   deleteIcon={<CreateIcon />}
-                  color="primary"
-                  sx={{ margin: "5px" }}
+                  sx={{ margin: "5px", backgroundColor: cat.color }}
                 />
               );
             } else {
@@ -64,8 +72,13 @@ const SettingAdmin = () => {
             }
           })}
         </Grid>
+        <Grid item xs={12}>
+          <Divider>
+            <Typography>แก้ไขหมวดหมู่สินค้า</Typography>
+          </Divider>
+        </Grid>
+        <CirclePicker />
       </Grid>
-      <SketchPicker />
     </Container>
   );
 };
