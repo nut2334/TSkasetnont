@@ -1,34 +1,49 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Chip from "@mui/material/Chip";
-import { Container, Divider, Grid, Typography } from "@mui/material";
+import {
+  Container,
+  Divider,
+  Grid,
+  Typography,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
 import CreateIcon from "@mui/icons-material/Create";
+import Hue from "@uiw/react-color-hue";
 import { CirclePicker } from "react-color";
+import FmdGoodIcon from "@mui/icons-material/FmdGood";
 
 const SettingAdmin = () => {
   const [category, setCategory] = React.useState<
     {
       category_id: string;
       category_name: string;
-      color: string;
+      textcolor: string;
+      bgcolor: string;
     }[]
   >([]);
-  const [editCategory, setEditCategory] = React.useState<
-    {
-      category_id: string;
-      category_name: string;
-      color: string;
-    }[]
-  >([]);
+  const [id, setId] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [textColor, setTextColor] = useState<string>("");
+  const [bgColor, setBgColor] = useState<string>("");
+
+  const [hsva, setHsva] = useState({ h: 0, s: 0, v: 68, a: 1 });
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
       setCategory(res.data);
     });
   }, []);
-  const handleEdit = () => {
-    console.log(category);
-    setEditCategory(category);
+  const handleEdit = (id: string) => {
+    console.log(id);
+    setId(id);
+    setName(
+      category.filter((cat) => {
+        return cat.category_id === id;
+      })[0].category_name
+    );
   };
 
   return (
@@ -56,9 +71,15 @@ const SettingAdmin = () => {
                 <Chip
                   key={cat.category_id}
                   label={cat.category_name}
-                  onDelete={handleEdit}
+                  onDelete={() => {
+                    handleEdit(cat.category_id);
+                  }}
                   deleteIcon={<CreateIcon />}
-                  sx={{ margin: "5px", backgroundColor: cat.color }}
+                  sx={{
+                    margin: "5px",
+                    backgroundColor: cat.bgcolor,
+                    color: cat.textcolor,
+                  }}
                 />
               );
             } else {
@@ -77,7 +98,50 @@ const SettingAdmin = () => {
             <Typography>แก้ไขหมวดหมู่สินค้า</Typography>
           </Divider>
         </Grid>
-        <CirclePicker />
+        {id && (
+          <>
+            <Box>
+              <Chip
+                label={name}
+                sx={{
+                  margin: "5px",
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  fontSize: "20px",
+                }}
+              />
+
+              <TextField
+                value={name}
+                id="outlined-basic"
+                label="ชื่อหมวดหมู่"
+                variant="outlined"
+                fullWidth
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+              />
+
+              <Typography>สีตัวอักษร</Typography>
+              <CirclePicker
+                color={textColor}
+                onChange={(color) => {
+                  setTextColor(color.hex);
+                }}
+              />
+
+              <Typography>สีพื้นหลัง</Typography>
+              <Hue
+                hue={hsva.h}
+                onChange={(newHue) => {
+                  setHsva({ ...hsva, ...newHue });
+                }}
+              />
+
+              <Button variant="contained">บันทึก</Button>
+            </Box>
+          </>
+        )}
       </Grid>
     </Container>
   );
