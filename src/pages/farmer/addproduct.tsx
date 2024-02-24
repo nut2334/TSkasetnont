@@ -529,7 +529,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item lg={6} xs={12}>
+                <Grid item xs={12}>
                   <TextField
                     id="outlined-basic"
                     label="จำนวนคลังสินค้า"

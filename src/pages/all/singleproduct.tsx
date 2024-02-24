@@ -9,6 +9,7 @@ import {
   Stack,
   Box,
   Divider,
+  TextField,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
@@ -400,7 +401,11 @@ const SigleProduct = (prop: {
               )}
             </Stack>
             <Stack>
-              <Typography>{amount}</Typography>
+              <TextField
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(parseInt(e.target.value))}
+              />
             </Stack>
             <Stack>
               <AddCircleIcon color="secondary" onClick={add} />
@@ -413,7 +418,11 @@ const SigleProduct = (prop: {
               </Stack>
             )}
           </Stack>
-
+          <Box>
+            <Typography variant="h6">ค่าจัดส่ง</Typography>
+            {/* ทำต่อ */}
+            <Typography>{}</Typography>
+          </Box>
           <Stack
             direction="row"
             spacing={2}
@@ -435,11 +444,6 @@ const SigleProduct = (prop: {
             )}
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
-                <Box>
-                  <Typography variant="h6">ค่าจัดส่ง</Typography>
-                  {/* ทำต่อ */}
-                  <Typography>{}</Typography>
-                </Box>
                 <Stack>
                   <Button
                     variant="contained"
