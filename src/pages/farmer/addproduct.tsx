@@ -26,6 +26,7 @@ import AddStandard from "../../components/addstandard";
 import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
+import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
@@ -40,12 +41,11 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedType, setSelectedType] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number>();
   const [unit, setUnit] = useState<string>("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [deposit, setDeposit] = useState<number>(0);
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>();
   const [selectedStandard, setSelectedStandard] = React.useState<
     {
       standard_id: string;
@@ -54,18 +54,43 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       standard_expire: Date | undefined;
       standard_cercification: File | undefined;
     }[]
-  >([]);
-  const [dataCarriage, setDataCarriage] = useState<
+  >([{ standard_id: "", standard_name: "", standard_number: "", standard_expire: undefined, standard_cercification: undefined }]);
+  const [shippingcost, setShippingCost] = useState<
     {
       weight: number;
       price: number;
     }[]
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
+  const { productid } = useParams<{ productid: string }>();
 
   useEffect(() => {
     console.log(selectedStandard);
   }, [selectedStandard]);
+
+  useEffect(() => {
+    if (productid) {
+      let apiGetProduct = config.getApiEndpoint(`getproduct/${productid}`, "GET");
+      axios.get(apiGetProduct).then((res) => {
+        console.log(res.data);
+        setProductName(res.data.product_name);
+        setSelectedCategory(res.data.category_id);
+        setDescription(res.data.product_description);
+        setSelectedType(res.data.selectedType);
+        setPrice(res.data.price);
+        setUnit(res.data.unit);
+        setStock(res.data.stock);
+        setSelectedStatus(res.data.selectedStatus);
+        setStartDate(res.data.startDate);
+        setEndDate(res.data.endDate);
+        console.log(JSON.parse(res.data.certificate));
+
+        setSelectedStandard(JSON.parse(res.data.certificate));
+        setShippingCost(JSON.parse(res.data.shippingcost));
+      })
+    }
+  }
+    , []);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryId = event.target.value;
@@ -155,13 +180,22 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       //รูปแบบการเก็บข้อมูล
       data.append("selectedType", selectedType);
       //ราคา
-      data.append("price", price.toString());
+      if (price) {
+        data.append("price", price.toString());
+      }
       //หน่วย
-      data.append("unit", unit);
+      if (unit) {
+        data.append("unit", unit);
+      }
       //คลังสินค้า
-      data.append("stock", stock.toString());
+      if (stock) {
+        data.append("stock", stock.toString());
+
+      }
       //สถานะการจอง
-      data.append("selectedStatus", selectedStatus);
+      if (selectedStatus) {
+        data.append("selectedStatus", selectedStatus);
+      }
       //วันเริ่มรับจอง
       if (startDate) {
         data.append("startDate", startDate);
@@ -170,8 +204,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       if (endDate) {
         data.append("endDate", endDate);
       }
-      //ราคามัดจำ
-      data.append("deposit", deposit.toString());
       //มาตรฐานสินค้า
       console.log(selectedStandard);
       data.append("selectedStandard", JSON.stringify(selectedStandard));
@@ -184,7 +216,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         }
       });
       //ค่าส่ง
-      data.append("dataCarriage", JSON.stringify(dataCarriage));
+      data.append("shippingcost", JSON.stringify(shippingcost));
 
       axios.post(apiAddProduct, data, {
         headers: {
@@ -194,8 +226,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }
   };
   useEffect(() => {
-    //console.log(dataCarriage);
-  }, [dataCarriage]);
+    //console.log(shippingcost);
+  }, [shippingcost]);
 
   const storageImage = () => {
     return Swal.fire({
@@ -237,6 +269,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 id="outlined-basic"
                 label="ชื่อสินค้า"
                 variant="outlined"
+                value={productName}
                 fullWidth
                 onChange={(e) => setProductName(e.target.value)}
                 error={!checkProductName}
@@ -245,7 +278,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               />
             </Grid>
             <Grid item xs={6}>
-              <DropdownCatagory handleCategoryChange={handleCategoryChange} />
+              <DropdownCatagory value={selectedCategory} handleCategoryChange={handleCategoryChange} />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -254,6 +287,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 type="text"
                 multiline
                 fullWidth
+                value={description}
                 rows={4}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -475,7 +509,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     label="ราคามัดจำ"
                     variant="outlined"
                     fullWidth
-                    onChange={(e) => setDeposit(parseInt(e.target.value))}
+                    onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -557,7 +591,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     onChange={(e) => setStock(parseInt(e.target.value))}
                   />
                 </Grid>
-                <AddCarriage unit={unit} setDataCarriage={setDataCarriage} />
+                <AddCarriage unit={unit} setShippingCost={setShippingCost} />
               </>
             )}
           </Grid>
