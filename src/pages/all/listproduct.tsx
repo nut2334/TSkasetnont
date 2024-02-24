@@ -29,16 +29,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { RGBColor } from "react-color";
 import Pagination from "@mui/material/Pagination";
 
-const SearchSection = styled("div")`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 10px;
-  @media (min-width: 600px) {
-    padding: 0 20px;
-  }
-`;
-
 interface sortInterface {
   title: string;
   type: "last_modified" | "price" | "view_count";
@@ -58,19 +48,6 @@ const sortType = [
     type: "view_count",
   },
 ] as sortInterface[];
-
-const Cateagory = styled("div")`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 15%;
-  background-color: #f5f5f5;
-  align-items: center;
-  padding: 0 10px;
-  @media (min-width: 600px) {
-    padding: 20px;
-  }
-`;
 
 interface CateagoryInterface {
   category_id: string;
@@ -107,11 +84,12 @@ const ListProduct = () => {
       category_id: "",
       category_name: "ทั้งหมด",
     });
-  const [page, setPage] = React.useState("0");
+  const [page, setPage] = React.useState("1");
   const [searchParams, setSearchParams] = useSearchParams();
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
   const [hasMore, setHasMore] = React.useState(true);
   const [value, setValue] = React.useState(0);
+  const [maxPage, setMaxPage] = React.useState(0);
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
@@ -188,7 +166,7 @@ const ListProduct = () => {
         params: {
           ["search"]: searchContent,
           ["category"]: selectedCategory.category_id,
-          ["page"]: page,
+          ["page"]: (parseInt(page) - 1).toString(),
           ["sort"]: sortBy,
           ["order"]: order,
         },
@@ -197,14 +175,15 @@ const ListProduct = () => {
         console.log(res.data);
         setShowProduct(res.data.products);
         setHasMore(res.data.hasMore);
+        setMaxPage(res.data.maxPage);
       })
       .catch((err) => {
         console.log(err);
       });
   }, [selectedCategory, page, sortBy, order, searchContent]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setValue(value);
   };
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
@@ -213,6 +192,13 @@ const ListProduct = () => {
     } else {
       return false;
     }
+  };
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    console.log(value);
+    setPage(value.toString());
   };
 
   return (
@@ -406,33 +392,22 @@ const ListProduct = () => {
                 );
               })}
             </Grid>
-            <Pagination
-              count={parseInt(page) + 1}
-              page={parseInt(page) + 1}
-              onChange={(e, value) => {
-                setPage((value - 1).toString());
+            <Container
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px",
               }}
-            />
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              {parseInt(page) > 0 && (
-                <Button
-                  onClick={() => {
-                    setPage((prev) => (parseInt(prev) - 1).toString());
-                  }}
-                >
-                  ก่อนหน้า
-                </Button>
-              )}
-              {hasMore && (
-                <Button
-                  onClick={() => {
-                    setPage((prev) => (parseInt(prev) + 1).toString());
-                  }}
-                >
-                  ถัดไป
-                </Button>
-              )}
-            </div>
+            >
+              <Pagination
+                count={maxPage}
+                page={parseInt(page)}
+                onChange={(e, value) => {
+                  console.log(value);
+                  handleChangePage(e, value);
+                }}
+              />
+            </Container>
           </Container>
         </div>
       </Container>
