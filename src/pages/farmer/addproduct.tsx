@@ -12,7 +12,6 @@ import {
   Avatar,
   TextField,
   Divider,
-  InputAdornment,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +27,7 @@ import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -229,6 +229,22 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     //console.log(shippingcost);
   }, [shippingcost]);
 
+  const storageImage = () => {
+    return Swal.fire({
+      title: "<strong>คลังรูปภาพ</strong>",
+      html: `
+      <input type="file" id="file" accept="image/*" />
+        `,
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: "ยืนยัน",
+      confirmButtonAriaLabel: "Thumbs up, great!",
+      cancelButtonText: "ยกเลิก",
+      cancelButtonAriaLabel: "Thumbs down",
+    });
+  };
+
   return (
     <React.Fragment>
       <Container component="main" maxWidth="md">
@@ -284,11 +300,14 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 />
                 รูปปก
               </Typography>
-              <input
+              {/* <input
                 type="file"
                 accept="image/*"
                 onChange={handleProductImageChange}
-              />
+              /> */}
+              <Button onClick={storageImage} variant="contained">
+                เลือกรูปภาพ
+              </Button>
               {productImage && (
                 <div style={{ marginTop: "10px" }}>
                   <img
@@ -447,7 +466,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} lg={6}>
               <TextField select fullWidth label="รูปแบบสินค้า">
                 {web_activity.map((activity) => (
                   <MenuItem
@@ -545,7 +564,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             )}
             {selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
-                <Grid item xs={4}>
+                <Grid item xs={8} lg={6}>
                   <TextField
                     id="outlined-basic"
                     label="ราคา"
@@ -554,7 +573,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={4} lg={6}>
                   <TextField
                     id="outlined-basic"
                     label="หน่วย"
@@ -563,7 +582,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     id="outlined-basic"
                     label="จำนวนคลังสินค้า"
