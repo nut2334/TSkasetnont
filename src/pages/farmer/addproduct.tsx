@@ -12,7 +12,6 @@ import {
   Avatar,
   TextField,
   Divider,
-  InputAdornment,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,6 +26,7 @@ import AddStandard from "../../components/addstandard";
 import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
+import Swal from "sweetalert2";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -197,6 +197,22 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     //console.log(dataCarriage);
   }, [dataCarriage]);
 
+  const storageImage = () => {
+    return Swal.fire({
+      title: "<strong>คลังรูปภาพ</strong>",
+      html: `
+      <input type="file" id="file" accept="image/*" />
+        `,
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: "ยืนยัน",
+      confirmButtonAriaLabel: "Thumbs up, great!",
+      cancelButtonText: "ยกเลิก",
+      cancelButtonAriaLabel: "Thumbs down",
+    });
+  };
+
   return (
     <React.Fragment>
       <Container component="main" maxWidth="md">
@@ -250,11 +266,14 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 />
                 รูปปก
               </Typography>
-              <input
+              {/* <input
                 type="file"
                 accept="image/*"
                 onChange={handleProductImageChange}
-              />
+              /> */}
+              <Button onClick={storageImage} variant="contained">
+                เลือกรูปภาพ
+              </Button>
               {productImage && (
                 <div style={{ marginTop: "10px" }}>
                   <img
