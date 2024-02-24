@@ -34,7 +34,7 @@ const SetDataCarriage = (prop: {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={2}>
+        <Grid item lg={2} xs={3}>
           <TextField
             label="น้ำหนัก"
             type="number"
@@ -42,10 +42,10 @@ const SetDataCarriage = (prop: {
             onChange={(e) => setWeight(parseInt(e.target.value))}
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item lg={2} xs={3}>
           <TextField label="หน่วย" value={prop.unit} disabled />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item lg={2} xs={3}>
           <TextField
             label="ค่าส่ง"
             type="number"
@@ -53,7 +53,7 @@ const SetDataCarriage = (prop: {
             onChange={(e) => setPrice(parseInt(e.target.value))}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item lg={1} xs={1}>
           <Button
             variant="contained"
             color="primary"
@@ -69,7 +69,7 @@ const SetDataCarriage = (prop: {
           </Button>
         </Grid>
         {prop.index !== 0 && (
-          <Grid item xs={1}>
+          <Grid item lg={1}>
             <Button
               variant="contained"
               color="secondary"

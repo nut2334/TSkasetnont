@@ -413,7 +413,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} lg={6}>
               <TextField select fullWidth label="รูปแบบสินค้า">
                 {web_activity.map((activity) => (
                   <MenuItem
@@ -511,7 +511,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             )}
             {selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
-                <Grid item xs={4}>
+                <Grid item xs={8} lg={6}>
                   <TextField
                     id="outlined-basic"
                     label="ราคา"
@@ -520,7 +520,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={4} lg={6}>
                   <TextField
                     id="outlined-basic"
                     label="หน่วย"
@@ -529,7 +529,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     fullWidth
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item lg={6} xs={12}>
                   <TextField
                     id="outlined-basic"
                     label="จำนวนคลังสินค้า"

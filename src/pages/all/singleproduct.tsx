@@ -7,7 +7,6 @@ import {
   Container,
   Typography,
   Stack,
-  Grid,
   Box,
   Divider,
 } from "@mui/material";
@@ -80,7 +79,6 @@ const SigleProduct = (prop: {
 }) => {
   const carousel = useRef<AliceCarousel>(null);
   const [amount, setAmount] = useState(1);
-  const [showProduct, setShowProduct] = useState<ProductInterface[]>([]);
   const [product, setProduct] = useState<FullProductInterface>({
     product_id: "",
     product_name: "",
@@ -202,6 +200,75 @@ const SigleProduct = (prop: {
 
     return [].concat(...slides);
   };
+
+  const GenerateSlideComputer = () => {
+    let slides = [];
+    slides.push(
+      <img
+        src={`${config.getApiEndpoint(
+          `getimage/${product.product_image.split("/").pop()}`,
+          "get"
+        )}`}
+        className="sliderimg"
+        style={{
+          width: "100%",
+          height: "500px",
+          objectFit: "cover",
+        }}
+        onClick={() => {
+          setShowFullImage(product.product_image);
+        }}
+        draggable="false"
+      />
+    );
+    if (product.additional_image) {
+      console.log(product.additional_image);
+      slides.push(
+        JSON.parse(product.additional_image.replace("\\", "")).map(
+          (image: string) => (
+            <img
+              className="sliderimg"
+              style={{
+                width: "100%",
+                height: "250px",
+                objectFit: "cover",
+              }}
+              src={`${config.getApiEndpoint(
+                `getimage/${image.split("/").pop()}`,
+                "get"
+              )}`}
+              draggable="false"
+              onClick={() => {
+                setShowFullImage(image);
+              }}
+            />
+          )
+        )
+      );
+    }
+    if (product.product_video) {
+      slides.push(
+        <video
+          controls
+          style={{
+            width: "100%",
+            height: "250px",
+            objectFit: "cover",
+          }}
+        >
+          <source
+            src={`${config.getApiEndpoint(
+              `getimage/${product.product_video.split("/").pop()}`,
+              "get"
+            )}`}
+            type="video/mp4"
+          />
+        </video>
+      );
+    }
+
+    return [].concat(...slides);
+  };
   return (
     <Container component="main" maxWidth="lg">
       <Box sx={{ position: "relative" }}>
@@ -209,7 +276,7 @@ const SigleProduct = (prop: {
           <ArrowBackIosNewIcon
             sx={{
               position: "absolute",
-              top: "30%",
+              top: "40%",
               zIndex: 1,
               backgroundColor: "gray",
               color: "white",
@@ -222,7 +289,7 @@ const SigleProduct = (prop: {
             sx={{
               position: "absolute",
               zIndex: 1,
-              top: "30%",
+              top: "40%",
               backgroundColor: "gray",
               color: "white",
               right: 20,
@@ -230,8 +297,17 @@ const SigleProduct = (prop: {
             }}
             onClick={(e) => carousel?.current?.slideNext(e)}
           />
+          <AliceCarousel
+            key="carousel"
+            disableButtonsControls
+            mouseTracking
+            infinite
+            ref={carousel}
+          >
+            {GenerateSlideComputer()}
+          </AliceCarousel>
         </Box>
-        <Box display={{ xs: "flex" }}>
+        <Box display={{ xs: "flex", lg: "none" }}>
           <AliceCarousel
             key="carousel"
             mouseTracking
@@ -359,6 +435,11 @@ const SigleProduct = (prop: {
             )}
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
+                <Box>
+                  <Typography variant="h6">ค่าจัดส่ง</Typography>
+                  {/* ทำต่อ */}
+                  <Typography>{}</Typography>
+                </Box>
                 <Stack>
                   <Button
                     variant="contained"
