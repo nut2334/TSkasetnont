@@ -25,6 +25,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
+import QuantityInput from "../../components/addamount";
 
 import {
   FacebookShareButton,
@@ -123,15 +124,6 @@ const SigleProduct = (prop: {
         console.log(error);
       });
   }, []);
-
-  const add = () => {
-    setAmount(amount + 1);
-  };
-  const subtract = () => {
-    if (amount > 1) {
-      setAmount(amount - 1);
-    }
-  };
 
   const GenerateSlide = () => {
     let slides = [];
@@ -388,6 +380,7 @@ const SigleProduct = (prop: {
           <Stack
             direction="row"
             spacing={2}
+            alignItems="center"
             sx={{
               cursor: "pointer",
               paddingTop: "5px",
@@ -395,20 +388,11 @@ const SigleProduct = (prop: {
             marginLeft={2}
           >
             <Stack>
-              {amount == 1 && <DoNotDisturbOnIcon color="info" />}
-              {amount > 1 && (
-                <DoNotDisturbOnIcon color="secondary" onClick={subtract} />
-              )}
-            </Stack>
-            <Stack>
-              <TextField
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(parseInt(e.target.value))}
+              <QuantityInput
+                stock={product.stock}
+                amount={amount}
+                setAmount={setAmount}
               />
-            </Stack>
-            <Stack>
-              <AddCircleIcon color="secondary" onClick={add} />
             </Stack>
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <Stack>
