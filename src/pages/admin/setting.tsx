@@ -12,12 +12,10 @@ import {
 import axios from "axios";
 import * as config from "../../config/config";
 import CreateIcon from "@mui/icons-material/Create";
-import AddIcon from '@mui/icons-material/Add';
-import {
-  BlockPicker, RGBColor
-} from "react-color";
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
+import AddIcon from "@mui/icons-material/Add";
+import { BlockPicker, RGBColor } from "react-color";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const SettingAdmin = (prop: { jwt_token: string }) => {
   const [category, setCategory] = React.useState<
@@ -40,8 +38,7 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
   useEffect(() => {
     if (isDark(bgColor)) {
       setTextColor("white");
-    }
-    else {
+    } else {
       setTextColor("black");
     }
   }, [bgColor]);
@@ -50,11 +47,10 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
     if (luma < 128) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
-  }
+  };
   const handleEdit = (id: string) => {
     setId(id);
     setName(
@@ -74,8 +70,8 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
     axios
       .post(config.getApiEndpoint("categories", "POST"), body, {
         headers: {
-          "Authorization": `Bearer ${prop.jwt_token}`,
-        }
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
       })
       .then((res) => {
         console.log(res);
@@ -86,20 +82,22 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   const showSwal = () => {
     console.log("1");
 
     withReactContent(Swal).fire({
-      title: <i>Input something</i>,
-      input: 'text',
-      inputLabel: 'Your category name',
+      title: <i>เพิ่มหมวดหมู่สินค้า</i>,
+      input: "text",
+      showDenyButton: true,
+      denyButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
       preConfirm: () => {
-        setId(Swal.getInput()?.value || '')
+        setId(Swal.getInput()?.value || "");
       },
-    })
-  }
+    });
+  };
 
   return (
     <Container
@@ -121,7 +119,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         </Grid>
         <Grid item xs={12}>
           {category.map((cat) => {
-            let bgcolor = cat.bgcolor ? JSON.parse(cat.bgcolor) : { r: 235, g: 235, b: 235, a: 1 } as { r: number, g: number, b: number, a: number };
+            let bgcolor = cat.bgcolor
+              ? JSON.parse(cat.bgcolor)
+              : ({ r: 235, g: 235, b: 235, a: 1 } as {
+                  r: number;
+                  g: number;
+                  b: number;
+                  a: number;
+                });
             if (cat.category_id !== "OTHER") {
               return (
                 <Chip
@@ -130,7 +135,11 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                   onDelete={() => {
                     handleEdit(cat.category_id);
                   }}
-                  deleteIcon={<CreateIcon sx={{ fill: isDark(bgcolor) ? "white" : "black" }} />}
+                  deleteIcon={
+                    <CreateIcon
+                      sx={{ fill: isDark(bgcolor) ? "white" : "black" }}
+                    />
+                  }
                   sx={{
                     margin: "5px",
                     backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
@@ -149,10 +158,8 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
             }
           })}
           <Chip
-            label={<AddIcon sx={{ paddingTop: '5px' }} />}
-            onClick={
-              showSwal
-            }
+            label={<AddIcon sx={{ paddingTop: "5px" }} />}
+            onClick={showSwal}
             sx={{ margin: "5px", position: "relative" }}
           />
         </Grid>
@@ -163,8 +170,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         </Grid>
         {id && (
           <>
-            <Box sx={{ display: 'flex', textAlign: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ display: "flex", textAlign: "center" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 <Chip
                   label={name}
                   sx={{
@@ -193,9 +206,10 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                   }}
                 />
 
-                <Button variant="contained" onClick={handleSubmit}>บันทึก</Button>
+                <Button variant="contained" onClick={handleSubmit}>
+                  บันทึก
+                </Button>
               </Box>
-
             </Box>
           </>
         )}
