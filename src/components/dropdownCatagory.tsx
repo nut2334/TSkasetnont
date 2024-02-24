@@ -11,12 +11,15 @@ interface Category {
 
 const DropdownCatagory = (prop: {
   handleCategoryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
 }) => {
   const apiCategories = config.getApiEndpoint("categories", "GET");
 
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
+    console.log(prop.value);
+
     const fetchData = async () => {
       const response = await axios.get(apiCategories);
       const data: Category[] = await response.data;
@@ -30,6 +33,7 @@ const DropdownCatagory = (prop: {
       id="outlined-select-currency"
       select
       label="หมวดหมู่สินค้า"
+      value={prop.value}
       defaultValue={categories.length > 0 ? categories[0].category_name : ""}
       fullWidth
       onChange={prop.handleCategoryChange}

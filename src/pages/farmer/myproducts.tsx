@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import { NavLink } from "react-router-dom";
+import { NavLink, Navigate } from "react-router-dom";
 import axios from "axios";
 import * as config from "../../config/config";
 
@@ -27,6 +27,7 @@ interface ProductInterface {
 }
 const Myproducts = (prop: { jwt_token: string, username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([])
+  const [navigatePath, setNavigatePath] = useState("");
   const fetchProduct = () => {
     const apiMyproducts = config.getApiEndpoint(`myproducts/${prop.username}`, "GET");
     axios
@@ -40,6 +41,9 @@ const Myproducts = (prop: { jwt_token: string, username: string }) => {
   useEffect(() => {
     fetchProduct()
   }, []);
+  if (navigatePath) {
+    return <Navigate to={`/editproduct/${navigatePath}`} />
+  }
   return (
     <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
@@ -94,7 +98,9 @@ const Myproducts = (prop: { jwt_token: string, username: string }) => {
                   <NavLink to={"/shop/" + product.product_id}>
                     <Button size="small">View</Button>
                   </NavLink>
-                  <Button size="small">Edit</Button>
+                  <Button size="small" onClick={() => {
+                    setNavigatePath(product.product_id)
+                  }}>Edit</Button>
                   <Button size="small" onClick={() => {
                     const apiDeleteProduct = config.getApiEndpoint(`deleteproduct/${product.product_id}`, "POST");
                     axios.delete(apiDeleteProduct,

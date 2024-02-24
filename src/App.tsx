@@ -123,6 +123,15 @@ function App() {
                   />
                 }
               />
+              <Route
+                path="/editproduct/:productid"
+                element={
+                  <AddProduct
+                    jwt_token={jwt_token}
+                    username={decodeJWT.username}
+                  />
+                }
+              />
             </React.Fragment>
           )}
 

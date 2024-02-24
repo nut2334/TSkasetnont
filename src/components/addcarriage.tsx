@@ -5,7 +5,7 @@ import SetDataCarriage from "./setDataCarriage";
 
 const AddCarriage = (prop: {
   unit: string;
-  setDataCarriage: React.Dispatch<
+  setShippingCost: React.Dispatch<
     React.SetStateAction<
       {
         weight: number;
@@ -27,7 +27,7 @@ const AddCarriage = (prop: {
               index={index}
               setCarriageList={setCarriageList}
               unit={prop.unit}
-              setDataCarriage={prop.setDataCarriage}
+              setDataCarriage={prop.setShippingCost}
             />
           </Grid>
         </>
