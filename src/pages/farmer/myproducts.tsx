@@ -27,9 +27,8 @@ interface ProductInterface {
 }
 const Myproducts = (prop: { jwt_token: string, username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([])
-  const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  useEffect(() => {
-    const apiMyproducts = config.getApiEndpoint(`myproducts/${prop.username}`, "POST");
+  const fetchProduct = () => {
+    const apiMyproducts = config.getApiEndpoint(`myproducts/${prop.username}`, "GET");
     axios
       .get(apiMyproducts)
       .then((response: any) => {
@@ -37,6 +36,9 @@ const Myproducts = (prop: { jwt_token: string, username: string }) => {
 
         setAllProduct(response.data)
       });
+  }
+  useEffect(() => {
+    fetchProduct()
   }, []);
   return (
     <Container component="main" maxWidth="md">
@@ -101,8 +103,8 @@ const Myproducts = (prop: { jwt_token: string, username: string }) => {
                           Authorization: `Bearer ${prop.jwt_token}`,
                         },
                       }
-                    ).then((response: any) => {
-                      console.log(response.data);
+                    ).then(() => {
+                      fetchProduct()
                     });
                   }}>Delete</Button>
                 </CardActions>
