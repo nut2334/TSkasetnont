@@ -79,10 +79,24 @@ const ManageUser = (prop: { jwt_token: string }) => {
   }, []);
 
   const deleteUser = (username: string, role: string) => {
-    let body = {
-      id: username,
-    };
-    setUsers(users.filter((user) => user.id !== username));
+
+    const apiDeleteUser = config.getApiEndpoint(`deleteuser/${role}/${username}`, "DELETE");
+    axios
+      .delete(apiDeleteUser, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((response) => {
+        if (response.data) {
+          alert("ลบสำเร็จ");
+          setUsers(users.filter((user) => user.username != username));
+          setFilteredUsers(filteredUsers.filter((user) => user.username != username));
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const editUser = (username: string, role: string) => {
