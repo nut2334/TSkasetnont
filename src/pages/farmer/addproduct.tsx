@@ -27,7 +27,7 @@ import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 import { useParams } from "react-router-dom";
-import Modal from '@mui/material/Modal';
+import Modal from "@mui/material/Modal";
 import Imagestore from "../../components/imagestore";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
@@ -55,7 +55,15 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       standard_expire: Date | undefined;
       standard_cercification: File | undefined;
     }[]
-  >([{ standard_id: "", standard_name: "", standard_number: "", standard_expire: undefined, standard_cercification: undefined }]);
+  >([
+    {
+      standard_id: "",
+      standard_name: "",
+      standard_number: "",
+      standard_expire: undefined,
+      standard_cercification: undefined,
+    },
+  ]);
   const [shippingcost, setShippingCost] = useState<
     {
       weight: number;
@@ -64,8 +72,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
   const { productid } = useParams<{ productid: string }>();
-
-
 
   const [modalIsOpen, setIsOpen] = React.useState<{
     isOpen: boolean;
@@ -83,7 +89,10 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
 
   useEffect(() => {
     if (productid) {
-      let apiGetProduct = config.getApiEndpoint(`getproduct/${productid}`, "GET");
+      let apiGetProduct = config.getApiEndpoint(
+        `getproduct/${productid}`,
+        "GET"
+      );
       axios.get(apiGetProduct).then((res) => {
         console.log(res.data);
         setProductName(res.data.product_name);
@@ -98,13 +107,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         setEndDate(res.data.endDate);
         setCoverImage([res.data.product_image]);
         setProductVideo(res.data.product_video ? [res.data.product_video] : []);
-        setSelectImage(res.data.additional_images ? JSON.parse(res.data.additional_images) : []);
+        setSelectImage(
+          res.data.additional_images
+            ? JSON.parse(res.data.additional_images)
+            : []
+        );
         setSelectedStandard(JSON.parse(res.data.certificate));
         setShippingCost(JSON.parse(res.data.shippingcost));
-      })
+      });
     }
-  }
-    , []);
+  }, []);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryId = event.target.value;
@@ -173,7 +185,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       //คลังสินค้า
       if (stock) {
         data.append("stock", stock.toString());
-
       }
       //สถานะการจอง
       if (selectedStatus) {
@@ -212,9 +223,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     //console.log(shippingcost);
   }, [shippingcost]);
 
-  const storageImage = () => {
-
-  };
+  const storageImage = () => {};
 
   return (
     <React.Fragment>
@@ -249,7 +258,10 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               />
             </Grid>
             <Grid item xs={6}>
-              <DropdownCatagory value={selectedCategory} handleCategoryChange={handleCategoryChange} />
+              <DropdownCatagory
+                value={selectedCategory}
+                handleCategoryChange={handleCategoryChange}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -271,16 +283,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 />
                 รูปปก
               </Typography>
-
-              <Button onClick={() => {
-                setIsOpen({
-                  isOpen: true,
-                  imageSelect: 1,
-                  setStateImage: setCoverImage
-
-                });
-
-              }} variant="contained">
+              <Button
+                onClick={() => {
+                  setIsOpen({
+                    isOpen: true,
+                    imageSelect: 1,
+                    setStateImage: setCoverImage,
+                  });
+                }}
+                variant="contained"
+              >
                 เลือกรูปภาพ
               </Button>
               {coverImage.length > 0 && (
@@ -308,14 +320,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 <VideoFileIcon sx={{ marginRight: "5px" }} color="primary" />
                 วิดีโอ
               </Typography>
-              <Button onClick={() => {
-                setIsOpen({
-                  isOpen: true,
-                  imageSelect: 1,
-                  setStateImage: setProductVideo
-                });
-
-              }} variant="contained">
+              <Button
+                onClick={() => {
+                  setIsOpen({
+                    isOpen: true,
+                    imageSelect: 1,
+                    setStateImage: setProductVideo,
+                  });
+                }}
+                variant="contained"
+              >
                 เลือกวิดิโอ
               </Button>
               {productVideo.length > 0 && (
@@ -344,13 +358,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 accept="image/*"
                 onChange={handleAdditionalImagesChange}
               /> */}
-              <Button onClick={() => {
-                setIsOpen({
-                  isOpen: true,
-                  imageSelect: 8,
-                  setStateImage: setSelectImage
-                });
-              }} variant="contained">
+              <Button
+                onClick={() => {
+                  setIsOpen({
+                    isOpen: true,
+                    imageSelect: 8,
+                    setStateImage: setSelectImage,
+                  });
+                }}
+                variant="contained"
+              >
                 เลือกรูปภาพเพิ่มเติม
               </Button>
             </Grid>
@@ -621,8 +638,15 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           </DialogActions>
         </Dialog> */}
       </Container>
-      {modalIsOpen && <Imagestore modalIsOpen={modalIsOpen.isOpen} closeModal={closeModal} imageSelect={modalIsOpen.imageSelect} setSelectImage={modalIsOpen.setStateImage} jwt_token={prop.jwt_token} />}
-
+      {modalIsOpen && (
+        <Imagestore
+          modalIsOpen={modalIsOpen.isOpen}
+          closeModal={closeModal}
+          imageSelect={modalIsOpen.imageSelect}
+          setSelectImage={modalIsOpen.setStateImage}
+          jwt_token={prop.jwt_token}
+        />
+      )}
     </React.Fragment>
   );
 };
