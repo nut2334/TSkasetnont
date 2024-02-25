@@ -1,12 +1,26 @@
 import { Box, Button, Modal, Typography } from '@mui/material'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import * as config from '../config/config'
 import axios from 'axios'
 const Imagestore = (prop: { modalIsOpen: boolean, closeModal(): void, imageSelect: number, setSelectImage: React.Dispatch<React.SetStateAction<string[]>>, jwt_token: string }) => {
-    const [productImage, setProductImage] = useState<string[]>([])
+    const [productImage, setProductImage] = useState<{ imagepath: string }[]>([])
     const [selectedImage, setSelectedImage] = useState<string[]>([])
     const inputRef = useRef<HTMLInputElement>(null)
+    useEffect(() => {
+        let getApiImage = config.getApiEndpoint("imagestore", "GET")
+        axios.get(getApiImage, {
+            headers: {
+                "Authorization": `Bearer ${prop.jwt_token}`
+            }
+        }).then((res) => {
+            console.log(res.data);
 
+            setProductImage(res.data.images)
+        }
+        ).catch((err) => {
+            console.log(err)
+        })
+    }, [])
     return (
         <Modal
             open={prop.modalIsOpen}
@@ -32,7 +46,7 @@ const Imagestore = (prop: { modalIsOpen: boolean, closeModal(): void, imageSelec
                 }}>เพิ่มรูปภาพ</Button>
                 <input ref={inputRef} style={{
                     display: 'none'
-                }} type="file" multiple accept="image/*" onChange={(e) => {
+                }} type="file" multiple accept="image/*,video/*" onChange={(e) => {
                     if (e.target.files === null) {
                         return;
                     }
@@ -49,13 +63,15 @@ const Imagestore = (prop: { modalIsOpen: boolean, closeModal(): void, imageSelec
                             'Authorization': `Bearer ${prop.jwt_token}`
                         }
                     }).then(() => {
-                        let getApiImage = config.getApiEndpoint("getstoreimage", "GET")
+                        let getApiImage = config.getApiEndpoint("imagestore", "GET")
                         axios.get(getApiImage, {
                             headers: {
                                 "Authorization": `Bearer ${prop.jwt_token}`
                             }
                         }).then((res) => {
-                            setProductImage(res.data)
+                            console.log(res.data);
+
+                            setProductImage(res.data.images)
                         }
                         ).catch((err) => {
                             console.log(err)
@@ -66,27 +82,56 @@ const Imagestore = (prop: { modalIsOpen: boolean, closeModal(): void, imageSelec
                     })
 
                 }} />
-                {productImage.map((image, index) => {
+                {productImage.map(({ imagepath }, index) => {
+                    var isVideo = imagepath.match(/\.(mp4|webm|ogg|ogv|avi|mov|wmv|flv|3gp)$/i);
+
+                    if (isVideo) {
+                        return (
+                            <video src={`${config.getApiEndpoint(
+                                `getimage/${imagepath.split("/").pop()}`,
+                                "get"
+                            )}`} key={index}
+                                onClick={() => {
+
+                                    // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
+
+                                    if (selectedImage.indexOf(imagepath) === -1 && selectedImage.length < prop.imageSelect) {
+                                        setSelectedImage([...selectedImage, imagepath])
+
+                                    }
+                                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
+                                    else if (selectedImage.indexOf(imagepath) !== -1) {
+                                        setSelectedImage(selectedImage.filter((item) => item !== imagepath))
+                                    }
+                                }}
+                                style={{
+                                    border: selectedImage.indexOf(imagepath) !== -1 ? "2px solid red" : "2px solid white",
+                                    width: '100px'
+                                }}
+                            />
+                        )
+                    }
+
                     return (
                         <img src={`${config.getApiEndpoint(
-                            `getimage/${image.split("/").pop()}`,
+                            `getimage/${imagepath.split("/").pop()}`,
                             "get"
                         )}`} key={index}
                             onClick={() => {
 
                                 // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
 
-                                if (selectedImage.indexOf(image) === -1 && selectedImage.length < prop.imageSelect) {
-                                    setSelectedImage([...selectedImage, image])
+                                if (selectedImage.indexOf(imagepath) === -1 && selectedImage.length < prop.imageSelect) {
+                                    setSelectedImage([...selectedImage, imagepath])
 
                                 }
                                 // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
-                                else if (selectedImage.indexOf(image) !== -1) {
-                                    setSelectedImage(selectedImage.filter((item) => item !== image))
+                                else if (selectedImage.indexOf(imagepath) !== -1) {
+                                    setSelectedImage(selectedImage.filter((item) => item !== imagepath))
                                 }
                             }}
                             style={{
-                                border: selectedImage.indexOf(image) !== -1 ? "2px solid red" : "2px solid white",
+                                border: selectedImage.indexOf(imagepath) !== -1 ? "2px solid red" : "2px solid white",
                                 width: '100px'
                             }}
                         />
