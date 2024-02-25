@@ -164,53 +164,56 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
             sx={{ margin: "5px", position: "relative" }}
           />
         </Grid>
-        <Grid item xs={12}>
-          <Divider>
-            <Typography>แก้ไขหมวดหมู่สินค้า</Typography>
-          </Divider>
-        </Grid>
+
         {id && (
           <>
-            <Box sx={{ display: "flex", textAlign: "center" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Chip
-                  label={name}
-                  sx={{
-                    marginBottom: "10px",
-                    backgroundColor: `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`,
-                    color: textColor,
-                    fontSize: "20px",
-                  }}
-                />
-                <BlockPicker
-                  color={bgColor}
-                  onChange={(color) => {
-                    setBgColor(color.rgb);
-                  }}
-                />
-              </Box>
-              <Box>
-                <TextField
-                  value={name}
-                  id="outlined-basic"
-                  label="ชื่อหมวดหมู่"
-                  variant="outlined"
-                  fullWidth
-                  onChange={(e) => {
-                    setName(e.target.value);
-                  }}
-                />
+            <Grid item xs={12} marginBottom={2}>
+              <Divider>
+                <Typography>แก้ไขหมวดหมู่สินค้า</Typography>
+              </Divider>
+            </Grid>
 
-                <Button variant="contained" onClick={handleSubmit}>
-                  บันทึก
-                </Button>
-              </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginLeft: "100px",
+                marginRight: "50px",
+              }}
+            >
+              <Chip
+                label={name}
+                sx={{
+                  marginBottom: "10px",
+                  backgroundColor: `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`,
+                  color: textColor,
+                  fontSize: "20px",
+                }}
+              />
+              <BlockPicker
+                color={bgColor}
+                onChange={(color) => {
+                  setBgColor(color.rgb);
+                }}
+              />
+            </Box>
+            <Box>
+              <TextField
+                value={name}
+                id="outlined-basic"
+                label="ชื่อหมวดหมู่"
+                variant="outlined"
+                fullWidth
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+                sx={{ marginBottom: "10px" }}
+              />
+
+              <Button variant="contained" onClick={handleSubmit}>
+                บันทึก
+              </Button>
             </Box>
           </>
         )}
