@@ -29,7 +29,12 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [textColor, setTextColor] = useState<string>("");
-  const [bgColor, setBgColor] = useState<RGBColor>({ r: 235, g: 235, b: 235, a: 1 });
+  const [bgColor, setBgColor] = useState<RGBColor>({
+    r: 235,
+    g: 235,
+    b: 235,
+    a: 1,
+  });
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
       setCategory(res.data);
@@ -58,27 +63,25 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         return cat.category_id === id;
       })[0].category_name
     );
-    setBgColor(bgColor)
+    setBgColor(bgColor);
   };
 
   const handleSubmit = (isNewEdit: Boolean, paramName?: string) => {
     let body = {
       category_name: paramName ? paramName : name,
-
-    } as { category_name: string; bgcolor: string, category_id?: string }
+    } as { category_name: string; bgcolor: string; category_id?: string };
 
     if (!isNewEdit) {
       body = {
         ...body,
         category_id: id,
-        bgcolor: JSON.stringify(bgColor)
-      }
-    }
-    else {
+        bgcolor: JSON.stringify(bgColor),
+      };
+    } else {
       body = {
         ...body,
-        bgcolor: JSON.stringify({ r: 235, g: 235, b: 235, a: 1 })
-      }
+        bgcolor: JSON.stringify({ r: 235, g: 235, b: 235, a: 1 }),
+      };
     }
 
     axios
@@ -90,15 +93,13 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       .then((res) => {
         console.log(res);
         axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
-
           setCategory(res.data);
         });
       })
       .catch((err) => {
         console.log(err);
       });
-    ;
-  }
+  };
 
   const showSwal = () => {
     withReactContent(Swal).fire({
@@ -112,8 +113,7 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
 
         handleSubmit(true, Swal.getInput()?.value || "");
       },
-    })
-
+    });
   };
 
   return (
@@ -222,8 +222,17 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                 sx={{ marginBottom: "10px" }}
               />
 
-              <Button variant="contained" onClick={() => handleSubmit(false)}>
+              <Button
+                variant="contained"
+                sx={{
+                  marginRight: "10px",
+                }}
+                onClick={() => handleSubmit(false)}
+              >
                 บันทึก
+              </Button>
+              <Button color="error" variant="contained">
+                ลบ
               </Button>
             </Box>
           </>

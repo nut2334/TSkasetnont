@@ -25,7 +25,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
-import QuantityInput from "../../components/addamount";
+import { QuantityInput } from "../../components/addamount";
 
 import {
   FacebookShareButton,
@@ -433,12 +433,14 @@ const SigleProduct = (prop: {
                     variant="contained"
                     color="secondary"
                     startIcon={<AddShoppingCartIcon />}
+                    disabled={product.stock == 0}
                     onClick={() => {
                       let cart: Cart = {
                         product_id: product.product_id,
                         amount: amount,
                         product_name: product.product_name,
                         price: product.price,
+                        stock: product.stock,
                       };
                       prop.cartList.find(
                         (item) => item.product_id == product.product_id
@@ -464,13 +466,16 @@ const SigleProduct = (prop: {
                 </Stack>
 
                 <Stack>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<PointOfSaleIcon />}
-                  >
-                    ซื้อสินค้า
-                  </Button>
+                  <NavLink to="/payment">
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<PointOfSaleIcon />}
+                      disabled={product.stock == 0}
+                    >
+                      ซื้อสินค้า
+                    </Button>
+                  </NavLink>
                 </Stack>
               </>
             )}

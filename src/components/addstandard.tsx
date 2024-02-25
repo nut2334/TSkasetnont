@@ -211,6 +211,7 @@ const AddStandard = (prop: {
     standard_expire: Date | undefined;
     standard_cercification: string | undefined;
   }[];
+  checkStandard: boolean;
 }) => {
 
   const [allStandard, setAllStandard] = useState<
