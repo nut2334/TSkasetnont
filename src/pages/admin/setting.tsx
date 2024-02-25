@@ -79,24 +79,25 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         ...body,
         bgcolor: JSON.stringify({ r: 235, g: 235, b: 235, a: 1 })
       }
+    }
 
-      axios
-        .post(config.getApiEndpoint("categories", "POST"), body, {
-          headers: {
-            Authorization: `Bearer ${prop.jwt_token}`,
-          },
-        })
-        .then((res) => {
-          console.log(res);
-          axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
+    axios
+      .post(config.getApiEndpoint("categories", "POST"), body, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
 
-            setCategory(res.data);
-          });
-        })
-        .catch((err) => {
-          console.log(err);
+          setCategory(res.data);
         });
-    };
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    ;
   }
 
   const showSwal = () => {
