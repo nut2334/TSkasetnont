@@ -29,7 +29,7 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [textColor, setTextColor] = useState<string>("");
-  const [bgColor, setBgColor] = useState<RGBColor>({ r: 0, g: 0, b: 0, a: 1 });
+  const [bgColor, setBgColor] = useState<RGBColor>({ r: 235, g: 235, b: 235, a: 1 });
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
       setCategory(res.data);
@@ -51,41 +51,55 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       return false;
     }
   };
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: string, bgColor: RGBColor) => {
     setId(id);
     setName(
       category.filter((cat) => {
         return cat.category_id === id;
       })[0].category_name
     );
+    setBgColor(bgColor)
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (isNewEdit: Boolean, paramName?: string) => {
     let body = {
-      category_name: name,
-      bgcolor: JSON.stringify(bgColor),
-    };
+      category_name: paramName ? paramName : name,
 
-    axios
-      .post(config.getApiEndpoint("categories", "POST"), body, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
-          setCategory(res.data);
+    } as { category_name: string; bgcolor: string, category_id?: string }
+
+    if (!isNewEdit) {
+      body = {
+        ...body,
+        category_id: id,
+        bgcolor: JSON.stringify(bgColor)
+      }
+    }
+    else {
+      body = {
+        ...body,
+        bgcolor: JSON.stringify({ r: 235, g: 235, b: 235, a: 1 })
+      }
+
+      axios
+        .post(config.getApiEndpoint("categories", "POST"), body, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
+
+            setCategory(res.data);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+    };
+  }
 
   const showSwal = () => {
-    console.log("1");
-
     withReactContent(Swal).fire({
       title: <i>เพิ่มหมวดหมู่สินค้า</i>,
       input: "text",
@@ -94,10 +108,11 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       confirmButtonText: "บันทึก",
       preConfirm: () => {
         // setId(Swal.getInput()?.value || "");
-        setName(Swal.getInput()?.value || "");
-        handleSubmit();
+
+        handleSubmit(true, Swal.getInput()?.value || "");
       },
-    });
+    })
+
   };
 
   return (
@@ -122,19 +137,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
           {category.map((cat) => {
             let bgcolor = cat.bgcolor
               ? JSON.parse(cat.bgcolor)
-              : ({ r: 235, g: 235, b: 235, a: 1 } as {
-                  r: number;
-                  g: number;
-                  b: number;
-                  a: number;
-                });
+              : ({ r: 235, g: 235, b: 235, a: 1 } as RGBColor);
             if (cat.category_id !== "OTHER") {
               return (
                 <Chip
                   key={cat.category_id}
                   label={cat.category_name}
                   onDelete={() => {
-                    handleEdit(cat.category_id);
+                    handleEdit(cat.category_id, bgcolor);
                   }}
                   deleteIcon={
                     <CreateIcon
@@ -207,7 +217,7 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                   }}
                 />
 
-                <Button variant="contained" onClick={handleSubmit}>
+                <Button variant="contained" onClick={() => handleSubmit(false)}>
                   บันทึก
                 </Button>
               </Box>
