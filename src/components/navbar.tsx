@@ -163,29 +163,33 @@ const Navbar = (prop: {
               </Menu>
             </Box>
             {/* phone */}
-            <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
-              <img
-                src={require("../assets/karsetnont.png")}
-                alt="Italian Trulli"
-                height="40px"
-              ></img>
-            </IconButton>
-            <Typography
-              variant="h5"
-              noWrap
-              component="a"
-              sx={{
-                mr: 2,
-                display: { xs: "flex", md: "none" },
-                flexGrow: 1,
-                fontWeight: 700,
-                textDecoration: "none",
-                color: "black",
-                fontSize: 20,
-              }}
-            >
-              ของเด็ดเกษตรนนท์
-            </Typography>
+            <NavLink to="/" style={{ textDecoration: "none" }}>
+              <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
+                <img
+                  src={require("../assets/karsetnont.png")}
+                  alt="Italian Trulli"
+                  height="30px"
+                ></img>
+              </IconButton>
+            </NavLink>
+            <NavLink to="/" style={{ textDecoration: "none" }}>
+              <Typography
+                variant="h5"
+                noWrap
+                component="a"
+                sx={{
+                  display: { xs: "flex", md: "none" },
+                  flexGrow: 1,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: 18,
+                }}
+              >
+                ของเด็ดเกษตรนนท์
+              </Typography>
+            </NavLink>
+
             {/* computer */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {visiblePages.map((page, index) => (
