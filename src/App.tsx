@@ -21,12 +21,14 @@ import SigleProduct from "./pages/all/singleproduct";
 import EditProfile from "./pages/editprofile";
 import ListCart from "./pages/member/listcart";
 import Reserve from "./pages/member/reserve";
+import Payment from "./pages/member/payment";
 
 export interface Cart {
   product_id: string;
   amount: number;
   product_name: string;
   price: number;
+  stock: number;
 }
 
 function App() {
@@ -80,6 +82,7 @@ function App() {
           role={decodeJWT.role}
           username={decodeJWT.username}
           setJwt_token={setJwt_token}
+          cartList={cartList}
         />
         <Routes>
           <Route path="/" element={<Home jwt_token={jwt_token} />} />
@@ -137,7 +140,10 @@ function App() {
 
           {decodeJWT.role == "admins" && (
             <React.Fragment>
-              <Route path="/setting" element={<SettingAdmin jwt_token={jwt_token} />} />
+              <Route
+                path="/setting"
+                element={<SettingAdmin jwt_token={jwt_token} />}
+              />
               <Route
                 path="/adduser"
                 element={<AddUser jwt_token={jwt_token} />}
@@ -155,6 +161,7 @@ function App() {
                 element={<ListCart cartList={cartList} jwt_token={jwt_token} />}
               />
               <Route path="/reservation/:productid" element={<Reserve />} />
+              <Route path="/payment" element={<Payment />} />
             </>
           )}
           {decodeJWT.role == "tambons" && (

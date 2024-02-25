@@ -34,19 +34,28 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
+
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [checkCategory, setCheckCategory] = useState<boolean>(true);
+
   const [coverImage, setCoverImage] = useState<string[]>([]);
+  const [checkCoverImage, setCheckCoverImage] = useState<boolean>(true);
   const [productVideo, setProductVideo] = useState<string[]>([]);
   const [selectImage, setSelectImage] = useState<string[]>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const [selectedType, setSelectedType] = useState<string>("");
+  const [checkType, setCheckType] = useState<boolean>(true);
+
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>();
   const [unit, setUnit] = useState<string>("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState<string>();
+
+  const [checkStandard, setCheckStandard] = useState<boolean>(true);
   const [selectedStandard, setSelectedStandard] = React.useState<
     {
       standard_id: string;
@@ -149,6 +158,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     if (productName == "") {
       setCheckProductName(false);
     }
+    if (coverImage.length == 0) {
+      setCheckCoverImage(false);
+    }
     if (checkProductName) {
       const data = new FormData();
       //username
@@ -157,7 +169,11 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       data.append("productName", productName);
       //หมวดหมู่สินค้า
       console.log(selectedCategory);
-      data.append("category", selectedCategory);
+      if (selectedCategory) {
+        data.append("category", selectedCategory);
+      } else {
+        setCheckCategory(false);
+      }
       //รายละเอียดสินค้า
       data.append("description", description);
       //รูปปก
@@ -261,6 +277,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               <DropdownCatagory
                 value={selectedCategory}
                 handleCategoryChange={handleCategoryChange}
+                checkCategory={checkCategory}
               />
             </Grid>
             <Grid item xs={12}>
@@ -281,8 +298,11 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   sx={{ marginRight: "5px" }}
                   color="primary"
                 />
-                รูปปก
+                รูปปก*
               </Typography>
+              {checkCoverImage == false && (
+                <Typography color="red">กรุณาใส่รูปปก</Typography>
+              )}
               <Button
                 onClick={() => {
                   setIsOpen({
@@ -409,6 +429,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               <AddStandard
                 setSelectedStandard={setSelectedStandard}
                 selectedStandard={selectedStandard}
+                checkStandard={checkStandard}
               />
             </Grid>
             <Grid item xs={12}>
@@ -419,6 +440,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 container
                 sx={{
                   border: 1,
+                  borderRadius: 2,
+                  padding: "10px",
                 }}
               >
                 <Grid item xs={12}>
@@ -427,15 +450,18 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                       textAlign: "center",
                       fontWeight: "bold",
                       marginBottom: "10px",
+                      fontSize: "20px",
                     }}
+                    variant="h6"
                   >
-                    คำอธิบายรูปแบบสินค้า
+                    คำอธิบายรูปแบบการเก็บข้อมูล
                   </Typography>
                 </Grid>
-                <Grid item xs={4} sx={{ borderRight: 1 }}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       textAlign: "center",
+                      fontWeight: "bold",
                     }}
                   >
                     ประชาสัมพันธ์
@@ -444,10 +470,11 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     สินค้าที่เกษตรกรประชาสัมพันธ์เพื่อเป็นการโฆษณาสินค้า
                   </Typography>
                 </Grid>
-                <Grid item xs={4} sx={{ borderRight: 1 }}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       textAlign: "center",
+                      fontWeight: "bold",
                     }}
                   >
                     จองสินค้าผ่านเว็บไซต์
@@ -458,10 +485,17 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     และช่องทางการติดต่อ
                   </Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid
+                  item
+                  xs={4}
+                  sx={{
+                    paddingLeft: "10px",
+                  }}
+                >
                   <Typography
                     sx={{
                       textAlign: "center",
+                      fontWeight: "bold",
                     }}
                   >
                     สินค้าจัดส่งพัสดุ
@@ -471,7 +505,13 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     หากสมาชิกสั่งซื้อสินค้าจะต้องระบุหมายเลขพัสดุเมื่อทำการจัดส่งแล้ว
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    textAlign: "center",
+                  }}
+                >
                   <Typography>
                     หากไม่ต้องการให้สมาชิกสั่งซื้อสินค้า โปรดเลือกประชาสัมพันธ์
                   </Typography>
@@ -479,7 +519,14 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               </Grid>
             </Grid>
             <Grid item xs={12} lg={6}>
-              <TextField select fullWidth label="รูปแบบสินค้า">
+              <TextField
+                select
+                fullWidth
+                label="รูปแบบการเก็บข้อมูล"
+                required
+                error={!checkType}
+                helperText={!checkType && "กรุณาเลือกรูปแบบการเก็บข้อมูล"}
+              >
                 {web_activity.map((activity) => (
                   <MenuItem
                     key={activity.activityID}

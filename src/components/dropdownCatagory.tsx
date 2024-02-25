@@ -12,6 +12,7 @@ interface Category {
 const DropdownCatagory = (prop: {
   handleCategoryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
+  checkCategory?: boolean;
 }) => {
   const apiCategories = config.getApiEndpoint("categories", "GET");
 
@@ -38,6 +39,8 @@ const DropdownCatagory = (prop: {
       fullWidth
       onChange={prop.handleCategoryChange}
       required
+      error={!prop.checkCategory}
+      helperText={!prop.checkCategory ? "กรุณาเลือกหมวดหมู่สินค้า" : ""}
     >
       {categories.map((option) => (
         <MenuItem key={option.category_id} value={option.category_id}>

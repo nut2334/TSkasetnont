@@ -11,11 +11,13 @@ import {
   MenuItem,
   Tooltip,
   Container,
+  Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Cookies from "universal-cookie";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { Cart } from "../App";
 
 interface Page {
   name: string;
@@ -26,6 +28,7 @@ const Navbar = (prop: {
   role: string;
   username: string;
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
+  cartList: Cart[];
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
   const defaultPages = [{ name: "สินค้าทั้งหมด", path: "/listproduct" }];
@@ -207,9 +210,16 @@ const Navbar = (prop: {
               ))}
             </Box>
             {prop.role == "members" && (
-              <NavLink to="/listcart">
-                <ShoppingCartIcon />
-              </NavLink>
+              <Badge badgeContent={prop.cartList.length} color="primary">
+                <NavLink
+                  to="/listcart"
+                  style={{
+                    color: "green",
+                  }}
+                >
+                  <ShoppingCartIcon />
+                </NavLink>
+              </Badge>
             )}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
