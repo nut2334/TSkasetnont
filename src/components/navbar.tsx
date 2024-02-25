@@ -83,8 +83,11 @@ const Navbar = (prop: {
         { name: "จัดการเกษตรกร", path: "/managefarmer" },
       ]);
     }
-    if (prop.role == "") {
-      setVisiblePages(defaultPages);
+    if (prop.role == "members") {
+      setVisiblePages([
+        ...defaultPages,
+        { name: "ประวัติการซื้อขาย", path: "/orderlist" }
+      ]);
     }
   }, [prop.role]);
 

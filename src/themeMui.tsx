@@ -32,10 +32,6 @@ const themeMui = createTheme({
       main: "#7D7C7C",
       contrastText: "#FFFFFF",
     },
-    info: {
-      main: "#adadad",
-      contrastText: "#FFFFFF",
-    },
   },
   components: {
     MuiButton: {

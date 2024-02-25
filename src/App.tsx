@@ -21,6 +21,7 @@ import SigleProduct from "./pages/all/singleproduct";
 import EditProfile from "./pages/editprofile";
 import ListCart from "./pages/member/listcart";
 import Reserve from "./pages/member/reserve";
+import Orderlist from "./pages/member/orderlist";
 
 export interface Cart {
   product_id: string;
@@ -155,6 +156,7 @@ function App() {
                 element={<ListCart cartList={cartList} jwt_token={jwt_token} />}
               />
               <Route path="/reservation/:productid" element={<Reserve />} />
+              <Route path="/orderlist" element={<Orderlist jwt_token={jwt_token} />} />
             </>
           )}
           {decodeJWT.role == "tambons" && (
