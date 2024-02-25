@@ -62,7 +62,6 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
 
   const handleSubmit = () => {
     let body = {
-      category_id: id,
       category_name: name,
       bgcolor: JSON.stringify(bgColor),
     };
@@ -94,7 +93,9 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       denyButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       preConfirm: () => {
-        setId(Swal.getInput()?.value || "");
+        // setId(Swal.getInput()?.value || "");
+        setName(Swal.getInput()?.value || "");
+        handleSubmit();
       },
     });
   };
