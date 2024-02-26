@@ -62,7 +62,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       standard_name: string;
       standard_number: string;
       standard_expire: Date | undefined;
-      standard_cercification: File | undefined;
+      standard_cercification: string | undefined;
     }[]
   >([
     {
@@ -117,8 +117,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         setCoverImage([res.data.product_image]);
         setProductVideo(res.data.product_video ? [res.data.product_video] : []);
         setSelectImage(
-          res.data.additional_images
-            ? JSON.parse(res.data.additional_images)
+          res.data.additional_image
+            ? JSON.parse(res.data.additional_image)
             : []
         );
         setSelectedStandard(JSON.parse(res.data.certificate));
@@ -139,10 +139,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
   const handleReservationStatusChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -158,77 +154,34 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     if (productName == "") {
       setCheckProductName(false);
     }
-    if (coverImage.length == 0) {
-      setCheckCoverImage(false);
-    }
+    console.log(selectedStandard);
+
     if (checkProductName) {
-      const data = new FormData();
-      //username
-      data.append("username", prop.username);
-      //ชื่อสินค้า
-      data.append("productName", productName);
-      //หมวดหมู่สินค้า
-      console.log(selectedCategory);
-      if (selectedCategory) {
-        data.append("category", selectedCategory);
-      } else {
-        setCheckCategory(false);
-      }
-      //รายละเอียดสินค้า
-      data.append("description", description);
-      //รูปปก
-      // if (coverImage) {
-      //   data.append("productImage", coverImage);
-      // }
-      // //วิดีโอ
-      // if (productVideo) {
-      //   data.append("productVideo", productVideo);
-      // }
-      //รูปเพิ่มเติม
+      let body = {
+        product_name: productName,
+        category_id: selectedCategory,
+        product_description: description,
+        selectedType: selectedType,
+        price: price,
+        unit: unit,
+        stock: stock,
+        selectedStatus: selectedStatus,
+        startDate: startDate,
+        endDate: endDate,
+        product_image: coverImage[0],
+        product_video: productVideo[0],
+        additional_images: JSON.stringify(selectImage),
+        certificate: JSON.stringify(selectedStandard),
+        shippingcost: JSON.stringify(shippingcost),
+      } as any
 
-      data.append("additionalImages", selectImage.toString());
-
-      //รูปแบบการเก็บข้อมูล
-      data.append("selectedType", selectedType);
-      //ราคา
-      if (price) {
-        data.append("price", price.toString());
+      if (productid) {
+        body = {
+          ...body,
+          product_id: productid,
+        };
       }
-      //หน่วย
-      if (unit) {
-        data.append("unit", unit);
-      }
-      //คลังสินค้า
-      if (stock) {
-        data.append("stock", stock.toString());
-      }
-      //สถานะการจอง
-      if (selectedStatus) {
-        data.append("selectedStatus", selectedStatus);
-      }
-      //วันเริ่มรับจอง
-      if (startDate) {
-        data.append("startDate", startDate);
-      }
-      //วันสิ้นสุดการจอง
-      if (endDate) {
-        data.append("endDate", endDate);
-      }
-      //มาตรฐานสินค้า
-      console.log(selectedStandard);
-      data.append("selectedStandard", JSON.stringify(selectedStandard));
-      //ใบรับรองมาตรฐานสินค้า
-      selectedStandard.forEach((standard) => {
-        if (standard.standard_cercification) {
-          data.append("cercificationImage", standard.standard_cercification);
-        } else {
-          data.append("cercificationImage", "");
-        }
-      });
-      //ค่าส่ง
-      data.append("shippingcost", JSON.stringify(shippingcost));
-
-      axios.post(apiAddProduct, data, {
+      axios.post(apiAddProduct, body, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
@@ -239,7 +192,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     //console.log(shippingcost);
   }, [shippingcost]);
 
-  const storageImage = () => {};
 
   return (
     <React.Fragment>
@@ -393,6 +345,34 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             </Grid>
             <Grid item xs={12}>
               <Container style={{ overflowX: "auto" }}>
+                {selectImage.map((image, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <img
+                      src={`${config.getApiEndpoint(
+                        `getimage/${image.split("/").pop()}`,
+                        "get"
+                      )}`}
+                      alt={`additionalImage-${index}`}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        margin: "5px",
+                        cursor: "pointer",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                      onClick={() => handleOpenDialog(index)}
+                    />
+                  </div>
+                ))}
                 {/* <div style={{ display: "flex", flexDirection: "row" }}>
                   {additionalImages.slice(0, 8).map((image, index) => (
                     <div
@@ -429,6 +409,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               <AddStandard
                 setSelectedStandard={setSelectedStandard}
                 selectedStandard={selectedStandard}
+                jwt_token={prop.jwt_token}
                 checkStandard={checkStandard}
               />
             </Grid>
