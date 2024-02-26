@@ -4,9 +4,6 @@ import {
   Container,
   Grid,
   Typography,
-  Dialog,
-  DialogContent,
-  DialogActions,
   MenuItem,
   Box,
   Avatar,
@@ -14,7 +11,6 @@ import {
   Divider,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -27,8 +23,8 @@ import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 import { useParams } from "react-router-dom";
-import Modal from "@mui/material/Modal";
 import Imagestore from "../../components/imagestore";
+import Swal from "sweetalert2";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -117,9 +113,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         setCoverImage([res.data.product_image]);
         setProductVideo(res.data.product_video ? [res.data.product_video] : []);
         setSelectImage(
-          res.data.additional_image
-            ? JSON.parse(res.data.additional_image)
-            : []
+          res.data.additional_image ? JSON.parse(res.data.additional_image) : []
         );
         setSelectedStandard(JSON.parse(res.data.certificate));
         setShippingCost(JSON.parse(res.data.shippingcost));
@@ -154,8 +148,18 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     if (productName == "") {
       setCheckProductName(false);
     }
-    console.log(selectedStandard);
-
+    if (selectedCategory == "") {
+      setCheckCategory(false);
+    }
+    if (selectedType == "") {
+      setCheckType(false);
+    }
+    if (coverImage.length == 0) {
+      setCheckCoverImage(false);
+    }
+    if (selectedStandard.length == 0) {
+      setCheckStandard(false);
+    }
     if (checkProductName) {
       let body = {
         product_name: productName,
@@ -173,7 +177,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         additional_images: JSON.stringify(selectImage),
         certificate: JSON.stringify(selectedStandard),
         shippingcost: JSON.stringify(shippingcost),
-      } as any
+      } as any;
 
       if (productid) {
         body = {
@@ -186,12 +190,17 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
       });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "บันทึกข้อมูลไม่สำเร็จ",
+        text: "กรุณากรอกข้อมูลให้ครบถ้วน",
+      });
     }
   };
   useEffect(() => {
     //console.log(shippingcost);
   }, [shippingcost]);
-
 
   return (
     <React.Fragment>
@@ -325,11 +334,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 />
                 รูปเพิ่มเติม (ไม่เกิน 8 รูป)
               </Typography>
-              {/* <input
-                type="file"
-                accept="image/*"
-                onChange={handleAdditionalImagesChange}
-              /> */}
               <Button
                 onClick={() => {
                   setIsOpen({
@@ -373,46 +377,14 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     />
                   </div>
                 ))}
-                {/* <div style={{ display: "flex", flexDirection: "row" }}>
-                  {additionalImages.slice(0, 8).map((image, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginRight: "10px",
-                      }}
-                    >
-                      <img
-                        src={image && URL.createObjectURL(image)}
-                        alt={`additionalImage-${index}`}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          margin: "5px",
-                          cursor: "pointer",
-                          objectFit: "cover",
-                          objectPosition: "center",
-                        }}
-                        onClick={() => handleOpenDialog(index)}
-                      />
-                    </div>
-                  ))}
-                </div> */}
               </Container>
             </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-            <Grid item xs={12}>
-              <AddStandard
-                setSelectedStandard={setSelectedStandard}
-                selectedStandard={selectedStandard}
-                jwt_token={prop.jwt_token}
-                checkStandard={checkStandard}
-              />
-            </Grid>
+            <AddStandard
+              setSelectedStandard={setSelectedStandard}
+              selectedStandard={selectedStandard}
+              jwt_token={prop.jwt_token}
+              checkStandard={checkStandard}
+            />
             <Grid item xs={12}>
               <Divider />
             </Grid>
@@ -639,32 +611,6 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             ยืนยัน
           </Button>
         </form>
-
-        {/* <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogContent>
-            <img
-              src={
-                additionalImages[currentImageIndex] &&
-                URL.createObjectURL(additionalImages[currentImageIndex])
-              }
-              alt={`additionalImage-${currentImageIndex}`}
-              style={{ maxWidth: "100%", maxHeight: "400px" }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              ปิด
-            </Button>
-            <Button
-              onClick={() => handleRemoveAdditionalImage(currentImageIndex)}
-              color="secondary"
-              variant="contained"
-              startIcon={<DeleteIcon />}
-            >
-              ลบรูปภาพ
-            </Button>
-          </DialogActions>
-        </Dialog> */}
       </Container>
       {modalIsOpen && (
         <Imagestore

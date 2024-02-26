@@ -64,6 +64,9 @@ const Navbar = (prop: {
   };
 
   useEffect(() => {
+    if (!prop.role) {
+      setVisiblePages(defaultPages);
+    }
     if (prop.role == "admins") {
       setVisiblePages([
         ...defaultPages,
@@ -89,7 +92,7 @@ const Navbar = (prop: {
     if (prop.role == "members") {
       setVisiblePages([
         ...defaultPages,
-        { name: "ประวัติการซื้อขาย", path: "/orderlist" }
+        { name: "ประวัติการซื้อขาย", path: "/orderlist" },
       ]);
     }
   }, [prop.role]);

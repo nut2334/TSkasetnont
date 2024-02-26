@@ -27,6 +27,7 @@ import {
 } from "react-leaflet";
 import { Icon, LatLngLiteral } from "leaflet";
 import { EdituserSuccess, EdituserFail } from "../components/popup";
+import Swal from "sweetalert2";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -395,7 +396,10 @@ const EditProfile = (prop: {
       });
   };
   const changePassword = () => {
-    console.log(passwordNew, comfirmPassword);
+    console.log("passwordNew: ", passwordNew);
+    console.log("comfirmPassword: ", comfirmPassword);
+    console.log("passwordCheck: ", passwordCheck);
+    console.log("comfirmPasswordCheck: ", comfirmPasswordCheck);
     if (
       passwordNew == comfirmPassword &&
       passwordCheck &&
@@ -409,7 +413,6 @@ const EditProfile = (prop: {
         usernameBody?: string;
         roleBody?: string;
       };
-
       if (prop.admin) {
         body = {
           ...body,
@@ -425,6 +428,21 @@ const EditProfile = (prop: {
         })
         .then((res) => {
           console.log(res.data);
+          Swal.fire({
+            icon: "success",
+            title: "เปลี่ยนรหัสผ่านสำเร็จ",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          Swal.fire({
+            icon: "error",
+            title: "เปลี่ยนรหัสผ่านไม่สำเร็จ",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         });
     }
   };
@@ -865,59 +883,26 @@ const EditProfile = (prop: {
                 <Typography>รหัสผ่าน</Typography>
               </Divider>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                id="password"
-                label="รหัสผ่านเดิม"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
             {!prop.admin && (
               <Grid item xs={12}>
                 <TextField
-                  type={showPasswordNew ? "text" : "password"}
                   fullWidth
-                  label="รหัสผ่านใหม่"
-                  value={passwordNew}
+                  id="password"
+                  label="รหัสผ่านเดิม"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
                   onChange={(event) => {
-                    setPasswordNew(event.target.value);
+                    setPassword(event.target.value);
                   }}
-                  onBlur={validatePassword}
-                  error={!passwordCheck}
-                  helperText={
-                    passwordNew == "" && passwordCheck == false
-                      ? "กรุณากรอกรหัสผ่าน"
-                      : "" || !passwordCheck
-                      ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
-                      : ""
-                  }
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
-                          onClick={handleClickShowPasswordNew}
-                          onMouseDown={handleMouseDownPasswordNew}
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
                         >
-                          {showPasswordNew ? <VisibilityOff /> : <Visibility />}
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -925,6 +910,40 @@ const EditProfile = (prop: {
                 />
               </Grid>
             )}
+
+            <Grid item xs={12}>
+              <TextField
+                type={showPasswordNew ? "text" : "password"}
+                fullWidth
+                label="รหัสผ่านใหม่"
+                value={passwordNew}
+                onChange={(event) => {
+                  setPasswordNew(event.target.value);
+                }}
+                onBlur={validatePassword}
+                error={!passwordCheck}
+                helperText={
+                  passwordNew == "" && passwordCheck == false
+                    ? "กรุณากรอกรหัสผ่าน"
+                    : "" || !passwordCheck
+                    ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                    : ""
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPasswordNew}
+                        onMouseDown={handleMouseDownPasswordNew}
+                      >
+                        {showPasswordNew ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
 
             <Grid item xs={12}>
               <TextField

@@ -35,18 +35,6 @@ import {
 } from "react-share";
 import { Cart } from "../../App";
 
-interface ProductInterface {
-  product_id: string;
-  product_name: string;
-  product_price: number;
-  product_image: string;
-  product_description: string;
-  product_category: string;
-  product_date: Date;
-  view_count: number;
-  selectedType: string;
-}
-
 interface FullProductInterface {
   product_id: string;
   product_name: string;
@@ -63,6 +51,7 @@ interface FullProductInterface {
   campaign_id: string;
   last_modified: Date;
   selectedType: string;
+  shippingcost: string;
 }
 
 const style = {
@@ -97,6 +86,7 @@ const SigleProduct = (prop: {
     campaign_id: "",
     last_modified: new Date(),
     selectedType: "",
+    shippingcost: "",
   });
   const { productid } = useParams<{ productid: string }>();
   const [showFullImage, setShowFullImage] = useState("");
@@ -223,7 +213,7 @@ const SigleProduct = (prop: {
               className="sliderimg"
               style={{
                 width: "100%",
-                height: "250px",
+                height: "500px",
                 objectFit: "cover",
               }}
               src={`${config.getApiEndpoint(
@@ -245,7 +235,7 @@ const SigleProduct = (prop: {
           controls
           style={{
             width: "100%",
-            height: "250px",
+            height: "500px",
             objectFit: "cover",
           }}
         >
@@ -404,8 +394,14 @@ const SigleProduct = (prop: {
           </Stack>
           <Box>
             <Typography variant="h6">ค่าจัดส่ง</Typography>
-            {/* ทำต่อ */}
-            <Typography>{}</Typography>
+            <Typography>
+              {
+                product.shippingcost
+                  .split(",")
+                  .find((item) => item.split(":")[0] == "จัดส่งฟรี")
+                  ?.split(":")[1]
+              }
+            </Typography>
           </Box>
           <Stack
             direction="row"
