@@ -376,9 +376,12 @@ const EditProfile = (prop: {
         lng: position?.lng,
         facebooklink: facebookLink,
         lineid: lineId,
-        address: address,
         zipcode: zipCode,
       };
+    }
+
+    if (role === "members" || prop.admin?.role === "members") {
+      data = { ...data, address: address };
     }
 
     axios
@@ -443,9 +446,9 @@ const EditProfile = (prop: {
           position
             ? position
             : ({
-                lat: 13.736717,
-                lng: 100.523186,
-              } as LatLngLiteral)
+              lat: 13.736717,
+              lng: 100.523186,
+            } as LatLngLiteral)
         }
         icon={iconMarker}
       >
@@ -496,10 +499,10 @@ const EditProfile = (prop: {
                   username == "" && usernameCheck == false
                     ? "กรุณากรอก Username"
                     : "" || !usernameCheck
-                    ? "Username นี้มีผู้ใช้งานแล้ว"
-                    : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                    : ""
+                      ? "Username นี้มีผู้ใช้งานแล้ว"
+                      : "" || !usernameReg
+                        ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                        : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -521,8 +524,8 @@ const EditProfile = (prop: {
                   email == "" && emailCheck == false
                     ? "กรุณากรอก Email"
                     : "" || !emailReg
-                    ? "กรุณากรอก Email ให้ถูกต้อง"
-                    : ""
+                      ? "กรุณากรอก Email ให้ถูกต้อง"
+                      : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -547,8 +550,8 @@ const EditProfile = (prop: {
                   firstName == "" && firstNameValidate == false
                     ? "กรุณากรอกชื่อ"
                     : "" || !firstNameValidate
-                    ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : ""
+                      ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : ""
                 }
               />
             </Grid>
@@ -569,10 +572,10 @@ const EditProfile = (prop: {
                   lastName == "" && lastNameValidate == false
                     ? "กรุณากรอกนามสกุล"
                     : "" || !lastNameValidate
-                    ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
-                    : "" || !sameLang
-                    ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
-                    : ""
+                      ? "นามสกุลต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
+                      : "" || !sameLang
+                        ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
+                        : ""
                 }
               />
             </Grid>
@@ -598,8 +601,8 @@ const EditProfile = (prop: {
                   tel == "" && telValidate == false
                     ? "กรุณากรอกเบอร์โทรศัพท์"
                     : "" || !telValidate
-                    ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
-                    : ""
+                      ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
+                      : ""
                 }
               />
             </Grid>
@@ -607,149 +610,39 @@ const EditProfile = (prop: {
               role: string;
             }>(prop.jwt_token).role == "farmers" ||
               prop.admin?.role == "farmers") && (
-              <>
-                <Grid item xs={12}>
-                  <Divider textAlign="left">
-                    <Typography>ข้อมูลร้านค้า</Typography>
-                  </Divider>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="ชื่อร้านค้า"
-                    fullWidth
-                    value={storeName}
-                    onChange={(event) => setStoreName(event.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Facebook Link"
-                    fullWidth
-                    placeholder="https://www.facebook.com/..."
-                    value={facebookLink}
-                    onChange={(event) => setFacebookLink(event.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Line id"
-                    fullWidth
-                    placeholder="@HelloWorld หรือ 0912345678"
-                    value={lineId}
-                    onChange={(event) => setLineId(event.target.value)}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    label="จังหวัด"
-                    fullWidth
-                    value={selected.province_name_th}
-                    onChange={(event) => {
-                      setAmphures(
-                        provinces.filter(
-                          (province) => province.name_th == event.target.value
-                        )[0].amphure
-                      );
-
-                      setSelected({
-                        province_name_th: event.target.value
-                          ? event.target.value
-                          : selected.province_name_th,
-                        amphure_name_th: "",
-                        tambon_name_th: "",
-                      });
-                    }}
-                  >
-                    {provinces.map((province: province) => (
-                      <MenuItem value={province.name_th}>
-                        {province.name_th}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                {amphures.length > 0 && (
-                  <Grid item xs={12}>
-                    <TextField
-                      select
-                      label="เขต/อำเภอ"
-                      fullWidth
-                      value={selected.amphure_name_th}
-                      onChange={(event) => {
-                        setTambons(
-                          amphures.filter(
-                            (amphures) => amphures.name_th == event.target.value
-                          )[0].tambon
-                        );
-
-                        setSelected({
-                          ...selected,
-                          amphure_name_th: event.target.value
-                            ? event.target.value
-                            : selected.amphure_name_th,
-                          tambon_name_th: "",
-                        });
-                      }}
-                    >
-                      {amphures.map((amphure: amphure) => (
-                        <MenuItem value={amphure.name_th}>
-                          {amphure.name_th}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                )}
-                {tambons.length > 0 && (
-                  <Grid item xs={12}>
-                    <TextField
-                      select
-                      label="แขวง/ตำบล"
-                      fullWidth
-                      value={selected.tambon_name_th}
-                      onChange={(event) => {
-                        setSelected({
-                          ...selected,
-                          tambon_name_th: event.target.value
-                            ? event.target.value
-                            : selected.tambon_name_th,
-                        });
-                        setZipCode(tambons[0].zip_code);
-                      }}
-                    >
-                      {tambons.map((tambon: tambon) => (
-                        <MenuItem value={tambon.name_th}>
-                          {tambon.name_th}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                )}
-                <Grid item xs={12}>
-                  {zipCode && (
-                    <TextField
-                      label="รหัสไปรษณีย์"
-                      fullWidth
-                      disabled
-                      value={zipCode}
-                    />
-                  )}
-                </Grid>
-                <MapContainer
-                  center={[13.736717, 100.523186]}
-                  zoom={13}
-                  scrollWheelZoom={true}
-                  style={{ height: "100vh", width: "100%" }}
-                >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <CreateMarker />
-                </MapContainer>
-              </>
-            )}
-
-            {role == "members" ||
-              (prop.admin?.role == "members" && provinces && (
                 <>
+                  <Grid item xs={12}>
+                    <Divider textAlign="left">
+                      <Typography>ข้อมูลร้านค้า</Typography>
+                    </Divider>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="ชื่อร้านค้า"
+                      fullWidth
+                      value={storeName}
+                      onChange={(event) => setStoreName(event.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Facebook Link"
+                      fullWidth
+                      placeholder="https://www.facebook.com/..."
+                      value={facebookLink}
+                      onChange={(event) => setFacebookLink(event.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Line id"
+                      fullWidth
+                      placeholder="@HelloWorld หรือ 0912345678"
+                      value={lineId}
+                      onChange={(event) => setLineId(event.target.value)}
+                    />
+                  </Grid>
+
                   <Grid item xs={12}>
                     <TextField
                       select
@@ -771,7 +664,13 @@ const EditProfile = (prop: {
                           tambon_name_th: "",
                         });
                       }}
-                    ></TextField>
+                    >
+                      {provinces.map((province: province) => (
+                        <MenuItem value={province.name_th}>
+                          {province.name_th}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Grid>
                   {amphures.length > 0 && (
                     <Grid item xs={12}>
@@ -783,8 +682,7 @@ const EditProfile = (prop: {
                         onChange={(event) => {
                           setTambons(
                             amphures.filter(
-                              (amphures) =>
-                                amphures.name_th == event.target.value
+                              (amphures) => amphures.name_th == event.target.value
                             )[0].tambon
                           );
 
@@ -796,7 +694,13 @@ const EditProfile = (prop: {
                             tambon_name_th: "",
                           });
                         }}
-                      ></TextField>
+                      >
+                        {amphures.map((amphure: amphure) => (
+                          <MenuItem value={amphure.name_th}>
+                            {amphure.name_th}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                   )}
                   {tambons.length > 0 && (
@@ -815,7 +719,13 @@ const EditProfile = (prop: {
                           });
                           setZipCode(tambons[0].zip_code);
                         }}
-                      ></TextField>
+                      >
+                        {tambons.map((tambon: tambon) => (
+                          <MenuItem value={tambon.name_th}>
+                            {tambon.name_th}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                   )}
                   <Grid item xs={12}>
@@ -828,26 +738,36 @@ const EditProfile = (prop: {
                       />
                     )}
                   </Grid>
+                  <MapContainer
+                    center={[13.736717, 100.523186]}
+                    zoom={13}
+                    scrollWheelZoom={true}
+                    style={{ height: "100vh", width: "100%" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <CreateMarker />
+                  </MapContainer>
                 </>
-              ))}
+              )}
 
-            {role == "farmers" ||
+
+            {(role == "farmers" ||
               prop.admin?.role == "farmers" ||
               role == "members" ||
-              (prop.admin?.role == "members" && (
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="ที่อยู่"
-                    value={address}
-                    onChange={(event) => {
-                      setAddress(event.target.value);
-                    }}
-                  />
-                </Grid>
-              ))}
+              prop.admin?.role == "members") &&
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="ที่อยู่"
+                  value={address}
+                  onChange={(event) => {
+                    setAddress(event.target.value);
+                  }}
+                />
+              </Grid>
+            }
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -906,8 +826,8 @@ const EditProfile = (prop: {
                     passwordNew == "" && passwordCheck == false
                       ? "กรุณากรอกรหัสผ่าน"
                       : "" || !passwordCheck
-                      ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
-                      : ""
+                        ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                        : ""
                   }
                   InputProps={{
                     endAdornment: (
@@ -934,8 +854,8 @@ const EditProfile = (prop: {
                   comfirmPassword == "" && comfirmPasswordCheck == false
                     ? "กรุณากรอกรหัสผ่าน"
                     : "" || !comfirmPasswordCheck
-                    ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
-                    : ""
+                      ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                      : ""
                 }
                 label="ยืนยันรหัสผ่านใหม่"
                 type={showComfirmPassword ? "text" : "password"}

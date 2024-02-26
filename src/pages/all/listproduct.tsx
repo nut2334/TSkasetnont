@@ -87,7 +87,6 @@ const ListProduct = () => {
   const [page, setPage] = React.useState("1");
   const [searchParams, setSearchParams] = useSearchParams();
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
-  const [hasMore, setHasMore] = React.useState(true);
   const [value, setValue] = React.useState(0);
   const [maxPage, setMaxPage] = React.useState(0);
 
@@ -150,7 +149,7 @@ const ListProduct = () => {
     //  set page to 0 when category is changed
 
     if (searchParams.get("category") !== selectedCategory.category_id) {
-      setPage("0");
+      setPage("1");
     }
 
     setSearchParams({
@@ -160,13 +159,14 @@ const ListProduct = () => {
       ["order"]: order,
       ["page"]: page,
     });
+    console.log(page);
 
     axios
       .get(apiProducts, {
         params: {
           ["search"]: searchContent,
           ["category"]: selectedCategory.category_id,
-          ["page"]: (parseInt(page) - 1).toString(),
+          ["page"]: page,
           ["sort"]: sortBy,
           ["order"]: order,
         },
@@ -174,7 +174,6 @@ const ListProduct = () => {
       .then((res) => {
         console.log(res.data);
         setShowProduct(res.data.products);
-        setHasMore(res.data.hasMore);
         setMaxPage(res.data.maxPage);
       })
       .catch((err) => {
@@ -218,11 +217,11 @@ const ListProduct = () => {
             let bgcolor = item.bgcolor
               ? JSON.parse(item.bgcolor)
               : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                  r: number;
-                  g: number;
-                  b: number;
-                  a: number;
-                });
+                r: number;
+                g: number;
+                b: number;
+                a: number;
+              });
             return (
               <Tab
                 sx={{
@@ -313,22 +312,22 @@ const ListProduct = () => {
                   (item) => item.category_id === product.category_id
                 )?.bgcolor
                   ? JSON.parse(
-                      allCategory.find(
-                        (item) => item.category_id === product.category_id
-                      )?.bgcolor as string
-                    )
+                    allCategory.find(
+                      (item) => item.category_id === product.category_id
+                    )?.bgcolor as string
+                  )
                   : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                      r: number;
-                      g: number;
-                      b: number;
-                      a: number;
-                    });
+                    r: number;
+                    g: number;
+                    b: number;
+                    a: number;
+                  });
                 let nameCategory = allCategory.find(
                   (item) => item.category_id === product.category_id
                 )?.category_name
                   ? allCategory.find(
-                      (item) => item.category_id === product.category_id
-                    )?.category_name
+                    (item) => item.category_id === product.category_id
+                  )?.category_name
                   : "OTHER";
                 return (
                   <Grid item key={index} lg={3} xs={6}>
