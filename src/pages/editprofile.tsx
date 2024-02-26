@@ -377,9 +377,12 @@ const EditProfile = (prop: {
         lng: position?.lng,
         facebooklink: facebookLink,
         lineid: lineId,
-        address: address,
         zipcode: zipCode,
       };
+    }
+
+    if (role === "members" || prop.admin?.role === "members") {
+      data = { ...data, address: address };
     }
 
     axios
@@ -765,107 +768,23 @@ const EditProfile = (prop: {
               </>
             )}
 
-            {role == "members" ||
-              (prop.admin?.role == "members" && provinces && (
-                <>
-                  <Grid item xs={12}>
-                    <TextField
-                      select
-                      label="จังหวัด"
-                      fullWidth
-                      value={selected.province_name_th}
-                      onChange={(event) => {
-                        setAmphures(
-                          provinces.filter(
-                            (province) => province.name_th == event.target.value
-                          )[0].amphure
-                        );
-
-                        setSelected({
-                          province_name_th: event.target.value
-                            ? event.target.value
-                            : selected.province_name_th,
-                          amphure_name_th: "",
-                          tambon_name_th: "",
-                        });
-                      }}
-                    ></TextField>
-                  </Grid>
-                  {amphures.length > 0 && (
-                    <Grid item xs={12}>
-                      <TextField
-                        select
-                        label="เขต/อำเภอ"
-                        fullWidth
-                        value={selected.amphure_name_th}
-                        onChange={(event) => {
-                          setTambons(
-                            amphures.filter(
-                              (amphures) =>
-                                amphures.name_th == event.target.value
-                            )[0].tambon
-                          );
-
-                          setSelected({
-                            ...selected,
-                            amphure_name_th: event.target.value
-                              ? event.target.value
-                              : selected.amphure_name_th,
-                            tambon_name_th: "",
-                          });
-                        }}
-                      ></TextField>
-                    </Grid>
-                  )}
-                  {tambons.length > 0 && (
-                    <Grid item xs={12}>
-                      <TextField
-                        select
-                        label="แขวง/ตำบล"
-                        fullWidth
-                        value={selected.tambon_name_th}
-                        onChange={(event) => {
-                          setSelected({
-                            ...selected,
-                            tambon_name_th: event.target.value
-                              ? event.target.value
-                              : selected.tambon_name_th,
-                          });
-                          setZipCode(tambons[0].zip_code);
-                        }}
-                      ></TextField>
-                    </Grid>
-                  )}
-                  <Grid item xs={12}>
-                    {zipCode && (
-                      <TextField
-                        label="รหัสไปรษณีย์"
-                        fullWidth
-                        disabled
-                        value={zipCode}
-                      />
-                    )}
-                  </Grid>
-                </>
-              ))}
-
-            {role == "farmers" ||
+            {(role == "farmers" ||
               prop.admin?.role == "farmers" ||
               role == "members" ||
-              (prop.admin?.role == "members" && (
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="ที่อยู่"
-                    value={address}
-                    onChange={(event) => {
-                      setAddress(event.target.value);
-                    }}
-                  />
-                </Grid>
-              ))}
+              prop.admin?.role == "members") && (
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="ที่อยู่"
+                  value={address}
+                  onChange={(event) => {
+                    setAddress(event.target.value);
+                  }}
+                />
+              </Grid>
+            )}
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -894,6 +813,15 @@ const EditProfile = (prop: {
                   onChange={(event) => {
                     setPassword(event.target.value);
                   }}
+                  onBlur={validatePassword}
+                  error={!passwordCheck}
+                  helperText={
+                    passwordNew == "" && passwordCheck == false
+                      ? "กรุณากรอกรหัสผ่าน"
+                      : "" || !passwordCheck
+                      ? "รหัสผ่านต้องประกอบด้วยตัวอักษรและตัวเลข อย่างน้อย 8 ตัว"
+                      : ""
+                  }
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

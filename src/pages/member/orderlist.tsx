@@ -27,8 +27,10 @@ interface orderInterface {
     status: string;
     total_amount: number;
     date_buys: string;
+    tracking_number: string,
     date_complete: string | null;
     transaction_comfirm: string | null;
+    comment: string | null;
     products: {
         product_id: string;
         product_name: string;
@@ -57,7 +59,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const EachOrder = (prop: { order: orderInterface, jwt_token: string }) => {
+const EachOrder = (prop: { order: orderInterface, jwt_token: string, fecthOrder: () => void }) => {
     const [open, setOpen] = React.useState(false);
     const { order } = prop
     const handleClick = () => {
@@ -85,15 +87,14 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string }) => {
                         alignItems='flex-start'
                     >
                         <ListItemText>
-                            สถาณะการชำระเงิน :&nbsp;
-
-                            {order.transaction_comfirm ? <Chip label="ชำระเงินเสร็จสิ้น" color="success" /> : <>
-                                <Chip label="ยังไม่ชำระเงิน" color="error" />
-
-                            </>}
+                            สถาณะคำสั่งซื้อ :&nbsp;
+                            {order.status === "complete" ? <Chip label="สำเร็จ" color="success" />
+                                : order.status === "waiting" ? <Chip label="รอจัดส่ง" color="warning" />
+                                    : order.status === "pending" ? <Chip label="รอการตรวจสอบ" color="info" />
+                                        : <Chip label="ยกเลิก" color="error" />}
 
                         </ListItemText>
-                        {!order.transaction_comfirm ?
+                        {order.status === "reject" ?
                             <>
                                 <input type="file" accept='image/*' ref={inputRef} style={{ display: 'none' }}
                                     onChange={(e) => {
@@ -111,7 +112,7 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string }) => {
                                                 'Authorization': `Bearer ${prop.jwt_token}`
                                             }
                                         }).then(() => {
-                                            console.log("upload success")
+                                            prop.fecthOrder()
 
                                         }).catch((err) => {
                                             console.log(err)
@@ -121,10 +122,17 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string }) => {
                                 <Chip icon={<AddCircle />} label="แจ้งชำระเงิน" color="info" onClick={() => {
                                     inputRef.current?.click()
                                 }} />
+                                <ListItemText>
+                                    {order.comment}
+
+                                </ListItemText>
                             </>
+                            : order.status == "complete" ?
+                                <ListItemText
+                                    primary={`เลขพัสดุ: ${order.tracking_number}`}
+                                /> : null}
 
 
-                            : <Chip icon={<AddCircle />} label="ดูหลักฐานการโอนเงิน" color="info" />}
                     </ListItem>
                     <Divider orientation="vertical" flexItem />
                     <ListItem>
@@ -183,59 +191,7 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string }) => {
 
 const Orderlist = (prop: { jwt_token: string }) => {
     const [orderList, setOrderList] = useState<orderInterface[]>([])
-
-    useEffect(() => {
-        const mockData = [
-            {
-                id: "1",
-                status: "complete",
-                total_amount: 600,
-                date_buys: "2022-09-09",
-                date_complete: "2022-09-10",
-                transaction_comfirm: null,
-                products: [
-                    {
-                        product_id: "1",
-                        product_name: "apple",
-                        product_image: "https://www.google.com",
-                        quantity: 10,
-                        price: 10
-                    },
-                    {
-                        product_id: "2",
-                        product_name: "banana",
-                        product_image: "https://www.google.com",
-                        quantity: 20,
-                        price: 10
-                    },
-                    {
-                        product_id: "3",
-                        product_name: "orange",
-                        product_image: "https://www.google.com",
-                        quantity: 30,
-                        price: 10
-                    }
-                ]
-            },
-            {
-                id: "2",
-                status: "pending",
-                total_amount: 200,
-                date_buys: "2022-09-09",
-                date_complete: null,
-                transaction_comfirm: "123456",
-                products: [
-                    {
-                        product_id: "2",
-                        product_name: "banana",
-                        product_image: "https://www.google.com",
-                        quantity: 20,
-                        price: 10
-                    }
-                ]
-            }
-        ]
-        setOrderList(mockData)
+    const fecthOrder = () => {
         let apiOrderList = config.getApiEndpoint("orderlist", "GET")
         axios.get(apiOrderList, {
             headers: {
@@ -244,18 +200,21 @@ const Orderlist = (prop: { jwt_token: string }) => {
         }).then((res) => {
             console.log(res.data.orders);
 
-            // setOrderList(res.data.orders)
+            setOrderList(res.data.orders)
         }
         ).catch((err) => {
             console.log(err)
         })
+    }
+    useEffect(() => {
+        fecthOrder()
     }, [])
 
     return (
         <div>
             {orderList.map((order: any, index: number) => {
                 return (
-                    <EachOrder key={index} order={order} jwt_token={prop.jwt_token} />
+                    <EachOrder key={index} order={order} jwt_token={prop.jwt_token} fecthOrder={fecthOrder} />
                 )
 
             })}

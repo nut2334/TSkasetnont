@@ -57,6 +57,7 @@ const Navbar = (prop: {
     setAnchorElUser(null);
     if (name == "ออกจากระบบ" && path == "/") {
       prop.setJwt_token("");
+      setVisiblePages([...defaultPages]);
       if (cookies.get("jwt_token")) {
         cookies.remove("jwt_token");
       }
@@ -94,6 +95,9 @@ const Navbar = (prop: {
         ...defaultPages,
         { name: "ประวัติการซื้อขาย", path: "/orderlist" },
       ]);
+    }
+    if (prop.role == "") {
+      setVisiblePages([...defaultPages]);
     }
   }, [prop.role]);
 
