@@ -26,6 +26,8 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
 import { NumberInput } from "../../components/addamount";
+import { QuantityInput } from "../../components/addamount";
+import StarIcon from "@mui/icons-material/Star";
 
 import {
   FacebookShareButton,
@@ -34,18 +36,6 @@ import {
   LineIcon,
 } from "react-share";
 import { Cart } from "../../App";
-
-interface ProductInterface {
-  product_id: string;
-  product_name: string;
-  product_price: number;
-  product_image: string;
-  product_description: string;
-  product_category: string;
-  product_date: Date;
-  view_count: number;
-  selectedType: string;
-}
 
 interface FullProductInterface {
   product_id: string;
@@ -63,6 +53,7 @@ interface FullProductInterface {
   campaign_id: string;
   last_modified: Date;
   selectedType: string;
+  shippingcost: string;
 }
 
 const style = {
@@ -97,9 +88,21 @@ const SigleProduct = (prop: {
     campaign_id: "",
     last_modified: new Date(),
     selectedType: "",
+    shippingcost: "",
   });
   const { productid } = useParams<{ productid: string }>();
   const [showFullImage, setShowFullImage] = useState("");
+  const [comment, setComment] = useState<
+    {
+      review_id: string;
+      member_id: string;
+      product_id: string;
+      order_id: string;
+      rating: number;
+      comment: string;
+      date_comment: Date;
+    }[]
+  >([]);
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -107,7 +110,6 @@ const SigleProduct = (prop: {
       "get"
     );
     axios.get(apiSingleProduct).then((response) => {
-      console.log(response.data);
       setProduct(response.data);
     });
 
@@ -118,35 +120,44 @@ const SigleProduct = (prop: {
     axios
       .get(apiUpdateView)
       .then((response) => {
-        console.log(response.data);
+        setComment(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
   }, []);
 
+  useEffect(() => {
+    const apiComments = config.getApiEndpoint(`getcomment/${productid}`, "get");
+    axios.get(apiComments).then((response) => {
+      console.log(response.data.reviews);
+      setComment(response.data.reviews);
+    });
+  }, []);
+
   const GenerateSlide = () => {
     let slides = [];
-    slides.push(
-      <img
-        src={`${config.getApiEndpoint(
-          `getimage/${product.product_image.split("/").pop()}`,
-          "get"
-        )}`}
-        className="sliderimg"
-        style={{
-          width: "100%",
-          height: "250px",
-          objectFit: "cover",
-        }}
-        onClick={() => {
-          setShowFullImage(product.product_image);
-        }}
-        draggable="false"
-      />
-    );
+    if (product.product_image) {
+      slides.push(
+        <img
+          src={`${config.getApiEndpoint(
+            `getimage/${product.product_image.split("/").pop()}`,
+            "get"
+          )}`}
+          className="sliderimg"
+          style={{
+            width: "100%",
+            height: "250px",
+            objectFit: "cover",
+          }}
+          onClick={() => {
+            setShowFullImage(product.product_image);
+          }}
+          draggable="false"
+        />
+      );
+    }
     if (product.additional_image) {
-      console.log(product.additional_image);
       slides.push(
         JSON.parse(product.additional_image.replace("\\", "")).map(
           (image: string) => (
@@ -196,26 +207,27 @@ const SigleProduct = (prop: {
 
   const GenerateSlideComputer = () => {
     let slides = [];
-    slides.push(
-      <img
-        src={`${config.getApiEndpoint(
-          `getimage/${product.product_image.split("/").pop()}`,
-          "get"
-        )}`}
-        className="sliderimg"
-        style={{
-          width: "100%",
-          height: "500px",
-          objectFit: "cover",
-        }}
-        onClick={() => {
-          setShowFullImage(product.product_image);
-        }}
-        draggable="false"
-      />
-    );
+    if (product.product_image) {
+      slides.push(
+        <img
+          src={`${config.getApiEndpoint(
+            `getimage/${product.product_image.split("/").pop()}`,
+            "get"
+          )}`}
+          className="sliderimg"
+          style={{
+            width: "100%",
+            height: "500px",
+            objectFit: "cover",
+          }}
+          onClick={() => {
+            setShowFullImage(product.product_image);
+          }}
+          draggable="false"
+        />
+      );
+    }
     if (product.additional_image) {
-      console.log(product.additional_image);
       slides.push(
         JSON.parse(product.additional_image.replace("\\", "")).map(
           (image: string) => (
@@ -223,7 +235,7 @@ const SigleProduct = (prop: {
               className="sliderimg"
               style={{
                 width: "100%",
-                height: "250px",
+                height: "500px",
                 objectFit: "cover",
               }}
               src={`${config.getApiEndpoint(
@@ -245,7 +257,7 @@ const SigleProduct = (prop: {
           controls
           style={{
             width: "100%",
-            height: "250px",
+            height: "500px",
             objectFit: "cover",
           }}
         >
@@ -406,8 +418,13 @@ const SigleProduct = (prop: {
           </Stack>
           <Box>
             <Typography variant="h6">ค่าจัดส่ง</Typography>
-            {/* ทำต่อ */}
-            <Typography>{ }</Typography>
+            <Typography>
+              {product.shippingcost &&
+                product.shippingcost
+                  .split(",")
+                  .find((item) => item.split(":")[0] == "จัดส่งฟรี")
+                  ?.split(":")[1]}
+            </Typography>
           </Box>
           <Stack
             direction="row"
@@ -485,25 +502,47 @@ const SigleProduct = (prop: {
         </>
       )}
 
-      <Modal
-        open={showFullImage != ""}
-        onClose={() => setShowFullImage("")}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <img
-            style={{
-              width: "100%",
-              height: "70%",
-            }}
-            src={`${config.getApiEndpoint(
-              `getimage/${showFullImage.split("/").pop()}`,
-              "get"
-            )}`}
-          />
+      {showFullImage && (
+        <Modal
+          open={showFullImage != ""}
+          onClose={() => setShowFullImage("")}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <img
+              style={{
+                width: "100%",
+                height: "70%",
+              }}
+              src={`${config.getApiEndpoint(
+                `getimage/${showFullImage.split("/").pop()}`,
+                "get"
+              )}`}
+            />
+          </Box>
+        </Modal>
+      )}
+      {comment.length > 0 && (
+        <Box>
+          <Typography variant="h5">ความคิดเห็น</Typography>
+          {comment.map((item) => {
+            return (
+              <Box
+                sx={{
+                  border: 1,
+                  borderColor: "gray",
+                  marginTop: 2,
+                  padding: 2,
+                }}
+              >
+                {Array(Math.round(item.rating)).fill(<StarIcon />)}
+                <Typography variant="body1">{item.comment}</Typography>
+              </Box>
+            );
+          })}
         </Box>
-      </Modal>
+      )}
     </Container>
   );
 };
