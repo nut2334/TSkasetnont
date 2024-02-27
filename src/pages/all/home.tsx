@@ -11,6 +11,9 @@ import { Tabs, Tab } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useSearchParams } from "react-router-dom";
 import { RGBColor } from "react-color";
+import SwipeableEdgeDrawer from "../../components/SwipeableEdgeDrawer";
+import Box from "@mui/material/Box";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface CateagoryInterface {
   category_id: string;
@@ -36,12 +39,6 @@ const Home = (prop: { jwt_token: string }) => {
       lng: string;
     }[]
   >([]);
-  const [data2, setData2] = React.useState<
-    {
-      lat: string;
-      lng: string;
-    }[]
-  >([]);
   const [allCategory, setAllCategory] = React.useState<
     {
       category_id: string;
@@ -57,26 +54,26 @@ const Home = (prop: { jwt_token: string }) => {
   const [value, setValue] = React.useState("1");
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = React.useState("0");
-
-  // useEffect(() => {
-  //   axios
-  //     .get(apiProducts, {
-  //       params: {
-  //         ["search"]: "",
-  //         ["category"]: "",
-  //         ["page"]: "0",
-  //         ["sort"]: "view_count",
-  //         ["order"]: "desc",
-  //         ["perPage"]: 10,
-  //         ["groupby"]: 1,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       setData2(res.data.products);
-  //       setData(res.data.products);
-  //       console.log(res.data);
-  //     });
-  // }, []);
+  const [open, setOpen] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<{
+    product_id: string;
+    product_name: string;
+    product_description: string;
+    product_price: string;
+    product_image: string;
+    category_id: string;
+    lat: string;
+    lng: string;
+  }>({
+    product_id: "",
+    product_name: "",
+    product_description: "",
+    product_price: "",
+    product_image: "",
+    category_id: "",
+    lat: "",
+    lng: "",
+  });
 
   useEffect(() => {
     console.log(
@@ -163,6 +160,11 @@ const Home = (prop: { jwt_token: string }) => {
 
   return (
     <div>
+      <SwipeableEdgeDrawer
+        open={open}
+        setOpen={setOpen}
+        selectedProduct={selectedProduct}
+      />
       <MapContainer
         center={[13.736717, 100.523186]}
         zoom={13}
@@ -171,10 +173,10 @@ const Home = (prop: { jwt_token: string }) => {
           width: "100%",
           height: "92vh",
           zIndex: 1,
+          maxHeight: "92vh",
         }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {/* <Marker position={[13.736717, 100.523186]} icon={iconMarker}></Marker> */}
         {data.map((item, index) => {
           const markerHtmlStyles = `
             background-color: ${myCustomColour(item.category_id)};
@@ -201,14 +203,13 @@ const Home = (prop: { jwt_token: string }) => {
                 key={index}
                 position={[parseFloat(item.lat), parseFloat(item.lng)]}
                 icon={iconMarker}
-              >
-                <Popup>
-                  <div>
-                    <h2>{item.product_name}</h2>
-                    <p>{item.product_description}</p>
-                  </div>
-                </Popup>
-              </Marker>
+                eventHandlers={{
+                  click: () => {
+                    setOpen(true);
+                    setSelectedProduct(item);
+                  },
+                }}
+              ></Marker>
             )
           );
         })}
@@ -219,20 +220,20 @@ const Home = (prop: { jwt_token: string }) => {
           position: "absolute",
           zIndex: 2,
           top: "10%",
-          left: "10%",
+          left: "20%",
+          width: "100%",
         }}
       >
         <div
           style={{
-            marginTop: "20px",
             display: "flex",
-            border: "1px solid #e0e0e0",
-            borderRadius: "5px",
+            borderRadius: "100px",
             flexDirection: "row",
             justifyContent: "center",
-            paddingLeft: "10px",
-            marginBottom: "20px",
             backgroundColor: "white",
+            paddingLeft: "10px",
+            boxShadow:
+              "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
           }}
         >
           <InputBase
@@ -255,7 +256,6 @@ const Home = (prop: { jwt_token: string }) => {
             <SearchIcon />
           </IconButton>
         </div>
-        <div>{searchContent}</div>
         <Tabs
           value={value}
           onChange={handleChange}
@@ -289,7 +289,7 @@ const Home = (prop: { jwt_token: string }) => {
                   color: `${isDark(bgcolor) ? "white" : "black"}`,
                   marginRight: "5px",
                   boxShadow:
-                    "rgb(85, 91, 255) 0px 0px 0px 3px, rgb(31, 193, 27) 0px 0px 0px 6px, rgb(255, 217, 19) 0px 0px 0px 9px, rgb(255, 156, 85) 0px 0px 0px 12px, rgb(255, 85, 85) 0px 0px 0px 15px;",
+                    "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
                 }}
                 onClick={() => setSelectedCategory(item)}
               />
