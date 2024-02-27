@@ -26,7 +26,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
 import { NumberInput } from "../../components/addamount";
-import { QuantityInput } from "../../components/addamount";
+
 import StarIcon from "@mui/icons-material/Star";
 
 import {
