@@ -24,6 +24,7 @@ interface ProductInterface {
   product_category: string;
   last_modified: Date;
   product_viewed: number;
+  farmerstorename: string;
 }
 const Myproducts = (prop: { jwt_token: string, username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([])
@@ -95,11 +96,11 @@ const Myproducts = (prop: { jwt_token: string, username: string }) => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <NavLink to={"/shop/" + product.product_id}>
+                  <NavLink to={`/shop/${product.farmerstorename}/${product.product_id}`}>
                     <Button size="small">View</Button>
                   </NavLink>
                   <Button size="small" onClick={() => {
-                    setNavigatePath(product.product_id)
+                    setNavigatePath(`${product.farmerstorename}/${product.product_id}`)
                   }}>Edit</Button>
                   <Button size="small" onClick={() => {
                     const apiDeleteProduct = config.getApiEndpoint(`deleteproduct/${product.product_id}`, "POST");

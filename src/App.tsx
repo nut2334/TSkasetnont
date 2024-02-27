@@ -128,7 +128,7 @@ function App() {
                 }
               />
               <Route
-                path="/editproduct/:productid"
+                path="/editproduct/:shopname/:productid"
                 element={
                   <AddProduct
                     jwt_token={jwt_token}

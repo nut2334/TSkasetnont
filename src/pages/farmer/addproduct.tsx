@@ -76,7 +76,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }[]
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
-  const { productid } = useParams<{ productid: string }>();
+  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
 
   const [modalIsOpen, setIsOpen] = React.useState<{
     isOpen: boolean;
@@ -95,7 +95,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   useEffect(() => {
     if (productid) {
       let apiGetProduct = config.getApiEndpoint(
-        `getproduct/${productid}`,
+        `getproduct/${shopname}/${productid}`,
         "GET"
       );
       axios.get(apiGetProduct).then((res) => {
