@@ -6,12 +6,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
-
+import { Cart } from "../../App";
+import TableBank from "../../components/tablebank";
+import axios from "axios";
+import * as config from "../../config/config";
+import Swal from "sweetalert2";
+import { Navigate } from "react-router-dom";
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -23,15 +28,126 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
-
-const Payment = () => {
+interface productInterface {
+  product_id: string;
+  product_name: string;
+  product_image: string;
+  quantity: number;
+  price: number;
+}
+const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]>>, cartList: Cart[], jwt_token: string }) => {
   const [address, setAddress] = React.useState<string>("");
+  const [payment, setPayment] = React.useState<string>("");
+  const [products, setProducts] = React.useState<productInterface[]>([]);
   const [checkAddress, setCheckAdress] = React.useState<boolean>(true);
   const [slip, setSlip] = React.useState<File | null>(null);
-
+  const [redirect, setRedirect] = React.useState<boolean>(false);
   const cliclChangeAddress = () => {
     setCheckAdress(!checkAddress);
   };
+  useEffect(() => {
+    let products: productInterface[] = [];
+    prop.cartList.forEach((product) => {
+      products.push({
+        product_id: product.product_id,
+        product_name: product.product_name,
+        product_image: "",
+        quantity: product.quantity,
+        price: product.price,
+      });
+    });
+    setProducts(products);
+  }, [prop.cartList]);
+
+  useEffect(() => {
+    const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
+    axios
+      .get(apiGetinfo, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setAddress(res.data.address);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const apiPayment = config.getApiEndpoint(`getpayment/${prop.cartList[0].product_id}`, "GET");
+    axios
+      .get(apiPayment)
+      .then((res) => {
+        console.log(res.data);
+        setPayment(res.data.payment);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [])
+  const handleSubmit = () => {
+    if (slip === null) {
+      Swal.fire({
+        title: "กรุณาเลือกสลิปการโอนเงิน",
+        icon: "error",
+      });
+      return;
+    }
+    Swal.fire({
+      title: "ยืนยันการชำระเงิน",
+      text: "คุณต้องการยืนยันการชำระเงินใช่หรือไม่",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "กำลังดำเนินการ",
+          icon: "info",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false,
+        });
+        const formData = new FormData();
+        formData.append("productSlip", slip);
+        formData.append("address", address);
+        let allProduct = prop.cartList.map((product) => {
+          return {
+            product_id: product.product_id,
+            amount: product.quantity,
+          }
+        })
+        formData.append("cartList", JSON.stringify(allProduct));
+        axios
+          .post(config.getApiEndpoint("checkout", "POST"), formData, {
+            headers: {
+              "Authorization": `Bearer ${prop.jwt_token}`
+            }
+          })
+          .then(() => {
+            Swal.fire({
+              title: "สำเร็จ",
+              text: "ทำการสั่งซื้อสำเร็จ",
+              icon: "success",
+            });
+            prop.setCartList([]);
+            setRedirect(true);
+          })
+          .catch((err) => {
+            Swal.fire({
+              title: "เกิดข้อผิดพลาด",
+              text: "กรุณาลองใหม่อีกครั้ง",
+              icon: "error",
+            });
+          });
+      }
+    });
+  }
+  if (redirect) {
+    return <Navigate to="/orderlist" />
+  }
 
   return (
     <>
@@ -91,6 +207,7 @@ const Payment = () => {
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">รายการสินค้า</Typography>
+            <TableBank products={products} />
           </Grid>
           <Grid item xs={12}>
             <Divider />
@@ -106,8 +223,7 @@ const Payment = () => {
           >
             <Typography variant="h6">ช่องทางการชำระเงิน</Typography>
             <Typography>
-              กรุณาชำระเงินผ่านบัญชีธนาคาร ธ.กสิกรไทย สาขา สวนหลวง ชื่อบัญชี
-              นายสมชาย ใจดี เลขที่บัญชี 123-4-56789-0
+              {payment}
             </Typography>
 
             <Button
@@ -139,7 +255,7 @@ const Payment = () => {
                   marginTop: "10px",
                 }}
               >
-                {slip.name}
+                <img src={URL.createObjectURL(slip)} alt="slip" width="100" />
               </Typography>
             )}
           </Grid>
@@ -147,7 +263,7 @@ const Payment = () => {
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained">ยืนยันการชำระเงิน</Button>
+            <Button variant="contained" onClick={handleSubmit}>ยืนยันการชำระเงิน</Button>
           </Grid>
         </Grid>
       </Container>

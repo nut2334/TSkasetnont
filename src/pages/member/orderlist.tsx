@@ -21,6 +21,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Button, Chip, ListItem } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import AddCircle from '@mui/icons-material/AddCircle';
+import TableBank from '../../components/tablebank';
 
 interface orderInterface {
     id: string;
@@ -152,35 +153,7 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string, fecthOrder:
                 <Divider />
 
                 <ListSubheader>สินค้าทั้งหมด</ListSubheader>
-                <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <StyledTableRow>
-
-                                <StyledTableCell>สินค้า</StyledTableCell>
-                                <StyledTableCell>รายการ</StyledTableCell>
-                                <StyledTableCell align="right">จำนวน</StyledTableCell>
-                                <StyledTableCell align="right">ราคา</StyledTableCell>
-                            </StyledTableRow>
-                        </TableHead>
-                        <TableBody>
-                            {order.products.map((product, index) => (
-                                <StyledTableRow key={index}>
-                                    <StyledTableCell align="left">{index + 1}</StyledTableCell>
-                                    <StyledTableCell component="th" scope="row">
-                                        {product.product_name}
-                                    </StyledTableCell>
-                                    <StyledTableCell align="right">{product.quantity}</StyledTableCell>
-                                    <StyledTableCell align="right">{product.price * product.quantity} บาท</StyledTableCell>
-                                </StyledTableRow>
-                            ))}
-                            {/* total */}
-                            <StyledTableRow>
-                                <StyledTableCell colSpan={4} align="right">รวมราคาทั้งหมด : {order.total_amount} บาท</StyledTableCell>
-                            </StyledTableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <TableBank products={order.products} />
 
             </List>
 
