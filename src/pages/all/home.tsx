@@ -171,9 +171,8 @@ const Home = (prop: { jwt_token: string }) => {
         scrollWheelZoom={true}
         style={{
           width: "100%",
-          height: "92vh",
+          height: "100vh",
           zIndex: 1,
-          maxHeight: "92vh",
         }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

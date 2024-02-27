@@ -100,7 +100,7 @@ export default function SwipeableEdgeDrawer(
           >
             <Puller />
             <Typography sx={{ p: 2, color: "text.secondary" }}>
-              {props.selectedProduct.product_name}
+              ของเด็ดเกษตรนนท์
             </Typography>
           </StyledBox>
           <StyledBox
@@ -174,7 +174,7 @@ export default function SwipeableEdgeDrawer(
                     marginTop: "20px",
                   }}
                 >
-                  เยี่ยมชมสินค้า
+                  จิ้มๆ
                 </Button>
               </Container>
             }
