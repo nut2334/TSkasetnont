@@ -28,7 +28,6 @@ import { RWebShare } from "react-web-share";
 import { NumberInput } from "../../components/addamount";
 
 import StarIcon from "@mui/icons-material/Star";
-
 import {
   FacebookShareButton,
   LineShareButton,
@@ -110,6 +109,7 @@ const SigleProduct = (prop: {
       "get"
     );
     axios.get(apiSingleProduct).then((response) => {
+      console.log(response.data);
       setProduct(response.data);
     });
 
@@ -130,7 +130,6 @@ const SigleProduct = (prop: {
   useEffect(() => {
     const apiComments = config.getApiEndpoint(`getcomment/${productid}`, "get");
     axios.get(apiComments).then((response) => {
-      console.log(response.data.reviews);
       setComment(response.data.reviews);
     });
   }, []);
@@ -530,13 +529,18 @@ const SigleProduct = (prop: {
             return (
               <Box
                 sx={{
-                  border: 1,
-                  borderColor: "gray",
                   marginTop: 2,
                   padding: 2,
+                  boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px;",
                 }}
               >
-                {Array(Math.round(item.rating)).fill(<StarIcon />)}
+                {Array(Math.round(item.rating)).fill(
+                  <StarIcon
+                    sx={{
+                      color: "#ffd700",
+                    }}
+                  />
+                )}
                 <Typography variant="body1">{item.comment}</Typography>
               </Box>
             );
