@@ -2,6 +2,7 @@ import { Box, Button, Divider, Grid, Modal, Typography } from "@mui/material";
 import React, { useState, useRef, useEffect } from "react";
 import * as config from "../config/config";
 import axios from "axios";
+import { ImageList, ImageListItem } from "@mui/material";
 
 const Imagestore = (prop: {
   modalIsOpen: boolean;
@@ -40,10 +41,9 @@ const Imagestore = (prop: {
       <Box
         sx={{
           position: "absolute" as "absolute",
-          top: "30%",
+          top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "90%",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
@@ -71,6 +71,88 @@ const Imagestore = (prop: {
         </Grid>
         <Grid item xs={12} marginTop={2}>
           <Typography>กดเพื่อเลือกรูปภาพ</Typography>
+        </Grid>
+        <Grid item xs={12} marginTop={2}>
+          <ImageList
+            sx={{ width: "100%", height: 450 }}
+            cols={3}
+            rowHeight={164}
+          >
+            {productImage.map(({ imagepath }, index) => {
+              var isVideo = imagepath.match(
+                /\.(mp4|webm|ogg|ogv|avi|mov|wmv|flv|3gp)$/i
+              );
+
+              if (isVideo) {
+                return (
+                  <ImageListItem
+                    key={index}
+                    style={{
+                      border:
+                        selectedImage.indexOf(imagepath) !== -1
+                          ? "2px solid red"
+                          : "2px solid white",
+                      width: 164,
+                    }}
+                    onClick={() => {
+                      // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
+                      if (
+                        selectedImage.indexOf(imagepath) === -1 &&
+                        selectedImage.length < prop.imageSelect
+                      ) {
+                        setSelectedImage([...selectedImage, imagepath]);
+                      }
+                      // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
+                      else if (selectedImage.indexOf(imagepath) !== -1) {
+                        setSelectedImage(
+                          selectedImage.filter((item) => item !== imagepath)
+                        );
+                      }
+                    }}
+                  >
+                    <video
+                      src={`${config.getApiEndpoint(
+                        `getimage/${imagepath.split("/").pop()}`,
+                        "get"
+                      )}`}
+                      key={index}
+                    />
+                  </ImageListItem>
+                );
+              }
+
+              return (
+                <ImageListItem
+                  key={index}
+                  sx={{
+                    border:
+                      selectedImage.indexOf(imagepath) !== -1
+                        ? "2px solid red"
+                        : "2px solid white",
+                    width: 164,
+                  }}
+                  onClick={() => {
+                    // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
+                    if (
+                      selectedImage.indexOf(imagepath) === -1 &&
+                      selectedImage.length < prop.imageSelect
+                    ) {
+                      setSelectedImage([...selectedImage, imagepath]);
+                    }
+                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไ
+                  }}
+                >
+                  <img
+                    src={`${config.getApiEndpoint(
+                      `getimage/${imagepath.split("/").pop()}`,
+                      "get"
+                    )}`}
+                    key={index}
+                  />
+                </ImageListItem>
+              );
+            })}
+          </ImageList>
         </Grid>
 
         <input

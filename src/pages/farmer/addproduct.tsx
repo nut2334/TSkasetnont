@@ -264,6 +264,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               {checkCoverImage == false && (
                 <Typography color="red">กรุณาใส่รูปปก</Typography>
               )}
+
               <Button
                 onClick={() => {
                   setIsOpen({
@@ -276,6 +277,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               >
                 เลือกรูปภาพ
               </Button>
+
               {coverImage.length > 0 && (
                 <div style={{ marginTop: "10px" }}>
                   <img
