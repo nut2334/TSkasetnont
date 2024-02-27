@@ -9,26 +9,28 @@ import * as config from "../../config/config";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Grid from "@mui/material/Grid";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import { QuantityInput } from "../../components/addamount";
+import { NumberInput } from "../../components/addamount";
 import Navbar from "../../components/navbar";
 import { NavLink } from "react-router-dom";
+import Payment from "./payment";
+import Swal from "sweetalert2";
 
 const EachItem = (prop: {
   cart: Cart;
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
 }) => {
-  const [amount, setAmount] = React.useState<number>(prop.cart.amount);
-
+  const [quantity, setQuantity] = React.useState<number>(prop.cart.quantity);
   useEffect(() => {
     prop.setCartList((prev) =>
       prev.map((cart) => {
         if (cart.product_id === prop.cart.product_id) {
-          return { ...cart, amount: amount };
+          return { ...cart, quantity: quantity };
         }
         return cart;
       })
     );
-  }, [amount]);
+  }, [quantity]);
+
 
   return (
     <Box
@@ -45,11 +47,14 @@ const EachItem = (prop: {
           <Typography variant="h5">{prop.cart.product_name}</Typography>
         </Grid>
         <Grid item xs={3}>
-          {QuantityInput({
-            stock: prop.cart.stock,
-            setAmount: setAmount,
-            amount: amount,
-          })}
+          <NumberInput
+            aria-label="Quantity Input"
+            min={1}
+            max={prop.cart.stock}
+            value={quantity}
+            setQuantity={setQuantity}
+            quantity={quantity}
+          />
         </Grid>
 
         <Grid item xs={11}>
@@ -61,6 +66,15 @@ const EachItem = (prop: {
             }}
           >
             {prop.cart.price} บาท
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: "20px",
+              color: "green",
+            }}
+          >
+            ราคารวม : {prop.cart.price * quantity} บาท
           </Typography>
         </Grid>
         <Grid item xs={1}>
@@ -77,16 +91,32 @@ const EachItem = (prop: {
     </Box>
   );
 };
-const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
-  const apiCheckOut = config.getApiEndpoint("checkout", "POST");
-  const [cartList, setCartList] = React.useState<Cart[]>(
-    prop.cartList.map((cart) => {
-      return cart;
-    })
-  );
+const ListCart = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]>>, cartList: Cart[]; jwt_token: string }) => {
+  const { cartList, setCartList } = prop;
+  const [comfirmPayment, setComfirmPayment] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(cartList);
+
+  }, [cartList]);
+  useEffect(() => {
+    console.log(comfirmPayment);
+
+  }, [comfirmPayment]);
+
+  const handleSubmit = () => {
+    if (cartList.length === 0) {
+      Swal.fire({
+        title: "กรุณาเลือกสินค้า",
+        icon: "error",
+      });
+      return;
+    }
+    setComfirmPayment(true);
+  }
   return (
     <Container component="main" maxWidth="lg" sx={{ marginTop: 3 }}>
-      <div>
+      {!comfirmPayment ? <div>
         {cartList.map((cart, index) => {
           return (
             <>
@@ -94,31 +124,17 @@ const ListCart = (prop: { cartList: Cart[]; jwt_token: string }) => {
             </>
           );
         })}
-        <NavLink to="/payment">
-          <Button
-            startIcon={<PointOfSaleIcon />}
-            variant="contained"
-            onClick={() => {
-              console.log(prop.cartList);
-              axios.post(
-                apiCheckOut,
-                {
-                  cartList: prop.cartList.map((cart) => {
-                    return { product_id: cart.product_id, amount: cart.amount };
-                  }),
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${prop.jwt_token}`,
-                  },
-                }
-              );
-            }}
-          >
-            ชำระเงิน
-          </Button>
-        </NavLink>
+
+        <Button
+          startIcon={<PointOfSaleIcon />}
+          variant="contained"
+          onClick={handleSubmit}
+        >
+          ชำระเงิน
+        </Button>
       </div>
+        : <Payment setCartList={setCartList} cartList={cartList} jwt_token={prop.jwt_token} />
+      }
     </Container>
   );
 };

@@ -25,7 +25,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
-import { QuantityInput } from "../../components/addamount";
+import { NumberInput } from "../../components/addamount";
 
 import {
   FacebookShareButton,
@@ -80,7 +80,7 @@ const SigleProduct = (prop: {
   cartList: Cart[];
 }) => {
   const carousel = useRef<AliceCarousel>(null);
-  const [amount, setAmount] = useState(1);
+  const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState<FullProductInterface>({
     product_id: "",
     product_name: "",
@@ -388,11 +388,13 @@ const SigleProduct = (prop: {
             marginLeft={2}
           >
             <Stack>
-              <QuantityInput
-                stock={product.stock}
-                amount={amount}
-                setAmount={setAmount}
-              />
+              <NumberInput
+                aria-label="Quantity Input"
+                min={1}
+                max={product.stock}
+                value={quantity}
+                setQuantity={setQuantity}
+                quantity={quantity} />
             </Stack>
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <Stack>
@@ -405,7 +407,7 @@ const SigleProduct = (prop: {
           <Box>
             <Typography variant="h6">ค่าจัดส่ง</Typography>
             {/* ทำต่อ */}
-            <Typography>{}</Typography>
+            <Typography>{ }</Typography>
           </Box>
           <Stack
             direction="row"
@@ -437,7 +439,7 @@ const SigleProduct = (prop: {
                     onClick={() => {
                       let cart: Cart = {
                         product_id: product.product_id,
-                        amount: amount,
+                        quantity: quantity,
                         product_name: product.product_name,
                         price: product.price,
                         stock: product.stock,
@@ -454,7 +456,7 @@ const SigleProduct = (prop: {
                           (item) => item.product_id == product.product_id
                         );
                         let newCart = [...prop.cartList];
-                        newCart[index].amount += amount;
+                        newCart[index].quantity += quantity;
                         prop.setCartList(newCart);
                       } else {
                         prop.setCartList([...prop.cartList, cart]);

@@ -26,7 +26,7 @@ import Orderlist from "./pages/member/orderlist";
 
 export interface Cart {
   product_id: string;
-  amount: number;
+  quantity: number;
   product_name: string;
   price: number;
   stock: number;
@@ -159,10 +159,10 @@ function App() {
             <>
               <Route
                 path="/listcart"
-                element={<ListCart cartList={cartList} jwt_token={jwt_token} />}
+                element={<ListCart setCartList={setCartList} cartList={cartList} jwt_token={jwt_token} />}
               />
               <Route path="/reservation/:productid" element={<Reserve />} />
-              <Route path="/payment" element={<Payment />} />
+
               <Route
                 path="/orderlist"
                 element={<Orderlist jwt_token={jwt_token} />}

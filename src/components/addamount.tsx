@@ -6,14 +6,18 @@ import {
 import { styled } from "@mui/system";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import { Input } from "@mui/material";
 
-const NumberInput = React.forwardRef(function CustomNumberInput(
+export const NumberInput = React.forwardRef(function CustomNumberInput(
   props: NumberInputProps & {
-    setAmount: React.Dispatch<React.SetStateAction<number>>;
-    amount: number;
+    max: number;
+    setQuantity: React.Dispatch<React.SetStateAction<number>>;
+    quantity: number;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
+  console.log(ref);
+
   return (
     <BaseNumberInput
       slots={{
@@ -22,14 +26,35 @@ const NumberInput = React.forwardRef(function CustomNumberInput(
         incrementButton: StyledButton,
         decrementButton: StyledButton,
       }}
+      onBlur={(event) => {
+        console.log(ref);
+
+      }}
       slotProps={{
+        input: {
+          onChange: (event) => {
+            if (event.target.value === "") {
+              props.setQuantity(1);
+              return;
+            }
+            if (parseInt(event.target.value) <= 0) {
+              props.setQuantity(1);
+              return;
+            }
+            if (parseInt(event.target.value) > props.max) {
+              props.setQuantity(props.max);
+              return;
+            }
+            props.setQuantity(parseInt(event.target.value));
+          },
+
+        },
         incrementButton: {
           children: (
             <AddIcon
               fontSize="small"
               onClick={() => {
-                console.log(props.amount);
-                props.setAmount(props.amount + 1);
+                props.setQuantity(props.quantity + 1);
               }}
             />
           ),
@@ -40,8 +65,7 @@ const NumberInput = React.forwardRef(function CustomNumberInput(
             <RemoveIcon
               fontSize="small"
               onClick={() => {
-                console.log(props.amount - 1);
-                props.setAmount(props.amount - 1);
+                props.setQuantity(props.quantity - 1);
               }}
             />
           ),
@@ -52,23 +76,6 @@ const NumberInput = React.forwardRef(function CustomNumberInput(
     />
   );
 });
-
-export function QuantityInput(prop: {
-  stock: number;
-  setAmount: React.Dispatch<React.SetStateAction<number>>;
-  amount: number;
-}) {
-  return (
-    <NumberInput
-      aria-label="Quantity Input"
-      min={1}
-      max={prop.stock}
-      value={prop.amount}
-      setAmount={prop.setAmount}
-      amount={prop.amount}
-    />
-  );
-}
 
 const blue = {
   100: "#daecff",
@@ -115,9 +122,8 @@ const StyledInput = styled("input")(
   color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
   background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
   border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
-  box-shadow: 0px 2px 4px ${
-    theme.palette.mode === "dark" ? "rgba(0,0,0, 0.5)" : "rgba(0,0,0, 0.05)"
-  };
+  box-shadow: 0px 2px 4px ${theme.palette.mode === "dark" ? "rgba(0,0,0, 0.5)" : "rgba(0,0,0, 0.05)"
+    };
   border-radius: 8px;
   margin: 0 8px;
   padding: 10px 12px;
@@ -132,8 +138,7 @@ const StyledInput = styled("input")(
 
   &:focus {
     border-color: ${blue[400]};
-    box-shadow: 0 0 0 3px ${
-      theme.palette.mode === "dark" ? blue[700] : blue[200]
+    box-shadow: 0 0 0 3px ${theme.palette.mode === "dark" ? blue[700] : blue[200]
     };
   }
 

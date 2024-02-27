@@ -12,6 +12,8 @@ import {
   MenuItem,
   Divider,
 } from "@mui/material";
+import L, { LatLng } from 'leaflet';
+import { useMap } from "react-leaflet";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
@@ -109,7 +111,8 @@ const EditProfile = (prop: {
   const [facebookLink, setFacebookLink] = useState<string>("");
   const [lineId, setLineId] = useState<string>("");
   const [position, setPosition] = useState<LatLngLiteral>();
-
+  const [payment, setPayment] = useState<string>("");
+  const [current, setCurrent] = useState<boolean>(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -192,8 +195,6 @@ const EditProfile = (prop: {
         "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
       );
       let provinces = dataProvinces.data as province[];
-      console.log(provinces);
-
       if (!prop.admin) {
         axios
           .get(apiGetinfo, {
@@ -207,6 +208,7 @@ const EditProfile = (prop: {
             setFirstName(res.data.firstname);
             setLastName(res.data.lastname);
             setTel(res.data.phone);
+            setPayment(res.data.payment);
             setSelected({
               province_name_th: res.data.province,
               amphure_name_th: res.data.amphure,
@@ -258,6 +260,7 @@ const EditProfile = (prop: {
             setFirstName(res.data.firstname);
             setLastName(res.data.lastname);
             setTel(res.data.phone);
+            setPayment(res.data.payment);
             setSelected({
               province_name_th: res.data.province,
               amphure_name_th: res.data.amphure,
@@ -355,6 +358,7 @@ const EditProfile = (prop: {
       lineid?: string;
       address?: string;
       zipcode?: number;
+      payment?: string;
     };
     if (prop.admin) {
       data = { ...data, role: prop.admin.role };
@@ -366,8 +370,11 @@ const EditProfile = (prop: {
       }>(prop.jwt_token).role == "farmers" ||
       prop.admin?.role == "farmers"
     ) {
+      console.log(position);
+
       data = {
         ...data,
+        address: address,
         farmerstorename: storeName,
         province: selected.province_name_th,
         amphure: selected.amphure_name_th,
@@ -377,12 +384,14 @@ const EditProfile = (prop: {
         facebooklink: facebookLink,
         lineid: lineId,
         zipcode: zipCode,
+        payment: payment,
       };
     }
 
     if (role === "members" || prop.admin?.role === "members") {
       data = { ...data, address: address };
     }
+    console.log(data);
 
     axios
       .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
@@ -432,29 +441,34 @@ const EditProfile = (prop: {
     }
   };
 
-  const CreateMarker = () => {
+  const CreateMarker = (prop: { setPosition: React.Dispatch<React.SetStateAction<L.LatLngLiteral | undefined>>, position?: LatLngLiteral, current: boolean }) => {
+    const [currentLocation, setCurrentLocation] = useState<LatLngLiteral | undefined>(prop.position);
+    const { setPosition, position, current } = prop;
+    const map = useMap();
+
     useMapEvents({
-      // locate latlng on click
       click(e) {
         setPosition(e.latlng);
+        map.flyTo(e.latlng, map.getZoom());
       },
     });
 
-    return position === null ? null : (
-      <Marker
-        position={
-          position
-            ? position
-            : ({
-              lat: 13.736717,
-              lng: 100.523186,
-            } as LatLngLiteral)
-        }
-        icon={iconMarker}
-      >
-        <Popup>You are here</Popup>
+    useEffect(() => {
+      map.locate().on("locationfound", function (e) {
+        setCurrentLocation(e.latlng);
+        map.flyTo(e.latlng, map.getZoom());
+      });
+
+    }, [map]);
+
+    return currentLocation ?
+      <Marker position={currentLocation} icon={iconMarker}>
+        <Popup>
+          You are here. <br />
+
+        </Popup>
       </Marker>
-    );
+      : null;
   };
 
   return (
@@ -626,6 +640,14 @@ const EditProfile = (prop: {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
+                      label="ช่องทางการชำระเงิน"
+                      fullWidth
+                      value={payment}
+                      onChange={(event) => setPayment(event.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
                       label="Facebook Link"
                       fullWidth
                       placeholder="https://www.facebook.com/..."
@@ -745,8 +767,20 @@ const EditProfile = (prop: {
                     style={{ height: "100vh", width: "100%" }}
                   >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <CreateMarker />
+                    <CreateMarker setPosition={setPosition} position={position} current={current} />
                   </MapContainer>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="contained"
+                      color={`${current ? "warning" : "success"}`}
+                      onClick={() => {
+                        // setPosition(undefined)
+                        setCurrent(!current)
+                      }}
+                    >
+                      ตำแหน่งปัจจุบัน
+                    </Button>
+                  </Grid>
                 </>
               )}
 
