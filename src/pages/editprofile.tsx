@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Container,
   Box,
@@ -94,7 +94,6 @@ const EditProfile = (prop: {
   >([{ role_id: "", role_name: "" }]);
   const [role, setRole] = useState<string>();
   const [storeName, setStoreName] = useState<string>("");
-
   const [provinces, setProvinces] = useState<province[]>([]);
   const [amphures, setAmphures] = useState<amphure[]>([]);
   const [tambons, setTambons] = useState<tambon[]>([]);
@@ -459,28 +458,34 @@ const EditProfile = (prop: {
     }
   };
 
-  const CreateMarker = (prop: { setPosition: React.Dispatch<React.SetStateAction<L.LatLngLiteral | undefined>>, position?: LatLngLiteral, current: boolean }) => {
-    const [currentLocation, setCurrentLocation] = useState<LatLngLiteral | undefined>(prop.position);
-    const { setPosition, position, current } = prop;
+  const CreateMarker = (prop: { current: boolean }) => {
     const map = useMap();
 
     useMapEvents({
       click(e) {
         setPosition(e.latlng);
         map.flyTo(e.latlng, map.getZoom());
+        if (prop.current) {
+          setCurrent(false);
+        }
       },
+
     });
 
+
+
     useEffect(() => {
-      map.locate().on("locationfound", function (e) {
-        setCurrentLocation(e.latlng);
-        map.flyTo(e.latlng, map.getZoom());
-      });
+      if (prop.current && position == undefined) {
+        map.locate().on("locationfound", function (e) {
+          setPosition(e.latlng);
+          map.flyTo(e.latlng, map.getZoom());
+        });
+      }
 
     }, [map]);
 
-    return currentLocation ?
-      <Marker position={currentLocation} icon={iconMarker}>
+    return position ?
+      <Marker position={position} icon={iconMarker}>
         <Popup>
           You are here. <br />
 
@@ -788,14 +793,14 @@ const EditProfile = (prop: {
                     style={{ height: "100vh", width: "100%" }}
                   >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <CreateMarker setPosition={setPosition} position={position} current={current} />
+                    <CreateMarker current={current} />
                   </MapContainer>
                   <Grid item xs={12}>
                     <Button
                       variant="contained"
                       color={`${current ? "warning" : "success"}`}
                       onClick={() => {
-                        // setPosition(undefined)
+                        setPosition(undefined)
                         setCurrent(!current)
                       }}
                     >

@@ -90,7 +90,7 @@ const SigleProduct = (prop: {
     selectedType: "",
     shippingcost: "",
   });
-  const { productid } = useParams<{ productid: string }>();
+  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
   const [showFullImage, setShowFullImage] = useState("");
   const [comment, setComment] = useState<
     {

@@ -96,7 +96,7 @@ function App() {
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
           <Route
-            path="/shop/:productid"
+            path="/shop/:shopname/:productid"
             element={
               <SigleProduct setCartList={setCartList} cartList={cartList} />
             }
