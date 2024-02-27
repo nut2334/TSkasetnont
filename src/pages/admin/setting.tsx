@@ -231,7 +231,28 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
               >
                 บันทึก
               </Button>
-              <Button color="error" variant="contained">
+              <Button
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  axios
+                    .delete(config.getApiEndpoint("categories", "DELETE"), {
+                      headers: {
+                        Authorization: `Bearer ${prop.jwt_token}`,
+                      },
+                      data: {
+                        category_id: id,
+                      },
+                    })
+                    .then((res) => {
+                      axios
+                        .get(config.getApiEndpoint("categories", "GET"))
+                        .then((res) => {
+                          setCategory(res.data);
+                        });
+                    });
+                }}
+              >
                 ลบ
               </Button>
             </Box>
