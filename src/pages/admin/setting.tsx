@@ -91,12 +91,20 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        console.log(res);
+
         axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
           setCategory(res.data);
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+          });
         });
       })
       .catch((err) => {
+        Swal.fire({
+          title: `เกิดข้อผิดพลาด ${err.response.data.message}`,
+          icon: "error",
+        });
         console.log(err);
       });
   };
@@ -248,8 +256,19 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                       axios
                         .get(config.getApiEndpoint("categories", "GET"))
                         .then((res) => {
+                          Swal.fire({
+                            title: "ลบสำเร็จ",
+                            icon: "success",
+                          });
+                          setId("");
                           setCategory(res.data);
-                        });
+                        }).catch((err) => {
+                          Swal.fire({
+                            title: "เกิดข้อผิดพลาด",
+                            icon: "error",
+                          });
+                          console.log(err);
+                        })
                     });
                 }}
               >
