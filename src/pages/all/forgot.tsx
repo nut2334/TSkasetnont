@@ -11,16 +11,19 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 import * as config from "../../config/config";
+import Swal from "sweetalert2";
 
 const Forgot = () => {
   const [email, setEmail] = React.useState("");
+  const [regEmail, setRegEmail] = React.useState(false);
   const [isSubmit, setIsSubmit] = React.useState(false);
 
   const apiForgot = config.getApiEndpoint("forgot", "POST");
 
   const handleSubmit = () => {
-    if (typeof email !== "string" || email.trim() === "") {
-      alert("กรุณากรอกอีเมล");
+    const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if(!regexEmail.test(email)){
+      setRegEmail(true);
       return;
     }
     axios
@@ -28,7 +31,19 @@ const Forgot = () => {
         email: email,
       })
       .then(() => {
-        setIsSubmit(true);
+        Swal.fire({
+          title: "สำเร็จ",
+          text: "กรุณาตรวจสอบอีเมลของคุณ",
+          icon: "success",
+          confirmButtonText: "ปิด",
+        });
+      }).catch((error) => {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด",
+          text: error.response.data.message,
+          icon: "error",
+          confirmButtonText: "ปิด",
+        });
       });
   };
   if (isSubmit) {
@@ -44,7 +59,7 @@ const Forgot = () => {
           alignItems: "center",
         }}
         component="form"
-        onSubmit={handleSubmit}
+        
       >
         <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
           <LockOutlinedIcon />
@@ -70,6 +85,10 @@ const Forgot = () => {
           sx={{ mt: 3, mb: 2, color: "white" }}
           color="primary"
           type="submit"
+          onClick={() => {
+            setIsSubmit(true);
+            handleSubmit();
+          }}
         >
           ยืนยัน
         </Button>

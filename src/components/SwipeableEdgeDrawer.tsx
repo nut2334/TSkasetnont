@@ -61,6 +61,7 @@ export default function SwipeableEdgeDrawer(
 
   const toggleDrawer = (newOpen: boolean) => () => {
     props.setOpen(newOpen);
+    console.log(props.selectedProduct);
   };
 
   return (

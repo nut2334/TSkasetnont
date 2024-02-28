@@ -12,8 +12,6 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useSearchParams } from "react-router-dom";
 import { RGBColor } from "react-color";
 import SwipeableEdgeDrawer from "../../components/SwipeableEdgeDrawer";
-import Box from "@mui/material/Box";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface CateagoryInterface {
   category_id: string;
@@ -105,7 +103,6 @@ const Home = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setData(res.data.products);
       })
       .catch((err) => {
@@ -138,7 +135,6 @@ const Home = (prop: { jwt_token: string }) => {
             b: number;
             a: number;
           });
-      console.log(bgcolor);
       return `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`;
     } else {
       return "rgba(68,93,72,1)";
@@ -173,6 +169,7 @@ const Home = (prop: { jwt_token: string }) => {
           width: "100%",
           height: "100vh",
           zIndex: 1,
+          maxHeight: "calc(100vh - 80px)"
         }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -219,8 +216,15 @@ const Home = (prop: { jwt_token: string }) => {
           position: "absolute",
           zIndex: 2,
           top: "10%",
-          left: "20%",
           width: "100%",
+          left: "50%",
+    transform: "translateX(-50%)" ,
+    '@media (max-width: 600px)': {
+      left: "initial",
+      transform: "initial",
+      marginLeft: "auto",
+      marginRight: "auto",
+    }
         }}
       >
         <div
