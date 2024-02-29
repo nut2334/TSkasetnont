@@ -331,7 +331,7 @@ const ListProduct = () => {
                     )?.category_name
                   : "OTHER";
                 return (
-                  <Grid item key={index} lg={3} xs={6}>
+                  <Grid item key={index} lg={4} xs={12} sm={6}>
                     <NavLink
                       to={`/shop/${product.farmerstorename}/${product.product_id}`}
                       style={{

@@ -176,7 +176,7 @@ const Navbar = (prop: {
               </Menu>
             </Box>
             {/* phone */}
-            <NavLink to="/" style={{ textDecoration: "none" }}>
+            <NavLink to="/" style={{ textDecoration: "none",alignItems: "center" }}>
               <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
                 <img
                   src={require("../assets/karsetnont.png")}
@@ -192,11 +192,10 @@ const Navbar = (prop: {
                 component="a"
                 sx={{
                   display: { xs: "flex", md: "none" },
-                  flexGrow: 1,
                   fontWeight: 700,
                   textDecoration: "none",
                   color: "black",
-                  fontSize: 18,
+                  fontSize: "20px"
                 }}
               >
                 ของเด็ดเกษตรนนท์
@@ -233,7 +232,6 @@ const Navbar = (prop: {
             )}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
-
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {!prop.role && (
                   <NavLink to="/login" style={{ textDecoration: "none" }}>
