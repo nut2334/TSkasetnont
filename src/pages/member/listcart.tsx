@@ -31,7 +31,6 @@ const EachItem = (prop: {
     );
   }, [quantity]);
 
-
   return (
     <Box
       marginBottom={2}
@@ -91,17 +90,19 @@ const EachItem = (prop: {
     </Box>
   );
 };
-const ListCart = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]>>, cartList: Cart[]; jwt_token: string }) => {
+const ListCart = (prop: {
+  setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
+  cartList: Cart[];
+  jwt_token: string;
+}) => {
   const { cartList, setCartList } = prop;
   const [comfirmPayment, setComfirmPayment] = React.useState<boolean>(false);
 
   useEffect(() => {
     console.log(cartList);
-
   }, [cartList]);
   useEffect(() => {
     console.log(comfirmPayment);
-
   }, [comfirmPayment]);
 
   const handleSubmit = () => {
@@ -113,28 +114,66 @@ const ListCart = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[
       return;
     }
     setComfirmPayment(true);
-  }
+  };
   return (
     <Container component="main" maxWidth="lg" sx={{ marginTop: 3 }}>
-      {!comfirmPayment ? <div>
-        {cartList.map((cart, index) => {
-          return (
+      {!comfirmPayment ? (
+        <div>
+          {cartList &&
+            cartList.map((cart, index) => {
+              return (
+                <>
+                  <EachItem setCartList={setCartList} cart={cart} />
+                </>
+              );
+            })}
+          {cartList.length == 0 && (
             <>
-              <EachItem setCartList={setCartList} cart={cart} />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100vh",
+                }}
+              >
+                <>
+                  <img
+                    src={require("../../assets/sad.png")}
+                    alt="sad"
+                    width="200"
+                    height="200"
+                  />
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    ไม่มีสินค้าในตะกร้า
+                  </Typography>
+                </>
+              </Box>
             </>
-          );
-        })}
-
-        <Button
-          startIcon={<PointOfSaleIcon />}
-          variant="contained"
-          onClick={handleSubmit}
-        >
-          ชำระเงิน
-        </Button>
-      </div>
-        : <Payment setCartList={setCartList} cartList={cartList} jwt_token={prop.jwt_token} />
-      }
+          )}
+          {cartList.length > 0 && (
+            <Button
+              startIcon={<PointOfSaleIcon />}
+              variant="contained"
+              onClick={handleSubmit}
+            >
+              ชำระเงิน
+            </Button>
+          )}
+        </div>
+      ) : (
+        <Payment
+          setCartList={setCartList}
+          cartList={cartList}
+          jwt_token={prop.jwt_token}
+        />
+      )}
     </Container>
   );
 };

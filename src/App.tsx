@@ -23,6 +23,7 @@ import ListCart from "./pages/member/listcart";
 import Reserve from "./pages/member/reserve";
 import Payment from "./pages/member/payment";
 import Orderlist from "./pages/member/orderlist";
+import { MessengerChat } from "react-messenger-chat-plugin";
 
 export interface Cart {
   product_id: string;
@@ -75,7 +76,6 @@ function App() {
     }
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
-
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
@@ -85,6 +85,35 @@ function App() {
           setJwt_token={setJwt_token}
           cartList={cartList}
         />
+        <MessengerChat
+          pageId="109287808726963"
+          language="th_TH"
+          themeColor={"#2f6e39"}
+          bottomSpacing={70}
+          loggedInGreeting="loggedInGreeting"
+          loggedOutGreeting="loggedOutGreeting"
+          greetingDialogDisplay={"show"}
+          debugMode={true}
+          onMessengerShow={() => {
+            console.log("onMessengerShow");
+          }}
+          onMessengerHide={() => {
+            console.log("onMessengerHide");
+          }}
+          onMessengerDialogShow={() => {
+            console.log("onMessengerDialogShow");
+          }}
+          onMessengerDialogHide={() => {
+            console.log("onMessengerDialogHide");
+          }}
+          onMessengerMounted={() => {
+            console.log("onMessengerMounted");
+          }}
+          onMessengerLoad={() => {
+            console.log("onMessengerLoad");
+          }}
+        />
+
         <Routes>
           <Route path="/" element={<Home jwt_token={jwt_token} />} />
           <Route
@@ -159,7 +188,13 @@ function App() {
             <>
               <Route
                 path="/listcart"
-                element={<ListCart setCartList={setCartList} cartList={cartList} jwt_token={jwt_token} />}
+                element={
+                  <ListCart
+                    setCartList={setCartList}
+                    cartList={cartList}
+                    jwt_token={jwt_token}
+                  />
+                }
               />
               <Route path="/reservation/:productid" element={<Reserve />} />
 
