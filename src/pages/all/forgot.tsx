@@ -30,13 +30,21 @@ const Forgot = () => {
       .post(apiForgot, {
         email: email,
       })
-      .then(() => {
-        Swal.fire({
-          title: "สำเร็จ",
-          text: "กรุณาตรวจสอบอีเมลของคุณ",
-          icon: "success",
-          confirmButtonText: "ปิด",
-        });
+      .then((response) => {
+        if (response.data.email == true) {
+          Swal.fire({
+            title: "สำเร็จ",
+            text: "กรุณาตรวจสอบอีเมลของคุณ",
+            icon: "success",
+            confirmButtonText: "ปิด",
+          });
+        } else {
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด",
+            icon: "error",
+            confirmButtonText: "ปิด",
+          });
+        }
       })
       .catch((error) => {
         Swal.fire({
