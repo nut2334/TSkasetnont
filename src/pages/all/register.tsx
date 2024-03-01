@@ -16,6 +16,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Navigate } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Register = (prop: {
   setValue: React.Dispatch<React.SetStateAction<string>>;
@@ -123,6 +124,7 @@ const Register = (prop: {
       setPasswordCheck(false);
     }
   };
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -222,9 +224,21 @@ const Register = (prop: {
       axios
         .post(apiRegister, userData)
         .then((response) => {
+          Swal.fire({
+            title: "สมัครสมาชิกสำเร็จ",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
           setIsRegister(true);
         })
         .catch((error) => {
+          setComfirmPasswordCheck(true);
+          setPasswordCheck(true);
+          Swal.fire({
+            title: "สมัครสมาชิกไม่สำเร็จ",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
           console.log(error);
         });
     }

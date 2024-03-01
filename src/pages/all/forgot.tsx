@@ -22,7 +22,7 @@ const Forgot = () => {
 
   const handleSubmit = () => {
     const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if(!regexEmail.test(email)){
+    if (!regexEmail.test(email)) {
       setRegEmail(true);
       return;
     }
@@ -37,7 +37,8 @@ const Forgot = () => {
           icon: "success",
           confirmButtonText: "ปิด",
         });
-      }).catch((error) => {
+      })
+      .catch((error) => {
         Swal.fire({
           title: "เกิดข้อผิดพลาด",
           text: error.response.data.message,
@@ -59,7 +60,6 @@ const Forgot = () => {
           alignItems: "center",
         }}
         component="form"
-        
       >
         <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
           <LockOutlinedIcon />
@@ -77,6 +77,8 @@ const Forgot = () => {
           name="email"
           autoComplete="email"
           autoFocus
+          error={regEmail}
+          helperText={regEmail ? "กรุณากรอกอีเมลให้ถูกต้อง" : ""}
           onChange={(event) => setEmail(event.target.value)}
         />
         <Button
