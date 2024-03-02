@@ -35,7 +35,11 @@ interface productInterface {
   quantity: number;
   price: number;
 }
-const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]>>, cartList: Cart[], jwt_token: string }) => {
+const Payment = (prop: {
+  setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
+  cartList: Cart[];
+  jwt_token: string;
+}) => {
   const [address, setAddress] = React.useState<string>("");
   const [payment, setPayment] = React.useState<string>("");
   const [products, setProducts] = React.useState<productInterface[]>([]);
@@ -75,9 +79,12 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
         console.log(err);
       });
 
-    const apiPayment = config.getApiEndpoint(`getpayment/${prop.cartList[0].product_id}`, "GET");
+    const apiPayment = config.getApiEndpoint(
+      `getpayment/${prop.cartList[0].product_id}`,
+      "GET"
+    );
     axios
-      .get(apiPayment)
+      .post(apiPayment)
       .then((res) => {
         console.log(res.data);
         setPayment(res.data.payment);
@@ -85,7 +92,7 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
       .catch((err) => {
         console.log(err);
       });
-  }, [])
+  }, []);
   const handleSubmit = () => {
     if (slip === null) {
       Swal.fire({
@@ -113,18 +120,19 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
         const formData = new FormData();
         formData.append("productSlip", slip);
         formData.append("address", address);
+        console.log(address);
         let allProduct = prop.cartList.map((product) => {
           return {
             product_id: product.product_id,
             amount: product.quantity,
-          }
-        })
+          };
+        });
         formData.append("cartList", JSON.stringify(allProduct));
         axios
           .post(config.getApiEndpoint("checkout", "POST"), formData, {
             headers: {
-              "Authorization": `Bearer ${prop.jwt_token}`
-            }
+              Authorization: `Bearer ${prop.jwt_token}`,
+            },
           })
           .then(() => {
             Swal.fire({
@@ -144,9 +152,9 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
           });
       }
     });
-  }
+  };
   if (redirect) {
-    return <Navigate to="/orderlist" />
+    return <Navigate to="/orderlist" />;
   }
 
   return (
@@ -222,9 +230,7 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
             }}
           >
             <Typography variant="h6">ช่องทางการชำระเงิน</Typography>
-            <Typography>
-              {payment}
-            </Typography>
+            <Typography>{payment}</Typography>
 
             <Button
               component="label"
@@ -263,7 +269,9 @@ const Payment = (prop: { setCartList: React.Dispatch<React.SetStateAction<Cart[]
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" onClick={handleSubmit}>ยืนยันการชำระเงิน</Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              ยืนยันการชำระเงิน
+            </Button>
           </Grid>
         </Grid>
       </Container>

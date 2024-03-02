@@ -126,7 +126,7 @@ const EachOrder = (prop: {
             {/* make all item flex */}
             <ListItem alignItems="flex-start">
               <ListItemText>
-                สถาณะคำสั่งซื้อ :&nbsp;
+                สถานะคำสั่งซื้อ :&nbsp;
                 {order.status === "complete" ? (
                   <Chip label="สำเร็จ" color="success" />
                 ) : order.status === "waiting" ? (
@@ -343,7 +343,6 @@ const Orderhistory = (prop: { jwt_token: string }) => {
       })
       .then((res) => {
         console.log(res.data);
-
         setOrderHistory(res.data);
       })
       .catch((err) => {

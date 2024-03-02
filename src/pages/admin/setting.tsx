@@ -35,6 +35,12 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
     b: 235,
     a: 1,
   });
+  const [standard, setStandard] = useState<
+    {
+      standard_id: string;
+      standard_name: string;
+    }[]
+  >([]);
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
       setCategory(res.data);
@@ -47,6 +53,12 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       setTextColor("black");
     }
   }, [bgColor]);
+  useEffect(() => {
+    const apiStandard = config.getApiEndpoint("standardproducts", "GET");
+    axios.get(apiStandard).then((res) => {
+      setStandard(res.data);
+    });
+  }, []);
 
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
@@ -91,7 +103,6 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-
         axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
           setCategory(res.data);
           Swal.fire({
@@ -262,13 +273,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                           });
                           setId("");
                           setCategory(res.data);
-                        }).catch((err) => {
+                        })
+                        .catch((err) => {
                           Swal.fire({
                             title: "เกิดข้อผิดพลาด",
                             icon: "error",
                           });
                           console.log(err);
-                        })
+                        });
                     });
                 }}
               >
@@ -277,6 +289,22 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
             </Box>
           </>
         )}
+      </Grid>
+      <Grid item xs={12} marginBottom={2}>
+        <Divider>
+          <Typography>มาตรฐานสินค้า</Typography>
+        </Divider>
+      </Grid>
+      <Grid item xs={12}>
+        {standard.map((std) => {
+          return (
+            <Chip
+              key={std.standard_id}
+              label={std.standard_name}
+              sx={{ margin: "5px" }}
+            />
+          );
+        })}
       </Grid>
     </Container>
   );
