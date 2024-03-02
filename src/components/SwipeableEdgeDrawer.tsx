@@ -8,7 +8,9 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import { Container } from "@mui/material";
+import { Container, Grid } from "@mui/material";
+import axios from "axios";
+import * as config from "../config/config";
 
 const drawerBleeding = 56;
 
@@ -51,6 +53,7 @@ export default function SwipeableEdgeDrawer(
       category_id: string;
       lat: string;
       lng: string;
+      farmerstorename: string;
     };
   }
 ) {
@@ -101,7 +104,7 @@ export default function SwipeableEdgeDrawer(
           >
             <Puller />
             <Typography sx={{ p: 2, color: "text.secondary" }}>
-              ของเด็ดเกษตรนนท์
+              {props.selectedProduct.farmerstorename || "ของเด็ดเกษตรนนท์"}
             </Typography>
           </StyledBox>
           <StyledBox
@@ -113,71 +116,13 @@ export default function SwipeableEdgeDrawer(
             }}
           >
             {
-              <Container
-                maxWidth="lg"
-                sx={{
-                  position: "absolute",
-                  zIndex: 2,
-                  top: "10%",
-                  left: "20%",
-                  width: "100%",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    borderRadius: "100px",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    backgroundColor: "white",
-                    paddingLeft: "10px",
-                    boxShadow:
-                      "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
-                  }}
-                >
-                  <img
-                    src={props.selectedProduct.product_image}
-                    alt={props.selectedProduct.product_name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: "100px",
-                    }}
-                  />
-                </div>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    marginTop: "20px",
-                  }}
-                >
-                  {props.selectedProduct.product_name}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    marginTop: "20px",
-                  }}
-                >
-                  {props.selectedProduct.product_description}
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    marginTop: "20px",
-                  }}
-                >
-                  ราคา {props.selectedProduct.product_price} บาท
-                </Typography>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginTop: "20px",
-                  }}
-                >
-                  จิ้มๆ
-                </Button>
-              </Container>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <img src={`${config.getApiEndpoint(
+            `getimage/${props.selectedProduct.product_image.split("/").pop()}`,
+            "get")}`}/>
+              </Grid>
+              </Grid>
             }
           </StyledBox>
         </SwipeableDrawer>

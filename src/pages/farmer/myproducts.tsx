@@ -8,6 +8,8 @@ import {
   CardContent,
   Typography,
   CardActions,
+  TextField,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,6 +20,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Swal from "sweetalert2";
+import { MenuItem } from "@mui/material";
+import { web_activity } from "../../config/dataDropdown";
 
 interface ProductInterface {
   product_id: string;
@@ -29,10 +33,19 @@ interface ProductInterface {
   last_modified: Date;
   product_viewed: number;
   farmerstorename: string;
+  selectedType: string;
+  
 }
 const Myproducts = (prop: { jwt_token: string; username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
   const [navigatePath, setNavigatePath] = useState("");
+  const [allCategory, setAllCategory] = useState<
+    {
+      category_id: string;
+      category_name: string;
+      bgcolor: string;
+    }[]
+  >([]);
   const fetchProduct = () => {
     const apiMyproducts = config.getApiEndpoint(
       `myproducts/${prop.username}`,
@@ -50,9 +63,31 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   if (navigatePath) {
     return <Navigate to={`/editproduct/${navigatePath}`} />;
   }
+  useEffect(() => {
+    axios.get(config.getApiEndpoint("categories", "GET")).then((response) => {
+      setAllCategory(response.data);
+    });
+  }, []);
+
   return (
     <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+          select
+          label="รูปแบบการเก็บข้อมูล"
+          fullWidth
+          >
+            {
+              web_activity.map((option) => (
+                <MenuItem key={option.activityID} value={option.activityID}>
+                  {option.activityName}
+                </MenuItem>
+              ))
+
+            }
+          </TextField>
+        </Grid>
         <Grid item xs={12} sm={6}>
           <Button
             variant="contained"
@@ -97,6 +132,14 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                     <Typography gutterBottom variant="h5" component="h2">
                       {product.product_name}
                     </Typography>
+                    <Chip label={product.product_category} 
+                    sx={{
+                      backgroundColor: allCategory.find(
+                        (category) => category.category_id === product.product_category
+                      )?.bgcolor,
+                    }}
+                    />
+                    <Chip label={product.selectedType} />
                     <Typography>{product.product_description}</Typography>
                   </CardContent>
                   <CardActions>

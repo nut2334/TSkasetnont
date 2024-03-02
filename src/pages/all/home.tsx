@@ -35,6 +35,7 @@ const Home = (prop: { jwt_token: string }) => {
       category_id: string;
       lat: string;
       lng: string;
+      farmerstorename: string;
     }[]
   >([]);
   const [allCategory, setAllCategory] = React.useState<
@@ -62,6 +63,7 @@ const Home = (prop: { jwt_token: string }) => {
     category_id: string;
     lat: string;
     lng: string;
+    farmerstorename: string;
   }>({
     product_id: "",
     product_name: "",
@@ -71,6 +73,7 @@ const Home = (prop: { jwt_token: string }) => {
     category_id: "",
     lat: "",
     lng: "",
+    farmerstorename: "",
   });
 
   useEffect(() => {
@@ -104,6 +107,7 @@ const Home = (prop: { jwt_token: string }) => {
       })
       .then((res) => {
         setData(res.data.products);
+        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
