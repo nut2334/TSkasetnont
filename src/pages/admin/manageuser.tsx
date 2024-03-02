@@ -19,6 +19,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
 
 interface userInterface {
   id: string;
@@ -41,7 +42,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
       role_id: string;
       role_name: string;
     }[]
-  >([{ role_id: "all", role_name: "ทั้งหมด" }]);
+  >([]);
 
   const [editingUser, setEditingUser] = useState<{
     username: string;
@@ -70,7 +71,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
       .get(apiRole)
       .then((res) => {
         if (res.data) {
-          setAllrole((role) => [...role, ...res.data]);
+          setAllrole([{ role_id: "all", role_name: "ทั้งหมด" }, ...res.data]);
         }
       })
       .catch((err) => {
@@ -79,8 +80,10 @@ const ManageUser = (prop: { jwt_token: string }) => {
   }, []);
 
   const deleteUser = (username: string, role: string) => {
-
-    const apiDeleteUser = config.getApiEndpoint(`deleteuser/${role}/${username}`, "DELETE");
+    const apiDeleteUser = config.getApiEndpoint(
+      `deleteuser/${role}/${username}`,
+      "DELETE"
+    );
     axios
       .delete(apiDeleteUser, {
         headers: {
@@ -89,12 +92,25 @@ const ManageUser = (prop: { jwt_token: string }) => {
       })
       .then((response) => {
         if (response.data) {
-          alert("ลบสำเร็จ");
+          Swal.fire({
+            icon: "success",
+            title: "ลบสำเร็จ",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           setUsers(users.filter((user) => user.username != username));
-          setFilteredUsers(filteredUsers.filter((user) => user.username != username));
+          setFilteredUsers(
+            filteredUsers.filter((user) => user.username != username)
+          );
         }
       })
       .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "ลบไม่สำเร็จ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
         console.log(error);
       });
   };
@@ -257,7 +273,24 @@ const ManageUser = (prop: { jwt_token: string }) => {
                           color: "#EB5353",
                           cursor: "pointer",
                         }}
-                        onClick={() => deleteUser(user.username, user.role)}
+                        onClick={() => {
+                          Swal.fire({
+                            title: "คุณแน่ใจหรือไม่?",
+                            text: "คุณจะไม่สามารถกู้คืนข้อมูลนี้ได้!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "ใช่, ลบข้อมูล!",
+                            cancelButtonText: "ยกเลิก",
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              {
+                                deleteUser(user.username, user.role);
+                              }
+                            }
+                          });
+                        }}
                       />
                     </TableCell>
                   </TableRow>
