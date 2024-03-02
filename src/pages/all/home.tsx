@@ -30,12 +30,13 @@ const Home = (prop: { jwt_token: string }) => {
       product_id: string;
       product_name: string;
       product_description: string;
-      product_price: string;
+      price: string;
       product_image: string;
       category_id: string;
       lat: string;
       lng: string;
       farmerstorename: string;
+      unit: string;
     }[]
   >([]);
   const [allCategory, setAllCategory] = React.useState<
@@ -58,22 +59,24 @@ const Home = (prop: { jwt_token: string }) => {
     product_id: string;
     product_name: string;
     product_description: string;
-    product_price: string;
+    price: string;
     product_image: string;
     category_id: string;
     lat: string;
     lng: string;
     farmerstorename: string;
+    unit: string;
   }>({
     product_id: "",
     product_name: "",
     product_description: "",
-    product_price: "",
+    price: "",
     product_image: "",
     category_id: "",
     lat: "",
     lng: "",
     farmerstorename: "",
+    unit: "",
   });
 
   useEffect(() => {

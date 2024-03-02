@@ -201,37 +201,31 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           showCancelButton: true,
           confirmButtonText: "ใช่",
           cancelButtonText: "ไม่",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setProductName("");
-            setSelectedCategory("");
-            setDescription("");
-            setSelectedType("");
-            setPrice(0);
-            setUnit("");
-            setStock(0);
-            setSelectedStatus("");
-            setStartDate(null);
-            setEndDate(null);
-            setCoverImage([]);
-            setProductVideo([]);
-            setSelectImage([]);
-            setSelectedStandard([
-              {
-                standard_id: "",
-                standard_name: "",
-                standard_number: "",
-                standard_expire: undefined,
-                standard_cercification: undefined,
-              },
-            ]);
-            setShippingCost([{ weight: 0, price: 0 }]);
-            setSelectedType("");
-          }
-          if (result.isDismissed) {
-            setIsExist(true);
-          }
-        });
+        })
+          .then((result) => {
+            if (result.isConfirmed) {
+              // setProductName("");
+              // setSelectedCategory("");
+              // setDescription("");
+              // setSelectedType("");
+              // setPrice(0);
+              // setUnit("");
+              // setStock(0);
+              // setSelectedStatus("");
+              // setStartDate(null);
+              // setEndDate(null);
+              // setCoverImage([]);
+              // setProductVideo([]);
+              // setSelectImage([]);
+              // setSelectedStandard([]);
+              // setShippingCost([{ weight: 0, price: 0 }]); 
+            } else {
+              setIsExist(true);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
         
       }).catch((err) => {
         Swal.fire({
@@ -559,6 +553,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     label="ราคา"
                     variant="outlined"
                     fullWidth
+                    type="number"
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
@@ -663,6 +658,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setStock(parseInt(e.target.value))}
+                    type="number"
                   />
                 </Grid>
                 <AddCarriage unit={unit} setShippingCost={setShippingCost} />

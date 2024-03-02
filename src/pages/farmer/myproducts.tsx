@@ -22,6 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Swal from "sweetalert2";
 import { MenuItem } from "@mui/material";
 import { web_activity } from "../../config/dataDropdown";
+import { RGBColor } from "react-color";
 
 interface ProductInterface {
   product_id: string;
@@ -29,12 +30,12 @@ interface ProductInterface {
   price: number;
   product_image: string;
   product_description: string;
-  product_category: string;
   last_modified: Date;
   product_viewed: number;
   farmerstorename: string;
   selectedType: string;
-  
+  category_id: string;
+  category_name: string;
 }
 const Myproducts = (prop: { jwt_token: string; username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
@@ -53,21 +54,32 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
     );
     axios.get(apiMyproducts).then((response: any) => {
       console.log(response.data);
-
       setAllProduct(response.data);
     });
   };
   useEffect(() => {
     fetchProduct();
   }, []);
-  if (navigatePath) {
-    return <Navigate to={`/editproduct/${navigatePath}`} />;
-  }
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((response) => {
       setAllCategory(response.data);
     });
   }, []);
+  const isDark = (color: RGBColor) => {
+    var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
+    if (luma < 128) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  if (navigatePath) {
+    return <Navigate to={`/editproduct/${navigatePath}`} />;
+  }
+  
+
+  
 
   return (
     <Container component="main" maxWidth="md">
@@ -108,7 +120,22 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
         {/* End hero unit */}
         <Grid container spacing={4}>
           {allProduct &&
-            allProduct.map((product, index) => (
+            allProduct.map((product, index) => {
+              let bgcolor = allCategory.find(
+                (item) => item.category_id === product.category_id
+              )?.bgcolor
+                ? JSON.parse(
+                    allCategory.find(
+                      (item) => item.category_id === product.category_id
+                    )?.bgcolor as string
+                  )
+                : ({ r: 68, g: 93, b: 72, a: 1 } as {
+                    r: number;
+                    g: number;
+                    b: number;
+                    a: number;
+                  });
+              return(
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card
                   sx={{
@@ -132,11 +159,10 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                     <Typography gutterBottom variant="h5" component="h2">
                       {product.product_name}
                     </Typography>
-                    <Chip label={product.product_category} 
+                    <Chip label={product.category_name} 
                     sx={{
-                      backgroundColor: allCategory.find(
-                        (category) => category.category_id === product.product_category
-                      )?.bgcolor,
+                      backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                      color: isDark(bgcolor) ? "white" : "black",
                     }}
                     />
                     <Chip label={product.selectedType} />
@@ -216,7 +242,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                   </CardActions>
                 </Card>
               </Grid>
-            ))}
+            )})}
         </Grid>
       </Container>
     </Container>
