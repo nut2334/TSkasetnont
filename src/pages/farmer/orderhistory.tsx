@@ -241,12 +241,7 @@ const EachOrder = (prop: {
                 <TextField
                   value={trackingNumber}
                   onChange={(e) => {
-                    const reg = new RegExp(/^[A-Za-z0-9]{10}$/);
-                    if (reg.test(e.target.value)) {
-                      setTrackingNumber(e.target.value);
-                    } else {
-                      setRegTrackingNumber(false);
-                    }
+                    setTrackingNumber(e.target.value);
                   }}
                   size="small"
                   sx={{
@@ -254,12 +249,19 @@ const EachOrder = (prop: {
                   }}
                   error={!regTrackingNumber}
                   label="เลขพัสดุ"
-                  helperText="กรุณากรอกเลขพัสดุให้ถูกต้อง"
+                  helperText={!regTrackingNumber ? "เลขพัสดุไม่ถูกต้อง" : ""}
                 />
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={() => {
+                    const reg = /^[A-Za-z0-9][13]$/;
+                    if (!reg.test(trackingNumber)) {
+                      setRegTrackingNumber(false);
+                    } else {
+                      setRegTrackingNumber(true);
+                    }
+                    if (!regTrackingNumber) return;
                     let apiConfirmOrder = config.getApiEndpoint(
                       "confirmorder",
                       "POST"
