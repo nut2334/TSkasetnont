@@ -79,6 +79,7 @@ const Login = (prop: {
           }
         })
         .catch((err) => {
+          console.log(err);
           setError(true);
         });
     }

@@ -78,9 +78,7 @@ const Navbar = (prop: {
     if (prop.role == "farmers") {
       setVisiblePages([
         ...defaultPages,
-        { name: "จัดการสินค้า", path: "/myproducts" },
-        { name: "วิเคราะห์สินค้า", path: "/analyze" },
-        { name: "ประวัติการซื้อขาย", path: "/history" },
+        { name: "ข้อมูลสินค้าของฉัน", path: "/myproducts" },
       ]);
     }
     if (prop.role == "tambons") {
@@ -176,7 +174,10 @@ const Navbar = (prop: {
               </Menu>
             </Box>
             {/* phone */}
-            <NavLink to="/" style={{ textDecoration: "none",alignItems: "center" }}>
+            <NavLink
+              to="/"
+              style={{ textDecoration: "none", alignItems: "center" }}
+            >
               <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
                 <img
                   src={require("../assets/karsetnont.png")}
@@ -195,7 +196,7 @@ const Navbar = (prop: {
                   fontWeight: 700,
                   textDecoration: "none",
                   color: "black",
-                  fontSize: "20px"
+                  fontSize: "20px",
                 }}
               >
                 ของเด็ดเกษตรนนท์

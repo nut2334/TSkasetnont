@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import * as config from "../config/config";
+import * as config from "../../config/config";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -23,7 +23,7 @@ import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import TableBank from "../components/tablebank";
+import TableBank from "../../components/tablebank";
 import TextField from "@mui/material/TextField";
 interface OrderHistoryInterface {
   order_id: string;
@@ -126,7 +126,7 @@ const EachOrder = (prop: {
             {/* make all item flex */}
             <ListItem alignItems="flex-start">
               <ListItemText>
-                สถาณะคำสั่งซื้อ :&nbsp;
+                สถานะคำสั่งซื้อ :&nbsp;
                 {order.status === "complete" ? (
                   <Chip label="สำเร็จ" color="success" />
                 ) : order.status === "waiting" ? (
@@ -343,7 +343,6 @@ const Orderhistory = (prop: { jwt_token: string }) => {
       })
       .then((res) => {
         console.log(res.data);
-
         setOrderHistory(res.data);
       })
       .catch((err) => {
