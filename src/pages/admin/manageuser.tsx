@@ -42,7 +42,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
       role_id: string;
       role_name: string;
     }[]
-  >([{ role_id: "all", role_name: "ทั้งหมด" }]);
+  >([]);
 
   const [editingUser, setEditingUser] = useState<{
     username: string;
@@ -71,7 +71,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
       .get(apiRole)
       .then((res) => {
         if (res.data) {
-          setAllrole((role) => [...role, ...res.data]);
+          setAllrole([{ role_id: "all", role_name: "ทั้งหมด" }, ...res.data]);
         }
       })
       .catch((err) => {

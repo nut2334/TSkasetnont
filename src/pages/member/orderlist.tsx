@@ -23,6 +23,7 @@ import Divider from '@mui/material/Divider';
 import AddCircle from '@mui/icons-material/AddCircle';
 import TableBank from '../../components/tablebank';
 
+
 interface orderInterface {
     id: string;
     status: string;
@@ -153,7 +154,13 @@ const EachOrder = (prop: { order: orderInterface, jwt_token: string, fecthOrder:
                 <Divider />
 
                 <ListSubheader>สินค้าทั้งหมด</ListSubheader>
-                <TableBank products={order.products} />
+                <TableBank products={order.products} haveComment={order.status == "complete" ?
+                    {
+                        fecthOrder: prop.fecthOrder,
+                        jwt_token: prop.jwt_token,
+                        order_id: order.id
+                    }
+                    : undefined} />
 
             </List>
 
