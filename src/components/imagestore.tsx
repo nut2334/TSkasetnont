@@ -7,12 +7,15 @@ import { ImageList, ImageListItem } from "@mui/material";
 const Imagestore = (prop: {
   modalIsOpen: boolean;
   closeModal(): void;
+  imgType: "image" | "video";
   imageSelect: number;
+  selectImage: string[];
   setSelectImage: React.Dispatch<React.SetStateAction<string[]>>;
   jwt_token: string;
 }) => {
-  const [productImage, setProductImage] = useState<{ imagepath: string }[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string[]>([]);
+  const [productImage, setProductImage] = useState<string[]>([]);
+  const [productVideo, setProductVideo] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string[]>(prop.selectImage);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     let getApiImage = config.getApiEndpoint("imagestore", "GET");
@@ -23,9 +26,8 @@ const Imagestore = (prop: {
         },
       })
       .then((res) => {
-        console.log(res.data);
-
         setProductImage(res.data.images);
+        setProductVideo(res.data.videos);
       })
       .catch((err) => {
         console.log(err);
@@ -78,49 +80,44 @@ const Imagestore = (prop: {
             cols={3}
             rowHeight={164}
           >
-            {productImage.map(({ imagepath }, index) => {
-              var isVideo = imagepath.match(
-                /\.(mp4|webm|ogg|ogv|avi|mov|wmv|flv|3gp)$/i
-              );
-
-              if (isVideo) {
-                return (
-                  <ImageListItem
+            {prop.imgType == "video" && productVideo.map((videopath, index) => {
+              return (
+                <ImageListItem
+                  key={index}
+                  style={{
+                    border:
+                      selectedImage.indexOf(videopath) !== -1
+                        ? "2px solid red"
+                        : "2px solid white",
+                    width: 164,
+                  }}
+                  onClick={() => {
+                    // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
+                    if (
+                      selectedImage.indexOf(videopath) === -1 &&
+                      selectedImage.length < prop.imageSelect
+                    ) {
+                      setSelectedImage([...selectedImage, videopath]);
+                    }
+                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
+                    else if (selectedImage.indexOf(videopath) !== -1) {
+                      setSelectedImage(
+                        selectedImage.filter((item) => item !== videopath)
+                      );
+                    }
+                  }}
+                >
+                  <video
+                    src={`${config.getApiEndpoint(
+                      `getimage/${videopath.split("/").pop()}`,
+                      "get"
+                    )}`}
                     key={index}
-                    style={{
-                      border:
-                        selectedImage.indexOf(imagepath) !== -1
-                          ? "2px solid red"
-                          : "2px solid white",
-                      width: 164,
-                    }}
-                    onClick={() => {
-                      // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
-                      if (
-                        selectedImage.indexOf(imagepath) === -1 &&
-                        selectedImage.length < prop.imageSelect
-                      ) {
-                        setSelectedImage([...selectedImage, imagepath]);
-                      }
-                      // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
-                      else if (selectedImage.indexOf(imagepath) !== -1) {
-                        setSelectedImage(
-                          selectedImage.filter((item) => item !== imagepath)
-                        );
-                      }
-                    }}
-                  >
-                    <video
-                      src={`${config.getApiEndpoint(
-                        `getimage/${imagepath.split("/").pop()}`,
-                        "get"
-                      )}`}
-                      key={index}
-                    />
-                  </ImageListItem>
-                );
-              }
-
+                  />
+                </ImageListItem>
+              )
+            })}
+            {prop.imgType == "image" && productImage.map((imagepath, index) => {
               return (
                 <ImageListItem
                   key={index}
@@ -139,7 +136,13 @@ const Imagestore = (prop: {
                     ) {
                       setSelectedImage([...selectedImage, imagepath]);
                     }
-                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไ
+
+                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
+                    else if (selectedImage.indexOf(imagepath) !== -1) {
+                      setSelectedImage(
+                        selectedImage.filter((item) => item !== imagepath)
+                      );
+                    }
                   }}
                 >
                   <img
@@ -151,7 +154,8 @@ const Imagestore = (prop: {
                   />
                 </ImageListItem>
               );
-            })}
+            })
+            }
           </ImageList>
         </Grid>
 
@@ -162,7 +166,7 @@ const Imagestore = (prop: {
           }}
           type="file"
           multiple
-          accept="image/*,video/*"
+          accept={prop.imgType == "video" ? "video/*" : "image/*"}
           onChange={(e) => {
             if (e.target.files === null) {
               return;
@@ -203,83 +207,6 @@ const Imagestore = (prop: {
               });
           }}
         />
-        {productImage.map(({ imagepath }, index) => {
-          var isVideo = imagepath.match(
-            /\.(mp4|webm|ogg|ogv|avi|mov|wmv|flv|3gp)$/i
-          );
-
-          if (isVideo) {
-            return (
-              <>
-                <video
-                  src={`${config.getApiEndpoint(
-                    `getimage/${imagepath.split("/").pop()}`,
-                    "get"
-                  )}`}
-                  key={index}
-                  onClick={() => {
-                    // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
-
-                    if (
-                      selectedImage.indexOf(imagepath) === -1 &&
-                      selectedImage.length < prop.imageSelect
-                    ) {
-                      setSelectedImage([...selectedImage, imagepath]);
-                    }
-                    // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
-                    else if (selectedImage.indexOf(imagepath) !== -1) {
-                      setSelectedImage(
-                        selectedImage.filter((item) => item !== imagepath)
-                      );
-                    }
-                  }}
-                  style={{
-                    border:
-                      selectedImage.indexOf(imagepath) !== -1
-                        ? "2px solid red"
-                        : "2px solid white",
-                    width: "100px",
-                  }}
-                />
-              </>
-            );
-          }
-
-          return (
-            <>
-              <img
-                src={`${config.getApiEndpoint(
-                  `getimage/${imagepath.split("/").pop()}`,
-                  "get"
-                )}`}
-                key={index}
-                onClick={() => {
-                  // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
-
-                  if (
-                    selectedImage.indexOf(imagepath) === -1 &&
-                    selectedImage.length < prop.imageSelect
-                  ) {
-                    setSelectedImage([...selectedImage, imagepath]);
-                  }
-                  // ถ้ารูปภาพที่เลือกอยู่ในรายการ ให้ลบออกไป
-                  else if (selectedImage.indexOf(imagepath) !== -1) {
-                    setSelectedImage(
-                      selectedImage.filter((item) => item !== imagepath)
-                    );
-                  }
-                }}
-                style={{
-                  border:
-                    selectedImage.indexOf(imagepath) !== -1
-                      ? "2px solid red"
-                      : "2px solid white",
-                  width: "100px",
-                }}
-              />
-            </>
-          );
-        })}
         <Grid item xs={12} marginTop={2}>
           <Divider />
         </Grid>

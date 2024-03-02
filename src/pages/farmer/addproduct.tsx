@@ -81,6 +81,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const [modalIsOpen, setIsOpen] = React.useState<{
     isOpen: boolean;
     imageSelect: number;
+    imageType: "image" | "video";
+    selectImage: string[],
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
 
@@ -270,6 +272,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   setIsOpen({
                     isOpen: true,
                     imageSelect: 1,
+                    selectImage: coverImage,
+                    imageType: "image",
                     setStateImage: setCoverImage,
                   });
                 }}
@@ -308,6 +312,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   setIsOpen({
                     isOpen: true,
                     imageSelect: 1,
+                    selectImage: productVideo,
+                    imageType: "video",
                     setStateImage: setProductVideo,
                   });
                 }}
@@ -341,6 +347,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   setIsOpen({
                     isOpen: true,
                     imageSelect: 8,
+                    selectImage: selectImage,
+                    imageType: "image",
                     setStateImage: setSelectImage,
                   });
                 }}
@@ -618,7 +626,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         <Imagestore
           modalIsOpen={modalIsOpen.isOpen}
           closeModal={closeModal}
+          imgType={modalIsOpen.imageType}
           imageSelect={modalIsOpen.imageSelect}
+          selectImage={modalIsOpen.selectImage}
           setSelectImage={modalIsOpen.setStateImage}
           jwt_token={prop.jwt_token}
         />
