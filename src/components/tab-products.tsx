@@ -7,7 +7,7 @@ import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import Myproducts from "../pages/farmer/myproducts";
-import Orderhistory from "../pages/orderhistory";
+import Orderhistory from "../pages/farmer/orderhistory";
 
 const TabProducts = (prop: { jwt_token: string; username: string }) => {
   const [value, setValue] = React.useState("1");
