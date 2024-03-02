@@ -27,6 +27,7 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
     }[]
   >([]);
   const [id, setId] = useState<string>("");
+  const [idStandard, setIdStandard] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [textColor, setTextColor] = useState<string>("");
   const [bgColor, setBgColor] = useState<RGBColor>({
@@ -77,6 +78,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
     );
     setBgColor(bgColor);
   };
+  const handleEditStandard = (id: string) => {
+    setIdStandard(id);
+    setName(
+      standard.filter((std) => {
+        return std.standard_id === id;
+      })[0].standard_name
+    );
+  };
 
   const handleSubmit = (isNewEdit: Boolean, paramName?: string) => {
     let body = {
@@ -95,7 +104,6 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         bgcolor: JSON.stringify({ r: 235, g: 235, b: 235, a: 1 }),
       };
     }
-
     axios
       .post(config.getApiEndpoint("categories", "POST"), body, {
         headers: {
@@ -120,6 +128,43 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       });
   };
 
+  const handleSubmnitStandard = (isNewEdit: Boolean, paramName?: string) => {
+    let body = {
+      name: paramName ? paramName : name,
+    } as { name: string; id?: string };
+
+    if (!isNewEdit) {
+      body = {
+        ...body,
+        id: idStandard,
+      };
+    }
+    axios
+      .post(config.getApiEndpoint("certificate", "POST"), body, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        axios
+          .get(config.getApiEndpoint("standardproducts", "GET"))
+          .then((res) => {
+            setStandard(res.data);
+            Swal.fire({
+              title: "บันทึกสำเร็จ",
+              icon: "success",
+            });
+          });
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: `เกิดข้อผิดพลาด ${err.response.data.message}`,
+          icon: "error",
+        });
+        console.log(err);
+      });
+  };
+
   const showSwal = () => {
     withReactContent(Swal).fire({
       title: <i>เพิ่มหมวดหมู่สินค้า</i>,
@@ -128,9 +173,20 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       denyButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       preConfirm: () => {
-        // setId(Swal.getInput()?.value || "");
-
         handleSubmit(true, Swal.getInput()?.value || "");
+      },
+    });
+  };
+
+  const showSwalStandard = () => {
+    withReactContent(Swal).fire({
+      title: <i>เพิ่มมาตรฐานสินค้า</i>,
+      input: "text",
+      showDenyButton: true,
+      denyButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      preConfirm: () => {
+        handleSubmnitStandard(true, Swal.getInput()?.value || "");
       },
     });
   };
@@ -158,35 +214,26 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
             let bgcolor = cat.bgcolor
               ? JSON.parse(cat.bgcolor)
               : ({ r: 235, g: 235, b: 235, a: 1 } as RGBColor);
-            if (cat.category_id !== "OTHER") {
-              return (
-                <Chip
-                  key={cat.category_id}
-                  label={cat.category_name}
-                  onDelete={() => {
-                    handleEdit(cat.category_id, bgcolor);
-                  }}
-                  deleteIcon={
-                    <CreateIcon
-                      sx={{ fill: isDark(bgcolor) ? "white" : "black" }}
-                    />
-                  }
-                  sx={{
-                    margin: "5px",
-                    backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                    color: isDark(bgcolor) ? "white" : "black",
-                  }}
-                />
-              );
-            } else {
-              return (
-                <Chip
-                  key={cat.category_id}
-                  label={cat.category_name}
-                  sx={{ margin: "5px" }}
-                />
-              );
-            }
+
+            return (
+              <Chip
+                key={cat.category_id}
+                label={cat.category_name}
+                onDelete={() => {
+                  handleEdit(cat.category_id, bgcolor);
+                }}
+                deleteIcon={
+                  <CreateIcon
+                    sx={{ fill: isDark(bgcolor) ? "white" : "black" }}
+                  />
+                }
+                sx={{
+                  margin: "5px",
+                  backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                  color: isDark(bgcolor) ? "white" : "black",
+                }}
+              />
+            );
           })}
           <Chip
             label={<AddIcon sx={{ paddingTop: "5px" }} />}
@@ -229,63 +276,68 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
               />
             </Box>
             <Box>
-              <TextField
-                value={name}
-                id="outlined-basic"
-                label="ชื่อหมวดหมู่"
-                variant="outlined"
-                fullWidth
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-                sx={{ marginBottom: "10px" }}
-              />
+              {category.filter((cat) => {
+                return cat.category_id === id;
+              })[0].category_name !== "อื่นๆ" && (
+                <TextField
+                  label="ชื่อหมวดหมู่"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
+                />
+              )}
 
               <Button
                 variant="contained"
                 sx={{
                   marginRight: "10px",
+                  marginLeft: "10px",
                 }}
                 onClick={() => handleSubmit(false)}
               >
                 บันทึก
               </Button>
-              <Button
-                color="error"
-                variant="contained"
-                onClick={() => {
-                  axios
-                    .delete(config.getApiEndpoint("categories", "DELETE"), {
-                      headers: {
-                        Authorization: `Bearer ${prop.jwt_token}`,
-                      },
-                      data: {
-                        category_id: id,
-                      },
-                    })
-                    .then((res) => {
-                      axios
-                        .get(config.getApiEndpoint("categories", "GET"))
-                        .then((res) => {
-                          Swal.fire({
-                            title: "ลบสำเร็จ",
-                            icon: "success",
+              {category.filter((cat) => {
+                return cat.category_id === id;
+              })[0].category_name !== "อื่นๆ" && (
+                <Button
+                  color="error"
+                  variant="contained"
+                  onClick={() => {
+                    axios
+                      .delete(config.getApiEndpoint("categories", "DELETE"), {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                        data: {
+                          category_id: id,
+                        },
+                      })
+                      .then((res) => {
+                        axios
+                          .get(config.getApiEndpoint("categories", "GET"))
+                          .then((res) => {
+                            Swal.fire({
+                              title: "ลบสำเร็จ",
+                              icon: "success",
+                            });
+                            setId("");
+                            setCategory(res.data);
+                          })
+                          .catch((err) => {
+                            Swal.fire({
+                              title: "เกิดข้อผิดพลาด",
+                              icon: "error",
+                            });
+                            console.log(err);
                           });
-                          setId("");
-                          setCategory(res.data);
-                        })
-                        .catch((err) => {
-                          Swal.fire({
-                            title: "เกิดข้อผิดพลาด",
-                            icon: "error",
-                          });
-                          console.log(err);
-                        });
-                    });
-                }}
-              >
-                ลบ
-              </Button>
+                      });
+                  }}
+                >
+                  ลบ
+                </Button>
+              )}
             </Box>
           </>
         )}
@@ -302,10 +354,99 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
               key={std.standard_id}
               label={std.standard_name}
               sx={{ margin: "5px" }}
+              onDelete={() => {
+                handleEditStandard(std.standard_id);
+              }}
+              deleteIcon={<CreateIcon />}
             />
           );
         })}
+        <Chip
+          label={<AddIcon sx={{ paddingTop: "5px" }} />}
+          onClick={showSwalStandard}
+          sx={{ margin: "5px", position: "relative" }}
+        />
       </Grid>
+      {idStandard && (
+        <>
+          <Grid item xs={12} marginBottom={2}>
+            <Divider>
+              <Typography>แก้ไขมาตรฐานสินค้า</Typography>
+            </Divider>
+          </Grid>
+          <Box
+            sx={{
+              flexDirection: "column",
+              alignItems: "center",
+              marginRight: "50px",
+              marginBottom: "20px",
+            }}
+          >
+            <Chip
+              label={name}
+              sx={{
+                marginBottom: "10px",
+                fontSize: "20px",
+              }}
+            />
+          </Box>
+          <Box>
+            <TextField
+              label="ชื่อมาตรฐาน"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
+            <Button
+              variant="contained"
+              sx={{
+                marginRight: "10px",
+                marginLeft: "10px",
+              }}
+              onClick={() => handleSubmnitStandard(false)}
+            >
+              บันทึก
+            </Button>
+            <Button
+              color="error"
+              variant="contained"
+              onClick={() => {
+                axios
+                  .delete(config.getApiEndpoint("certificate", "DELETE"), {
+                    headers: {
+                      Authorization: `Bearer ${prop.jwt_token}`,
+                    },
+                    data: {
+                      id: idStandard,
+                    },
+                  })
+                  .then((res) => {
+                    axios
+                      .get(config.getApiEndpoint("standardproducts", "GET"))
+                      .then((res) => {
+                        Swal.fire({
+                          title: "ลบสำเร็จ",
+                          icon: "success",
+                        });
+                        setIdStandard("");
+                        setStandard(res.data);
+                      })
+                      .catch((err) => {
+                        Swal.fire({
+                          title: "เกิดข้อผิดพลาด",
+                          icon: "error",
+                        });
+                        console.log(err);
+                      });
+                  });
+              }}
+            >
+              ลบ
+            </Button>
+          </Box>
+        </>
+      )}
     </Container>
   );
 };
