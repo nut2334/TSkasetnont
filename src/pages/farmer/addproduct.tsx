@@ -125,6 +125,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }
   }, []);
 
+  
+
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryId = event.target.value;
     if (selectedCategoryId) {

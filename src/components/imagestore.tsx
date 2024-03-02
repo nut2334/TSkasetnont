@@ -16,6 +16,7 @@ const Imagestore = (prop: {
   const [productImage, setProductImage] = useState<string[]>([]);
   const [productVideo, setProductVideo] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string[]>(prop.selectImage);
+
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     let getApiImage = config.getApiEndpoint("imagestore", "GET");
@@ -50,7 +51,7 @@ const Imagestore = (prop: {
           boxShadow: 24,
           p: 4,
         }}
-      >
+      >{}
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -71,15 +72,18 @@ const Imagestore = (prop: {
         <Grid item xs={12} marginTop={2}>
           <Divider />
         </Grid>
-        <Grid item xs={12} marginTop={2}>
+        {productImage.length > 0 && (
+        <Grid item xs={12} marginTop={2} >
           <Typography>กดเพื่อเลือกรูปภาพ</Typography>
         </Grid>
+        )}
         <Grid item xs={12} marginTop={2}>
           <ImageList
             sx={{ width: "100%", height: 450 }}
             cols={3}
             rowHeight={164}
           >
+
             {prop.imgType == "video" && productVideo.map((videopath, index) => {
               return (
                 <ImageListItem
@@ -89,7 +93,7 @@ const Imagestore = (prop: {
                       selectedImage.indexOf(videopath) !== -1
                         ? "2px solid red"
                         : "2px solid white",
-                    width: 164,
+                    
                   }}
                   onClick={() => {
                     // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
@@ -126,7 +130,6 @@ const Imagestore = (prop: {
                       selectedImage.indexOf(imagepath) !== -1
                         ? "2px solid red"
                         : "2px solid white",
-                    width: 164,
                   }}
                   onClick={() => {
                     // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
@@ -151,6 +154,13 @@ const Imagestore = (prop: {
                       "get"
                     )}`}
                     key={index}
+                    style={
+                      {
+                        width: 164,
+                        aspectRatio: 1 / 1,
+                        // borderRadius: "25px",
+                      }
+                    }
                   />
                 </ImageListItem>
               );
