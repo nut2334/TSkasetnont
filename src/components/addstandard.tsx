@@ -44,10 +44,12 @@ const EachCertificate = (prop: {
   setIsOpen: React.Dispatch<
     React.SetStateAction<
       | {
-          isOpen: boolean;
-          imageSelect: number;
-          setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
-        }
+        isOpen: boolean;
+        imageSelect: number;
+        imageType: "image" | "video";
+        selectImage: string[];
+        setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
+      }
       | null
       | undefined
     >
@@ -120,7 +122,7 @@ const EachCertificate = (prop: {
                 label="ชื่อมาตรฐานสินค้า"
                 fullWidth
                 value={item.standard_name}
-                onChange={(e) => {}}
+                onChange={(e) => { }}
               />
             </Grid>
           )}
@@ -152,6 +154,8 @@ const EachCertificate = (prop: {
                 setIsOpen({
                   isOpen: true,
                   imageSelect: 1,
+                  imageType: "image",
+                  selectImage: certificate,
                   setStateImage: setCertificate,
                 });
               }}
@@ -238,6 +242,8 @@ const AddStandard = (prop: {
   const [modalIsOpen, setIsOpen] = React.useState<{
     isOpen: boolean;
     imageSelect: number;
+    imageType: "image" | "video";
+    selectImage: string[];
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
   function closeModal() {
@@ -310,8 +316,10 @@ const AddStandard = (prop: {
       {modalIsOpen && (
         <Imagestore
           modalIsOpen={modalIsOpen.isOpen}
+          imgType={modalIsOpen.imageType}
           closeModal={closeModal}
           imageSelect={modalIsOpen.imageSelect}
+          selectImage={modalIsOpen.selectImage}
           setSelectImage={modalIsOpen.setStateImage}
           jwt_token={prop.jwt_token}
         />
