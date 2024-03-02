@@ -194,9 +194,8 @@ const Imagestore = (prop: {
                     },
                   })
                   .then((res) => {
-                    console.log(res.data);
-
                     setProductImage(res.data.images);
+                    setProductVideo(res.data.videos);
                   })
                   .catch((err) => {
                     console.log(err);
