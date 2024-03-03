@@ -43,13 +43,64 @@ interface productInterface {
         comment: string;
     };
 }
+
+const GenerateStart = (prop: {
+    index2: number, product: productInterface, haveComment: {
+        jwt_token: string, order_id: string, fecthOrder: () => void
+    }, callSwl: (index: number, rating: number, product_id: string, order_id: string, jwt_token: string) => void
+
+}) => {
+    const [hoverScore, setHoverScore] = useState<number>(0);
+    const { haveComment, product, callSwl, index2 } = prop;
+
+    return (
+        <StyledTableCell align="right">
+            {Array(5).fill(0).map((_, index) => {
+                if (product.comment === null || product.comment === undefined) {
+                    if (index < hoverScore) {
+                        return (<StarIcon sx={{
+                            color: "#ffd700",
+                            cursor: "pointer"
+                        }} key={index}
+                            onMouseOver={() => {
+                                setHoverScore(index + 1);
+                            }}
+                            onMouseOutCapture={() => {
+                                setHoverScore(0);
+                            }}
+                            onClick={() => {
+                                callSwl(index2, index + 1, product.product_id, haveComment.order_id, haveComment.jwt_token)
+                            }}
+                        />)
+                    }
+                    return (<StarBorderIcon
+                        key={index}
+                        onMouseOver={() => {
+                            setHoverScore(index + 1);
+                        }}
+                        onClick={() => {
+                            callSwl(index2, index + 1, product.product_id, haveComment.order_id, haveComment.jwt_token)
+                        }}
+                    />)
+                }
+                return index < product.comment.rating ? (<StarIcon sx={{
+                    color: "#ffd700",
+                }} key={index} />) : (<StarBorderIcon key={index} />)
+
+            }
+            )
+            }
+
+        </StyledTableCell>
+    )
+}
+
 const TableBank = (prop: {
     products: productInterface[], haveComment?: {
         jwt_token: string, order_id: string, fecthOrder: () => void
     }
 }) => {
     const [total, setTotal] = useState<number>(0);
-    const [hoverScore, setHoverScore] = useState<number>(0);
     useEffect(() => {
         let total = 0;
         console.log(prop.products);
@@ -60,28 +111,26 @@ const TableBank = (prop: {
         setTotal(total);
     }, [prop.products]);
 
-    const callSwl = (index: number, rating: number) => {
+    const callSwl = (index: number, rating: number, product_id: string, order_id: string, jwt_token: string) => {
         Swal.fire({
             title: 'ความคิดเห็น',
             input: 'textarea',
-            inputPlaceholder: 'กรุณาใส่ความคิดเห็น',
             showCancelButton: true,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'กรุณาใส่ความคิดเห็น'
-                }
-            }
+            inputPlaceholder: 'กรุณาใส่ความคิดเห็น(ถ้ามี)',
         }).then((result) => {
+            if (result.isDismissed) {
+                return;
+            }
             let apiComment = config.getApiEndpoint('comment', 'GET')
             let body = {
-                product_id: prop.products[index].product_id,
-                order_id: prop.haveComment?.order_id,
+                product_id: product_id,
+                order_id: order_id,
                 rating: rating,
-                comment: result.value
+                comment: result.value ? result.value : ""
             }
             axios.post(apiComment, body, {
                 headers: {
-                    "Authorization": `Bearer ${prop.haveComment?.jwt_token}`
+                    "Authorization": `Bearer ${jwt_token}`
                 }
             }).then((res) => {
                 console.log(res);
@@ -94,7 +143,6 @@ const TableBank = (prop: {
                 prop.haveComment?.fecthOrder()
 
             }).catch((err) => {
-                console.log(err);
                 Swal.fire({
                     icon: 'error',
                     title: 'เพิ่มความคิดเห็นไม่สำเร็จ',
@@ -130,50 +178,13 @@ const TableBank = (prop: {
                             </StyledTableCell>
                             <StyledTableCell align="right">{product.quantity}</StyledTableCell>
                             <StyledTableCell align="right">{product.price * product.quantity} บาท</StyledTableCell>
-                            {prop.haveComment && <StyledTableCell align="right">
-                                {Array(5).fill(0).map((_, index) => {
-                                    if (product.comment === null || product.comment === undefined) {
-                                        if (index < hoverScore) {
-                                            return (<StarIcon sx={{
-                                                color: "#ffd700",
-                                                cursor: "pointer"
-                                            }} key={index}
-                                                onMouseOver={() => {
-                                                    setHoverScore(index + 1);
-                                                }}
-                                                onMouseOutCapture={() => {
-                                                    setHoverScore(0);
-                                                }}
-                                                onClick={() => {
-                                                    callSwl(index2, index + 1)
-                                                }}
-                                            />)
-                                        }
-                                        return (<StarBorderIcon
-                                            key={index}
-                                            onMouseOver={() => {
-                                                setHoverScore(index + 1);
-                                            }}
-                                            onClick={() => {
-                                                callSwl(index2, index + 1)
-                                            }}
-                                        />)
-                                    }
-                                    return index < product.comment.rating ? (<StarIcon sx={{
-                                        color: "#ffd700",
-                                    }} key={index} />) : (<StarBorderIcon key={index} />)
-
-                                }
-                                )
-                                }
-
-                            </StyledTableCell>}
+                            {prop.haveComment && <GenerateStart callSwl={callSwl} haveComment={prop.haveComment} product={product} index2={index2} />}
 
                         </StyledTableRow>
                     ))}
                     {/* total */}
                     <StyledTableRow>
-                        <StyledTableCell colSpan={4} align="right">รวมราคาทั้งหมด : {total} บาท</StyledTableCell>
+                        <StyledTableCell colSpan={prop.haveComment ? 5 : 4} align="right">รวมราคาทั้งหมด : {total} บาท</StyledTableCell>
                     </StyledTableRow>
                 </TableBody>
             </Table>

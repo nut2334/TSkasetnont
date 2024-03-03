@@ -57,14 +57,14 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
       setAllProduct(response.data);
     });
   };
+
   useEffect(() => {
     fetchProduct();
-  }, []);
-  useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((response) => {
       setAllCategory(response.data);
     });
   }, []);
+
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
     if (luma < 128) {
@@ -77,18 +77,18 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   if (navigatePath) {
     return <Navigate to={`/editproduct/${navigatePath}`} />;
   }
-  
 
-  
+
+
 
   return (
     <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <TextField
-          select
-          label="รูปแบบการเก็บข้อมูล"
-          fullWidth
+            select
+            label="รูปแบบการเก็บข้อมูล"
+            fullWidth
           >
             {
               web_activity.map((option) => (
@@ -125,124 +125,125 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                 (item) => item.category_id === product.category_id
               )?.bgcolor
                 ? JSON.parse(
-                    allCategory.find(
-                      (item) => item.category_id === product.category_id
-                    )?.bgcolor as string
-                  )
+                  allCategory.find(
+                    (item) => item.category_id === product.category_id
+                  )?.bgcolor as string
+                )
                 : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                    r: number;
-                    g: number;
-                    b: number;
-                    a: number;
-                  });
-              return(
-              <Grid item key={index} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardMedia
-                    component="div"
+                  r: number;
+                  g: number;
+                  b: number;
+                  a: number;
+                });
+              return (
+                <Grid item key={index} xs={12} sm={6} md={4}>
+                  <Card
                     sx={{
-                      // 16:9
-                      pt: "56.25%",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
-                    image={`${config.getApiEndpoint(
-                      `getimage/${product.product_image.split("/").pop()}`,
-                      "get"
-                    )}`}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {product.product_name}
-                    </Typography>
-                    <Chip label={product.category_name} 
-                    sx={{
-                      backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                      color: isDark(bgcolor) ? "white" : "black",
-                    }}
+                  >
+                    <CardMedia
+                      component="div"
+                      sx={{
+                        // 16:9
+                        pt: "56.25%",
+                      }}
+                      image={product.product_image ? `${config.getApiEndpoint(
+                        `getimage/${product.product_image.split("/").pop()}`,
+                        "get"
+                      )}` : require("../../assets/noimage.jpg")}
                     />
-                    <Chip label={product.selectedType} />
-                    <Typography>{product.product_description}</Typography>
-                  </CardContent>
-                  <CardActions>
-                    <NavLink
-                      to={`/shop/${product.farmerstorename}/${product.product_id}`}
-                    >
-                      <Button size="small">
-                        <VisibilityIcon
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {product.product_name}
+                      </Typography>
+                      <Chip label={product.category_name}
+                        sx={{
+                          backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                          color: isDark(bgcolor) ? "white" : "black",
+                        }}
+                      />
+                      <Chip label={product.selectedType} />
+                      <Typography>{product.product_description}</Typography>
+                    </CardContent>
+                    <CardActions>
+                      <NavLink
+                        to={`/shop/${product.farmerstorename}/${product.product_id}`}
+                      >
+                        <Button size="small">
+                          <VisibilityIcon
+                            sx={{
+                              color: "#337357",
+                            }}
+                          />
+                        </Button>
+                      </NavLink>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setNavigatePath(
+                            `${product.farmerstorename}/${product.product_id}`
+                          );
+                        }}
+                      >
+                        <EditIcon sx={{ color: "#FFD23F" }} />
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          Swal.fire({
+                            title: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
+                            text: "คุณจะไม่สามารถกู้คืนสินค้านี้ได้อีก",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "ใช่",
+                            cancelButtonText: "ไม่",
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              const apiDeleteProduct = config.getApiEndpoint(
+                                `deleteproduct/${product.product_id}`,
+                                "POST"
+                              );
+                              axios
+                                .delete(apiDeleteProduct, {
+                                  headers: {
+                                    Authorization: `Bearer ${prop.jwt_token}`,
+                                  },
+                                })
+                                .then(() => {
+                                  Swal.fire(
+                                    "ลบสินค้าสำเร็จ",
+                                    "สินค้าของคุณถูกลบเรียบร้อยแล้ว",
+                                    "success"
+                                  );
+                                  fetchProduct();
+                                })
+                                .catch((error) => {
+                                  Swal.fire(
+                                    "ลบสินค้าไม่สำเร็จ",
+                                    "กรุณาลองใหม่อีกครั้ง",
+                                    "error"
+                                  );
+                                });
+                            }
+                          });
+                        }}
+                      >
+                        <DeleteIcon
                           sx={{
-                            color: "#337357",
+                            color: "#EE4266",
                           }}
                         />
                       </Button>
-                    </NavLink>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setNavigatePath(
-                          `${product.farmerstorename}/${product.product_id}`
-                        );
-                      }}
-                    >
-                      <EditIcon sx={{ color: "#FFD23F" }} />
-                    </Button>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        Swal.fire({
-                          title: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
-                          text: "คุณจะไม่สามารถกู้คืนสินค้านี้ได้อีก",
-                          icon: "warning",
-                          showCancelButton: true,
-                          confirmButtonColor: "#3085d6",
-                          cancelButtonColor: "#d33",
-                          confirmButtonText: "ใช่",
-                          cancelButtonText: "ไม่",
-                        }).then((result) => {
-                          if (result.isConfirmed) {
-                            const apiDeleteProduct = config.getApiEndpoint(
-                              `deleteproduct/${product.product_id}`,
-                              "POST"
-                            );
-                            axios
-                              .delete(apiDeleteProduct, {
-                                headers: {
-                                  Authorization: `Bearer ${prop.jwt_token}`,
-                                },
-                              })
-                              .then(() => {
-                                Swal.fire(
-                                  "ลบสินค้าสำเร็จ",
-                                  "สินค้าของคุณถูกลบเรียบร้อยแล้ว",
-                                  "success"
-                                );
-                                fetchProduct();
-                              })
-                              .catch((error) => {
-                                Swal.fire(
-                                  "ลบสินค้าไม่สำเร็จ",
-                                  "กรุณาลองใหม่อีกครั้ง",
-                                  "error"
-                                );
-                              });
-                          }
-                        });
-                      }}
-                    >
-                      <DeleteIcon
-                        sx={{
-                          color: "#EE4266",
-                        }}
-                      />
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            )})}
+                    </CardActions>
+                  </Card>
+                </Grid>
+              )
+            })}
         </Grid>
       </Container>
     </Container>

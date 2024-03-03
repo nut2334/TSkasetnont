@@ -149,98 +149,111 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }
   };
   const onSubmit = () => {
+    let check = true;
     if (productName == "") {
       setCheckProductName(false);
+      check = false;
+    } else {
+      setCheckProductName(true);
     }
+
     if (selectedCategory == "") {
       setCheckCategory(false);
+      check = false;
+    } else {
+      setCheckCategory(true);
     }
     if (selectedType == "") {
       setCheckType(false);
+      check = false;
+    } else {
+      setCheckType(true);
     }
     if (coverImage.length == 0) {
       setCheckCoverImage(false);
+      check = false;
+    } else {
+      setCheckCoverImage(true);
     }
     if (selectedStandard.length == 0) {
       setCheckStandard(false);
-    }
-    if (checkProductName) {
-      let body = {
-        product_name: productName,
-        category_id: selectedCategory,
-        product_description: description,
-        selectedType: selectedType,
-        price: price,
-        unit: unit,
-        stock: stock,
-        selectedStatus: selectedStatus,
-        startDate: startDate,
-        endDate: endDate,
-        product_image: coverImage[0],
-        product_video: productVideo[0],
-        additional_images: JSON.stringify(selectImage),
-        certificate: JSON.stringify(selectedStandard),
-        shippingcost: JSON.stringify(shippingcost),
-      } as any;
-
-      if (productid) {
-        body = {
-          ...body,
-          product_id: productid,
-        };
-      }
-      axios.post(apiAddProduct, body, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      }).then((res) => {
-        Swal.fire({
-          icon: "success",
-          title: "บันทึกข้อมูลสำเร็จ",
-          text: "ต้องการเพิ่มสินค้าเพิ่มเติมหรือไม่",
-          showCancelButton: true,
-          confirmButtonText: "ใช่",
-          cancelButtonText: "ไม่",
-        })
-          .then((result) => {
-            if (result.isConfirmed) {
-              // setProductName("");
-              // setSelectedCategory("");
-              // setDescription("");
-              // setSelectedType("");
-              // setPrice(0);
-              // setUnit("");
-              // setStock(0);
-              // setSelectedStatus("");
-              // setStartDate(null);
-              // setEndDate(null);
-              // setCoverImage([]);
-              // setProductVideo([]);
-              // setSelectImage([]);
-              // setSelectedStandard([]);
-              // setShippingCost([{ weight: 0, price: 0 }]); 
-            } else {
-              setIsExist(true);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        
-      }).catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "บันทึกข้อมูลไม่สำเร็จ",
-          text: "กรุณากรอกข้อมูลให้ครบถ้วน",
-        });
-      });
+      check = false;
     } else {
+      setCheckStandard(true);
+    }
+    if (!check) {
+      return
+    }
+
+    let body = {
+      product_name: productName,
+      category_id: selectedCategory,
+      product_description: description,
+      selectedType: selectedType,
+      price: price,
+      unit: unit,
+      stock: stock,
+      selectedStatus: selectedStatus,
+      startDate: startDate,
+      endDate: endDate,
+      product_image: coverImage[0],
+      product_video: productVideo[0],
+      additional_images: JSON.stringify(selectImage),
+      certificate: JSON.stringify(selectedStandard),
+      shippingcost: JSON.stringify(shippingcost),
+    } as any;
+
+    if (productid) {
+      body = {
+        ...body,
+        product_id: productid,
+      };
+    }
+    axios.post(apiAddProduct, body, {
+      headers: {
+        Authorization: `Bearer ${prop.jwt_token}`,
+      },
+    }).then((res) => {
+      Swal.fire({
+        icon: "success",
+        title: "บันทึกข้อมูลสำเร็จ",
+        showCancelButton: true,
+        confirmButtonText: "เสร็จสิ้น",
+        cancelButtonText: "เพิ่มสินค้า",
+      })
+        .then((result) => {
+          if (result.isConfirmed) {
+            setIsExist(true);
+          } else {
+            setProductName("");
+            setSelectedCategory("");
+            setDescription("");
+            setSelectedType("");
+            setPrice(0);
+            setUnit("");
+            setStock(0);
+            setSelectedStatus("");
+            setStartDate(null);
+            setEndDate(null);
+            setCoverImage([]);
+            setProductVideo([]);
+            setSelectImage([]);
+            setSelectedStandard([]);
+            setShippingCost([{ weight: 0, price: 0 }]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+    }).catch((err) => {
       Swal.fire({
         icon: "error",
         title: "บันทึกข้อมูลไม่สำเร็จ",
         text: "กรุณากรอกข้อมูลให้ครบถ้วน",
       });
-    }
+    });
+
   };
   if (isExist) {
     return <Navigate to="/myproducts" />;
@@ -324,7 +337,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                 เลือกรูปภาพ
               </Button>
 
-              {coverImage.length > 0 && (
+              {coverImage[0] && (
                 <div style={{ marginTop: "10px" }}>
                   <img
                     src={`${config.getApiEndpoint(
@@ -669,29 +682,29 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             </Grid>
             <Grid item xs={12} sx={{
               marginBottom: "10px",
-              
+
             }}>
-            <Button
-          variant="contained"
-          color="error"
-            onClick={() => {
-              setIsExist(true);
-            }
-            }
-            sx={{
-              marginRight: "10px",
-            }}
-          >
-            ยกเลิก
-          </Button>
-          
-          <Button onClick={onSubmit} variant="contained">
-            ยืนยัน
-          </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  setIsExist(true);
+                }
+                }
+                sx={{
+                  marginRight: "10px",
+                }}
+              >
+                ยกเลิก
+              </Button>
+
+              <Button onClick={onSubmit} variant="contained">
+                ยืนยัน
+              </Button>
+            </Grid>
           </Grid>
-          </Grid>
-          
-          
+
+
         </form>
       </Container>
       {modalIsOpen && (
