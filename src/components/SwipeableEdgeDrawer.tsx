@@ -144,37 +144,49 @@ export default function SwipeableEdgeDrawer(
                   />
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="h6" gutterBottom>
-                    {props.selectedProduct.product_name}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {props.selectedProduct.product_description}
-                  </Typography>
-                  <Typography variant="h5" gutterBottom>
-                    ราคา {props.selectedProduct.price} บาท /{" "}
-                    {props.selectedProduct.unit}
-                  </Typography>
-                  <NavLink
-                    to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<StoreIcon />}
-                    >
-                      เยี่ยมชมสินค้า
-                    </Button>
-                    <RWebShare
-                      data={{
-                        text: `https://www.google.com/maps/search/?api=1&query=${props.selectedProduct.lat},${props.selectedProduct.lng}`,
-                        url: `https://www.google.com/maps/search/?api=1&query=${props.selectedProduct.lat},${props.selectedProduct.lng}`,
-                        title: props.selectedProduct.product_name,
-                      }}
-                      onClick={() => console.log("shared successfully!")}
-                    >
-                      <ShareIcon />
-                    </RWebShare>
-                  </NavLink>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Typography variant="h6" gutterBottom>
+                        {props.selectedProduct.product_name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body1" gutterBottom>
+                        {props.selectedProduct.product_description}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="h5" gutterBottom>
+                        ราคา {props.selectedProduct.price} บาท /{" "}
+                        {props.selectedProduct.unit}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <NavLink
+                        to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
+                      >
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<StoreIcon />}
+                        >
+                          เยี่ยมชมสินค้า
+                        </Button>
+                      </NavLink>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <RWebShare
+                        data={{
+                          text: `https://www.google.com/maps/search/?api=1&query=${props.selectedProduct.lat},${props.selectedProduct.lng}`,
+                          url: `https://www.google.com/maps/search/?api=1&query=${props.selectedProduct.lat},${props.selectedProduct.lng}`,
+                          title: props.selectedProduct.product_name,
+                        }}
+                        onClick={() => console.log("shared successfully!")}
+                      >
+                        <ShareIcon />
+                      </RWebShare>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             }

@@ -299,20 +299,10 @@ const EachOrder = (prop: {
                   color="primary"
                   onClick={() => {
                     const reg = /^[A-Za-z0-9]*$/;
-                    let valid = true;
+
                     if (!reg.test(trackingNumber)) {
-                      valid = false;
-                    }
-                    if (!valid) {
-                      if (!regTrackingNumber) {
-                        Swal.fire({
-                          title: "เลขพัสดุไม่ถูกต้อง",
-                          text: "กรุณากรอกเลขพัสดุให้ถูกต้อง",
-                          icon: "error",
-                          confirmButtonText: "ตกลง",
-                        });
-                        return;
-                      }
+                      setRegTrackingNumber(false);
+                      return;
                     }
                     let apiConfirmOrder = config.getApiEndpoint(
                       "confirmorder",
@@ -336,6 +326,11 @@ const EachOrder = (prop: {
                       .then((res) => {
                         prop.fetchOrderHistory();
                         setShowTrackingNumber(false);
+                        Swal.fire({
+                          title: "สำเร็จ",
+                          text: "ยืนยันการจัดส่งสำเร็จ",
+                          icon: "success",
+                        });
                       })
                       .catch((err) => {
                         console.log(err);
