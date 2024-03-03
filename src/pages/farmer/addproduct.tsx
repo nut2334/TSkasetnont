@@ -26,6 +26,7 @@ import { useParams } from "react-router-dom";
 import Imagestore from "../../components/imagestore";
 import Swal from "sweetalert2";
 import { Navigate } from "react-router-dom";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -77,13 +78,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }[]
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
-  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
+  const { productid, shopname } = useParams<{
+    productid: string;
+    shopname: string;
+  }>();
 
   const [modalIsOpen, setIsOpen] = useState<{
     isOpen: boolean;
     imageSelect: number;
     imageType: "image" | "video";
-    selectImage: string[],
+    selectImage: string[];
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
   const [isExist, setIsExist] = useState<boolean>(false);
@@ -238,8 +242,17 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             setCoverImage([]);
             setProductVideo([]);
             setSelectImage([]);
-            setSelectedStandard([]);
+            setSelectedStandard([
+              {
+                standard_id: "",
+                standard_name: "",
+                standard_number: "",
+                standard_expire: undefined,
+                standard_cercification: undefined,
+              },
+            ]);
             setShippingCost([{ weight: 0, price: 0 }]);
+            setSelectedType("");
           }
         })
         .catch((err) => {
@@ -311,13 +324,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               />
             </Grid>
             <Grid item xs={6}>
-              <Typography>
-                <AddPhotoAlternateIcon
-                  sx={{ marginRight: "5px" }}
-                  color="primary"
-                />
-                รูปปก*
-              </Typography>
+              <Typography>รูปปก*</Typography>
               {checkCoverImage == false && (
                 <Typography color="red">กรุณาใส่รูปปก</Typography>
               )}
@@ -333,6 +340,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   });
                 }}
                 variant="contained"
+                color="info"
+                startIcon={<AddPhotoAlternateIcon />}
               >
                 เลือกรูปภาพ
               </Button>
@@ -358,10 +367,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               )}
             </Grid>
             <Grid item xs={6}>
-              <Typography>
-                <VideoFileIcon sx={{ marginRight: "5px" }} color="primary" />
-                วิดีโอ
-              </Typography>
+              <Typography>วิดีโอ</Typography>
               <Button
                 onClick={() => {
                   setIsOpen({
@@ -373,9 +379,25 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   });
                 }}
                 variant="contained"
+                color="info"
+                startIcon={<VideoFileIcon />}
               >
                 เลือกวิดิโอ
               </Button>
+              {productVideo.length > 0 && (
+                <Button
+                  color="error"
+                  sx={{
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    setProductVideo([]);
+                  }}
+                  variant="contained"
+                >
+                  <ClearIcon />
+                </Button>
+              )}
               {productVideo.length > 0 && (
                 <div style={{ marginTop: "10px" }}>
                   <video
@@ -390,14 +412,10 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Typography>
-                <AddPhotoAlternateIcon
-                  sx={{ marginRight: "5px" }}
-                  color="primary"
-                />
-                รูปเพิ่มเติม (ไม่เกิน 8 รูป)
-              </Typography>
+              <Typography>รูปเพิ่มเติม (ไม่เกิน 8 รูป)</Typography>
               <Button
+                startIcon={<AddPhotoAlternateIcon />}
+                color="info"
                 onClick={() => {
                   setIsOpen({
                     isOpen: true,
@@ -411,6 +429,20 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               >
                 เลือกรูปภาพเพิ่มเติม
               </Button>
+              {selectImage.length > 0 && (
+                <Button
+                  color="error"
+                  sx={{
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    setSelectImage([]);
+                  }}
+                  variant="contained"
+                >
+                  <ClearIcon />
+                </Button>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Container style={{ overflowX: "auto" }}>
@@ -680,17 +712,19 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12} sx={{
-              marginBottom: "10px",
-
-            }}>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                marginBottom: "10px",
+              }}
+            >
               <Button
                 variant="contained"
                 color="error"
                 onClick={() => {
                   setIsExist(true);
-                }
-                }
+                }}
                 sx={{
                   marginRight: "10px",
                 }}
@@ -703,10 +737,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               </Button>
             </Grid>
           </Grid>
-
-
-        </form>
-      </Container>
+        </form >
+      </Container >
       {modalIsOpen && (
         <Imagestore
           modalIsOpen={modalIsOpen.isOpen}
@@ -718,7 +750,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           jwt_token={prop.jwt_token}
         />
       )}
-    </React.Fragment>
+    </React.Fragment >
   );
 };
 

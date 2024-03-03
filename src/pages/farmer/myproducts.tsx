@@ -77,10 +77,6 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   if (navigatePath) {
     return <Navigate to={`/editproduct/${navigatePath}`} />;
   }
-
-
-
-
   return (
     <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
@@ -159,7 +155,8 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                       <Typography gutterBottom variant="h5" component="h2">
                         {product.product_name}
                       </Typography>
-                      <Chip label={product.category_name}
+                      <Chip
+                        label={product.category_name}
                         sx={{
                           backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
                           color: isDark(bgcolor) ? "white" : "black",
@@ -242,7 +239,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                     </CardActions>
                   </Card>
                 </Grid>
-              )
+              );
             })}
         </Grid>
       </Container>
