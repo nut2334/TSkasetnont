@@ -113,7 +113,6 @@ const Payment = (prop: {
         Swal.fire({
           title: "กำลังดำเนินการ",
           icon: "info",
-          allowOutsideClick: false,
           allowEscapeKey: false,
           allowEnterKey: false,
         });
