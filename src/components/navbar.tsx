@@ -67,34 +67,34 @@ const Navbar = (prop: {
   useEffect(() => {
     if (!prop.role) {
       setVisiblePages(defaultPages);
-    }
-    if (prop.role == "admins") {
+    } else if (prop.role == "admins") {
       setVisiblePages([
         ...defaultPages,
         { name: "จัดการสมาชิก", path: "/manageuser" },
         { name: "การตั้งค่า", path: "/setting" },
       ]);
-    }
-    if (prop.role == "farmers") {
+    } else if (prop.role == "farmers") {
       setVisiblePages([
         ...defaultPages,
         { name: "ข้อมูลสินค้าของฉัน", path: "/myproducts" },
       ]);
-    }
-    if (prop.role == "tambons") {
+    } else if (prop.role == "providers") {
+      setVisiblePages([
+        ...defaultPages,
+        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
+      ]);
+    } else if (prop.role == "tambons") {
       setVisiblePages([
         ...defaultPages,
         { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
         { name: "จัดการเกษตรกร", path: "/managefarmer" },
       ]);
-    }
-    if (prop.role == "members") {
+    } else if (prop.role == "members") {
       setVisiblePages([
         ...defaultPages,
         { name: "ประวัติการซื้อขาย", path: "/orderlist" },
       ]);
-    }
-    if (prop.role == "") {
+    } else if (prop.role == "") {
       setVisiblePages([...defaultPages]);
     }
   }, [prop.role]);
