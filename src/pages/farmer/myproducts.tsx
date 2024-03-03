@@ -34,7 +34,6 @@ interface ProductInterface {
   product_viewed: number;
   farmerstorename: string;
   selectedType: string;
-  
 }
 const Myproducts = (prop: { jwt_token: string; username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
@@ -60,32 +59,26 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   useEffect(() => {
     fetchProduct();
   }, []);
-  if (navigatePath) {
-    return <Navigate to={`/editproduct/${navigatePath}`} />;
-  }
   useEffect(() => {
     axios.get(config.getApiEndpoint("categories", "GET")).then((response) => {
       setAllCategory(response.data);
     });
   }, []);
 
+  if (navigatePath) {
+    return <Navigate to={`/editproduct/${navigatePath}`} />;
+  }
+
   return (
     <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          <TextField
-          select
-          label="รูปแบบการเก็บข้อมูล"
-          fullWidth
-          >
-            {
-              web_activity.map((option) => (
-                <MenuItem key={option.activityID} value={option.activityID}>
-                  {option.activityName}
-                </MenuItem>
-              ))
-
-            }
+          <TextField select label="รูปแบบการเก็บข้อมูล" fullWidth>
+            {web_activity.map((option) => (
+              <MenuItem key={option.activityID} value={option.activityID}>
+                {option.activityName}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -132,12 +125,14 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                     <Typography gutterBottom variant="h5" component="h2">
                       {product.product_name}
                     </Typography>
-                    <Chip label={product.product_category} 
-                    sx={{
-                      backgroundColor: allCategory.find(
-                        (category) => category.category_id === product.product_category
-                      )?.bgcolor,
-                    }}
+                    <Chip
+                      label={product.product_category}
+                      sx={{
+                        backgroundColor: allCategory.find(
+                          (category) =>
+                            category.category_id === product.product_category
+                        )?.bgcolor,
+                      }}
                     />
                     <Chip label={product.selectedType} />
                     <Typography>{product.product_description}</Typography>

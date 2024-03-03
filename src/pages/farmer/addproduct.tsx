@@ -26,6 +26,7 @@ import { useParams } from "react-router-dom";
 import Imagestore from "../../components/imagestore";
 import Swal from "sweetalert2";
 import { Navigate } from "react-router-dom";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const AddProduct = (prop: { jwt_token: string; username: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -77,13 +78,16 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }[]
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
-  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
+  const { productid, shopname } = useParams<{
+    productid: string;
+    shopname: string;
+  }>();
 
   const [modalIsOpen, setIsOpen] = useState<{
     isOpen: boolean;
     imageSelect: number;
     imageType: "image" | "video";
-    selectImage: string[],
+    selectImage: string[];
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
   const [isExist, setIsExist] = useState<boolean>(false);
@@ -189,57 +193,59 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           product_id: productid,
         };
       }
-      axios.post(apiAddProduct, body, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      }).then((res) => {
-        Swal.fire({
-          icon: "success",
-          title: "บันทึกข้อมูลสำเร็จ",
-          text: "ต้องการเพิ่มสินค้าเพิ่มเติมหรือไม่",
-          showCancelButton: true,
-          confirmButtonText: "ใช่",
-          cancelButtonText: "ไม่",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setProductName("");
-            setSelectedCategory("");
-            setDescription("");
-            setSelectedType("");
-            setPrice(0);
-            setUnit("");
-            setStock(0);
-            setSelectedStatus("");
-            setStartDate(null);
-            setEndDate(null);
-            setCoverImage([]);
-            setProductVideo([]);
-            setSelectImage([]);
-            setSelectedStandard([
-              {
-                standard_id: "",
-                standard_name: "",
-                standard_number: "",
-                standard_expire: undefined,
-                standard_cercification: undefined,
-              },
-            ]);
-            setShippingCost([{ weight: 0, price: 0 }]);
-            setSelectedType("");
-          }
-          if (result.isDismissed) {
-            setIsExist(true);
-          }
+      axios
+        .post(apiAddProduct, body, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          Swal.fire({
+            icon: "success",
+            title: "บันทึกข้อมูลสำเร็จ",
+            text: "ต้องการเพิ่มสินค้าเพิ่มเติมหรือไม่",
+            showCancelButton: true,
+            confirmButtonText: "ใช่",
+            cancelButtonText: "ไม่",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              setProductName("");
+              setSelectedCategory("");
+              setDescription("");
+              setSelectedType("");
+              setPrice(0);
+              setUnit("");
+              setStock(0);
+              setSelectedStatus("");
+              setStartDate(null);
+              setEndDate(null);
+              setCoverImage([]);
+              setProductVideo([]);
+              setSelectImage([]);
+              setSelectedStandard([
+                {
+                  standard_id: "",
+                  standard_name: "",
+                  standard_number: "",
+                  standard_expire: undefined,
+                  standard_cercification: undefined,
+                },
+              ]);
+              setShippingCost([{ weight: 0, price: 0 }]);
+              setSelectedType("");
+            }
+            if (result.isDismissed) {
+              setIsExist(true);
+            }
+          });
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: "บันทึกข้อมูลไม่สำเร็จ",
+            text: "กรุณากรอกข้อมูลให้ครบถ้วน",
+          });
         });
-        
-      }).catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "บันทึกข้อมูลไม่สำเร็จ",
-          text: "กรุณากรอกข้อมูลให้ครบถ้วน",
-        });
-      });
     } else {
       Swal.fire({
         icon: "error",
@@ -404,6 +410,20 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               >
                 เลือกรูปภาพเพิ่มเติม
               </Button>
+              {selectImage.length > 0 && (
+                <Button
+                  color="error"
+                  sx={{
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    setSelectImage([]);
+                  }}
+                  variant="contained"
+                >
+                  <ClearIcon />
+                </Button>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Container style={{ overflowX: "auto" }}>
@@ -671,31 +691,31 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12} sx={{
-              marginBottom: "10px",
-              
-            }}>
-            <Button
-          variant="contained"
-          color="error"
-            onClick={() => {
-              setIsExist(true);
-            }
-            }
-            sx={{
-              marginRight: "10px",
-            }}
-          >
-            ยกเลิก
-          </Button>
-          
-          <Button onClick={onSubmit} variant="contained">
-            ยืนยัน
-          </Button>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                marginBottom: "10px",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  setIsExist(true);
+                }}
+                sx={{
+                  marginRight: "10px",
+                }}
+              >
+                ยกเลิก
+              </Button>
+
+              <Button onClick={onSubmit} variant="contained">
+                ยืนยัน
+              </Button>
+            </Grid>
           </Grid>
-          </Grid>
-          
-          
         </form>
       </Container>
       {modalIsOpen && (
