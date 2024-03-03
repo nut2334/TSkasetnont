@@ -80,10 +80,14 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   };
   const handleSearch = () => {
     let filter = allProduct;
+    console.log(searchType);
     if (searchType !== "") {
       filter = allProduct.filter((product) => {
         return product.selectedType === searchType;
       });
+    }
+    if (searchType === "all") {
+      filter = allProduct;
     }
     setFilterSearch(filter);
     console.log(filter);
@@ -102,8 +106,9 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
             fullWidth
             onChange={(e) => setSearchType(e.target.value as string)}
           >
+            <MenuItem value="all">ทั้งหมด</MenuItem>
             {web_activity.map((option) => (
-              <MenuItem key={option.activityID} value={option.activityID}>
+              <MenuItem key={option.activityID} value={option.activityName}>
                 {option.activityName}
               </MenuItem>
             ))}
