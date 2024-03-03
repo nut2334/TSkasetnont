@@ -218,11 +218,11 @@ const ListProduct = () => {
             let bgcolor = item.bgcolor
               ? JSON.parse(item.bgcolor)
               : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                r: number;
-                g: number;
-                b: number;
-                a: number;
-              });
+                  r: number;
+                  g: number;
+                  b: number;
+                  a: number;
+                });
             return (
               <Tab
                 sx={{
@@ -313,22 +313,22 @@ const ListProduct = () => {
                   (item) => item.category_id === product.category_id
                 )?.bgcolor
                   ? JSON.parse(
-                    allCategory.find(
-                      (item) => item.category_id === product.category_id
-                    )?.bgcolor as string
-                  )
+                      allCategory.find(
+                        (item) => item.category_id === product.category_id
+                      )?.bgcolor as string
+                    )
                   : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                    r: number;
-                    g: number;
-                    b: number;
-                    a: number;
-                  });
+                      r: number;
+                      g: number;
+                      b: number;
+                      a: number;
+                    });
                 let nameCategory = allCategory.find(
                   (item) => item.category_id === product.category_id
                 )?.category_name
                   ? allCategory.find(
-                    (item) => item.category_id === product.category_id
-                  )?.category_name
+                      (item) => item.category_id === product.category_id
+                    )?.category_name
                   : "OTHER";
                 return (
                   <Grid item key={index} lg={4} xs={12} sm={6}>
@@ -354,12 +354,16 @@ const ListProduct = () => {
                             // 16:9
                             pt: "56.25%",
                           }}
-                          image={product.product_image ? `${config.getApiEndpoint(
-                            `getimage/${product.product_image
-                              .split("/")
-                              .pop()}`,
-                            "get"
-                          )}` : require("../../assets/noimage.jpg")}
+                          image={
+                            product.product_image
+                              ? `${config.getApiEndpoint(
+                                  `getimage/${product.product_image
+                                    .split("/")
+                                    .pop()}`,
+                                  "get"
+                                )}`
+                              : require("../../assets/noimage.jpg")
+                          }
                         />
                         <CardContent sx={{ flexGrow: 1, padding: "20px" }}>
                           <Typography gutterBottom variant="h5">

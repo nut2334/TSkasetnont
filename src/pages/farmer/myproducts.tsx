@@ -13,7 +13,12 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import { NavLink, Navigate } from "react-router-dom";
+import {
+  NavLink,
+  Navigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 import * as config from "../../config/config";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -38,7 +43,7 @@ interface ProductInterface {
   category_name: string;
 }
 
-const Myproducts = (prop: { jwt_token: string; username: string }) => {
+const Myproducts = (prop: { jwt_token: string; username?: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
   const [navigatePath, setNavigatePath] = useState("");
   const [allCategory, setAllCategory] = useState<
@@ -50,6 +55,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
   >([]);
   const [searchType, setSearchType] = useState("");
   const [filterSearch, setFilterSearch] = useState<ProductInterface[]>([]);
+  const { username } = useParams<{ username: string }>();
 
   useEffect(() => {
     fetchProduct();
@@ -60,7 +66,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
 
   const fetchProduct = () => {
     const apiMyproducts = config.getApiEndpoint(
-      `myproducts/${prop.username}`,
+      `myproducts/${prop.username ? prop.username : username}`,
       "GET"
     );
     axios.get(apiMyproducts).then((response: any) => {
@@ -124,7 +130,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
           >
             ค้นหา
           </Button>
-          <NavLink to="/addproduct">
+          <NavLink to={`/addproduct/${username}`}>
             <Button variant="contained" color="primary" startIcon={<AddIcon />}>
               เพิ่มสินค้า
             </Button>
@@ -206,7 +212,7 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                         size="small"
                         onClick={() => {
                           setNavigatePath(
-                            `${product.farmerstorename}/${product.product_id}`
+                            `${product.farmerstorename}/${username}/${product.product_id}`
                           );
                         }}
                       >

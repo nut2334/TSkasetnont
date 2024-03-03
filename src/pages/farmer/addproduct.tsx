@@ -28,8 +28,9 @@ import Imagestore from "../../components/imagestore";
 import Swal from "sweetalert2";
 import { Navigate } from "react-router-dom";
 import ClearIcon from "@mui/icons-material/Clear";
+import { jwtDecode } from "jwt-decode";
 
-const AddProduct = (prop: { jwt_token: string; username: string }) => {
+const AddProduct = (prop: { jwt_token: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
@@ -79,8 +80,9 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
     }[]
   >([{ weight: 0, price: 0 }]);
   const [stock, setStock] = useState<number>(0);
-  const { productid, shopname } = useParams<{
+  const { productid, username, shopname } = useParams<{
     productid: string;
+    username: string;
     shopname: string;
   }>();
 
@@ -214,6 +216,19 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         product_id: productid,
       };
     }
+    const jwt = jwtDecode(prop.jwt_token) as {
+      role: string;
+      ID: string;
+      username: string;
+    };
+    if (jwt.role === "tambons") {
+      body = {
+        ...body,
+        username: username,
+      };
+    }
+    console.log(body);
+
     axios
       .post(apiAddProduct, body, {
         headers: {
