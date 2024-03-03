@@ -310,13 +310,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               />
             </Grid>
             <Grid item xs={6}>
-              <Typography>
-                <AddPhotoAlternateIcon
-                  sx={{ marginRight: "5px" }}
-                  color="primary"
-                />
-                รูปปก*
-              </Typography>
+              <Typography>รูปปก*</Typography>
               {checkCoverImage == false && (
                 <Typography color="red">กรุณาใส่รูปปก</Typography>
               )}
@@ -332,6 +326,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   });
                 }}
                 variant="contained"
+                color="info"
+                startIcon={<AddPhotoAlternateIcon />}
               >
                 เลือกรูปภาพ
               </Button>
@@ -357,10 +353,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               )}
             </Grid>
             <Grid item xs={6}>
-              <Typography>
-                <VideoFileIcon sx={{ marginRight: "5px" }} color="primary" />
-                วิดีโอ
-              </Typography>
+              <Typography>วิดีโอ</Typography>
               <Button
                 onClick={() => {
                   setIsOpen({
@@ -372,9 +365,25 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                   });
                 }}
                 variant="contained"
+                color="info"
+                startIcon={<VideoFileIcon />}
               >
                 เลือกวิดิโอ
               </Button>
+              {productVideo.length > 0 && (
+                <Button
+                  color="error"
+                  sx={{
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    setProductVideo([]);
+                  }}
+                  variant="contained"
+                >
+                  <ClearIcon />
+                </Button>
+              )}
               {productVideo.length > 0 && (
                 <div style={{ marginTop: "10px" }}>
                   <video
@@ -389,14 +398,10 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Typography>
-                <AddPhotoAlternateIcon
-                  sx={{ marginRight: "5px" }}
-                  color="primary"
-                />
-                รูปเพิ่มเติม (ไม่เกิน 8 รูป)
-              </Typography>
+              <Typography>รูปเพิ่มเติม (ไม่เกิน 8 รูป)</Typography>
               <Button
+                startIcon={<AddPhotoAlternateIcon />}
+                color="info"
                 onClick={() => {
                   setIsOpen({
                     isOpen: true,
