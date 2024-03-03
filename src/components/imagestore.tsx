@@ -76,7 +76,7 @@ const Imagestore = (prop: {
         </Grid>
         {productImage.length > 0 && (
           <Grid item xs={12} marginTop={2}>
-            <Typography>กดเพื่อเลือกรูปภาพ</Typography>
+            <Typography>กดเพื่อเลือก หากไม่ต้องการให้กดอีกครั้ง</Typography>
           </Grid>
         )}
         <Grid item xs={12} marginTop={2}>
@@ -118,6 +118,11 @@ const Imagestore = (prop: {
                         "get"
                       )}`}
                       key={index}
+                      style={{
+                        width: 164,
+                        aspectRatio: 1 / 1,
+                        objectFit: "cover",
+                      }}
                     />
                   </ImageListItem>
                 );
@@ -159,7 +164,6 @@ const Imagestore = (prop: {
                       style={{
                         width: 164,
                         aspectRatio: 1 / 1,
-                        // borderRadius: "25px",
                       }}
                     />
                   </ImageListItem>
@@ -219,6 +223,18 @@ const Imagestore = (prop: {
           <Divider />
         </Grid>
         <Grid item xs={12} marginTop={2}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              prop.closeModal();
+            }}
+            color="error"
+            sx={{
+              marginRight: "8px",
+            }}
+          >
+            ยกเลิก
+          </Button>
           <Button
             variant="contained"
             onClick={() => {

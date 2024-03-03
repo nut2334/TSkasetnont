@@ -9,6 +9,7 @@ import {
   Avatar,
   TextField,
   Divider,
+  Stack,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -186,7 +187,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
       setCheckStandard(true);
     }
     if (!check) {
-      return
+      return;
     }
 
     let body = {
@@ -213,60 +214,61 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
         product_id: productid,
       };
     }
-    axios.post(apiAddProduct, body, {
-      headers: {
-        Authorization: `Bearer ${prop.jwt_token}`,
-      },
-    }).then((res) => {
-      Swal.fire({
-        icon: "success",
-        title: "บันทึกข้อมูลสำเร็จ",
-        showCancelButton: true,
-        confirmButtonText: "เสร็จสิ้น",
-        cancelButtonText: "เพิ่มสินค้า",
+    axios
+      .post(apiAddProduct, body, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
       })
-        .then((result) => {
-          if (result.isConfirmed) {
-            setIsExist(true);
-          } else {
-            setProductName("");
-            setSelectedCategory("");
-            setDescription("");
-            setSelectedType("");
-            setPrice(0);
-            setUnit("");
-            setStock(0);
-            setSelectedStatus("");
-            setStartDate(null);
-            setEndDate(null);
-            setCoverImage([]);
-            setProductVideo([]);
-            setSelectImage([]);
-            setSelectedStandard([
-              {
-                standard_id: "",
-                standard_name: "",
-                standard_number: "",
-                standard_expire: undefined,
-                standard_cercification: undefined,
-              },
-            ]);
-            setShippingCost([{ weight: 0, price: 0 }]);
-            setSelectedType("");
-          }
+      .then((res) => {
+        Swal.fire({
+          icon: "success",
+          title: "บันทึกข้อมูลสำเร็จ",
+          showCancelButton: true,
+          confirmButtonText: "เสร็จสิ้น",
+          cancelButtonText: "เพิ่มสินค้า",
         })
-        .catch((err) => {
-          console.log(err);
+          .then((result) => {
+            if (result.isConfirmed) {
+              setIsExist(true);
+            } else {
+              setProductName("");
+              setSelectedCategory("");
+              setDescription("");
+              setSelectedType("");
+              setPrice(0);
+              setUnit("");
+              setStock(0);
+              setSelectedStatus("");
+              setStartDate(null);
+              setEndDate(null);
+              setCoverImage([]);
+              setProductVideo([]);
+              setSelectImage([]);
+              setSelectedStandard([
+                {
+                  standard_id: "",
+                  standard_name: "",
+                  standard_number: "",
+                  standard_expire: undefined,
+                  standard_cercification: undefined,
+                },
+              ]);
+              setShippingCost([{ weight: 0, price: 0 }]);
+              setSelectedType("");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "บันทึกข้อมูลไม่สำเร็จ",
+          text: "กรุณากรอกข้อมูลให้ครบถ้วน",
         });
-
-    }).catch((err) => {
-      Swal.fire({
-        icon: "error",
-        title: "บันทึกข้อมูลไม่สำเร็จ",
-        text: "กรุณากรอกข้อมูลให้ครบถ้วน",
       });
-    });
-
   };
   if (isExist) {
     return <Navigate to="/myproducts" />;
@@ -446,34 +448,38 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
             </Grid>
             <Grid item xs={12}>
               <Container style={{ overflowX: "auto" }}>
-                {selectImage.map((image, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <img
-                      src={`${config.getApiEndpoint(
-                        `getimage/${image.split("/").pop()}`,
-                        "get"
-                      )}`}
-                      alt={`additionalImage-${index}`}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        margin: "5px",
-                        cursor: "pointer",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                      }}
-                      onClick={() => handleOpenDialog(index)}
-                    />
-                  </div>
-                ))}
+                <Stack direction="row" spacing={2}>
+                  {selectImage.map((image, index) => (
+                    <Stack>
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          marginRight: "10px",
+                        }}
+                      >
+                        <img
+                          src={`${config.getApiEndpoint(
+                            `getimage/${image.split("/").pop()}`,
+                            "get"
+                          )}`}
+                          alt={`additionalImage-${index}`}
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            margin: "5px",
+                            cursor: "pointer",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                          }}
+                          onClick={() => handleOpenDialog(index)}
+                        />
+                      </div>
+                    </Stack>
+                  ))}
+                </Stack>
               </Container>
             </Grid>
             <AddStandard
@@ -737,8 +743,8 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
               </Button>
             </Grid>
           </Grid>
-        </form >
-      </Container >
+        </form>
+      </Container>
       {modalIsOpen && (
         <Imagestore
           modalIsOpen={modalIsOpen.isOpen}
@@ -750,7 +756,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           jwt_token={prop.jwt_token}
         />
       )}
-    </React.Fragment >
+    </React.Fragment>
   );
 };
 

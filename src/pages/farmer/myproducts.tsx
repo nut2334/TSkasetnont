@@ -37,6 +37,7 @@ interface ProductInterface {
   category_id: string;
   category_name: string;
 }
+
 const Myproducts = (prop: { jwt_token: string; username: string }) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
   const [navigatePath, setNavigatePath] = useState("");
@@ -47,16 +48,8 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
       bgcolor: string;
     }[]
   >([]);
-  const fetchProduct = () => {
-    const apiMyproducts = config.getApiEndpoint(
-      `myproducts/${prop.username}`,
-      "GET"
-    );
-    axios.get(apiMyproducts).then((response: any) => {
-      console.log(response.data);
-      setAllProduct(response.data);
-    });
-  };
+  const [searchType, setSearchType] = useState("");
+  const [filterSearch, setFilterSearch] = useState<ProductInterface[]>([]);
 
   useEffect(() => {
     fetchProduct();
@@ -65,6 +58,18 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
     });
   }, []);
 
+  const fetchProduct = () => {
+    const apiMyproducts = config.getApiEndpoint(
+      `myproducts/${prop.username}`,
+      "GET"
+    );
+    axios.get(apiMyproducts).then((response: any) => {
+      console.log(response.data);
+      setAllProduct(response.data);
+      setFilterSearch(response.data);
+    });
+  };
+
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
     if (luma < 128) {
@@ -72,6 +77,16 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
     } else {
       return false;
     }
+  };
+  const handleSearch = () => {
+    let filter = allProduct;
+    if (searchType !== "") {
+      filter = allProduct.filter((product) => {
+        return product.selectedType === searchType;
+      });
+    }
+    setFilterSearch(filter);
+    console.log(filter);
   };
 
   if (navigatePath) {
@@ -85,23 +100,22 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
             select
             label="รูปแบบการเก็บข้อมูล"
             fullWidth
+            onChange={(e) => setSearchType(e.target.value as string)}
           >
-            {
-              web_activity.map((option) => (
-                <MenuItem key={option.activityID} value={option.activityID}>
-                  {option.activityName}
-                </MenuItem>
-              ))
-
-            }
+            {web_activity.map((option) => (
+              <MenuItem key={option.activityID} value={option.activityID}>
+                {option.activityName}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Button
             variant="contained"
-            color="secondary"
+            color="info"
             startIcon={<SearchIcon />}
             style={{ marginRight: "8px" }}
+            onClick={handleSearch}
           >
             ค้นหา
           </Button>
@@ -115,22 +129,22 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
       <Container sx={{ py: 8 }} maxWidth="md">
         {/* End hero unit */}
         <Grid container spacing={4}>
-          {allProduct &&
-            allProduct.map((product, index) => {
+          {filterSearch &&
+            filterSearch.map((product, index) => {
               let bgcolor = allCategory.find(
                 (item) => item.category_id === product.category_id
               )?.bgcolor
                 ? JSON.parse(
-                  allCategory.find(
-                    (item) => item.category_id === product.category_id
-                  )?.bgcolor as string
-                )
+                    allCategory.find(
+                      (item) => item.category_id === product.category_id
+                    )?.bgcolor as string
+                  )
                 : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                  r: number;
-                  g: number;
-                  b: number;
-                  a: number;
-                });
+                    r: number;
+                    g: number;
+                    b: number;
+                    a: number;
+                  });
               return (
                 <Grid item key={index} xs={12} sm={6} md={4}>
                   <Card
@@ -146,10 +160,16 @@ const Myproducts = (prop: { jwt_token: string; username: string }) => {
                         // 16:9
                         pt: "56.25%",
                       }}
-                      image={product.product_image ? `${config.getApiEndpoint(
-                        `getimage/${product.product_image.split("/").pop()}`,
-                        "get"
-                      )}` : require("../../assets/noimage.jpg")}
+                      image={
+                        product.product_image
+                          ? `${config.getApiEndpoint(
+                              `getimage/${product.product_image
+                                .split("/")
+                                .pop()}`,
+                              "get"
+                            )}`
+                          : require("../../assets/noimage.jpg")
+                      }
                     />
                     <CardContent sx={{ flexGrow: 1 }}>
                       <Typography gutterBottom variant="h5" component="h2">
