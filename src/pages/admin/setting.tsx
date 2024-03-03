@@ -357,7 +357,14 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
               onDelete={() => {
                 handleEditStandard(std.standard_id);
               }}
-              deleteIcon={<CreateIcon />}
+              deleteIcon={
+                std.standard_name !== "อื่นๆ" &&
+                std.standard_name !== "ไม่มี" ? (
+                  <CreateIcon />
+                ) : (
+                  <></>
+                )
+              }
             />
           );
         })}
