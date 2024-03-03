@@ -53,6 +53,7 @@ const Imagestore = (prop: {
           p: 4,
         }}
       >
+        {}
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -73,9 +74,11 @@ const Imagestore = (prop: {
         <Grid item xs={12} marginTop={2}>
           <Divider />
         </Grid>
-        <Grid item xs={12} marginTop={2}>
-          <Typography>กดเพื่อเลือกรูปภาพ</Typography>
-        </Grid>
+        {productImage.length > 0 && (
+          <Grid item xs={12} marginTop={2}>
+            <Typography>กดเพื่อเลือกรูปภาพ</Typography>
+          </Grid>
+        )}
         <Grid item xs={12} marginTop={2}>
           <ImageList
             sx={{ width: "100%", height: 450 }}
@@ -92,7 +95,6 @@ const Imagestore = (prop: {
                         selectedImage.indexOf(videopath) !== -1
                           ? "2px solid red"
                           : "2px solid white",
-                      width: 164,
                     }}
                     onClick={() => {
                       // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
@@ -130,7 +132,6 @@ const Imagestore = (prop: {
                         selectedImage.indexOf(imagepath) !== -1
                           ? "2px solid red"
                           : "2px solid white",
-                      width: 164,
                     }}
                     onClick={() => {
                       // ถ้ารูปภาพที่เลือกไม่อยู่ในรายการ ให้เพิ่มเข้าไป
@@ -155,6 +156,11 @@ const Imagestore = (prop: {
                         "get"
                       )}`}
                       key={index}
+                      style={{
+                        width: 164,
+                        aspectRatio: 1 / 1,
+                        // borderRadius: "25px",
+                      }}
                     />
                   </ImageListItem>
                 );

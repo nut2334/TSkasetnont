@@ -193,6 +193,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
           product_id: productid,
         };
       }
+
       axios
         .post(apiAddProduct, body, {
           headers: {
@@ -584,6 +585,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     label="ราคา"
                     variant="outlined"
                     fullWidth
+                    type="number"
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
@@ -688,6 +690,7 @@ const AddProduct = (prop: { jwt_token: string; username: string }) => {
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setStock(parseInt(e.target.value))}
+                    type="number"
                   />
                 </Grid>
                 <AddCarriage unit={unit} setShippingCost={setShippingCost} />
