@@ -18,7 +18,7 @@ import Paper from "@mui/material/Paper";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
-import { Box, Button, Chip, Grid, ListItem } from "@mui/material";
+import { Box, Button, Chip, Container, Grid, ListItem } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import withReactContent from "sweetalert2-react-content";
@@ -106,18 +106,58 @@ const EachOrder = (prop: {
 
   return (
     <>
-      <ListItemButton onClick={handleClick}>
+      <ListItemButton
+        onClick={handleClick}
+        style={{
+          backgroundColor:
+            order.status === "complete"
+              ? "#D1F2EB"
+              : order.status === "waiting"
+              ? "#FDEBD0"
+              : order.status === "pending"
+              ? "#D6EAF8"
+              : "#FADBD8",
+
+          marginTop: "20px",
+          borderRadius: "10px",
+        }}
+      >
         <ListItemIcon>
           <InboxIcon />
         </ListItemIcon>
         <ListItemText primary={order.order_id} />
         <Chip
-          label={order.status}
-          color={`${order.status === "complete" ? "success" : "warning"}`}
+          label={
+            order.status === "complete"
+              ? "สำเร็จ"
+              : order.status === "waiting"
+              ? "รอจัดส่ง"
+              : order.status === "pending"
+              ? "รอการตรวจสอบ"
+              : order.status === "reject"
+              ? "ยกเลิก"
+              : ""
+          }
+          color={`${
+            order.status === "complete"
+              ? "success"
+              : order.status === "waiting"
+              ? "warning"
+              : order.status === "pending"
+              ? "info"
+              : "error"
+          }`}
         />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse
+        in={open}
+        timeout="auto"
+        unmountOnExit
+        sx={{
+          boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px;",
+        }}
+      >
         <List component="div" disablePadding>
           {/* table */}
           <ListSubheader>รายละเอียดคำสั่งซื้อ</ListSubheader>
@@ -188,6 +228,9 @@ const EachOrder = (prop: {
               <Button
                 variant="contained"
                 color="primary"
+                sx={{
+                  marginRight: "10px",
+                }}
                 onClick={() => {
                   let apiConfirmOrder = config.getApiEndpoint(
                     "confirmorder",
@@ -219,7 +262,7 @@ const EachOrder = (prop: {
               </Button>
               <Button
                 variant="contained"
-                color="secondary"
+                color="error"
                 onClick={() => {
                   showSweet();
                 }}
@@ -305,7 +348,11 @@ const EachOrder = (prop: {
               </ListItem>
             </>
           )}
-          <Divider />
+          <Divider
+            sx={{
+              marginTop: "10px",
+            }}
+          />
           <ListSubheader>รายละเอียดผู้ซื้อ</ListSubheader>
           <Box display={"flex"}>
             <ListItem>
@@ -346,7 +393,14 @@ const Orderhistory = (prop: { jwt_token: string }) => {
       })
       .then((res) => {
         console.log(res.data);
-        setOrderHistory(res.data);
+        const sortedOrders = res.data.sort(
+          (a: OrderHistoryInterface, b: OrderHistoryInterface) => {
+            return (
+              new Date(b.date_buys).getTime() - new Date(a.date_buys).getTime()
+            );
+          }
+        );
+        setOrderHistory(sortedOrders);
       })
       .catch((err) => {
         console.log(err);
@@ -357,16 +411,18 @@ const Orderhistory = (prop: { jwt_token: string }) => {
   }, []);
   return (
     <div>
-      {orderHistory.map((order, index) => {
-        return (
-          <EachOrder
-            key={index}
-            order={order}
-            jwt_token={prop.jwt_token}
-            fetchOrderHistory={fetchOrderHistory}
-          />
-        );
-      })}
+      <Container maxWidth="lg">
+        {orderHistory.map((order, index) => {
+          return (
+            <EachOrder
+              key={index}
+              order={order}
+              jwt_token={prop.jwt_token}
+              fetchOrderHistory={fetchOrderHistory}
+            />
+          );
+        })}
+      </Container>
     </div>
   );
 };
