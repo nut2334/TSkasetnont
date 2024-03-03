@@ -80,11 +80,7 @@ const Home = (prop: { jwt_token: string }) => {
   });
 
   useEffect(() => {
-    console.log(
-      searchParams.get("category"),
-      selectedCategory.category_id,
-      page
-    );
+    console.log(searchParams, selectedCategory.category_id, page);
 
     if (searchParams.get("category") !== selectedCategory.category_id) {
       setPage("0");
@@ -176,7 +172,7 @@ const Home = (prop: { jwt_token: string }) => {
           width: "100%",
           height: "100vh",
           zIndex: 1,
-          maxHeight: "calc(100vh - 80px)"
+          maxHeight: "calc(100vh - 80px)",
         }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -225,13 +221,13 @@ const Home = (prop: { jwt_token: string }) => {
           top: "10%",
           width: "100%",
           left: "50%",
-    transform: "translateX(-50%)" ,
-    '@media (max-width: 600px)': {
-      left: "initial",
-      transform: "initial",
-      marginLeft: "auto",
-      marginRight: "auto",
-    }
+          transform: "translateX(-50%)",
+          "@media (max-width: 600px)": {
+            left: "initial",
+            transform: "initial",
+            marginLeft: "auto",
+            marginRight: "auto",
+          },
         }}
       >
         <div

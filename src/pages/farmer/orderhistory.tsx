@@ -255,26 +255,27 @@ const EachOrder = (prop: {
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    const reg = /^[A-Za-z0-9][13]$/;
+                    const reg = /^[A-Za-z0-9]*$/;
+                    let valid = true;
                     if (!reg.test(trackingNumber)) {
-                      setRegTrackingNumber(false);
-                    } else {
-                      setRegTrackingNumber(true);
+                      valid = false;
                     }
-                    if (!regTrackingNumber) return;
+                    if (!valid) {
+                      if (!regTrackingNumber) {
+                        Swal.fire({
+                          title: "เลขพัสดุไม่ถูกต้อง",
+                          text: "กรุณากรอกเลขพัสดุให้ถูกต้อง",
+                          icon: "error",
+                          confirmButtonText: "ตกลง",
+                        });
+                        return;
+                      }
+                    }
                     let apiConfirmOrder = config.getApiEndpoint(
                       "confirmorder",
                       "POST"
                     );
-                    if (!regTrackingNumber) {
-                      Swal.fire({
-                        title: "เลขพัสดุไม่ถูกต้อง",
-                        text: "กรุณากรอกเลขพัสดุให้ถูกต้อง",
-                        icon: "error",
-                        confirmButtonText: "ตกลง",
-                      });
-                      return;
-                    }
+
                     axios
                       .post(
                         apiConfirmOrder,

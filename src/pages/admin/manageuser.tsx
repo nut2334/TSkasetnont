@@ -9,7 +9,7 @@ import Paper from "@mui/material/Paper";
 import { Button, Container, Grid, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import { NavLink } from "react-router-dom";
+import { NavLink, Navigate } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
 import EditProfile from "../editprofile";
@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
+import Myproducts from "../farmer/myproducts";
 
 interface userInterface {
   id: string;
@@ -37,6 +38,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
   const [searchUsername, setSearchUsername] = useState<string>("");
   const [role, setRole] = useState("");
   const [currentRole, setCurrentRole] = useState("");
+  const [viewFarmer, setViewFarmer] = useState<string>("");
   const [allRole, setAllrole] = useState<
     {
       role_id: string;
@@ -66,17 +68,19 @@ const ManageUser = (prop: { jwt_token: string }) => {
   }, []);
 
   useEffect(() => {
-    const apiRole = config.getApiEndpoint("role", "GET");
-    axios
-      .get(apiRole)
-      .then((res) => {
-        if (res.data) {
-          setAllrole([{ role_id: "all", role_name: "ทั้งหมด" }, ...res.data]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (currentRole !== "tambons") {
+      const apiRole = config.getApiEndpoint("role", "GET");
+      axios
+        .get(apiRole)
+        .then((res) => {
+          if (res.data) {
+            setAllrole([{ role_id: "all", role_name: "ทั้งหมด" }, ...res.data]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }, []);
 
   const deleteUser = (username: string, role: string) => {
@@ -137,6 +141,10 @@ const ManageUser = (prop: { jwt_token: string }) => {
     setFilteredUsers(filteredUsers);
   };
 
+  if (viewFarmer !== "") {
+    return <Navigate to={`/managefarmer/${viewFarmer}`} />;
+  }
+
   return (
     <Container
       component="main"
@@ -186,18 +194,20 @@ const ManageUser = (prop: { jwt_token: string }) => {
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                select
-                label="ตำแหน่ง"
-                fullWidth
-                onChange={(event) => setRole(event.target.value as string)}
-              >
-                {allRole.map((role) => (
-                  <MenuItem key={role.role_id} value={role.role_id}>
-                    {role.role_name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              {currentRole !== "tambons" && (
+                <TextField
+                  select
+                  label="ตำแหน่ง"
+                  fullWidth
+                  onChange={(event) => setRole(event.target.value as string)}
+                >
+                  {allRole.map((role) => (
+                    <MenuItem key={role.role_id} value={role.role_id}>
+                      {role.role_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
             </Grid>
             <Grid item xs={6}>
               <Button
@@ -259,6 +269,13 @@ const ManageUser = (prop: { jwt_token: string }) => {
                         sx={{
                           color: "#36AE7C",
                           cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          console.log(user.username);
+
+                          if (currentRole === "tambons") {
+                            setViewFarmer(user.username);
+                          }
                         }}
                       />
                       <EditIcon

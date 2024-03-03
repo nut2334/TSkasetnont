@@ -24,6 +24,7 @@ import Reserve from "./pages/member/reserve";
 import Payment from "./pages/member/payment";
 import Orderlist from "./pages/member/orderlist";
 import { MessengerChat } from "react-messenger-chat-plugin";
+import Myproducts from "./pages/farmer/myproducts";
 
 export interface Cart {
   product_id: string;
@@ -137,33 +138,25 @@ function App() {
             />
           )}
           {decodeJWT.role == "farmers" && (
+            <Route
+              path="/myproducts"
+              element={
+                <TabProducts
+                  jwt_token={jwt_token}
+                  username={decodeJWT.username}
+                />
+              }
+            />
+          )}
+          {(decodeJWT.role == "farmers" || decodeJWT.role == "tambons") && (
             <React.Fragment>
               <Route
-                path="/myproducts"
-                element={
-                  <TabProducts
-                    jwt_token={jwt_token}
-                    username={decodeJWT.username}
-                  />
-                }
+                path="/addproduct/:username"
+                element={<AddProduct jwt_token={jwt_token} />}
               />
               <Route
-                path="/addproduct"
-                element={
-                  <AddProduct
-                    jwt_token={jwt_token}
-                    username={decodeJWT.username}
-                  />
-                }
-              />
-              <Route
-                path="/editproduct/:shopname/:productid"
-                element={
-                  <AddProduct
-                    jwt_token={jwt_token}
-                    username={decodeJWT.username}
-                  />
-                }
+                path="/editproduct/:shopname/:username/:productid"
+                element={<AddProduct jwt_token={jwt_token} />}
               />
             </React.Fragment>
           )}
@@ -209,6 +202,10 @@ function App() {
               <Route
                 path="/managefarmer"
                 element={<ManageUser jwt_token={jwt_token} />}
+              />
+              <Route
+                path="/managefarmer/:username"
+                element={<Myproducts jwt_token={jwt_token} />}
               />
             </>
           )}
