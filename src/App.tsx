@@ -162,7 +162,10 @@ function App() {
             </React.Fragment>
           )}
           {(decodeJWT.role == "tambons" || decodeJWT.role == "providers") && (
-            <Route path="/datafarmer" element={<ExcelDownload />} />
+            <Route
+              path="/datafarmer"
+              element={<ExcelDownload jwt_token={jwt_token} />}
+            />
           )}
           {decodeJWT.role == "admins" && (
             <React.Fragment>
