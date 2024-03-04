@@ -9,10 +9,7 @@ import {
   Stack,
   Box,
   Divider,
-  TextField,
 } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import axios from "axios";
 import * as config from "../../config/config";
 import AliceCarousel from "react-alice-carousel";
@@ -34,7 +31,10 @@ import {
   LineIcon,
 } from "react-share";
 import { Cart } from "../../App";
-
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import StoreIcon from "@mui/icons-material/Store";
 interface FullProductInterface {
   product_id: string;
   product_name: string;
@@ -52,6 +52,8 @@ interface FullProductInterface {
   last_modified: Date;
   selectedType: string;
   shippingcost: string;
+  firstname: string;
+  lastname: string;
 }
 
 const style = {
@@ -64,6 +66,7 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
 };
+
 const SigleProduct = (prop: {
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
@@ -87,8 +90,13 @@ const SigleProduct = (prop: {
     last_modified: new Date(),
     selectedType: "",
     shippingcost: "",
+    firstname: "",
+    lastname: "",
   });
-  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
+  const { productid, shopname } = useParams<{
+    productid: string;
+    shopname: string;
+  }>();
   const [showFullImage, setShowFullImage] = useState("");
   const [comment, setComment] = useState<
     {
@@ -99,6 +107,7 @@ const SigleProduct = (prop: {
       rating: number;
       comment: string;
       date_comment: Date;
+      member_username: string;
     }[]
   >([]);
 
@@ -109,6 +118,7 @@ const SigleProduct = (prop: {
     );
     axios.get(apiSingleProduct).then((response) => {
       setProduct(response.data);
+      console.log(response.data);
     });
 
     const apiUpdateView = config.getApiEndpoint(
@@ -117,9 +127,7 @@ const SigleProduct = (prop: {
     );
     axios
       .get(apiUpdateView)
-      .then((response) => {
-        setComment(response.data);
-      })
+      .then((response) => {})
       .catch((error) => {
         console.log(error);
       });
@@ -391,7 +399,6 @@ const SigleProduct = (prop: {
             spacing={2}
             alignItems="center"
             sx={{
-              cursor: "pointer",
               paddingTop: "5px",
             }}
             marginLeft={2}
@@ -403,7 +410,8 @@ const SigleProduct = (prop: {
                 max={product.stock}
                 value={quantity}
                 setQuantity={setQuantity}
-                quantity={quantity} />
+                quantity={quantity}
+              />
             </Stack>
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <Stack>
@@ -413,16 +421,45 @@ const SigleProduct = (prop: {
               </Stack>
             )}
           </Stack>
-          <Box>
-            <Typography variant="h6">ค่าจัดส่ง</Typography>
-            <Typography>
+
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              paddingTop: "5px",
+            }}
+            marginLeft={2}
+            marginTop={2}
+          >
+            <Stack>
+              <LocalShippingIcon />
+            </Stack>
+            <Stack>
+              <Typography variant="h6">ค่าจัดส่ง</Typography>
+            </Stack>
+          </Stack>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              paddingTop: "5px",
+            }}
+            marginLeft={2}
+          >
+            <Stack>
               {product.shippingcost &&
-                product.shippingcost
-                  .split(",")
-                  .find((item) => item.split(":")[0] == "จัดส่งฟรี")
-                  ?.split(":")[1]}
-            </Typography>
-          </Box>
+                JSON.parse(product.shippingcost).map((item: any) => {
+                  return (
+                    <Typography>
+                      น้ำหนัก {">"} {item.weight} กรัม ค่าส่งราคา {item.price}{" "}
+                      บาท
+                    </Typography>
+                  );
+                })}
+            </Stack>
+          </Stack>
           <Stack
             direction="row"
             spacing={2}
@@ -482,7 +519,7 @@ const SigleProduct = (prop: {
                 </Stack>
 
                 <Stack>
-                  <NavLink to="/payment">
+                  <NavLink to="/listcart">
                     <Button
                       variant="contained"
                       color="secondary"
@@ -520,6 +557,32 @@ const SigleProduct = (prop: {
           </Box>
         </Modal>
       )}
+      <Box
+        sx={{
+          boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+          borderRadius: 2,
+          padding: 2,
+          marginBottom: 2,
+        }}
+      >
+        <Typography variant="h6">{shopname}</Typography>
+
+        <Typography>
+          โดย {product.firstname + " " + product.lastname}
+        </Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "right",
+            marginTop: 2,
+          }}
+        >
+          <NavLink to={`/shop/${shopname}`}>
+            <Button variant="contained">ดูสินค้าอื่นๆภายในร้าน</Button>
+          </NavLink>
+        </div>
+      </Box>
+
       {comment.length > 0 && (
         <Box>
           <Typography variant="h5">ความคิดเห็น</Typography>
@@ -527,19 +590,81 @@ const SigleProduct = (prop: {
             return (
               <Box
                 sx={{
-                  marginTop: 2,
+                  display: "flex",
+                  flexDirection: "row",
                   padding: 2,
-                  boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px;",
+                  marginBottom: 2,
+                  boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+                  borderRadius: 2,
                 }}
               >
-                {Array(Math.round(item.rating)).fill(
-                  <StarIcon
-                    sx={{
-                      color: "#ffd700",
-                    }}
-                  />
-                )}
-                <Typography variant="body1">{item.comment}</Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {
+                    <div
+                      style={{
+                        color: "#ffd700",
+                      }}
+                    >
+                      <Typography variant="h6">
+                        {item.rating.toFixed(1)}
+                      </Typography>
+                      {item.rating >= 1 ? (
+                        <StarIcon />
+                      ) : item.rating >= 0.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 2 ? (
+                        <StarIcon />
+                      ) : item.rating >= 1.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 3 ? (
+                        <StarIcon />
+                      ) : item.rating >= 2.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 4 ? (
+                        <StarIcon />
+                      ) : item.rating >= 3.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 5 ? (
+                        <StarIcon />
+                      ) : item.rating >= 4.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                    </div>
+                  }
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginLeft: 2,
+                  }}
+                >
+                  <Typography variant="h6">{item.comment}</Typography>
+                  <Typography variant="subtitle1">
+                    โดย {item.member_username}
+                  </Typography>
+                </Box>
               </Box>
             );
           })}
