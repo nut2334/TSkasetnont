@@ -130,7 +130,7 @@ const Myproducts = (prop: { jwt_token: string; username?: string }) => {
           >
             ค้นหา
           </Button>
-          <NavLink to={`/addproduct/${username}`}>
+          <NavLink to={`/addproduct/${username ? username : prop.username}`}>
             <Button variant="contained" color="primary" startIcon={<AddIcon />}>
               เพิ่มสินค้า
             </Button>
@@ -212,7 +212,9 @@ const Myproducts = (prop: { jwt_token: string; username?: string }) => {
                         size="small"
                         onClick={() => {
                           setNavigatePath(
-                            `${product.farmerstorename}/${username}/${product.product_id}`
+                            `${product.farmerstorename}/${
+                              username ? username : prop.username
+                            }/${product.product_id}`
                           );
                         }}
                       >

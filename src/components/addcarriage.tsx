@@ -23,12 +23,12 @@ const AddCarriage = (prop: {
       {carriageList.map((cost, index) => (
         <>
           <Grid item xs={12}>
-            <SetDataCarriage
+            {/* <SetDataCarriage
               index={index}
               setCarriageList={setCarriageList}
               unit={prop.unit}
               setDataCarriage={prop.setShippingCost}
-            />
+            /> */}
           </Grid>
         </>
       ))}

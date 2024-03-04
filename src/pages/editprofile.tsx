@@ -29,6 +29,8 @@ import {
 import { Icon, LatLngLiteral } from "leaflet";
 import { EdituserSuccess, EdituserFail } from "../components/popup";
 import Swal from "sweetalert2";
+import SetDataCarriage from "../components/setDataCarriage";
+import AddCarriage from "../components/addcarriage";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -112,6 +114,12 @@ const EditProfile = (prop: {
   const [position, setPosition] = useState<LatLngLiteral>();
   const [payment, setPayment] = useState<string>("");
   const [current, setCurrent] = useState<boolean>(false);
+  const [shippingcost, setShippingCost] = useState<
+    {
+      weight: number;
+      price: number;
+    }[]
+  >([{ weight: 0, price: 0 }]);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -229,6 +237,10 @@ const EditProfile = (prop: {
               );
             }
 
+            if (res.data.shippingcost) {
+              setShippingCost(JSON.parse(res.data.shippingcost));
+            }
+
             setProvinces(provinces);
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
@@ -281,6 +293,9 @@ const EditProfile = (prop: {
               );
             }
 
+            if (res.data.shippingcost) {
+              setShippingCost(JSON.parse(res.data.shippingcost));
+            }
             setProvinces(provinces);
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
@@ -358,6 +373,7 @@ const EditProfile = (prop: {
       address?: string;
       zipcode?: number;
       payment?: string;
+      shippingcost?: { weight: number; price: number }[];
     };
     if (prop.admin) {
       data = { ...data, role: prop.admin.role };
@@ -384,6 +400,7 @@ const EditProfile = (prop: {
         lineid: lineId,
         zipcode: zipCode,
         payment: payment,
+        shippingcost: shippingcost,
       };
     }
 
@@ -394,7 +411,10 @@ const EditProfile = (prop: {
 
     axios
       .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
-        headers: { Authorization: `Bearer ${prop.jwt_token}` },
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+          "Content-Type": "application/json",
+        },
       })
       .then((res) => {
         console.log(res.data);
@@ -459,7 +479,7 @@ const EditProfile = (prop: {
 
   const CreateMarker = (prop: { current: boolean }) => {
     const map = useMap();
-
+    const [initialFly, setInitialFly] = useState<boolean>(true);
     useMapEvents({
       click(e) {
         setPosition(e.latlng);
@@ -469,7 +489,12 @@ const EditProfile = (prop: {
         }
       },
     });
-
+    useEffect(() => {
+      if (position && initialFly) {
+        map.flyTo(position, map.getZoom());
+        setInitialFly(false);
+      }
+    }, []);
     useEffect(() => {
       if (prop.current && position == undefined) {
         map.locate().on("locationfound", function (e) {
@@ -679,6 +704,13 @@ const EditProfile = (prop: {
                     placeholder="@HelloWorld หรือ 0912345678"
                     value={lineId}
                     onChange={(event) => setLineId(event.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <SetDataCarriage
+                    unit="กรัม"
+                    dataCarriage={shippingcost}
+                    setDataCarriage={setShippingCost}
                   />
                 </Grid>
 

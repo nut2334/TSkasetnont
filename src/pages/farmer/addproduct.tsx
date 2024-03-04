@@ -20,7 +20,6 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import AddStandard from "../../components/addstandard";
-import AddCarriage from "../../components/addcarriage";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 import { useParams } from "react-router-dom";
@@ -50,6 +49,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
 
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number>();
+  const [weight, setWeight] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -73,12 +73,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       standard_cercification: undefined,
     },
   ]);
-  const [shippingcost, setShippingCost] = useState<
-    {
-      weight: number;
-      price: number;
-    }[]
-  >([{ weight: 0, price: 0 }]);
+
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
     productid: string;
@@ -115,6 +110,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
         setSelectedCategory(res.data.category_id);
         setDescription(res.data.product_description);
         setSelectedType(res.data.selectedType);
+        setWeight(res.data.weight);
         setPrice(res.data.price);
         setUnit(res.data.unit);
         setStock(res.data.stock);
@@ -127,7 +123,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
           res.data.additional_image ? JSON.parse(res.data.additional_image) : []
         );
         setSelectedStandard(JSON.parse(res.data.certificate));
-        setShippingCost(JSON.parse(res.data.shippingcost));
       });
     }
   }, []);
@@ -198,6 +193,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       product_description: description,
       selectedType: selectedType,
       price: price,
+      weight: weight,
       unit: unit,
       stock: stock,
       selectedStatus: selectedStatus,
@@ -207,7 +203,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
       product_video: productVideo[0],
       additional_images: JSON.stringify(selectImage),
       certificate: JSON.stringify(selectedStandard),
-      shippingcost: JSON.stringify(shippingcost),
     } as any;
 
     if (productid) {
@@ -269,7 +264,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   standard_cercification: undefined,
                 },
               ]);
-              setShippingCost([{ weight: 0, price: 0 }]);
               setSelectedType("");
             }
           })
@@ -702,16 +696,31 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 <Grid item xs={8} lg={6}>
                   <TextField
                     id="outlined-basic"
+                    value={price}
                     label="ราคา"
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
+                <Grid item xs={8} lg={6}>
+                  <TextField
+                    id="outlined-basic"
+                    label="น้ำหนัก"
+                    value={weight}
+                    placeholder="หน่วยกรัม (นำไปใช้ในการคำนวณค่าส่ง)"
+                    type="number"
+                    inputProps={{ min: 0 }}
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setWeight(parseInt(e.target.value))}
+                  />
+                </Grid>
                 <Grid item xs={4} lg={6}>
                   <TextField
                     id="outlined-basic"
                     label="หน่วย"
+                    value={unit}
                     variant="outlined"
                     onChange={(e) => setUnit(e.target.value)}
                     fullWidth
@@ -721,13 +730,13 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   <TextField
                     id="outlined-basic"
                     label="จำนวนคลังสินค้า"
+                    value={stock}
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setStock(parseInt(e.target.value))}
                     type="number"
                   />
                 </Grid>
-                <AddCarriage unit={unit} setShippingCost={setShippingCost} />
               </>
             )}
             <Grid item xs={12}>
