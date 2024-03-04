@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { Global } from "@emotion/react";
 import { styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +15,9 @@ import StoreIcon from "@mui/icons-material/Store";
 import { NavLink } from "react-router-dom";
 import ShareIcon from "@mui/icons-material/Share";
 import { RWebShare } from "react-web-share";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
 
 const drawerBleeding = 56;
 
@@ -62,6 +65,26 @@ export default function SwipeableEdgeDrawer(
     };
   }
 ) {
+  const [average, setAverage] = React.useState<number>(0);
+
+  useEffect(() => {
+    if (props.selectedProduct.product_id === "") return;
+    console.log(props.selectedProduct.product_id);
+    const apiComment = config.getApiEndpoint(
+      `getcomment/${props.selectedProduct.product_id}`,
+      "get"
+    );
+    axios.get(apiComment).then((response) => {
+      let average = response.data.reviews.reduce(
+        (acc: number, current: { rating: number }) => acc + current.rating,
+        0
+      );
+      average = average / response.data.reviews.length;
+      console.log(average);
+      setAverage(average);
+    });
+  }, [props.selectedProduct.product_id]);
+
   const { window } = props;
   // This is used only for the example
   const container =
@@ -124,7 +147,7 @@ export default function SwipeableEdgeDrawer(
               <Grid container spacing={2} padding={2}>
                 <Grid
                   item
-                  xs={6}
+                  xs={5}
                   sx={{
                     textAlign: "right",
                   }}
@@ -143,12 +166,56 @@ export default function SwipeableEdgeDrawer(
                     }}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={7}>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <Typography variant="h6" gutterBottom>
+                      <Typography variant="h4" gutterBottom>
                         {props.selectedProduct.product_name}
                       </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            คะแนนเฉลี่ย {average.toFixed(1)}
+                          </Typography>
+                          {average >= 1 ? (
+                            <StarIcon />
+                          ) : average >= 0.5 ? (
+                            <StarHalfIcon />
+                          ) : (
+                            <StarBorderIcon />
+                          )}
+                          {average >= 2 ? (
+                            <StarIcon />
+                          ) : average >= 1.5 ? (
+                            <StarHalfIcon />
+                          ) : (
+                            <StarBorderIcon />
+                          )}
+                          {average >= 3 ? (
+                            <StarIcon />
+                          ) : average >= 2.5 ? (
+                            <StarHalfIcon />
+                          ) : (
+                            <StarBorderIcon />
+                          )}
+                          {average >= 4 ? (
+                            <StarIcon />
+                          ) : average >= 3.5 ? (
+                            <StarHalfIcon />
+                          ) : (
+                            <StarBorderIcon />
+                          )}
+                          {average >= 5 ? (
+                            <StarIcon />
+                          ) : average >= 4.5 ? (
+                            <StarHalfIcon />
+                          ) : (
+                            <StarBorderIcon />
+                          )}
+                        </div>
+                      }
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="body1" gutterBottom>
@@ -156,7 +223,7 @@ export default function SwipeableEdgeDrawer(
                       </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="h5" gutterBottom>
+                      <Typography variant="h6" gutterBottom>
                         ราคา {props.selectedProduct.price} บาท /{" "}
                         {props.selectedProduct.unit}
                       </Typography>

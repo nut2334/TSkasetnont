@@ -8,6 +8,7 @@ import PieChartIcon from "@mui/icons-material/PieChart";
 import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import Myproducts from "../pages/farmer/myproducts";
 import Orderhistory from "../pages/farmer/orderhistory";
+import Analyze from "../pages/farmer/analyze";
 
 const TabProducts = (prop: { jwt_token: string; username: string }) => {
   const [value, setValue] = React.useState("1");
@@ -42,7 +43,9 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
         <TabPanel value="1">
           <Myproducts jwt_token={prop.jwt_token} username={prop.username} />
         </TabPanel>
-        <TabPanel value="2">8796</TabPanel>
+        <TabPanel value="2">
+          <Analyze jwt_token={prop.jwt_token} />
+        </TabPanel>
         <TabPanel value="3">
           <Orderhistory jwt_token={prop.jwt_token} />
         </TabPanel>
