@@ -8,17 +8,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/material/styles";
-import { Box, Button, Chip, Container, Grid, ListItem } from "@mui/material";
+import { Box, Button, Chip, Container, ListItem } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import withReactContent from "sweetalert2-react-content";
@@ -73,7 +65,6 @@ const EachOrder = (prop: {
       denyButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       preConfirm: () => {
-        // setId(Swal.getInput()?.value || "");
         handleSubmit(Swal.getInput()?.value || "");
       },
     });
