@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Grid, TextField } from "@mui/material";
-
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const EachDataCarriage = (prop: {
   index: number;
   unit: string;
@@ -59,6 +59,11 @@ const EachDataCarriage = (prop: {
             }}
             InputProps={{
               endAdornment: <div>กรัม</div>,
+              startAdornment: (
+                <div>
+                  <ArrowForwardIosIcon />
+                </div>
+              ),
             }}
           />
         </Grid>
@@ -130,18 +135,6 @@ const SetDataCarriage = (prop: {
     >
   >;
 }) => {
-  // const [weight, setWeight] = React.useState<number>(0);
-  // const [price, setPrice] = React.useState<number>(0);
-
-  // useEffect(() => {
-  //   prop.setDataCarriage([{ weight, price }]);
-  // }, [weight, price]);
-
-  // useEffect(() => {
-  //   setWeight(prop.dataCarriage.weight);
-  //   setPrice(prop.dataCarriage.price);
-  // }, [prop.dataCarriage]);
-
   return (
     <>
       {prop.dataCarriage.map((data, index) => {

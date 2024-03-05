@@ -66,6 +66,7 @@ interface FullProductInterface {
   firstname: string;
   lastname: string;
   farmer_id: string;
+  weight: number;
 }
 
 const style = {
@@ -108,6 +109,7 @@ const SigleProduct = (prop: {
     firstname: "",
     lastname: "",
     farmer_id: "",
+    weight: 0,
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -610,6 +612,8 @@ const SigleProduct = (prop: {
                               price: product.price,
                               stock: product.stock,
                               farmer_id: product.farmer_id,
+                              weight: product.weight,
+                              shipping_cost: product.shippingcost,
                             };
                             prop.setCartList([cart]);
                           }
@@ -623,6 +627,8 @@ const SigleProduct = (prop: {
                         price: product.price,
                         stock: product.stock,
                         farmer_id: product.farmer_id,
+                        weight: product.weight,
+                        shipping_cost: product.shippingcost,
                       };
 
                       prop.cartList.find(
@@ -672,6 +678,8 @@ const SigleProduct = (prop: {
                           price: product.price,
                           stock: product.stock,
                           farmer_id: product.farmer_id,
+                          weight: product.weight,
+                          shipping_cost: product.shippingcost,
                         };
                         prop.cartList.find(
                           (item) => item.product_id == product.product_id
