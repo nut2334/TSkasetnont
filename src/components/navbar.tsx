@@ -18,6 +18,11 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Cookies from "universal-cookie";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Cart } from "../App";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+
+import * as config from "../config/config";
+import axios from "axios";
 
 interface Page {
   name: string;
@@ -27,8 +32,29 @@ interface Page {
 const Navbar = (prop: {
   role: string;
   username: string;
+  jwt_token: string;
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
   cartList: Cart[];
+  notification: {
+    id: string;
+    is_unread: boolean;
+    link: string;
+    message: string;
+    timesent: string;
+    type: string;
+  }[];
+  setNotification: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: string;
+        is_unread: boolean;
+        link: string;
+        message: string;
+        timesent: string;
+        type: string;
+      }[]
+    >
+  >;
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
   const defaultPages = [{ name: "สินค้าทั้งหมด", path: "/listproduct" }];
@@ -43,6 +69,7 @@ const Navbar = (prop: {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -223,16 +250,90 @@ const Navbar = (prop: {
               ))}
             </Box>
             {prop.role == "members" && (
-              <Badge badgeContent={prop.cartList.length} color="primary">
-                <NavLink
-                  to="/listcart"
-                  style={{
-                    color: "green",
+              <>
+                <Badge badgeContent={prop.cartList.length} color="primary">
+                  <NavLink
+                    to="/listcart"
+                    style={{
+                      color: "green",
+                    }}
+                  >
+                    <ShoppingCartIcon />
+                  </NavLink>
+                </Badge>
+                <Badge
+                  badgeContent={
+                    prop.notification ? prop.notification.length : 0
+                  }
+                  color="primary"
+                  onClick={(event) => {
+                    setAnchorEl(event.currentTarget);
                   }}
                 >
-                  <ShoppingCartIcon />
-                </NavLink>
-              </Badge>
+                  {prop.notification.length > 0 ? (
+                    <NotificationsActiveIcon />
+                  ) : (
+                    <NotificationsIcon />
+                  )}
+                </Badge>
+                {prop.notification.map((noti, index) => (
+                  <Menu
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={() => {
+                      setAnchorEl(null);
+                    }}
+                  >
+                    <NavLink to={noti.link} style={{ textDecoration: "none" }}>
+                      <MenuItem
+                        key={index}
+                        onClick={() => {
+                          const apiNotification = config.getApiEndpoint(
+                            "notification",
+                            "post"
+                          );
+                          axios
+                            .post(
+                              apiNotification,
+                              {
+                                id: noti.id,
+                              },
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${prop.jwt_token}`,
+                                },
+                              }
+                            )
+                            .then(() => {
+                              let tmp = JSON.parse(
+                                JSON.stringify(prop.notification)
+                              );
+                              tmp.splice(index, 1);
+                              prop.setNotification(tmp);
+                              setAnchorEl(null);
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                            });
+                        }}
+                      >
+                        <Typography textAlign="center" sx={{ color: "black" }}>
+                          {noti.message}
+                        </Typography>
+                      </MenuItem>
+                    </NavLink>
+                  </Menu>
+                ))}
+              </>
             )}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
