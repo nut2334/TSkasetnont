@@ -38,6 +38,12 @@ interface orderInterface {
     product_image: string;
     quantity: number;
     price: number;
+    comment?: {
+      rating: number;
+      date_comment: string;
+      comment: string;
+      review_id?: string;
+    };
   }[];
 }
 
