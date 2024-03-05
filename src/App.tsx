@@ -137,7 +137,7 @@ function App() {
           .then((res) => {
             setNotification(res.data);
           });
-      }, 15);
+      }, 15000);
       return () => clearInterval(interval);
     }
   }, [jwt_token, decodeJWT.role]);
