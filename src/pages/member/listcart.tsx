@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Cart } from "../../App";
 import { Button, Divider, Typography, Stack } from "@mui/material";
 import { Container } from "@mui/material";
@@ -9,16 +9,17 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { NumberInput } from "../../components/addamount";
 import Payment from "./payment";
 import Swal from "sweetalert2";
+import { json } from "stream/consumers";
 
 const EachItem = (prop: {
   cart: Cart;
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
 }) => {
   const [quantity, setQuantity] = React.useState<number>(prop.cart.quantity);
-  const [shipping_cost, setShipping_cost] = React.useState<{
+  const [shipping_cost, setShipping_cost] = useState<{
     weight: number;
     price: number;
-  }>({ weight: 0, price: 0 });
+  }>();
 
   useEffect(() => {
     prop.setCartList((prev) =>
@@ -29,6 +30,17 @@ const EachItem = (prop: {
         return cart;
       })
     );
+  }, [quantity]);
+
+  useEffect(() => {
+    JSON.parse(prop.cart.shipping_cost).map(
+      (shipping: { weight: number; price: number }) => {
+        if (shipping.weight >= prop.cart.weight * prop.cart.quantity) {
+          setShipping_cost(shipping);
+        }
+      }
+    );
+    console.log(prop.cart.shipping_cost);
   }, [quantity]);
 
   return (
@@ -55,7 +67,6 @@ const EachItem = (prop: {
             quantity={quantity}
           />
         </Grid>
-        {/* เช็คน้ำหนักกับราคาค่าส่ง */}
 
         <Grid item xs={12}>
           <Typography
@@ -67,14 +78,15 @@ const EachItem = (prop: {
             {prop.cart.price} บาท
           </Typography>
         </Grid>
-        {/* <Grid item xs={12}>
+
+        <Grid item xs={12}>
           <Divider />
         </Grid>
         <Grid item xs={11}>
           <Typography variant="h6" color="info">
             ราคารวม {prop.cart.price * quantity} บาท
           </Typography>
-        </Grid> */}
+        </Grid>
         <Grid item xs={1}>
           <Button
             onClick={() => {
@@ -135,7 +147,6 @@ const ListCart = (prop: {
                 <Grid item xs={12}>
                   <Divider />
                 </Grid>
-
                 <Grid
                   item
                   xs={12}
