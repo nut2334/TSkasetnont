@@ -10,6 +10,13 @@ import {
   Box,
   Divider,
   Chip,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -350,9 +357,6 @@ const SigleProduct = (prop: {
       <Stack
         direction="row"
         spacing={1}
-        sx={{
-          cursor: "pointer",
-        }}
         marginLeft={2}
         justifyContent="flex-end"
       >
@@ -449,27 +453,56 @@ const SigleProduct = (prop: {
               </Stack>
             </Stack>
           )}
-          <Stack
-            direction="row"
-            spacing={2}
-            alignItems="center"
+          <TableContainer
+            component={Paper}
             sx={{
-              paddingTop: "5px",
+              width: "200px",
             }}
-            marginLeft={2}
           >
-            <Stack>
-              {product.shippingcost &&
-                JSON.parse(product.shippingcost).map((item: any) => {
-                  return (
-                    <Typography>
-                      น้ำหนัก {">"} {item.weight} กรัม ค่าส่งราคา {item.price}{" "}
-                      บาท
-                    </Typography>
-                  );
-                })}
-            </Stack>
-          </Stack>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>น้ำหนัก</TableCell>
+                  <TableCell align="right">ค่าส่ง</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {product.shippingcost &&
+                  JSON.parse(product.shippingcost).map((item: any) => {
+                    return (
+                      <TableRow key={item.weight}>
+                        <TableCell component="th" scope="row">
+                          {">"}
+                          {item.weight} กรัม
+                        </TableCell>
+                        <TableCell align="right">{item.price} บาท</TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+              {/* <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{
+                  paddingTop: "5px",
+                }}
+                marginLeft={2}
+              >
+                <Stack>
+                  {product.shippingcost &&
+                    JSON.parse(product.shippingcost).map((item: any) => {
+                      return (
+                        <Typography>
+                          น้ำหนัก {">"} {item.weight} กรัม ค่าส่งราคา{" "}
+                          {item.price} บาท
+                        </Typography>
+                      );
+                    })}
+                </Stack>
+              </Stack> */}
+            </Table>
+          </TableContainer>
           <Stack
             direction="row"
             spacing={2}
@@ -495,7 +528,54 @@ const SigleProduct = (prop: {
                       }
                       Swal.fire({
                         title: "จองสินค้า",
-                        html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}`,
+                        html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}
+                        <br/>Line ID <input type="text" id="lineid">
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: "จอง",
+                        cancelButtonText: "ยกเลิก",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          let quantity = (
+                            document.getElementById(
+                              "quantity"
+                            ) as HTMLInputElement
+                          ).value;
+                          let lineid = (
+                            document.getElementById(
+                              "lineid"
+                            ) as HTMLInputElement
+                          ).value;
+                          const apiReserve = config.getApiEndpoint(
+                            `reserve`,
+                            "post"
+                          );
+                          axios
+                            .post(
+                              apiReserve,
+                              {
+                                quantity: quantity,
+                                lineid: lineid,
+                                product_id: product.product_id,
+                              },
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${prop.jwt_token}`,
+                                },
+                              }
+                            )
+                            .then(() => {
+                              Swal.fire({
+                                icon: "success",
+                                title: "จองสินค้าสำเร็จ",
+                                showConfirmButton: false,
+                                timer: 1500,
+                              });
+                            })
+                            .catch((error) => {
+                              console.log(error);
+                            });
+                        }
                       });
                     }}
                   >
@@ -675,7 +755,11 @@ const SigleProduct = (prop: {
               label="ติดตาม"
               icon={
                 prop.followList.includes(product.farmer_id) ? (
-                  <FavoriteIcon />
+                  <FavoriteIcon
+                    sx={{
+                      fill: "white",
+                    }}
+                  />
                 ) : (
                   <FavoriteBorderIcon />
                 )
@@ -837,7 +921,7 @@ const SigleProduct = (prop: {
                     marginLeft: 2,
                   }}
                 >
-                  <Typography variant="h6">{item.comment}</Typography>
+                  <Typography variant="subtitle1">{item.comment}</Typography>
                   <Typography variant="subtitle1">
                     โดย {item.member_username}
                   </Typography>

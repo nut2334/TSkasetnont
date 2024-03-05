@@ -21,12 +21,10 @@ import SigleProduct from "./pages/all/singleproduct";
 import EditProfile from "./pages/editprofile";
 import ListCart from "./pages/member/listcart";
 import Reserve from "./pages/member/reserve";
-import Payment from "./pages/member/payment";
 import Orderlist from "./pages/member/orderlist";
 import { MessengerChat } from "react-messenger-chat-plugin";
 import Myproducts from "./pages/farmer/myproducts";
 import ExcelDownload from "./pages/provider/exceldownload";
-import exp from "constants";
 
 export interface Cart {
   product_id: string;
@@ -35,11 +33,6 @@ export interface Cart {
   price: number;
   stock: number;
   farmer_id: string;
-}
-
-export interface ReserveList {
-  product_id: string;
-  quantity: number;
 }
 
 function App() {

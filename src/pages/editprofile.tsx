@@ -715,13 +715,12 @@ const EditProfile = (prop: {
                     onChange={(event) => setLineId(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <SetDataCarriage
-                    unit="กรัม"
-                    dataCarriage={shippingcost}
-                    setDataCarriage={setShippingCost}
-                  />
-                </Grid>
+
+                <SetDataCarriage
+                  unit="กรัม"
+                  dataCarriage={shippingcost}
+                  setDataCarriage={setShippingCost}
+                />
 
                 <Grid item xs={12}>
                   <TextField

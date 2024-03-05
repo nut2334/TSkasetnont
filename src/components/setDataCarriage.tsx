@@ -57,10 +57,10 @@ const EachDataCarriage = (prop: {
             onChange={(e) => {
               setWeight(parseInt(e.target.value));
             }}
+            InputProps={{
+              endAdornment: <div>กรัม</div>,
+            }}
           />
-        </Grid>
-        <Grid item lg={2} xs={3}>
-          <TextField label="หน่วย" value={prop.unit} disabled />
         </Grid>
         <Grid item lg={2} xs={3}>
           <TextField
@@ -71,27 +71,31 @@ const EachDataCarriage = (prop: {
             onChange={(e) => {
               setPrice(parseInt(e.target.value));
             }}
+            InputProps={{
+              endAdornment: <div>บาท</div>,
+            }}
           />
         </Grid>
-        {prop.index > 0 && (
-          <Grid item lg={1}>
+        <Grid item lg={2}>
+          {prop.index > 0 && (
             <Button
               variant="contained"
-              color="secondary"
+              color="error"
+              sx={{
+                marginRight: "10px",
+              }}
               onClick={() => {
                 let temp = JSON.parse(JSON.stringify(prop.dataCarriage));
                 temp.splice(prop.index, 1);
                 prop.setDataCarriage(temp);
               }}
             >
-              ลบค่าส่ง
+              -
             </Button>
-          </Grid>
-        )}
-        {prop.index == prop.dataCarriage.length - 1 &&
-          weight > 0 &&
-          price > 0 && (
-            <Grid item lg={1} xs={1}>
+          )}
+          {prop.index == prop.dataCarriage.length - 1 &&
+            weight > 0 &&
+            price > 0 && (
               <Button
                 variant="contained"
                 color="primary"
@@ -104,8 +108,8 @@ const EachDataCarriage = (prop: {
               >
                 +
               </Button>
-            </Grid>
-          )}
+            )}
+        </Grid>{" "}
       </Grid>
     </>
   );
