@@ -84,24 +84,27 @@ function App() {
       setDecodeJWT({ role: "", username: "" });
       return;
     }
-    setDecodeJWT(jwtDecode(jwt_token));
-  }, [jwt_token]);
+    let decodeJWT = jwtDecode(jwt_token) as { role: string; username: string };
+    setDecodeJWT(decodeJWT);
 
-  useEffect(() => {
-    const apiFollow = config.getApiEndpoint("followfarmer", "GET");
-    {
-      decodeJWT.role == "members" &&
-        axios
-          .get(apiFollow, {
-            headers: {
-              Authorization: `Bearer ${jwt_token}`,
-            },
-          })
-          .then((res) => {
-            setFollowList(res.data.data);
+    if (decodeJWT.role == "members") {
+      const apiFollow = config.getApiEndpoint("followfarmer", "GET");
 
-            console.log(res.data.data);
-          });
+      axios
+        .get(apiFollow, {
+          headers: {
+            Authorization: `Bearer ${jwt_token}`,
+          },
+        })
+        .then((res) => {
+          let response: { farmer_id: string }[] = res.data.data;
+          console.log(response);
+
+          let followList: string[] = response.map((item) => item.farmer_id);
+          console.log(followList);
+
+          setFollowList(followList);
+        });
     }
   }, [jwt_token]);
 
