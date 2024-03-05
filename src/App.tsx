@@ -33,6 +33,7 @@ export interface Cart {
   product_name: string;
   price: number;
   stock: number;
+  farmer_id: string;
 }
 
 function App() {
@@ -129,7 +130,11 @@ function App() {
           <Route
             path="/shop/:shopname/:productid"
             element={
-              <SigleProduct setCartList={setCartList} cartList={cartList} />
+              <SigleProduct
+                setCartList={setCartList}
+                cartList={cartList}
+                jwt_token={jwt_token}
+              />
             }
           />
           {decodeJWT.role && (
