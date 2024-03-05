@@ -126,6 +126,7 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/listproduct" element={<ListProduct />} />
+          <Route path="/shop/:shopname" element={<ListProduct />} />
           <Route
             path="/shop/:shopname/:productid"
             element={

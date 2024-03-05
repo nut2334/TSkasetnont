@@ -18,7 +18,7 @@ import {
   IconButton,
   ButtonGroup,
 } from "@mui/material";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useParams } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
@@ -90,6 +90,7 @@ const ListProduct = () => {
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
   const [value, setValue] = React.useState(0);
   const [maxPage, setMaxPage] = React.useState(0);
+  const { shopname } = useParams<{ shopname: string }>();
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
@@ -170,6 +171,7 @@ const ListProduct = () => {
           ["page"]: page,
           ["sort"]: sortBy,
           ["order"]: order,
+          ["farmerstorename"]: shopname,
         },
       })
       .then((res) => {

@@ -210,6 +210,8 @@ const EditProfile = (prop: {
             },
           })
           .then((res) => {
+            console.log(res.data);
+
             setUsername(res.data.username);
             setEmail(res.data.email);
             setFirstName(res.data.firstname);
@@ -236,9 +238,12 @@ const EditProfile = (prop: {
                 )[0].tambon
               );
             }
+            // console.log(res.data.shippingcost);
 
             if (res.data.shippingcost) {
-              setShippingCost(JSON.parse(res.data.shippingcost));
+              setShippingCost(
+                JSON.parse(res.data.shippingcost.replace("'", ""))
+              );
             }
 
             setProvinces(provinces);
@@ -247,7 +252,9 @@ const EditProfile = (prop: {
             setStoreName(res.data.farmerstorename);
             setFacebookLink(res.data.facebooklink);
             setLineId(res.data.lineid);
-            setPosition({ lat: res.data.lat, lng: res.data.lng });
+            if (res.data.lat && res.data.lng) {
+              setPosition({ lat: res.data.lat, lng: res.data.lng });
+            }
           })
           .catch((err) => {
             console.log(err);
@@ -302,7 +309,9 @@ const EditProfile = (prop: {
             setStoreName(res.data.farmerstorename);
             setFacebookLink(res.data.facebooklink);
             setLineId(res.data.lineid);
-            setPosition({ lat: res.data.lat, lng: res.data.lng });
+            if (res.data.lat && res.data.lng) {
+              setPosition({ lat: res.data.lat, lng: res.data.lng });
+            }
           })
           .catch((err) => {
             console.log(err);
