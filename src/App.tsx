@@ -41,6 +41,16 @@ function App() {
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
   const [cartList, setCartList] = React.useState<Cart[]>([]);
   const [followList, setFollowList] = React.useState<string[]>([]);
+  const [notification, setNotification] = React.useState<
+    {
+      id: string;
+      is_unread: boolean;
+      link: string;
+      message: string;
+      timesent: string;
+      type: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     const cookies = new Cookies();
@@ -82,7 +92,7 @@ function App() {
 
     if (decodeJWT.role == "members") {
       const apiFollow = config.getApiEndpoint("followfarmer", "GET");
-
+      const apiNotification = config.getApiEndpoint("notification", "GET");
       axios
         .get(apiFollow, {
           headers: {
@@ -98,17 +108,49 @@ function App() {
 
           setFollowList(followList);
         });
+
+      axios
+        .get(apiNotification, {
+          headers: {
+            Authorization: `Bearer ${jwt_token}`,
+          },
+        })
+        .then((res) => {
+          setNotification(res.data);
+        });
     }
   }, [jwt_token]);
+
+  //polling notification
+  useEffect(() => {
+    if (decodeJWT.role == "members") {
+      const interval = setInterval(() => {
+        const apiNotification = config.getApiEndpoint("notification", "GET");
+        axios
+          .get(apiNotification, {
+            headers: {
+              Authorization: `Bearer ${jwt_token}`,
+            },
+          })
+          .then((res) => {
+            setNotification(res.data);
+          });
+      }, 15);
+      return () => clearInterval(interval);
+    }
+  }, [jwt_token, decodeJWT.role]);
 
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <Navbar
           role={decodeJWT.role}
+          jwt_token={jwt_token}
           username={decodeJWT.username}
           setJwt_token={setJwt_token}
           cartList={cartList}
+          notification={notification}
+          setNotification={setNotification}
         />
         <MessengerChat
           pageId="109287808726963"
