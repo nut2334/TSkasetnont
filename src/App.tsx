@@ -41,6 +41,7 @@ function App() {
   const [jwt_token, setJwt_token] = React.useState("");
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
   const [cartList, setCartList] = React.useState<Cart[]>([]);
+  const [followList, setFollowList] = React.useState<string[]>([]);
 
   useEffect(() => {
     const cookies = new Cookies();
@@ -79,6 +80,25 @@ function App() {
     }
     setDecodeJWT(jwtDecode(jwt_token));
   }, [jwt_token]);
+
+  useEffect(() => {
+    const apiFollow = config.getApiEndpoint("followfarmer", "GET");
+    {
+      jwt_token &&
+        axios
+          .get(apiFollow, {
+            headers: {
+              Authorization: `Bearer ${jwt_token}`,
+            },
+          })
+          .then((res) => {
+            setFollowList(res.data.data);
+
+            console.log(res.data.data);
+          });
+    }
+  }, [jwt_token]);
+
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
@@ -135,6 +155,8 @@ function App() {
                 setCartList={setCartList}
                 cartList={cartList}
                 jwt_token={jwt_token}
+                followList={followList}
+                setFollowList={setFollowList}
               />
             }
           />

@@ -9,6 +9,7 @@ import {
   Stack,
   Box,
   Divider,
+  Chip,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -35,6 +36,9 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import Swal from "sweetalert2";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+
 interface FullProductInterface {
   product_id: string;
   product_name: string;
@@ -69,6 +73,8 @@ const style = {
 };
 
 const SigleProduct = (prop: {
+  followList: string[];
+  setFollowList: React.Dispatch<React.SetStateAction<string[]>>;
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
   jwt_token: string;
@@ -128,12 +134,9 @@ const SigleProduct = (prop: {
       `updateview/${productid}`,
       "get"
     );
-    axios
-      .get(apiUpdateView)
-      .then((response) => {})
-      .catch((error) => {
-        console.log(error);
-      });
+    axios.get(apiUpdateView).catch((error) => {
+      console.log(error);
+    });
   }, []);
 
   useEffect(() => {
@@ -332,7 +335,6 @@ const SigleProduct = (prop: {
           </AliceCarousel>
         </Box>
       </Box>
-
       <Typography variant="h4">{product.product_name}</Typography>
 
       <Typography
@@ -646,8 +648,78 @@ const SigleProduct = (prop: {
           marginBottom: 2,
         }}
       >
-        <Typography variant="h6">{shopname}</Typography>
-
+        <Stack direction="row" spacing={2}>
+          <Stack>
+            <Typography variant="h6">{shopname}</Typography>
+          </Stack>
+          <Stack>
+            <Chip
+              label="ติดตาม"
+              icon={
+                prop.followList.includes(product.farmer_id) ? (
+                  <FavoriteIcon />
+                ) : (
+                  <FavoriteBorderIcon />
+                )
+              }
+              sx={
+                prop.followList.includes(product.farmer_id)
+                  ? {
+                      backgroundColor: "#EE4266",
+                      color: "white",
+                    }
+                  : {}
+              }
+              onClick={() => {
+                const apiFollow = config.getApiEndpoint(`followfarmer`, "post");
+                const apiUnFollow = config.getApiEndpoint(
+                  `followfarmer`,
+                  "delete"
+                );
+                if (
+                  prop.followList.includes(product.farmer_id) &&
+                  prop.jwt_token !== ""
+                ) {
+                  axios
+                    .delete(apiUnFollow, {
+                      data: {
+                        farmer_id: product.farmer_id,
+                      },
+                      headers: {
+                        Authorization: `Bearer ${prop.jwt_token}`,
+                      },
+                    })
+                    .then(() => {
+                      prop.setFollowList(
+                        prop.followList.filter(
+                          (item) => item !== product.farmer_id
+                        )
+                      );
+                    });
+                } else {
+                  axios
+                    .post(
+                      apiFollow,
+                      {
+                        farmer_id: product.farmer_id,
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                      }
+                    )
+                    .then(() => {
+                      prop.setFollowList([
+                        ...prop.followList,
+                        product.farmer_id,
+                      ]);
+                    });
+                }
+              }}
+            />
+          </Stack>
+        </Stack>
         <Typography>
           โดย {product.firstname + " " + product.lastname}
         </Typography>
