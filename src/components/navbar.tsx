@@ -165,7 +165,10 @@ const Navbar = (prop: {
                 }}
               >
                 {visiblePages.map((page, index) => (
-                  <NavLink to={page.path} style={{ textDecoration: "none" }}>
+                  <NavLink
+                    to={page.path}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
                     <MenuItem key={index} onClick={handleCloseNavMenu}>
                       <Typography textAlign="center">{page.name}</Typography>
                     </MenuItem>

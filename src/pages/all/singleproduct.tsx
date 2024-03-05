@@ -424,24 +424,26 @@ const SigleProduct = (prop: {
               </Stack>
             )}
           </Stack>
+          {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              sx={{
+                paddingTop: "5px",
+              }}
+              marginLeft={2}
+              marginTop={2}
+            >
+              <Stack>
+                <LocalShippingIcon />
+              </Stack>
 
-          <Stack
-            direction="row"
-            spacing={2}
-            alignItems="center"
-            sx={{
-              paddingTop: "5px",
-            }}
-            marginLeft={2}
-            marginTop={2}
-          >
-            <Stack>
-              <LocalShippingIcon />
+              <Stack>
+                <Typography variant="h6">ค่าจัดส่ง</Typography>
+              </Stack>
             </Stack>
-            <Stack>
-              <Typography variant="h6">ค่าจัดส่ง</Typography>
-            </Stack>
-          </Stack>
+          )}
           <Stack
             direction="row"
             spacing={2}
