@@ -695,6 +695,9 @@ const SigleProduct = (prop: {
                           (item) => item !== product.farmer_id
                         )
                       );
+                    })
+                    .catch((error) => {
+                      console.log(error);
                     });
                 } else {
                   axios
@@ -714,6 +717,9 @@ const SigleProduct = (prop: {
                         ...prop.followList,
                         product.farmer_id,
                       ]);
+                    })
+                    .catch((error) => {
+                      console.log(error);
                     });
                 }
               }}
