@@ -381,17 +381,19 @@ const ListProduct = () => {
                           />
                           <Typography>{product.product_description}</Typography>
                         </CardContent>
-                        <CardActions>
-                          <Typography
-                            sx={{
-                              color: "green",
-                              fontWeight: "bold",
-                              fontSize: "20px",
-                            }}
-                          >
-                            {product.price} บาท
-                          </Typography>
-                        </CardActions>
+                        {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
+                          <CardActions>
+                            <Typography
+                              sx={{
+                                color: "green",
+                                fontWeight: "bold",
+                                fontSize: "20px",
+                              }}
+                            >
+                              {product.price} บาท
+                            </Typography>
+                          </CardActions>
+                        )}
                       </Card>
                     </NavLink>
                   </Grid>

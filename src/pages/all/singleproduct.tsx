@@ -336,15 +336,16 @@ const SigleProduct = (prop: {
         </Box>
       </Box>
       <Typography variant="h4">{product.product_name}</Typography>
-
-      <Typography
-        variant="h6"
-        sx={{
-          color: "green",
-        }}
-      >
-        {product.price} บาท/{product.unit}
-      </Typography>
+      {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
+        <Typography
+          variant="h6"
+          sx={{
+            color: "green",
+          }}
+        >
+          {product.price} บาท/{product.unit}
+        </Typography>
+      )}
 
       <Stack
         direction="row"
@@ -408,22 +409,24 @@ const SigleProduct = (prop: {
             }}
             marginLeft={2}
           >
-            <Stack>
-              <NumberInput
-                aria-label="Quantity Input"
-                min={1}
-                max={product.stock}
-                value={quantity}
-                setQuantity={setQuantity}
-                quantity={quantity}
-              />
-            </Stack>
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
-              <Stack>
-                <Typography>
-                  มีสินค้าทั้งหมด {product.stock} {product.unit}
-                </Typography>
-              </Stack>
+              <>
+                <Stack>
+                  <NumberInput
+                    aria-label="Quantity Input"
+                    min={1}
+                    max={product.stock}
+                    value={quantity}
+                    setQuantity={setQuantity}
+                    quantity={quantity}
+                  />
+                </Stack>
+                <Stack>
+                  <Typography>
+                    มีสินค้าทั้งหมด {product.stock} {product.unit}
+                  </Typography>
+                </Stack>
+              </>
             )}
           </Stack>
           {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
@@ -475,11 +478,26 @@ const SigleProduct = (prop: {
           >
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <Stack>
-                <NavLink to={`/reservation/${product.product_id}`}>
+                <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
                   <Button
                     variant="contained"
                     color="secondary"
                     startIcon={<PointOfSaleIcon />}
+                    onClick={() => {
+                      if (prop.jwt_token == "") {
+                        Swal.fire({
+                          icon: "info",
+                          title: "กรุณาเข้าสู่ระบบ",
+                          showConfirmButton: false,
+                          timer: 1500,
+                        });
+                        return;
+                      }
+                      Swal.fire({
+                        title: "จองสินค้า",
+                        html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}`,
+                      });
+                    }}
                   >
                     จองสินค้า
                   </Button>

@@ -22,25 +22,6 @@ interface tambon {
 
 const Reserve = () => {
   const { productid } = useParams<{ productid: string }>();
-  const [provinces, setProvinces] = React.useState<province[]>([]);
-  const [amphures, setAmphures] = React.useState<amphure[]>([]);
-  const [tambons, setTambons] = React.useState<tambon[]>([]);
-
-  React.useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/earthchie/jquery.Thailand.js/master/jquery.Thailand.js/database/raw_database/raw_database.json"
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setProvinces(data);
-      });
-  }, []);
-
-  const onChangeHandle = (province_id: string) => {
-    let amphure = provinces.filter((province) => province.id == province_id)[0]
-      .amphures;
-    setAmphures(amphure);
-  };
 
   return (
     <>

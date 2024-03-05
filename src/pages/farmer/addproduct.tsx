@@ -631,7 +631,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
             )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <TextField
                     value={price}
                     id="outlined-basic"
@@ -640,7 +640,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     fullWidth
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item xs={6}>
                   <TextField
                     select
@@ -654,6 +654,16 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       </MenuItem>
                     ))}
                   </TextField>
+                </Grid>
+                <Grid item xs={6} lg={6}>
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    value={unit}
+                    variant="outlined"
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                  />
                 </Grid>
 
                 {selectedStatus == "เปิดรับจองตามช่วงเวลา" && (
@@ -686,9 +696,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     </Grid>
                   </React.Fragment>
                 )}
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
               </React.Fragment>
             )}
             {selectedType == "สินค้าจัดส่งพัสดุ" && (
