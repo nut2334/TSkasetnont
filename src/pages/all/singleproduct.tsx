@@ -480,27 +480,6 @@ const SigleProduct = (prop: {
                     );
                   })}
               </TableBody>
-              {/* <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                sx={{
-                  paddingTop: "5px",
-                }}
-                marginLeft={2}
-              >
-                <Stack>
-                  {product.shippingcost &&
-                    JSON.parse(product.shippingcost).map((item: any) => {
-                      return (
-                        <Typography>
-                          น้ำหนัก {">"} {item.weight} กรัม ค่าส่งราคา{" "}
-                          {item.price} บาท
-                        </Typography>
-                      );
-                    })}
-                </Stack>
-              </Stack> */}
             </Table>
           </TableContainer>
           <Stack
@@ -574,6 +553,12 @@ const SigleProduct = (prop: {
                             })
                             .catch((error) => {
                               console.log(error);
+                              Swal.fire({
+                                icon: "error",
+                                title: "จองสินค้าไม่สำเร็จ",
+                                showConfirmButton: false,
+                                timer: 1500,
+                              });
                             });
                         }
                       });

@@ -192,6 +192,7 @@ const ListCart = (prop: {
                         sx={{
                           justifyContent: "center",
                           alignItems: "center",
+                          color: "gray",
                         }}
                       >
                         ไม่มีสินค้าในตะกร้า
