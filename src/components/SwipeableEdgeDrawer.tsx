@@ -176,9 +176,11 @@ export default function SwipeableEdgeDrawer(
                     <Grid item xs={12}>
                       {
                         <div>
-                          <Typography variant="h6" gutterBottom>
-                            คะแนนเฉลี่ย {average.toFixed(1)}
-                          </Typography>
+                          {!isNaN(average) && (
+                            <Typography variant="h6" gutterBottom>
+                              คะแนนเฉลี่ย {average.toFixed(1)}
+                            </Typography>
+                          )}
                           {average >= 1 ? (
                             <StarIcon />
                           ) : average >= 0.5 ? (

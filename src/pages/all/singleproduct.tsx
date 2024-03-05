@@ -9,10 +9,7 @@ import {
   Stack,
   Box,
   Divider,
-  TextField,
 } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import axios from "axios";
 import * as config from "../../config/config";
 import AliceCarousel from "react-alice-carousel";
@@ -34,7 +31,10 @@ import {
   LineIcon,
 } from "react-share";
 import { Cart } from "../../App";
-
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import Swal from "sweetalert2";
 interface FullProductInterface {
   product_id: string;
   product_name: string;
@@ -52,6 +52,9 @@ interface FullProductInterface {
   last_modified: Date;
   selectedType: string;
   shippingcost: string;
+  firstname: string;
+  lastname: string;
+  farmer_id: string;
 }
 
 const style = {
@@ -64,9 +67,11 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
 };
+
 const SigleProduct = (prop: {
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
+  jwt_token: string;
 }) => {
   const carousel = useRef<AliceCarousel>(null);
   const [quantity, setQuantity] = useState(1);
@@ -87,8 +92,14 @@ const SigleProduct = (prop: {
     last_modified: new Date(),
     selectedType: "",
     shippingcost: "",
+    firstname: "",
+    lastname: "",
+    farmer_id: "",
   });
-  const { productid, shopname } = useParams<{ productid: string, shopname: string }>();
+  const { productid, shopname } = useParams<{
+    productid: string;
+    shopname: string;
+  }>();
   const [showFullImage, setShowFullImage] = useState("");
   const [comment, setComment] = useState<
     {
@@ -99,6 +110,7 @@ const SigleProduct = (prop: {
       rating: number;
       comment: string;
       date_comment: Date;
+      member_username: string;
     }[]
   >([]);
 
@@ -109,6 +121,7 @@ const SigleProduct = (prop: {
     );
     axios.get(apiSingleProduct).then((response) => {
       setProduct(response.data);
+      console.log(response.data);
     });
 
     const apiUpdateView = config.getApiEndpoint(
@@ -117,9 +130,7 @@ const SigleProduct = (prop: {
     );
     axios
       .get(apiUpdateView)
-      .then((response) => {
-        setComment(response.data);
-      })
+      .then((response) => {})
       .catch((error) => {
         console.log(error);
       });
@@ -391,7 +402,6 @@ const SigleProduct = (prop: {
             spacing={2}
             alignItems="center"
             sx={{
-              cursor: "pointer",
               paddingTop: "5px",
             }}
             marginLeft={2}
@@ -403,7 +413,8 @@ const SigleProduct = (prop: {
                 max={product.stock}
                 value={quantity}
                 setQuantity={setQuantity}
-                quantity={quantity} />
+                quantity={quantity}
+              />
             </Stack>
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <Stack>
@@ -413,16 +424,45 @@ const SigleProduct = (prop: {
               </Stack>
             )}
           </Stack>
-          <Box>
-            <Typography variant="h6">ค่าจัดส่ง</Typography>
-            <Typography>
+
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              paddingTop: "5px",
+            }}
+            marginLeft={2}
+            marginTop={2}
+          >
+            <Stack>
+              <LocalShippingIcon />
+            </Stack>
+            <Stack>
+              <Typography variant="h6">ค่าจัดส่ง</Typography>
+            </Stack>
+          </Stack>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              paddingTop: "5px",
+            }}
+            marginLeft={2}
+          >
+            <Stack>
               {product.shippingcost &&
-                product.shippingcost
-                  .split(",")
-                  .find((item) => item.split(":")[0] == "จัดส่งฟรี")
-                  ?.split(":")[1]}
-            </Typography>
-          </Box>
+                JSON.parse(product.shippingcost).map((item: any) => {
+                  return (
+                    <Typography>
+                      น้ำหนัก {">"} {item.weight} กรัม ค่าส่งราคา {item.price}{" "}
+                      บาท
+                    </Typography>
+                  );
+                })}
+            </Stack>
+          </Stack>
           <Stack
             direction="row"
             spacing={2}
@@ -451,13 +491,53 @@ const SigleProduct = (prop: {
                     startIcon={<AddShoppingCartIcon />}
                     disabled={product.stock == 0}
                     onClick={() => {
+                      if (prop.jwt_token == "") {
+                        Swal.fire({
+                          icon: "info",
+                          title: "กรุณาเข้าสู่ระบบ",
+                          showConfirmButton: false,
+                          timer: 1500,
+                        });
+                        return;
+                      }
+                      if (
+                        product.farmer_id !==
+                        prop.cartList.find(
+                          (item) => item.farmer_id == product.farmer_id
+                        )?.farmer_id
+                      ) {
+                        Swal.fire({
+                          icon: "question",
+                          title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
+                          text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
+                          showDenyButton: true,
+                          confirmButtonText: "ใช่",
+                          denyButtonText: "ไม่",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            prop.setCartList([]);
+                            let cart: Cart = {
+                              product_id: product.product_id,
+                              quantity: quantity,
+                              product_name: product.product_name,
+                              price: product.price,
+                              stock: product.stock,
+                              farmer_id: product.farmer_id,
+                            };
+                            prop.setCartList([cart]);
+                          }
+                        });
+                      }
+
                       let cart: Cart = {
                         product_id: product.product_id,
                         quantity: quantity,
                         product_name: product.product_name,
                         price: product.price,
                         stock: product.stock,
+                        farmer_id: product.farmer_id,
                       };
+
                       prop.cartList.find(
                         (item) => item.product_id == product.product_id
                       );
@@ -482,12 +562,48 @@ const SigleProduct = (prop: {
                 </Stack>
 
                 <Stack>
-                  <NavLink to="/payment">
+                  <NavLink to={prop.jwt_token == "" ? "/login" : "/listcart"}>
                     <Button
                       variant="contained"
                       color="secondary"
                       startIcon={<PointOfSaleIcon />}
                       disabled={product.stock == 0}
+                      onClick={() => {
+                        if (prop.jwt_token == "") {
+                          Swal.fire({
+                            icon: "info",
+                            title: "กรุณาเข้าสู่ระบบ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
+                          return;
+                        }
+                        let cart: Cart = {
+                          product_id: product.product_id,
+                          quantity: quantity,
+                          product_name: product.product_name,
+                          price: product.price,
+                          stock: product.stock,
+                          farmer_id: product.farmer_id,
+                        };
+                        prop.cartList.find(
+                          (item) => item.product_id == product.product_id
+                        );
+                        if (
+                          typeof prop.cartList.find(
+                            (item) => item.product_id == product.product_id
+                          ) !== "undefined"
+                        ) {
+                          let index = prop.cartList.findIndex(
+                            (item) => item.product_id == product.product_id
+                          );
+                          let newCart = [...prop.cartList];
+                          newCart[index].quantity += quantity;
+                          prop.setCartList(newCart);
+                        } else {
+                          prop.setCartList([...prop.cartList, cart]);
+                        }
+                      }}
                     >
                       ซื้อสินค้า
                     </Button>
@@ -520,6 +636,32 @@ const SigleProduct = (prop: {
           </Box>
         </Modal>
       )}
+      <Box
+        sx={{
+          boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+          borderRadius: 2,
+          padding: 2,
+          marginBottom: 2,
+        }}
+      >
+        <Typography variant="h6">{shopname}</Typography>
+
+        <Typography>
+          โดย {product.firstname + " " + product.lastname}
+        </Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "right",
+            marginTop: 2,
+          }}
+        >
+          <NavLink to={`/shop/${shopname}`}>
+            <Button variant="contained">ดูสินค้าอื่นๆภายในร้าน</Button>
+          </NavLink>
+        </div>
+      </Box>
+
       {comment.length > 0 && (
         <Box>
           <Typography variant="h5">ความคิดเห็น</Typography>
@@ -527,19 +669,81 @@ const SigleProduct = (prop: {
             return (
               <Box
                 sx={{
-                  marginTop: 2,
+                  display: "flex",
+                  flexDirection: "row",
                   padding: 2,
-                  boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px;",
+                  marginBottom: 2,
+                  boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+                  borderRadius: 2,
                 }}
               >
-                {Array(Math.round(item.rating)).fill(
-                  <StarIcon
-                    sx={{
-                      color: "#ffd700",
-                    }}
-                  />
-                )}
-                <Typography variant="body1">{item.comment}</Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {
+                    <div
+                      style={{
+                        color: "#ffd700",
+                      }}
+                    >
+                      <Typography variant="h6">
+                        {item.rating.toFixed(1)}
+                      </Typography>
+                      {item.rating >= 1 ? (
+                        <StarIcon />
+                      ) : item.rating >= 0.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 2 ? (
+                        <StarIcon />
+                      ) : item.rating >= 1.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 3 ? (
+                        <StarIcon />
+                      ) : item.rating >= 2.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 4 ? (
+                        <StarIcon />
+                      ) : item.rating >= 3.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                      {item.rating >= 5 ? (
+                        <StarIcon />
+                      ) : item.rating >= 4.5 ? (
+                        <StarHalfIcon />
+                      ) : (
+                        <StarBorderIcon />
+                      )}
+                    </div>
+                  }
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginLeft: 2,
+                  }}
+                >
+                  <Typography variant="h6">{item.comment}</Typography>
+                  <Typography variant="subtitle1">
+                    โดย {item.member_username}
+                  </Typography>
+                </Box>
               </Box>
             );
           })}

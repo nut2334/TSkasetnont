@@ -45,55 +45,6 @@ const Reserve = () => {
   return (
     <>
       <Container component="main" maxWidth="xs" sx={{ marginTop: 3 }}>
-        ซื้อสินค้า
-        <Grid item xs={12}>
-          <TextField
-            multiline
-            label="ที่อยู่ปัจจุบัน"
-            fullWidth
-            rows={4}
-            disabled
-          />
-        </Grid>
-        <Divider>เปลี่ยนที่จัดส่ง</Divider>
-        <Grid item xs={12}>
-          <TextField
-            select
-            label="จังหวัด"
-            fullWidth
-            onChange={(e) => onChangeHandle(e.target.value)}
-          >
-            {provinces.map((province) => (
-              <MenuItem key={province.id} value={province.id}>
-                {province.name_th}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField select label="อำเภอ" fullWidth>
-            {amphures.map((amphure) => (
-              <MenuItem key={amphure.id} value={amphure.id}>
-                {amphure.name_th}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField select label="ตำบล" fullWidth>
-            {tambons.map((tambon) => (
-              <MenuItem key={tambon.id} value={tambon.id}>
-                {tambon.name_th}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="รหัสไปรษณีย์" fullWidth disabled />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField multiline label="ที่อยู่" fullWidth rows={4} />
-        </Grid>
         จองสินค้า
         <Typography>{productid}</Typography>
         <Typography>จำนวน</Typography>

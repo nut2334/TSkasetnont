@@ -1,17 +1,12 @@
 import React, { useEffect } from "react";
 import { Cart } from "../../App";
-import { Button, Divider, Typography } from "@mui/material";
+import { Button, Divider, Typography, Stack } from "@mui/material";
 import { Container } from "@mui/material";
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import axios from "axios";
-import * as config from "../../config/config";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Grid from "@mui/material/Grid";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { NumberInput } from "../../components/addamount";
-import Navbar from "../../components/navbar";
-import { NavLink } from "react-router-dom";
 import Payment from "./payment";
 import Swal from "sweetalert2";
 
@@ -35,10 +30,10 @@ const EachItem = (prop: {
     <Box
       marginBottom={2}
       sx={{
-        borderRadius: 2,
         width: "100%",
         padding: 2,
-        boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+        borderRadius: 3,
+        boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px;",
       }}
     >
       <Grid container spacing={2}>
@@ -56,30 +51,31 @@ const EachItem = (prop: {
           />
         </Grid>
 
-        <Grid item xs={11}>
+        <Grid item xs={12}>
           <Typography
-            variant="h6"
+            variant="h5"
             sx={{
-              fontSize: "20px",
               color: "green",
             }}
           >
             {prop.cart.price} บาท
           </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              fontSize: "20px",
-              color: "green",
-            }}
-          >
-            ราคารวม : {prop.cart.price * quantity} บาท
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+        <Grid item xs={11}>
+          <Typography variant="h6" color="info">
+            ราคารวม {prop.cart.price * quantity} บาท
           </Typography>
         </Grid>
         <Grid item xs={1}>
           <Button
             onClick={() => {
               console.log(prop.cart);
+              prop.setCartList((prev) =>
+                prev.filter((cart) => cart.product_id !== prop.cart.product_id)
+              );
             }}
             color="error"
           >
@@ -127,6 +123,49 @@ const ListCart = (prop: {
                 </>
               );
             })}
+          {cartList.length > 0 && (
+            <>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Typography variant="h5">ยอดชำระเงินทั้งหมด </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: "green",
+                    }}
+                  >
+                    {cartList.reduce(
+                      (sum, cart) => sum + cart.price * cart.quantity,
+                      0
+                    )}{" "}
+                    บาท
+                  </Typography>
+
+                  <Button
+                    startIcon={<PointOfSaleIcon />}
+                    variant="contained"
+                    onClick={handleSubmit}
+                    sx={{ marginLeft: 2 }}
+                  >
+                    ชำระเงิน
+                  </Button>
+                </Grid>
+              </Grid>
+            </>
+          )}
           {cartList.length == 0 && (
             <>
               <Box
@@ -134,37 +173,34 @@ const ListCart = (prop: {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: "100vh",
+                  height: "82vh",
                 }}
               >
                 <>
-                  <img
-                    src={require("../../assets/sad.png")}
-                    alt="sad"
-                    width="200"
-                    height="200"
-                  />
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    ไม่มีสินค้าในตะกร้า
-                  </Typography>
+                  <Stack direction="column" spacing={2} alignItems="center">
+                    <Stack>
+                      <img
+                        src={require("../../assets/sad.png")}
+                        alt="sad"
+                        width="200"
+                        height="200"
+                      />
+                    </Stack>
+                    <Stack>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        ไม่มีสินค้าในตะกร้า
+                      </Typography>
+                    </Stack>
+                  </Stack>
                 </>
               </Box>
             </>
-          )}
-          {cartList.length > 0 && (
-            <Button
-              startIcon={<PointOfSaleIcon />}
-              variant="contained"
-              onClick={handleSubmit}
-            >
-              ชำระเงิน
-            </Button>
           )}
         </div>
       ) : (

@@ -102,6 +102,8 @@ const Home = (prop: { jwt_token: string }) => {
           ["page"]: (parseInt(page) - 1).toString(),
           ["sort"]: "view_count",
           ["order"]: "desc",
+          ["perPage"]: "999999999",
+          ["groupby"]: "true",
         },
       })
       .then((res) => {
