@@ -39,6 +39,7 @@ const Payment = (prop: {
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
   jwt_token: string;
+  shippingcost: number;
 }) => {
   const [address, setAddress] = React.useState<string>("");
   const [payment, setPayment] = React.useState<string>("");
@@ -119,7 +120,7 @@ const Payment = (prop: {
         const formData = new FormData();
         formData.append("productSlip", slip);
         formData.append("address", address);
-        console.log(address);
+        formData.append("shippingcost", prop.shippingcost.toString());
         let allProduct = prop.cartList.map((product) => {
           return {
             product_id: product.product_id,
@@ -214,7 +215,10 @@ const Payment = (prop: {
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">รายการสินค้า</Typography>
-            <TableBank products={products} />
+            <TableBank
+              products={products}
+              shippingcost={Number(prop.shippingcost)}
+            />
           </Grid>
           <Grid item xs={12}>
             <Divider />

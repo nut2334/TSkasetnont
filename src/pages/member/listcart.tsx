@@ -14,12 +14,16 @@ import { json } from "stream/consumers";
 const EachItem = (prop: {
   cart: Cart;
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
+  shippingcost: {
+    weight: number;
+    id: string;
+  }[];
+  setshippingcost: React.Dispatch<
+    React.SetStateAction<{ weight: number; id: string }[]>
+  >;
 }) => {
   const [quantity, setQuantity] = React.useState<number>(prop.cart.quantity);
-  const [shipping_cost, setShipping_cost] = useState<{
-    weight: number;
-    price: number;
-  }>();
+  const [totalWeight, setTotalWeight] = React.useState<number>(0);
 
   useEffect(() => {
     prop.setCartList((prev) =>
@@ -30,18 +34,37 @@ const EachItem = (prop: {
         return cart;
       })
     );
+    setTotalWeight(prop.cart.weight * quantity);
   }, [quantity]);
 
   useEffect(() => {
-    JSON.parse(prop.cart.shipping_cost).map(
-      (shipping: { weight: number; price: number }) => {
-        if (shipping.weight >= prop.cart.weight * prop.cart.quantity) {
-          setShipping_cost(shipping);
-        }
+    if (totalWeight > 0) {
+      if (prop.shippingcost.length == 0) {
+        prop.setshippingcost([
+          { weight: totalWeight, id: prop.cart.product_id },
+        ]);
+        return;
       }
-    );
-    console.log(prop.cart.shipping_cost);
-  }, [quantity]);
+      const index = prop.shippingcost.findIndex(
+        (shipping) => shipping.id === prop.cart.product_id
+      );
+      if (index === -1) {
+        prop.setshippingcost((prev) => [
+          ...prev,
+          { weight: totalWeight, id: prop.cart.product_id },
+        ]);
+      } else {
+        prop.setshippingcost((prev) =>
+          prev.map((shipping) => {
+            if (shipping.id === prop.cart.product_id) {
+              return { ...shipping, weight: totalWeight };
+            }
+            return shipping;
+          })
+        );
+      }
+    }
+  }, [totalWeight]);
 
   return (
     <Box
@@ -85,6 +108,7 @@ const EachItem = (prop: {
         <Grid item xs={11}>
           <Typography variant="h6" color="info">
             ราคารวม {prop.cart.price * quantity} บาท
+            {totalWeight > 0 && ` น้ำหนัก ${totalWeight} กรัม`}
           </Typography>
         </Grid>
         <Grid item xs={1}>
@@ -111,13 +135,40 @@ const ListCart = (prop: {
 }) => {
   const { cartList, setCartList } = prop;
   const [comfirmPayment, setComfirmPayment] = React.useState<boolean>(false);
+  const [shippingcost, setshippingcost] = useState<
+    {
+      weight: number;
+      id: string;
+    }[]
+  >([]);
+  const [summaryShippingCost, setSummaryShippingCost] = useState<number>(0);
+  console.log(prop.cartList);
 
   useEffect(() => {
-    console.log(cartList);
-  }, [cartList]);
-  useEffect(() => {
-    console.log(comfirmPayment);
-  }, [comfirmPayment]);
+    console.log(shippingcost);
+    if (shippingcost.length === 0) {
+      return;
+    }
+    let cost: {
+      weight: number;
+      price: number;
+    }[] = JSON.parse(prop.cartList[0].shippingcost);
+    let totalWeight = shippingcost.reduce(
+      (sum, shipping) => sum + shipping.weight,
+      0
+    );
+    let totalCost = 0;
+    cost.forEach((c) => {
+      if (totalWeight >= c.weight) {
+        totalCost = c.price;
+        return;
+      }
+    });
+    setSummaryShippingCost(totalCost);
+  }, [shippingcost]);
+  // useEffect(() => {
+  //   console.log(prop.cartList);
+  // }, [prop.cartList]);
 
   const handleSubmit = () => {
     if (cartList.length === 0) {
@@ -137,7 +188,12 @@ const ListCart = (prop: {
             cartList.map((cart, index) => {
               return (
                 <>
-                  <EachItem setCartList={setCartList} cart={cart} />
+                  <EachItem
+                    setCartList={setCartList}
+                    cart={cart}
+                    shippingcost={shippingcost}
+                    setshippingcost={setshippingcost}
+                  />
                 </>
               );
             })}
@@ -146,6 +202,35 @@ const ListCart = (prop: {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Divider />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Typography variant="h5">ราคาสินค้าทั้งหมด</Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Typography variant="h5">
+                    {cartList.reduce(
+                      (sum, cart) => sum + cart.price * cart.quantity,
+                      0
+                    )}{" "}
+                    บาท
+                  </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Typography variant="h5">
+                    ค่าจัดส่ง {summaryShippingCost} บาท
+                  </Typography>
                 </Grid>
                 <Grid
                   item
@@ -168,7 +253,7 @@ const ListCart = (prop: {
                     {cartList.reduce(
                       (sum, cart) => sum + cart.price * cart.quantity,
                       0
-                    )}{" "}
+                    ) + summaryShippingCost}{" "}
                     บาท
                   </Typography>
 
@@ -224,6 +309,7 @@ const ListCart = (prop: {
         </div>
       ) : (
         <Payment
+          shippingcost={summaryShippingCost}
           setCartList={setCartList}
           cartList={cartList}
           jwt_token={prop.jwt_token}

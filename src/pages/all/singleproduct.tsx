@@ -613,7 +613,7 @@ const SigleProduct = (prop: {
                               stock: product.stock,
                               farmer_id: product.farmer_id,
                               weight: product.weight,
-                              shipping_cost: product.shippingcost,
+                              shippingcost: product.shippingcost,
                             };
                             prop.setCartList([cart]);
                           }
@@ -628,7 +628,7 @@ const SigleProduct = (prop: {
                         stock: product.stock,
                         farmer_id: product.farmer_id,
                         weight: product.weight,
-                        shipping_cost: product.shippingcost,
+                        shippingcost: product.shippingcost,
                       };
 
                       prop.cartList.find(
@@ -679,7 +679,7 @@ const SigleProduct = (prop: {
                           stock: product.stock,
                           farmer_id: product.farmer_id,
                           weight: product.weight,
-                          shipping_cost: product.shippingcost,
+                          shippingcost: product.shippingcost,
                         };
                         prop.cartList.find(
                           (item) => item.product_id == product.product_id

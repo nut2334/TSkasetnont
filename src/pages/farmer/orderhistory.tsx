@@ -33,6 +33,7 @@ interface OrderHistoryInterface {
   total_amount: number;
   transaction_confirm: string;
   status: string;
+  shippingcost: number;
 }
 interface productInterface {
   product_id: string;
@@ -360,7 +361,10 @@ const EachOrder = (prop: {
           <Divider />
 
           <ListSubheader>สินค้าทั้งหมด</ListSubheader>
-          <TableBank products={order.products} />
+          <TableBank
+            products={order.products}
+            shippingcost={Number(order.shippingcost)}
+          />
         </List>
       </Collapse>
     </>
