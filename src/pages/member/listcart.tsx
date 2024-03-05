@@ -15,6 +15,11 @@ const EachItem = (prop: {
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
 }) => {
   const [quantity, setQuantity] = React.useState<number>(prop.cart.quantity);
+  const [shipping_cost, setShipping_cost] = React.useState<{
+    weight: number;
+    price: number;
+  }>({ weight: 0, price: 0 });
+
   useEffect(() => {
     prop.setCartList((prev) =>
       prev.map((cart) => {
@@ -50,6 +55,7 @@ const EachItem = (prop: {
             quantity={quantity}
           />
         </Grid>
+        {/* เช็คน้ำหนักกับราคาค่าส่ง */}
 
         <Grid item xs={12}>
           <Typography
@@ -61,14 +67,14 @@ const EachItem = (prop: {
             {prop.cart.price} บาท
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <Divider />
         </Grid>
         <Grid item xs={11}>
           <Typography variant="h6" color="info">
             ราคารวม {prop.cart.price * quantity} บาท
           </Typography>
-        </Grid>
+        </Grid> */}
         <Grid item xs={1}>
           <Button
             onClick={() => {
@@ -129,6 +135,7 @@ const ListCart = (prop: {
                 <Grid item xs={12}>
                   <Divider />
                 </Grid>
+
                 <Grid
                   item
                   xs={12}

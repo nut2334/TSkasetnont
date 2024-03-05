@@ -33,6 +33,8 @@ export interface Cart {
   price: number;
   stock: number;
   farmer_id: string;
+  weight: number;
+  shipping_cost: string;
 }
 
 function App() {
