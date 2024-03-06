@@ -6,6 +6,7 @@ import { Bar } from "react-chartjs-2";
 import BarChart from "../../components/bar";
 import axios from "axios";
 import FollowChart from "../../components/followchart";
+import Pricecenter from "./pricecenter";
 
 const Analyze = (prop: { jwt_token: string }) => {
   const apiOrder = config.getApiEndpoint("getordersale/date", "GET");
@@ -76,6 +77,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             <BarChart jwt_token={prop.jwt_token} />
           </Box>
         </Grid>
+        <Pricecenter />
       </Grid>
     </Container>
   );
