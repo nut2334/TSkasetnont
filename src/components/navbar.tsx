@@ -12,6 +12,7 @@ import {
   Tooltip,
   Container,
   Badge,
+  Stack,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -292,6 +293,9 @@ const Navbar = (prop: {
                     onClose={() => {
                       setAnchorEl(null);
                     }}
+                    sx={{
+                      marginTop: "40px",
+                    }}
                   >
                     <NavLink to={noti.link} style={{ textDecoration: "none" }}>
                       <MenuItem
@@ -326,9 +330,22 @@ const Navbar = (prop: {
                             });
                         }}
                       >
-                        <Typography textAlign="center" sx={{ color: "black" }}>
-                          {noti.message}
-                        </Typography>
+                        <Stack direction="column" spacing={1}>
+                          <Stack>
+                            <Typography
+                              sx={{ color: "black", fontWeight: "bold" }}
+                            >
+                              {noti.message}
+                            </Typography>
+                          </Stack>
+                          <Stack>
+                            <Typography
+                              sx={{ color: "gray", textAlign: "right" }}
+                            >
+                              {new Date(noti.timesent).toLocaleString()}
+                            </Typography>
+                          </Stack>
+                        </Stack>
                       </MenuItem>
                     </NavLink>
                   </Menu>

@@ -81,8 +81,15 @@ const style = {
 };
 
 const SigleProduct = (prop: {
-  followList: string[];
-  setFollowList: React.Dispatch<React.SetStateAction<string[]>>;
+  followList: { id: string; farmerstorename: string }[];
+  setFollowList: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: string;
+        farmerstorename: string;
+      }[]
+    >
+  >;
   setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   cartList: Cart[];
   jwt_token: string;
@@ -747,18 +754,18 @@ const SigleProduct = (prop: {
             <Chip
               label="ติดตาม"
               icon={
-                prop.followList.includes(product.farmer_id) ? (
-                  <FavoriteIcon
-                    sx={{
-                      fill: "white",
-                    }}
-                  />
+                prop.followList.filter((item) => {
+                  return item.id === product.farmer_id;
+                }).length > 0 ? (
+                  <FavoriteIcon />
                 ) : (
                   <FavoriteBorderIcon />
                 )
               }
               sx={
-                prop.followList.includes(product.farmer_id)
+                prop.followList.filter((item) => {
+                  return item.id === product.farmer_id;
+                }).length > 0
                   ? {
                       backgroundColor: "#EE4266",
                       color: "white",
@@ -772,7 +779,9 @@ const SigleProduct = (prop: {
                   "delete"
                 );
                 if (
-                  prop.followList.includes(product.farmer_id) &&
+                  prop.followList.filter((item) => {
+                    return item.id === product.farmer_id;
+                  }).length > 0 &&
                   prop.jwt_token !== ""
                 ) {
                   axios
@@ -786,9 +795,9 @@ const SigleProduct = (prop: {
                     })
                     .then(() => {
                       prop.setFollowList(
-                        prop.followList.filter(
-                          (item) => item !== product.farmer_id
-                        )
+                        prop.followList.filter((item) => {
+                          return item.id !== product.farmer_id;
+                        })
                       );
                     })
                     .catch((error) => {
@@ -810,7 +819,10 @@ const SigleProduct = (prop: {
                     .then(() => {
                       prop.setFollowList([
                         ...prop.followList,
-                        product.farmer_id,
+                        {
+                          id: product.farmer_id,
+                          farmerstorename: shopname ? shopname : "",
+                        },
                       ]);
                     })
                     .catch((error) => {

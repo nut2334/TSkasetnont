@@ -20,7 +20,6 @@ import ListProduct from "./pages/all/listproduct";
 import SigleProduct from "./pages/all/singleproduct";
 import EditProfile from "./pages/editprofile";
 import ListCart from "./pages/member/listcart";
-import Reserve from "./pages/member/reserve";
 import Orderlist from "./pages/member/orderlist";
 import { MessengerChat } from "react-messenger-chat-plugin";
 import Myproducts from "./pages/farmer/myproducts";
@@ -42,7 +41,12 @@ function App() {
   const [jwt_token, setJwt_token] = React.useState("");
   const [decodeJWT, setDecodeJWT] = React.useState({ role: "", username: "" });
   const [cartList, setCartList] = React.useState<Cart[]>([]);
-  const [followList, setFollowList] = React.useState<string[]>([]);
+  const [followList, setFollowList] = React.useState<
+    {
+      id: string;
+      farmerstorename: string;
+    }[]
+  >([]);
   const [notification, setNotification] = React.useState<
     {
       id: string;
@@ -105,8 +109,10 @@ function App() {
           let response: { farmer_id: string }[] = res.data.data;
           console.log(response);
 
-          let followList: string[] = response.map((item) => item.farmer_id);
-          console.log(followList);
+          let followList: {
+            id: string;
+            farmerstorename: string;
+          }[] = [];
 
           setFollowList(followList);
         });
@@ -209,7 +215,9 @@ function App() {
           {decodeJWT.role && (
             <Route
               path="/editprofile"
-              element={<EditProfile jwt_token={jwt_token} />}
+              element={
+                <EditProfile jwt_token={jwt_token} followList={followList} />
+              }
             />
           )}
           {decodeJWT.role == "farmers" && (
@@ -253,7 +261,9 @@ function App() {
               />
               <Route
                 path="/manageuser"
-                element={<ManageUser jwt_token={jwt_token} />}
+                element={
+                  <ManageUser jwt_token={jwt_token} followList={followList} />
+                }
               />
             </React.Fragment>
           )}
@@ -269,7 +279,6 @@ function App() {
                   />
                 }
               />
-              <Route path="/reservation/:productid" element={<Reserve />} />
 
               <Route
                 path="/orderlist"
@@ -281,7 +290,9 @@ function App() {
             <>
               <Route
                 path="/managefarmer"
-                element={<ManageUser jwt_token={jwt_token} />}
+                element={
+                  <ManageUser jwt_token={jwt_token} followList={followList} />
+                }
               />
               <Route
                 path="/managefarmer/:username"

@@ -30,7 +30,7 @@ import { Icon, LatLngLiteral } from "leaflet";
 import { EdituserSuccess, EdituserFail } from "../components/popup";
 import Swal from "sweetalert2";
 import SetDataCarriage from "../components/setDataCarriage";
-import AddCarriage from "../components/addcarriage";
+import Follow from "./member/follow";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -58,6 +58,7 @@ interface tambon {
 const EditProfile = (prop: {
   jwt_token: string;
   admin?: { username: string; role: string };
+  followList: { id: string; farmerstorename: string }[];
 }) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
@@ -238,7 +239,6 @@ const EditProfile = (prop: {
                 )[0].tambon
               );
             }
-            // console.log(res.data.shippingcost);
 
             if (res.data.shippingcost) {
               setShippingCost(
@@ -1003,6 +1003,7 @@ const EditProfile = (prop: {
           </Grid>
         </Box>
       </Box>
+      {role == "members" && <Follow followList={prop.followList} />}
     </Container>
   );
 };

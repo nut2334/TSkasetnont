@@ -356,6 +356,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
               >
                 เลือกรูปภาพ
               </Button>
+              {coverImage.length > 0 && (
+                <Button
+                  color="error"
+                  sx={{
+                    marginLeft: "10px",
+                  }}
+                  onClick={() => {
+                    setCoverImage([]);
+                  }}
+                  variant="contained"
+                >
+                  <ClearIcon />
+                </Button>
+              )}
 
               {coverImage[0] && (
                 <div style={{ marginTop: "10px" }}>
@@ -631,16 +645,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
             )}
             {selectedType == "จองสินค้าผ่านเว็บไซต์" && (
               <React.Fragment>
-                {/* <Grid item xs={6}>
-                  <TextField
-                    value={price}
-                    id="outlined-basic"
-                    label="ราคามัดจำ"
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => setPrice(parseInt(e.target.value))}
-                  />
-                </Grid> */}
                 <Grid item xs={6}>
                   <TextField
                     select
@@ -707,7 +711,11 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     label="ราคา"
                     variant="outlined"
                     fullWidth
+                    type="number"
                     onChange={(e) => setPrice(parseInt(e.target.value))}
+                    InputProps={{
+                      endAdornment: <Typography>บาท</Typography>,
+                    }}
                   />
                 </Grid>
                 <Grid item xs={8} lg={6}>
@@ -721,6 +729,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setWeight(parseInt(e.target.value))}
+                    InputProps={{
+                      endAdornment: <Typography>กรัม</Typography>,
+                    }}
                   />
                 </Grid>
                 <Grid item xs={4} lg={6}>
@@ -742,6 +753,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     fullWidth
                     onChange={(e) => setStock(parseInt(e.target.value))}
                     type="number"
+                    InputProps={{
+                      endAdornment: <Typography>{unit}</Typography>,
+                    }}
                   />
                 </Grid>
               </>

@@ -20,7 +20,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
-import Myproducts from "../farmer/myproducts";
 
 interface userInterface {
   id: string;
@@ -31,7 +30,10 @@ interface userInterface {
   phone: string;
   role: string;
 }
-const ManageUser = (prop: { jwt_token: string }) => {
+const ManageUser = (prop: {
+  jwt_token: string;
+  followList: { id: string; farmerstorename: string }[];
+}) => {
   const [users, setUsers] = useState<userInterface[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<userInterface[]>([]);
   const [searchUser, setSearchUser] = useState<string>("");
@@ -332,6 +334,7 @@ const ManageUser = (prop: { jwt_token: string }) => {
             ย้อนกลับ
           </div>
           <EditProfile
+            followList={prop.followList}
             jwt_token={prop.jwt_token}
             admin={{ username: editingUser.username, role: editingUser.role }}
           />
