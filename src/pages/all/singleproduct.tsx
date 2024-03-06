@@ -605,10 +605,11 @@ const SigleProduct = (prop: {
                         return;
                       }
                       if (
+                        prop.cartList.length > 0 &&
                         product.farmer_id !==
-                        prop.cartList.find(
-                          (item) => item.farmer_id == product.farmer_id
-                        )?.farmer_id
+                          prop.cartList.find(
+                            (item) => item.farmer_id == product.farmer_id
+                          )?.farmer_id
                       ) {
                         Swal.fire({
                           icon: "question",
@@ -631,7 +632,6 @@ const SigleProduct = (prop: {
                               shippingcost: product.shippingcost,
                             };
                             prop.setCartList([cart]);
-                            setGoCart(true);
                           }
                         });
                       } else {
@@ -646,7 +646,6 @@ const SigleProduct = (prop: {
                           shippingcost: product.shippingcost,
                         };
                         prop.setCartList([cart]);
-                        setGoCart(true);
                       }
                     }}
                   >
@@ -849,6 +848,12 @@ const SigleProduct = (prop: {
         <Typography>
           โดย {product.firstname + " " + product.lastname}
         </Typography>
+        <Typography>ช่องทางการติดต่อ</Typography>
+        {/* <FacebookShareButton>
+          <FacebookIcon
+            style={{ borderRadius: "100%", width: 30, height: "auto" }}
+          />
+        </FacebookShareButton> */}
         <div
           style={{
             display: "flex",
