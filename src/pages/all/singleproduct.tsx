@@ -46,6 +46,10 @@ import Swal from "sweetalert2";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { Icon, LatLngLiteral } from "leaflet";
 
 interface FullProductInterface {
   product_id: string;
@@ -58,7 +62,6 @@ interface FullProductInterface {
   product_image: string;
   product_video: string | null;
   additional_image: string;
-  certificate: string[];
   view_count: number;
   campaign_id: string;
   last_modified: Date;
@@ -68,6 +71,12 @@ interface FullProductInterface {
   lastname: string;
   farmer_id: string;
   weight: number;
+  address: string;
+  certificate: string;
+  facebooklink: string;
+  lineid: string;
+  lat: number | undefined;
+  lng: number | undefined;
 }
 
 const style = {
@@ -108,7 +117,6 @@ const SigleProduct = (prop: {
     product_image: "",
     product_video: "",
     additional_image: "",
-    certificate: [],
     view_count: 0,
     campaign_id: "",
     last_modified: new Date(),
@@ -118,6 +126,12 @@ const SigleProduct = (prop: {
     lastname: "",
     farmer_id: "",
     weight: 0,
+    address: "",
+    certificate: "",
+    facebooklink: "",
+    lineid: "",
+    lat: undefined,
+    lng: undefined,
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -198,10 +212,14 @@ const SigleProduct = (prop: {
                 height: "250px",
                 objectFit: "cover",
               }}
-              src={`${config.getApiEndpoint(
-                `getimage/${image.split("/").pop()}`,
-                "get"
-              )}`}
+              src={
+                image
+                  ? `${config.getApiEndpoint(
+                      `getimage/${image.split("/").pop()}`,
+                      "get"
+                    )}`
+                  : ""
+              }
               draggable="false"
               onClick={() => {
                 setShowFullImage(image);
@@ -304,6 +322,13 @@ const SigleProduct = (prop: {
 
     return [].concat(...slides);
   };
+
+  const iconMarker = new Icon({
+    iconUrl: require("../../assets/icon.svg").default,
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -40],
+  });
 
   if (goCart) {
     return <Navigate to="/listcart" />;
@@ -418,7 +443,86 @@ const SigleProduct = (prop: {
           marginTop: 1,
         }}
       />
-      <Typography variant="h6">{product.product_description}</Typography>
+      <Typography variant="h6">รายละเอียดสินค้า</Typography>
+      <Typography>{product.product_description}</Typography>
+      {product.certificate &&
+        JSON.parse(product.certificate)[0].standard_name !== "ไม่มี" && (
+          <Typography variant="h6">มาตรฐาน</Typography>
+        )}
+
+      {product.certificate && (
+        <>
+          <TableContainer
+            component={Paper}
+            sx={{
+              width: "100%",
+            }}
+          >
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>ชื่อมาตรฐาน</TableCell>
+                  <TableCell align="right">วันหมดอายุ</TableCell>
+                  <TableCell align="right">หมายเลข</TableCell>
+                  <TableCell align="right">หลักฐาน</TableCell>
+                </TableRow>
+              </TableHead>
+              {JSON.parse(product.certificate).map(
+                (item: {
+                  standard_name: string;
+                  standard_number: string;
+                  standard_expire: string;
+                  standard_cercification: string;
+                }) => {
+                  if (item.standard_name == "ไม่มี") {
+                    return;
+                  } else {
+                    return (
+                      <>
+                        <TableBody>
+                          <TableRow key={item.standard_name}>
+                            <TableCell component="th" scope="row">
+                              {item.standard_name}
+                            </TableCell>
+                            <TableCell align="right">
+                              {item.standard_expire}
+                            </TableCell>
+                            <TableCell align="right">
+                              {item.standard_number}
+                            </TableCell>
+                            <TableCell align="right">
+                              {item.standard_cercification && (
+                                <Chip
+                                  label="ดูหลักฐาน"
+                                  onClick={() => {
+                                    Swal.fire({
+                                      imageUrl: `${config.getApiEndpoint(
+                                        `getimage/${item.standard_cercification
+                                          .split("/")
+                                          .pop()}`,
+                                        "get"
+                                      )}`,
+                                      showConfirmButton: false,
+                                      showCancelButton: true,
+                                      cancelButtonText: "ปิด",
+                                      padding: "2em",
+                                    });
+                                  }}
+                                />
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </>
+                    );
+                  }
+                }
+              )}
+            </Table>
+          </TableContainer>
+        </>
+      )}
+
       {product.selectedType !== "ประชาสัมพันธ์" && (
         <>
           <Stack
@@ -451,141 +555,149 @@ const SigleProduct = (prop: {
             )}
           </Stack>
           {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              sx={{
-                paddingTop: "5px",
-              }}
-              marginLeft={2}
-              marginTop={2}
-            >
-              <Stack>
-                <LocalShippingIcon />
-              </Stack>
+            <>
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{
+                  paddingTop: "5px",
+                }}
+                marginLeft={2}
+                marginTop={2}
+              >
+                <Stack>
+                  <LocalShippingIcon />
+                </Stack>
 
-              <Stack>
-                <Typography variant="h6">ค่าจัดส่ง</Typography>
+                <Stack>
+                  <Typography variant="h6">ค่าจัดส่ง</Typography>
+                </Stack>
               </Stack>
-            </Stack>
+              <TableContainer
+                component={Paper}
+                sx={{
+                  width: "200px",
+                }}
+              >
+                <Table aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>น้ำหนัก</TableCell>
+                      <TableCell align="right">ค่าส่ง</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {product.shippingcost &&
+                      JSON.parse(product.shippingcost).map((item: any) => {
+                        return (
+                          <TableRow key={item.weight}>
+                            <TableCell component="th" scope="row">
+                              {">"}
+                              {item.weight} กรัม
+                            </TableCell>
+                            <TableCell align="right">
+                              {item.price} บาท
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
           )}
-          <TableContainer
-            component={Paper}
-            sx={{
-              width: "200px",
-            }}
-          >
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>น้ำหนัก</TableCell>
-                  <TableCell align="right">ค่าส่ง</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {product.shippingcost &&
-                  JSON.parse(product.shippingcost).map((item: any) => {
-                    return (
-                      <TableRow key={item.weight}>
-                        <TableCell component="th" scope="row">
-                          {">"}
-                          {item.weight} กรัม
-                        </TableCell>
-                        <TableCell align="right">{item.price} บาท</TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+
           <Stack
             direction="row"
             spacing={2}
             sx={{ marginTop: 2, marginBottom: 5 }}
             justifyContent="end"
           >
-            {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
-              <Stack>
-                <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<PointOfSaleIcon />}
-                    onClick={() => {
-                      if (prop.jwt_token == "") {
+            {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
+              (prop.jwt_token == "" ||
+                (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                  "members") && (
+                <Stack>
+                  <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<PointOfSaleIcon />}
+                      onClick={() => {
+                        if (prop.jwt_token == "") {
+                          Swal.fire({
+                            icon: "info",
+                            title: "กรุณาเข้าสู่ระบบ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
+                          return;
+                        }
                         Swal.fire({
-                          icon: "info",
-                          title: "กรุณาเข้าสู่ระบบ",
-                          showConfirmButton: false,
-                          timer: 1500,
-                        });
-                        return;
-                      }
-                      Swal.fire({
-                        title: "จองสินค้า",
-                        html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}
+                          title: "จองสินค้า",
+                          html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}
                         <br/>Line ID <input type="text" id="lineid">
                         `,
-                        showCancelButton: true,
-                        confirmButtonText: "จอง",
-                        cancelButtonText: "ยกเลิก",
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          let quantity = (
-                            document.getElementById(
-                              "quantity"
-                            ) as HTMLInputElement
-                          ).value;
-                          let lineid = (
-                            document.getElementById(
-                              "lineid"
-                            ) as HTMLInputElement
-                          ).value;
-                          const apiReserve = config.getApiEndpoint(
-                            `reserve`,
-                            "post"
-                          );
-                          axios
-                            .post(
-                              apiReserve,
-                              {
-                                quantity: quantity,
-                                lineid: lineid,
-                                product_id: product.product_id,
-                              },
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${prop.jwt_token}`,
+                          showCancelButton: true,
+                          confirmButtonText: "จอง",
+                          cancelButtonText: "ยกเลิก",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            let quantity = (
+                              document.getElementById(
+                                "quantity"
+                              ) as HTMLInputElement
+                            ).value;
+                            let lineid = (
+                              document.getElementById(
+                                "lineid"
+                              ) as HTMLInputElement
+                            ).value;
+                            const apiReserve = config.getApiEndpoint(
+                              `reserve`,
+                              "post"
+                            );
+                            axios
+                              .post(
+                                apiReserve,
+                                {
+                                  quantity: quantity,
+                                  lineid: lineid,
+                                  product_id: product.product_id,
                                 },
-                              }
-                            )
-                            .then(() => {
-                              Swal.fire({
-                                icon: "success",
-                                title: "จองสินค้าสำเร็จ",
-                                showConfirmButton: false,
-                                timer: 1500,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${prop.jwt_token}`,
+                                  },
+                                }
+                              )
+                              .then(() => {
+                                Swal.fire({
+                                  icon: "success",
+                                  title: "จองสินค้าสำเร็จ",
+                                  showConfirmButton: false,
+                                  timer: 1500,
+                                });
+                              })
+                              .catch((error) => {
+                                console.log(error);
+                                Swal.fire({
+                                  icon: "error",
+                                  title: "จองสินค้าไม่สำเร็จ",
+                                  showConfirmButton: false,
+                                  timer: 1500,
+                                });
                               });
-                            })
-                            .catch((error) => {
-                              console.log(error);
-                              Swal.fire({
-                                icon: "error",
-                                title: "จองสินค้าไม่สำเร็จ",
-                                showConfirmButton: false,
-                                timer: 1500,
-                              });
-                            });
-                        }
-                      });
-                    }}
-                  >
-                    จองสินค้า
-                  </Button>
-                </NavLink>
-              </Stack>
-            )}
+                          }
+                        });
+                      }}
+                    >
+                      จองสินค้า
+                    </Button>
+                  </NavLink>
+                </Stack>
+              )}
             {product.selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
                 <Stack>
@@ -756,104 +868,126 @@ const SigleProduct = (prop: {
       >
         <Stack direction="row" spacing={2}>
           <Stack>
-            <Typography variant="h6">{shopname}</Typography>
+            <Typography variant="h5">{shopname}</Typography>
           </Stack>
           <Stack>
-            <Chip
-              label="ติดตาม"
-              icon={
-                prop.followList.filter((item) => {
-                  return item.id === product.farmer_id;
-                }).length > 0 ? (
-                  <FavoriteIcon
-                    sx={{
-                      fill: "white",
-                    }}
-                  />
-                ) : (
-                  <FavoriteBorderIcon />
-                )
-              }
-              sx={
-                prop.followList.filter((item) => {
-                  return item.id === product.farmer_id;
-                }).length > 0
-                  ? {
-                      backgroundColor: "#ee4267",
-                      color: "white",
-                    }
-                  : {}
-              }
-              onClick={() => {
-                const apiFollow = config.getApiEndpoint(`followfarmer`, "post");
-                const apiUnFollow = config.getApiEndpoint(
-                  `followfarmer`,
-                  "delete"
-                );
-                if (
+            {(prop.jwt_token == "" ||
+              (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                "members") && (
+              <Chip
+                label="ติดตาม"
+                icon={
                   prop.followList.filter((item) => {
                     return item.id === product.farmer_id;
-                  }).length > 0 &&
-                  prop.jwt_token !== ""
-                ) {
-                  axios
-                    .delete(apiUnFollow, {
-                      data: {
-                        farmer_id: product.farmer_id,
-                      },
-                      headers: {
-                        Authorization: `Bearer ${prop.jwt_token}`,
-                      },
-                    })
-                    .then(() => {
-                      prop.setFollowList(
-                        prop.followList.filter((item) => {
-                          return item.id !== product.farmer_id;
-                        })
-                      );
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                    });
-                } else {
-                  axios
-                    .post(
-                      apiFollow,
-                      {
-                        farmer_id: product.farmer_id,
-                      },
-                      {
+                  }).length > 0 ? (
+                    <FavoriteIcon
+                      sx={{
+                        fill: "white",
+                      }}
+                    />
+                  ) : (
+                    <FavoriteBorderIcon />
+                  )
+                }
+                sx={
+                  prop.followList.filter((item) => {
+                    return item.id === product.farmer_id;
+                  }).length > 0
+                    ? {
+                        backgroundColor: "#ee4267",
+                        color: "white",
+                      }
+                    : {}
+                }
+                onClick={() => {
+                  const apiFollow = config.getApiEndpoint(
+                    `followfarmer`,
+                    "post"
+                  );
+                  const apiUnFollow = config.getApiEndpoint(
+                    `followfarmer`,
+                    "delete"
+                  );
+                  if (
+                    prop.followList.filter((item) => {
+                      return item.id === product.farmer_id;
+                    }).length > 0 &&
+                    prop.jwt_token !== ""
+                  ) {
+                    axios
+                      .delete(apiUnFollow, {
+                        data: {
+                          farmer_id: product.farmer_id,
+                        },
                         headers: {
                           Authorization: `Bearer ${prop.jwt_token}`,
                         },
-                      }
-                    )
-                    .then(() => {
-                      prop.setFollowList([
-                        ...prop.followList,
+                      })
+                      .then(() => {
+                        prop.setFollowList(
+                          prop.followList.filter((item) => {
+                            return item.id !== product.farmer_id;
+                          })
+                        );
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
+                  } else {
+                    axios
+                      .post(
+                        apiFollow,
                         {
-                          id: product.farmer_id,
-                          farmerstorename: shopname ? shopname : "",
+                          farmer_id: product.farmer_id,
                         },
-                      ]);
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                    });
-                }
-              }}
-            />
+                        {
+                          headers: {
+                            Authorization: `Bearer ${prop.jwt_token}`,
+                          },
+                        }
+                      )
+                      .then(() => {
+                        prop.setFollowList([
+                          ...prop.followList,
+                          {
+                            id: product.farmer_id,
+                            farmerstorename: shopname ? shopname : "",
+                          },
+                        ]);
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
+                  }
+                }}
+              />
+            )}
           </Stack>
         </Stack>
         <Typography>
           โดย {product.firstname + " " + product.lastname}
         </Typography>
-        <Typography>ช่องทางการติดต่อ</Typography>
-        {/* <FacebookShareButton>
-          <FacebookIcon
-            style={{ borderRadius: "100%", width: 30, height: "auto" }}
-          />
-        </FacebookShareButton> */}
+
+        {product.facebooklink ||
+          (product.lineid && (
+            <Typography variant="h6">ช่องทางการติดต่อ</Typography>
+          ))}
+
+        {product.facebooklink && (
+          <FacebookShareButton url={product.facebooklink}>
+            <FacebookIcon
+              style={{ borderRadius: "100%", width: 30, height: "auto" }}
+            />
+          </FacebookShareButton>
+        )}
+        {product.lineid && (
+          <LineShareButton url={product.lineid}>
+            <LineIcon
+              style={{ borderRadius: "100%", width: 30, height: "auto" }}
+            />
+          </LineShareButton>
+        )}
+
         <div
           style={{
             display: "flex",
@@ -953,6 +1087,19 @@ const SigleProduct = (prop: {
             );
           })}
         </Box>
+      )}
+      {product.lat && product.lng && (
+        <MapContainer
+          center={[product.lat, product.lng]}
+          zoom={13}
+          scrollWheelZoom={true}
+          style={{ height: "250px", width: "100%" }}
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <Marker position={[product.lat, product.lng]} icon={iconMarker}>
+            <Popup>{product.address}</Popup>
+          </Marker>
+        </MapContainer>
       )}
     </Container>
   );
