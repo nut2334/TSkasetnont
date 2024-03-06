@@ -26,6 +26,7 @@ import TableBank from "../../components/tablebank";
 interface orderInterface {
   id: string;
   status: string;
+  shippingcost: number;
   total_amount: number;
   date_buys: string;
   tracking_number: string;
@@ -201,6 +202,7 @@ const EachOrder = (prop: {
             <ListSubheader>สินค้าทั้งหมด</ListSubheader>
             <TableBank
               products={order.products}
+              shippingcost={Number(order.shippingcost)}
               haveComment={
                 order.status == "complete"
                   ? {

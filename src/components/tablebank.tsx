@@ -170,6 +170,7 @@ const GenerateStart = (prop: {
 
 const TableBank = (prop: {
   products: productInterface[];
+  shippingcost?: number;
   haveComment?: {
     jwt_token: string;
     order_id: string;
@@ -179,8 +180,6 @@ const TableBank = (prop: {
   const [total, setTotal] = useState<number>(0);
   useEffect(() => {
     let total = 0;
-    console.log(prop.products);
-
     prop.products.forEach((product) => {
       total += product.price * product.quantity;
     });
@@ -284,7 +283,10 @@ const TableBank = (prop: {
           {/* total */}
           <StyledTableRow>
             <StyledTableCell colSpan={prop.haveComment ? 5 : 4} align="right">
-              รวมราคาทั้งหมด : {total} บาท
+              <Box>ราคารวม : {total} บาท</Box>
+              {prop.shippingcost ? (
+                <Box>รวมราคาค่าจัดส่ง : {total + prop.shippingcost} บาท</Box>
+              ) : null}
             </StyledTableCell>
           </StyledTableRow>
         </TableBody>

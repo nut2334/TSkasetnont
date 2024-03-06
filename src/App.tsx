@@ -33,7 +33,7 @@ export interface Cart {
   stock: number;
   farmer_id: string;
   weight: number;
-  shipping_cost: string;
+  shippingcost: string;
 }
 
 function App() {
@@ -115,6 +115,9 @@ function App() {
           }[] = [];
 
           setFollowList(followList);
+        })
+        .catch((err) => {
+          console.log(err);
         });
 
       axios
@@ -125,6 +128,9 @@ function App() {
         })
         .then((res) => {
           setNotification(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
         });
     }
   }, [jwt_token]);
