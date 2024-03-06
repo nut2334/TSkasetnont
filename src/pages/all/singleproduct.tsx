@@ -49,7 +49,8 @@ import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Icon, LatLngLiteral } from "leaflet";
+import { Icon } from "leaflet";
+import { useCopyToClipboard } from "usehooks-ts";
 
 interface FullProductInterface {
   product_id: string;
@@ -151,6 +152,7 @@ const SigleProduct = (prop: {
     }[]
   >([]);
   const [goCart, setGoCart] = useState(false);
+  const [copiedText, copy] = useCopyToClipboard();
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -180,6 +182,16 @@ const SigleProduct = (prop: {
       setComment(response.data.reviews);
     });
   }, []);
+
+  const handleCopy = (text: string) => () => {
+    copy(text)
+      .then(() => {
+        console.log("Copied!", { text });
+      })
+      .catch((error) => {
+        console.error("Failed to copy!", error);
+      });
+  };
 
   const GenerateSlide = () => {
     let slides = [];
@@ -458,6 +470,7 @@ const SigleProduct = (prop: {
             component={Paper}
             sx={{
               width: "100%",
+              marginBottom: 2,
             }}
           >
             <Table aria-label="simple table">
@@ -970,24 +983,51 @@ const SigleProduct = (prop: {
           โดย {product.firstname + " " + product.lastname}
         </Typography>
 
-        {product.facebooklink ||
-          (product.lineid && (
-            <Typography variant="h6">ช่องทางการติดต่อ</Typography>
-          ))}
+        {product.facebooklink || product.lineid ? (
+          <Typography variant="h6">ช่องทางการติดต่อ</Typography>
+        ) : null}
 
         {product.facebooklink && (
-          <FacebookShareButton url={product.facebooklink}>
-            <FacebookIcon
-              style={{ borderRadius: "100%", width: 30, height: "auto" }}
-            />
-          </FacebookShareButton>
+          <Stack
+            direction="row"
+            spacing={2}
+            onClick={() => {
+              window.open(product.facebooklink, "_blank");
+            }}
+            sx={{
+              cursor: "pointer",
+            }}
+          >
+            <Stack>
+              <FacebookIcon
+                style={{ borderRadius: "100%", width: 30, height: "auto" }}
+              />
+            </Stack>
+            <Stack>
+              <Typography>{product.facebooklink}</Typography>
+            </Stack>
+          </Stack>
         )}
         {product.lineid && (
-          <LineShareButton url={product.lineid}>
-            <LineIcon
-              style={{ borderRadius: "100%", width: 30, height: "auto" }}
-            />
-          </LineShareButton>
+          <>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{
+                cursor: "pointer",
+              }}
+              onClick={handleCopy(product.lineid)}
+            >
+              <Stack>
+                <LineIcon
+                  style={{ borderRadius: "100%", width: 30, height: "auto" }}
+                />
+              </Stack>
+              <Stack>
+                <Typography>{product.lineid}</Typography>
+              </Stack>
+            </Stack>
+          </>
         )}
 
         <div

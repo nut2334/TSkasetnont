@@ -18,7 +18,7 @@ import {
   IconButton,
   ButtonGroup,
 } from "@mui/material";
-import { useSearchParams, Link, useParams } from "react-router-dom";
+import { useSearchParams, Link, useParams, Navigate } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
@@ -380,9 +380,9 @@ const ListProduct = () => {
                             }}
                           />
                           <Typography>{product.product_description}</Typography>
-                        </CardContent>
-                        {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
-                          <CardActions>
+                        </CardContent>{" "}
+                        <CardActions>
+                          {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
                             <Typography
                               sx={{
                                 color: "green",
@@ -392,8 +392,16 @@ const ListProduct = () => {
                             >
                               {product.price} บาท
                             </Typography>
-                          </CardActions>
-                        )}
+                          )}
+
+                          <Typography
+                            sx={{
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {product.farmerstorename}
+                          </Typography>
+                        </CardActions>
                       </Card>
                     </NavLink>
                   </Grid>
