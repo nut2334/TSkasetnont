@@ -128,6 +128,11 @@ const Payment = (prop: {
           };
         });
         formData.append("cartList", JSON.stringify(allProduct));
+        //log formdata
+        formData.forEach((value, key) => {
+          console.log(key, value);
+        });
+
         axios
           .post(config.getApiEndpoint("checkout", "POST"), formData, {
             headers: {
