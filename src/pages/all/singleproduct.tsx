@@ -153,6 +153,7 @@ const SigleProduct = (prop: {
     axios.get(apiUpdateView).catch((error) => {
       console.log(error);
     });
+    console.log(prop.followList);
   }, []);
 
   useEffect(() => {
@@ -757,7 +758,11 @@ const SigleProduct = (prop: {
                 prop.followList.filter((item) => {
                   return item.id === product.farmer_id;
                 }).length > 0 ? (
-                  <FavoriteIcon />
+                  <FavoriteIcon
+                    sx={{
+                      fill: "white",
+                    }}
+                  />
                 ) : (
                   <FavoriteBorderIcon />
                 )
@@ -767,7 +772,7 @@ const SigleProduct = (prop: {
                   return item.id === product.farmer_id;
                 }).length > 0
                   ? {
-                      backgroundColor: "#EE4266",
+                      backgroundColor: "#ee4267",
                       color: "white",
                     }
                   : {}

@@ -106,15 +106,11 @@ function App() {
           },
         })
         .then((res) => {
-          let response: { farmer_id: string }[] = res.data.data;
-          console.log(response);
+          let response: { id: string; farmerstorename: string }[] =
+            res.data.data;
 
-          let followList: {
-            id: string;
-            farmerstorename: string;
-          }[] = [];
-
-          setFollowList(followList);
+          setFollowList(response);
+          console.log(followList);
         })
         .catch((err) => {
           console.log(err);

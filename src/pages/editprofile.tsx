@@ -997,9 +997,6 @@ const EditProfile = (prop: {
                 เปลี่ยนรหัสผ่าน
               </Button>
             </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
           </Grid>
         </Box>
       </Box>

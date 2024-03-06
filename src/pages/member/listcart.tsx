@@ -166,9 +166,6 @@ const ListCart = (prop: {
     });
     setSummaryShippingCost(totalCost);
   }, [shippingcost]);
-  // useEffect(() => {
-  //   console.log(prop.cartList);
-  // }, [prop.cartList]);
 
   const handleSubmit = () => {
     if (cartList.length === 0) {
@@ -200,22 +197,13 @@ const ListCart = (prop: {
           {cartList.length > 0 && (
             <>
               <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
                 <Grid
                   item
                   xs={12}
                   sx={{ display: "flex", justifyContent: "flex-end" }}
                 >
-                  <Typography variant="h5">ราคาสินค้าทั้งหมด</Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{ display: "flex", justifyContent: "flex-end" }}
-                >
-                  <Typography variant="h5">
+                  <Typography>
+                    ราคาสินค้าทั้งหมด{" "}
                     {cartList.reduce(
                       (sum, cart) => sum + cart.price * cart.quantity,
                       0
@@ -223,14 +211,13 @@ const ListCart = (prop: {
                     บาท
                   </Typography>
                 </Grid>
+
                 <Grid
                   item
                   xs={12}
                   sx={{ display: "flex", justifyContent: "flex-end" }}
                 >
-                  <Typography variant="h5">
-                    ค่าจัดส่ง {summaryShippingCost} บาท
-                  </Typography>
+                  <Typography>ค่าจัดส่ง {summaryShippingCost} บาท</Typography>
                 </Grid>
                 <Grid
                   item

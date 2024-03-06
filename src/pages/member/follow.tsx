@@ -1,22 +1,39 @@
-import Favorite from "@mui/icons-material/Favorite";
-import { Chip, Typography } from "@mui/material";
-import React from "react";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { Chip, Divider, Grid, Stack, Typography } from "@mui/material";
+import React, { useEffect } from "react";
 
 const Follow = (prop: {
   followList: { id: string; farmerstorename: string }[];
 }) => {
+  useEffect(() => {
+    console.log(prop.followList);
+  }, [prop.followList]);
   return (
     <>
-      <Typography variant="h3">ร้านที่คุณติดตาม</Typography>
-      {prop.followList.map((follow) => {
-        return (
-          <Chip
-            icon={<Favorite />}
-            label={follow.farmerstorename}
-            variant="outlined"
-          />
-        );
-      })}
+      <Divider
+        textAlign="left"
+        sx={{
+          marginTop: 2,
+        }}
+      >
+        <Typography>ร้านที่ติดตาม</Typography>
+      </Divider>
+      <Grid container spacing={2}>
+        {prop.followList.map((follow) => {
+          return (
+            <>
+              <Grid item lg={6}>
+                <Typography>{follow.farmerstorename}</Typography>
+              </Grid>
+
+              <Grid item lg={6}>
+                <Chip sx={{}} icon={<FavoriteIcon />} label="ติดตาม" />
+              </Grid>
+            </>
+          );
+        })}
+      </Grid>
     </>
   );
 };
