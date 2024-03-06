@@ -8,7 +8,30 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-
+import { Button } from "@mui/base";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from "chart.js";
+import { string } from "yargs";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 const Pricecenter = () => {
   const [data, setData] = useState<
     {
@@ -23,6 +46,9 @@ const Pricecenter = () => {
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [selectedSellType, setSelectedSellType] = useState<string>("");
   const [product_id, setProduct_id] = useState<string>("");
+  const [graph, setGraph] = useState<
+    { date: string; price_min: number; price_max: number }[]
+  >([]);
 
   useEffect(() => {
     axios
@@ -49,10 +75,12 @@ const Pricecenter = () => {
       .get(
         ` https://dataapi.moc.go.th/gis-product-prices?product_id=${product_id}&from_date=${date.getFullYear()}-${
           date.getMonth() - 2
-        }-01&to_date=${date.getFullYear()}-${date.getMonth()}-01`
+        }-01&to_date=${date.getFullYear()}-${date.getMonth()}-${
+          date.getDate() - 1
+        }`
       )
       .then((res) => {
-        console.log(res.data);
+        setGraph(res.data.price_list);
       });
   };
 
@@ -63,7 +91,11 @@ const Pricecenter = () => {
           select
           label="หมวดหมู่"
           fullWidth
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setSelectedProduct("");
+            setSelectedSellType("");
+          }}
         >
           {category.map((item, index) => (
             <MenuItem key={index} value={item}>
@@ -78,7 +110,10 @@ const Pricecenter = () => {
             select
             label="สินค้า"
             fullWidth
-            onChange={(e) => setSelectedProduct(e.target.value)}
+            onChange={(e) => {
+              setSelectedProduct(e.target.value);
+              setSelectedSellType("");
+            }}
           >
             {data
               .filter((item) => item.category_name === selectedCategory)
@@ -102,7 +137,7 @@ const Pricecenter = () => {
                 data.filter(
                   (item) =>
                     item.product_name === selectedProduct &&
-                    item.sell_type === selectedSellType
+                    item.sell_type === e.target.value
                 )[0].product_id
               );
             }}
@@ -116,6 +151,49 @@ const Pricecenter = () => {
               ))}
           </TextField>
         </Grid>
+      )}
+      {product_id !== "" && (
+        <>
+          <Typography variant="h6" align="center">
+            {product_id}
+          </Typography>
+          <Button onClick={send}>ค้นหา</Button>
+        </>
+      )}
+      {graph.length > 0 && (
+        <Line
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top" as const,
+              },
+              title: {
+                display: true,
+                text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
+              },
+            },
+          }}
+          data={{
+            labels: graph.map((d) => new Date(d.date).toLocaleDateString()),
+            datasets: [
+              {
+                label: "ราคาต่ำสุด",
+                data: graph.map((d) => d.price_min),
+                fill: 1,
+                backgroundColor: "rgba(255, 99, 132,0.2)",
+                borderColor: "rgba(255, 99, 132, 0.2)",
+              },
+              {
+                label: "ราคาสูงสุด",
+                data: graph.map((d) => d.price_max),
+                fill: false,
+                backgroundColor: "rgb(54, 162, 235)",
+                borderColor: "rgba(54, 162, 235, 0.2)",
+              },
+            ],
+          }}
+        />
       )}
     </>
   );
