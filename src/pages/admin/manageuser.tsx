@@ -328,19 +328,6 @@ const ManageUser = (prop: {
         </>
       ) : (
         <>
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              left: "0",
-              marginTop: "10px",
-              marginLeft: "10px",
-              cursor: "pointer",
-            }}
-            onClick={() => setEditingUser(undefined)}
-          >
-            ย้อนกลับ
-          </div>
           <EditProfile
             followList={prop.followList}
             jwt_token={prop.jwt_token}
@@ -349,6 +336,21 @@ const ManageUser = (prop: {
           />
         </>
       )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "right",
+          width: "100%",
+        }}
+      >
+        <Button
+          color="error"
+          variant="contained"
+          onClick={() => setEditingUser(undefined)}
+        >
+          ยกเลิก
+        </Button>
+      </div>
     </Container>
   );
 };
