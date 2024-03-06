@@ -68,13 +68,15 @@ const Follow = (prop: {
                           "followfarmer",
                           "DELETE"
                         );
+                        console.log("apiFollow", follow.id);
+
                         axios
                           .delete(apiFollow, {
                             headers: {
                               Authorization: `Bearer ${prop.jwt_token}`,
                             },
                             data: {
-                              id: follow.id,
+                              farmer_id: follow.id,
                             },
                           })
                           .then((res) => {
