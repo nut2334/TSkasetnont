@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,30 +23,58 @@ ChartJS.register(
   Legend
 );
 
-const FollowChart = () => {
-  const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
-    datasets: [
-      {
-        label: "Followers",
-        data: [12, 19, 3, 5, 2, 3, 10],
-        fill: true,
-        backgroundColor: "rgba(75,192,192,0.2)",
-        borderColor: "rgba(75,192,192,1)",
-      },
-    ],
-  };
+const FollowChart = (prop: {
+  follower: {
+    createAt: string;
+    follow_count: number;
+  }[];
+}) => {
   const options = {
     scales: {
       y: {
         beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+        },
+        max:
+          prop.follower.length > 0
+            ? Math.max(
+                ...prop.follower.map((follower) => follower.follow_count)
+              ) + 10
+            : 10,
       },
     },
   };
+  useEffect(() => {
+    console.log(prop.follower);
+  }, [prop.follower]);
   return (
-    <div>
-      <Line options={options} data={data} />;
-    </div>
+    <>
+      {prop.follower.length > 0 && (
+        <div>
+          <Line
+            options={options}
+            data={{
+              labels: prop.follower.map((follower) => {
+                return follower.createAt;
+              }),
+              datasets: [
+                {
+                  label: "Followers",
+                  data: prop.follower.map((follower) => {
+                    return follower.follow_count;
+                  }),
+                  fill: true,
+                  backgroundColor: "rgba(75,192,192,0.2)",
+                  borderColor: "rgba(75,192,192,1)",
+                },
+              ],
+            }}
+          />
+          ;
+        </div>
+      )}
+    </>
   );
 };
 

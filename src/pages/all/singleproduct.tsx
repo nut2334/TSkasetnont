@@ -138,9 +138,11 @@ const SigleProduct = (prop: {
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
-      `getproduct/${shopname}/${productid}`,
+      `getproduct/${encodeURI(shopname ? shopname : "")}/${productid}`,
       "get"
     );
+    console.log(apiSingleProduct);
+
     axios.get(apiSingleProduct).then((response) => {
       setProduct(response.data);
       console.log(response.data);

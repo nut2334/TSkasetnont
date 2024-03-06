@@ -98,7 +98,7 @@ function App() {
 
     if (decodeJWT.role == "members") {
       const apiFollow = config.getApiEndpoint("followfarmer", "GET");
-      const apiNotification = config.getApiEndpoint("notification", "GET");
+
       axios
         .get(apiFollow, {
           headers: {
@@ -115,7 +115,9 @@ function App() {
         .catch((err) => {
           console.log(err);
         });
-
+    }
+    if (decodeJWT.role == "members" || decodeJWT.role == "farmers") {
+      const apiNotification = config.getApiEndpoint("notification", "GET");
       axios
         .get(apiNotification, {
           headers: {
@@ -133,7 +135,7 @@ function App() {
 
   //polling notification
   useEffect(() => {
-    if (decodeJWT.role == "members") {
+    if (decodeJWT.role == "members" || decodeJWT.role == "farmers") {
       const interval = setInterval(() => {
         const apiNotification = config.getApiEndpoint("notification", "GET");
         axios
