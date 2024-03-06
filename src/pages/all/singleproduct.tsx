@@ -459,84 +459,97 @@ const SigleProduct = (prop: {
       />
       <Typography variant="h6">รายละเอียดสินค้า</Typography>
       <Typography>{product.product_description}</Typography>
+
       {product.certificate &&
         JSON.parse(product.certificate)[0].standard_name !== "ไม่มี" && (
-          <Typography variant="h6">มาตรฐาน</Typography>
-        )}
-
-      {product.certificate && (
-        <>
-          <TableContainer
-            component={Paper}
+          <Box
             sx={{
-              width: "100%",
-              marginBottom: 2,
+              paddingTop: "10px",
             }}
           >
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>ชื่อมาตรฐาน</TableCell>
-                  <TableCell align="right">วันหมดอายุ</TableCell>
-                  <TableCell align="right">หมายเลข</TableCell>
-                  <TableCell align="right">หลักฐาน</TableCell>
-                </TableRow>
-              </TableHead>
-              {JSON.parse(product.certificate).map(
-                (item: {
-                  standard_name: string;
-                  standard_number: string;
-                  standard_expire: string;
-                  standard_cercification: string;
-                }) => {
-                  if (item.standard_name == "ไม่มี") {
-                    return;
-                  } else {
-                    return (
-                      <>
-                        <TableBody>
-                          <TableRow key={item.standard_name}>
-                            <TableCell component="th" scope="row">
-                              {item.standard_name}
-                            </TableCell>
-                            <TableCell align="right">
-                              {item.standard_expire}
-                            </TableCell>
-                            <TableCell align="right">
-                              {item.standard_number}
-                            </TableCell>
-                            <TableCell align="right">
-                              {item.standard_cercification && (
-                                <Chip
-                                  label="ดูหลักฐาน"
-                                  onClick={() => {
-                                    Swal.fire({
-                                      imageUrl: `${config.getApiEndpoint(
-                                        `getimage/${item.standard_cercification
-                                          .split("/")
-                                          .pop()}`,
-                                        "get"
-                                      )}`,
-                                      showConfirmButton: false,
-                                      showCancelButton: true,
-                                      cancelButtonText: "ปิด",
-                                      padding: "2em",
-                                    });
-                                  }}
-                                />
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </>
-                    );
-                  }
-                }
-              )}
-            </Table>
-          </TableContainer>
-        </>
-      )}
+            <Typography variant="h6">มาตรฐาน</Typography>
+            <Box
+              sx={{
+                padding: "10px",
+              }}
+            >
+              <TableContainer
+                component={Paper}
+                sx={{
+                  width: "100%",
+                  marginBottom: 2,
+                }}
+              >
+                <Table aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ชื่อมาตรฐาน</TableCell>
+                      <TableCell align="right">วันหมดอายุ</TableCell>
+                      <TableCell align="right">หมายเลข</TableCell>
+                      <TableCell align="right">หลักฐาน</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  {JSON.parse(product.certificate).map(
+                    (item: {
+                      standard_name: string;
+                      standard_number: string;
+                      standard_expire: string;
+                      standard_cercification: string;
+                    }) => {
+                      console.log(item);
+
+                      if (
+                        item.standard_name == "ไม่มี" ||
+                        !item.standard_name
+                      ) {
+                        return;
+                      } else {
+                        return (
+                          <>
+                            <TableBody>
+                              <TableRow key={item.standard_name}>
+                                <TableCell component="th" scope="row">
+                                  {item.standard_name}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {item.standard_expire}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {item.standard_number}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {item.standard_cercification && (
+                                    <Chip
+                                      label="ดูหลักฐาน"
+                                      onClick={() => {
+                                        Swal.fire({
+                                          imageUrl: `${config.getApiEndpoint(
+                                            `getimage/${item.standard_cercification
+                                              .split("/")
+                                              .pop()}`,
+                                            "get"
+                                          )}`,
+                                          showConfirmButton: false,
+                                          showCancelButton: true,
+                                          cancelButtonText: "ปิด",
+                                          padding: "2em",
+                                        });
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </>
+                        );
+                      }
+                    }
+                  )}
+                </Table>
+              </TableContainer>
+            </Box>
+          </Box>
+        )}
 
       {product.selectedType !== "ประชาสัมพันธ์" && (
         <>
@@ -623,12 +636,7 @@ const SigleProduct = (prop: {
             </>
           )}
 
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ marginTop: 2, marginBottom: 5 }}
-            justifyContent="end"
-          >
+          <Stack direction="row" spacing={2} justifyContent="end">
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
               (prop.jwt_token == "" ||
                 (jwtDecode(prop.jwt_token) as { role: string }).role ==
@@ -878,7 +886,7 @@ const SigleProduct = (prop: {
           boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
           borderRadius: 2,
           padding: 2,
-          marginBottom: 2,
+          margin: "20px 0",
         }}
       >
         <Stack direction="row" spacing={2}>
