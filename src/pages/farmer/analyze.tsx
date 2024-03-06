@@ -9,10 +9,33 @@ import FollowChart from "../../components/followchart";
 
 const Analyze = (prop: { jwt_token: string }) => {
   const apiOrder = config.getApiEndpoint("getordersale/date", "GET");
+  const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
 
   const [today, setToday] = React.useState<number>(0);
+  const [follower, setFollower] = React.useState<
+    {
+      createAt: string;
+      follow_count: number;
+    }[]
+  >([]);
+  const [allfollowers, setAllfollowers] = React.useState<number>(0);
 
   useEffect(() => {
+    axios
+      .get(apiFollowMember, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        let follower: {
+          createAt: string;
+          follow_count: number;
+        }[] = res.data.followers;
+
+        setAllfollowers(res.data.allfollowers);
+        setFollower(follower);
+      });
     axios
       .get(apiOrder, {
         headers: {
@@ -20,7 +43,6 @@ const Analyze = (prop: { jwt_token: string }) => {
         },
       })
       .then((response) => {
-        console.log(response.data);
         setToday(response.data.today);
       });
   }, []);
@@ -35,8 +57,10 @@ const Analyze = (prop: { jwt_token: string }) => {
     >
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h3">ยอดติดตาม 100 คน</Typography>
-          <FollowChart />
+          <Typography variant="h3">
+            ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+          </Typography>
+          <FollowChart follower={follower} />
         </Grid>
 
         <Grid item xs={6}>

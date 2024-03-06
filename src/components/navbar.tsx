@@ -262,6 +262,11 @@ const Navbar = (prop: {
                     <ShoppingCartIcon />
                   </NavLink>
                 </Badge>
+              </>
+            )}
+
+            {prop.role == "members" || prop.role == "farmers" ? (
+              <>
                 <Badge
                   badgeContent={
                     prop.notification ? prop.notification.length : 0
@@ -351,7 +356,7 @@ const Navbar = (prop: {
                   </Menu>
                 ))}
               </>
-            )}
+            ) : null}
             <Box sx={{ flexGrow: 0 }}>
               {/* computer */}
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
