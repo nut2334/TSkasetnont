@@ -33,6 +33,14 @@ interface userInterface {
 const ManageUser = (prop: {
   jwt_token: string;
   followList: { id: string; farmerstorename: string }[];
+  setFollowList: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: string;
+        farmerstorename: string;
+      }[]
+    >
+  >;
 }) => {
   const [users, setUsers] = useState<userInterface[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<userInterface[]>([]);
@@ -337,6 +345,7 @@ const ManageUser = (prop: {
             followList={prop.followList}
             jwt_token={prop.jwt_token}
             admin={{ username: editingUser.username, role: editingUser.role }}
+            setFollowList={prop.setFollowList}
           />
         </>
       )}

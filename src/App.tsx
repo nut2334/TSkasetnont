@@ -218,7 +218,11 @@ function App() {
             <Route
               path="/editprofile"
               element={
-                <EditProfile jwt_token={jwt_token} followList={followList} />
+                <EditProfile
+                  jwt_token={jwt_token}
+                  followList={followList}
+                  setFollowList={setFollowList}
+                />
               }
             />
           )}
@@ -264,7 +268,11 @@ function App() {
               <Route
                 path="/manageuser"
                 element={
-                  <ManageUser jwt_token={jwt_token} followList={followList} />
+                  <ManageUser
+                    jwt_token={jwt_token}
+                    followList={followList}
+                    setFollowList={setFollowList}
+                  />
                 }
               />
             </React.Fragment>
@@ -293,7 +301,11 @@ function App() {
               <Route
                 path="/managefarmer"
                 element={
-                  <ManageUser jwt_token={jwt_token} followList={followList} />
+                  <ManageUser
+                    jwt_token={jwt_token}
+                    followList={followList}
+                    setFollowList={setFollowList}
+                  />
                 }
               />
               <Route

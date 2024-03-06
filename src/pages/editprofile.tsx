@@ -59,6 +59,14 @@ const EditProfile = (prop: {
   jwt_token: string;
   admin?: { username: string; role: string };
   followList: { id: string; farmerstorename: string }[];
+  setFollowList: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: string;
+        farmerstorename: string;
+      }[]
+    >
+  >;
 }) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiRole = config.getApiEndpoint("role", "GET");
@@ -526,7 +534,7 @@ const EditProfile = (prop: {
     <Container
       component="main"
       maxWidth="lg"
-      sx={{ marginTop: 3, position: "relative" }}
+      sx={{ marginTop: 3, position: "relative", marginBottom: 10 }}
     >
       <Box
         sx={{
@@ -1000,7 +1008,13 @@ const EditProfile = (prop: {
           </Grid>
         </Box>
       </Box>
-      {role == "members" && <Follow followList={prop.followList} />}
+      {role == "members" && (
+        <Follow
+          followList={prop.followList}
+          jwt_token={prop.jwt_token}
+          setFollowList={prop.setFollowList}
+        />
+      )}
     </Container>
   );
 };
