@@ -45,6 +45,7 @@ import StarHalfIcon from "@mui/icons-material/StarHalf";
 import Swal from "sweetalert2";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { Navigate } from "react-router-dom";
 
 interface FullProductInterface {
   product_id: string;
@@ -135,6 +136,7 @@ const SigleProduct = (prop: {
       member_username: string;
     }[]
   >([]);
+  const [goCart, setGoCart] = useState(false);
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -302,6 +304,11 @@ const SigleProduct = (prop: {
 
     return [].concat(...slides);
   };
+
+  if (goCart) {
+    return <Navigate to="/listcart" />;
+  }
+
   return (
     <Container component="main" maxWidth="lg">
       <Box sx={{ position: "relative" }}>
@@ -624,61 +631,10 @@ const SigleProduct = (prop: {
                               shippingcost: product.shippingcost,
                             };
                             prop.setCartList([cart]);
+                            setGoCart(true);
                           }
                         });
-                      }
-
-                      let cart: Cart = {
-                        product_id: product.product_id,
-                        quantity: quantity,
-                        product_name: product.product_name,
-                        price: product.price,
-                        stock: product.stock,
-                        farmer_id: product.farmer_id,
-                        weight: product.weight,
-                        shippingcost: product.shippingcost,
-                      };
-
-                      prop.cartList.find(
-                        (item) => item.product_id == product.product_id
-                      );
-                      if (
-                        typeof prop.cartList.find(
-                          (item) => item.product_id == product.product_id
-                        ) !== "undefined"
-                      ) {
-                        let index = prop.cartList.findIndex(
-                          (item) => item.product_id == product.product_id
-                        );
-                        let newCart = [...prop.cartList];
-                        newCart[index].quantity += quantity;
-                        prop.setCartList(newCart);
                       } else {
-                        prop.setCartList([...prop.cartList, cart]);
-                      }
-                    }}
-                  >
-                    หยิบใส่ตะกร้า
-                  </Button>
-                </Stack>
-
-                <Stack>
-                  <NavLink to={prop.jwt_token == "" ? "/login" : "/listcart"}>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      startIcon={<PointOfSaleIcon />}
-                      disabled={product.stock == 0}
-                      onClick={() => {
-                        if (prop.jwt_token == "") {
-                          Swal.fire({
-                            icon: "info",
-                            title: "กรุณาเข้าสู่ระบบ",
-                            showConfirmButton: false,
-                            timer: 1500,
-                          });
-                          return;
-                        }
                         let cart: Cart = {
                           product_id: product.product_id,
                           quantity: quantity,
@@ -689,28 +645,80 @@ const SigleProduct = (prop: {
                           weight: product.weight,
                           shippingcost: product.shippingcost,
                         };
-                        prop.cartList.find(
-                          (item) => item.product_id == product.product_id
-                        );
-                        if (
-                          typeof prop.cartList.find(
-                            (item) => item.product_id == product.product_id
-                          ) !== "undefined"
-                        ) {
-                          let index = prop.cartList.findIndex(
-                            (item) => item.product_id == product.product_id
-                          );
-                          let newCart = [...prop.cartList];
-                          newCart[index].quantity += quantity;
-                          prop.setCartList(newCart);
-                        } else {
-                          prop.setCartList([...prop.cartList, cart]);
-                        }
-                      }}
-                    >
-                      ซื้อสินค้า
-                    </Button>
-                  </NavLink>
+                        prop.setCartList([cart]);
+                        setGoCart(true);
+                      }
+                    }}
+                  >
+                    หยิบใส่ตะกร้า
+                  </Button>
+                </Stack>
+
+                <Stack>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<PointOfSaleIcon />}
+                    disabled={product.stock == 0}
+                    onClick={() => {
+                      if (prop.jwt_token == "") {
+                        Swal.fire({
+                          icon: "info",
+                          title: "กรุณาเข้าสู่ระบบ",
+                          showConfirmButton: false,
+                          timer: 1500,
+                        });
+                        return;
+                      }
+                      if (
+                        prop.cartList.length > 0 &&
+                        product.farmer_id !==
+                          prop.cartList.find(
+                            (item) => item.farmer_id == product.farmer_id
+                          )?.farmer_id
+                      ) {
+                        Swal.fire({
+                          icon: "question",
+                          title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
+                          text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
+                          showDenyButton: true,
+                          confirmButtonText: "ใช่",
+                          denyButtonText: "ไม่",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            prop.setCartList([]);
+                            let cart: Cart = {
+                              product_id: product.product_id,
+                              quantity: quantity,
+                              product_name: product.product_name,
+                              price: product.price,
+                              stock: product.stock,
+                              farmer_id: product.farmer_id,
+                              weight: product.weight,
+                              shippingcost: product.shippingcost,
+                            };
+                            prop.setCartList([cart]);
+                            setGoCart(true);
+                          }
+                        });
+                      } else {
+                        let cart: Cart = {
+                          product_id: product.product_id,
+                          quantity: quantity,
+                          product_name: product.product_name,
+                          price: product.price,
+                          stock: product.stock,
+                          farmer_id: product.farmer_id,
+                          weight: product.weight,
+                          shippingcost: product.shippingcost,
+                        };
+                        prop.setCartList([cart]);
+                        setGoCart(true);
+                      }
+                    }}
+                  >
+                    ซื้อสินค้า
+                  </Button>
                 </Stack>
               </>
             )}
