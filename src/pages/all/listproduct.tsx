@@ -379,7 +379,17 @@ const ListProduct = () => {
                               color: isDark(bgcolor) ? "white" : "black",
                             }}
                           />
-                          <Typography>{product.product_description}</Typography>
+                          <Typography
+                            sx={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 4, // จำนวนบรรทัดที่ต้องการแสดง
+                            }}
+                          >
+                            {product.product_description}
+                          </Typography>
                         </CardContent>{" "}
                         <CardActions>
                           {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
