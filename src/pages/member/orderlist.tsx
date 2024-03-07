@@ -251,6 +251,11 @@ const Orderlist = (prop: { jwt_token: string }) => {
 
   return (
     <div>
+      {
+        orderList.length === 0 ? (
+          <div>ไม่มีรายการสั่งซื้อ</div>
+        ) : null
+      }
       {orderList.map((order: any, index: number) => {
         return (
           <EachOrder
