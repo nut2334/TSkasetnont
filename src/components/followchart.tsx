@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { Box } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -29,6 +30,11 @@ const FollowChart = (prop: {
     follow_count: number;
   }[];
 }) => {
+  const [max, setMax] = useState<number>(0);
+  useEffect(() => {
+    let max = Math.max(...prop.follower.map((data) => data.follow_count));
+    setMax(max);
+  }, [prop.follower]);
   const options = {
     scales: {
       y: {
@@ -36,22 +42,36 @@ const FollowChart = (prop: {
         ticks: {
           stepSize: 1,
         },
-        max:
-          prop.follower.length > 0
-            ? Math.max(
-                ...prop.follower.map((follower) => follower.follow_count)
-              ) + 10
-            : 10,
+        max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
+      },
+    },
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
+        align: "end" as const,
+      },
+      title: {
+        display: true,
+        text: "จำนวนยอดผู้ติดตาม",
+        align: "end" as const,
       },
     },
   };
-  useEffect(() => {
-    console.log(prop.follower);
-  }, [prop.follower]);
+
   return (
-    <>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+      }}
+    >
       {prop.follower.length > 0 && (
-        <div>
+        <Box
+          sx={{
+            filter: `${max === 0 ? "blur(5px)" : "none"}`,
+          }}
+        >
           <Line
             options={options}
             data={{
@@ -71,10 +91,21 @@ const FollowChart = (prop: {
               ],
             }}
           />
-          ;
+        </Box>
+      )}
+      {max === 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+          }}
+        >
+          <h1>ไม่มีข้อมูลการขาย</h1>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

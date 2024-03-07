@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
 import Forgot from "./pages/all/forgot";
@@ -146,6 +146,9 @@ function App() {
           })
           .then((res) => {
             setNotification(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
           });
       }, 15000);
       return () => clearInterval(interval);
@@ -154,7 +157,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
+      <HashRouter>
         <Navbar
           role={decodeJWT.role}
           jwt_token={jwt_token}
@@ -311,13 +314,17 @@ function App() {
                 }
               />
               <Route
+                path="/addfarmer"
+                element={<AddUser jwt_token={jwt_token} addfarmer={true} />}
+              />
+              <Route
                 path="/managefarmer/:username"
                 element={<Myproducts jwt_token={jwt_token} />}
               />
             </>
           )}
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   );
 }
