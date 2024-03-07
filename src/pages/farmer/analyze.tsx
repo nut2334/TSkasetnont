@@ -80,7 +80,7 @@ const Analyze = (prop: { jwt_token: string }) => {
           createAt: string;
           product_count: number;
         } = res.data.farmers[0];
-        console.log(selfData);
+        console.log(res.data);
 
         setFarmerDetail(selfData);
       });

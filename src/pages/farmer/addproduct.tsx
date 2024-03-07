@@ -785,20 +785,22 @@ const AddProduct = (prop: { jwt_token: string }) => {
               }}
             >
               <Button
+                onClick={onSubmit}
+                variant="contained"
+                sx={{
+                  marginRight: "10px",
+                }}
+              >
+                ยืนยัน
+              </Button>
+              <Button
                 variant="contained"
                 color="error"
                 onClick={() => {
                   setIsExist(true);
                 }}
-                sx={{
-                  marginRight: "10px",
-                }}
               >
                 ยกเลิก
-              </Button>
-
-              <Button onClick={onSubmit} variant="contained">
-                ยืนยัน
               </Button>
             </Grid>
           </Grid>

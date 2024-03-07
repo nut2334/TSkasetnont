@@ -45,7 +45,7 @@ const FollowChart = (prop: {
         max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
       },
     },
-    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top" as const,
