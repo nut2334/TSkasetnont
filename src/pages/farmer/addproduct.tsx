@@ -28,6 +28,7 @@ import Swal from "sweetalert2";
 import { Navigate } from "react-router-dom";
 import ClearIcon from "@mui/icons-material/Clear";
 import { jwtDecode } from "jwt-decode";
+import dayjs from "dayjs";
 
 const AddProduct = (prop: { jwt_token: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -115,8 +116,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
         setUnit(res.data.unit);
         setStock(res.data.stock);
         setSelectedStatus(res.data.selectedStatus);
-        setStartDate(res.data.startDate);
-        setEndDate(res.data.endDate);
+        setStartDate(res.data.date_reserve_start);
+        setEndDate(res.data.date_reserve_end);
         setCoverImage([res.data.product_image]);
         setProductVideo(res.data.product_video ? [res.data.product_video] : []);
         setSelectImage(
@@ -148,6 +149,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
     );
     if (selectedStatus) {
       setSelectedStatus(selectedStatus.statusName);
+      setStartDate(null);
+      setEndDate(null);
     }
   };
   const onSubmit = () => {
@@ -183,6 +186,14 @@ const AddProduct = (prop: { jwt_token: string }) => {
     } else {
       setCheckStandard(true);
     }
+    if (selectedType == "จองสินค้าผ่านเว็บไซต์" && selectedStatus == "") {
+      check = false;
+    }
+
+    if (selectedStatus == "เปิดรับจองตามช่วงเวลา" && !startDate && !endDate) {
+      check = false;
+    }
+
     if (!check) {
       return;
     }
@@ -197,8 +208,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
       unit: unit,
       stock: stock,
       selectedStatus: selectedStatus,
-      startDate: startDate,
-      endDate: endDate,
+      date_reserve_start: startDate,
+      date_reserve_end: endDate,
       product_image: coverImage[0],
       product_video: productVideo[0],
       additional_images: JSON.stringify(selectImage),
@@ -649,6 +660,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   <TextField
                     select
                     fullWidth
+                    value={selectedStatus}
                     label="สถานะการจอง"
                     onChange={handleReservationStatusChange}
                   >
@@ -679,6 +691,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
+                          defaultValue={startDate ? dayjs(startDate) : null}
                           onChange={(e: any) =>
                             setStartDate(e.format("YYYY-MM-DD"))
                           }
@@ -692,6 +705,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
+                          defaultValue={endDate ? dayjs(endDate) : null}
                           onChange={(e: any) =>
                             setEndDate(e.format("YYYY-MM-DD"))
                           }

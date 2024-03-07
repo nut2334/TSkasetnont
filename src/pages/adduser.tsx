@@ -18,8 +18,7 @@ import axios from "axios";
 import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
 
-const AddUser = (prop: { jwt_token: string }) => {
-  const apiAddUser = config.getApiEndpoint("adduser", "POST");
+const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
@@ -55,10 +54,16 @@ const AddUser = (prop: { jwt_token: string }) => {
   };
 
   useEffect(() => {
+    if (prop.addfarmer) {
+      setAllrole([{ role_id: "farmers", role_name: "เกษตรกร" }]);
+      return;
+    }
     axios
       .get(apiRole)
       .then((res) => {
         if (res.data) {
+          console.log(res.data);
+
           setAllrole(res.data);
         }
       })
@@ -167,13 +172,15 @@ const AddUser = (prop: { jwt_token: string }) => {
       tel: tel,
       role: role,
     };
-    console.log(data);
     if (role == "") {
       setRoleCheck(false);
       return;
     }
+    const apiAddUser = config.getApiEndpoint("adduser", "POST");
+    const apiAddFarmer = config.getApiEndpoint("addfarmer", "POST");
+
     axios
-      .post(apiAddUser, data, {
+      .post(prop.addfarmer ? apiAddFarmer : apiAddUser, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },

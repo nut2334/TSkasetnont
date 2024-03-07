@@ -1,4 +1,11 @@
-import { Container, Grid, Typography, Box } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Typography,
+  Box,
+  Divider,
+  Button,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import * as config from "../../config/config";
 import PieChart from "../../components/pie";
@@ -9,10 +16,27 @@ import FollowChart from "../../components/followchart";
 import Pricecenter from "./pricecenter";
 
 const Analyze = (prop: { jwt_token: string }) => {
-  const apiOrder = config.getApiEndpoint("getordersale/date", "GET");
-  const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
-
+  const [farmerDetail, setFarmerDetail] = React.useState<{
+    firstname: string;
+    lastname: string;
+    farmerstorename: string;
+    phone: string;
+    email: string;
+    createAt: string;
+    product_count: number;
+  }>();
   const [today, setToday] = React.useState<number>(0);
+  const [saleData, setSaleData] = React.useState<
+    {
+      date: string;
+      order_sale: number;
+      categories: {
+        category_name: string;
+        order_sale: number;
+        bgcolor: string;
+      }[];
+    }[]
+  >();
   const [follower, setFollower] = React.useState<
     {
       createAt: string;
@@ -20,8 +44,11 @@ const Analyze = (prop: { jwt_token: string }) => {
     }[]
   >([]);
   const [allfollowers, setAllfollowers] = React.useState<number>(0);
+  const [chartType, setChartType] = React.useState<"date" | "month">("date");
 
   useEffect(() => {
+    const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
+    const apiSelfInfo = config.getApiEndpoint("farmerselfinfo", "GET");
     axios
       .get(apiFollowMember, {
         headers: {
@@ -38,15 +65,40 @@ const Analyze = (prop: { jwt_token: string }) => {
         setFollower(follower);
       });
     axios
+      .get(apiSelfInfo, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        let selfData: {
+          firstname: string;
+          lastname: string;
+          farmerstorename: string;
+          phone: string;
+          email: string;
+          createAt: string;
+          product_count: number;
+        } = res.data.farmers[0];
+        console.log(selfData);
+
+        setFarmerDetail(selfData);
+      });
+  }, []);
+
+  useEffect(() => {
+    const apiOrder = config.getApiEndpoint(`getordersale/${chartType}`, "GET");
+    axios
       .get(apiOrder, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
       })
       .then((response) => {
+        setSaleData(response.data.orders);
         setToday(response.data.today);
       });
-  }, []);
+  }, [chartType]);
 
   return (
     <Container
@@ -57,28 +109,91 @@ const Analyze = (prop: { jwt_token: string }) => {
       }}
     >
       <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h3">
-            ยอดผู้ติดตามทั้งหมด {allfollowers} คน
-          </Typography>
-          <FollowChart follower={follower} />
-        </Grid>
-
-        <Grid item xs={6}>
-          <Typography variant="h4">ยอดขายวันนี้ {today} รายการ</Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Typography variant="h4">ยอดขาย 30 วันล่าสุด</Typography>
+        <Box sx={{ display: "flex", width: "100%", alignItems: "center" }}>
+          {farmerDetail && (
+            <Grid
+              sx={{ display: "flex", flexDirection: "column", width: "35%" }}
+            >
+              <Typography variant="h3">
+                ยินดีต้อนรับ {farmerDetail.farmerstorename}
+              </Typography>
+              {/* ข้อมูลพื้นฐาน */}
+              <Typography variant="h4">ข้อมูลพื้นฐาน</Typography>
+              <Typography variant="h5">
+                ชื่อ: {farmerDetail.firstname} {farmerDetail.lastname}
+              </Typography>
+              <Typography variant="h5">
+                เบอร์โทร: {farmerDetail.phone}
+              </Typography>
+              <Typography variant="h5">อีเมล: {farmerDetail.email}</Typography>
+              <Typography variant="h5">
+                วันที่เริ่มใช้งาน:{" "}
+                {new Date(farmerDetail.createAt).toLocaleDateString()}
+              </Typography>
+              <Typography variant="h5">
+                จำนวนสินค้าทั้งหมด: {farmerDetail.product_count} ชิ้น
+              </Typography>
+            </Grid>
+          )}
           <Box
             sx={{
-              padding: 2,
+              width: "65%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            <BarChart jwt_token={prop.jwt_token} />
+            <Typography variant="h3">
+              ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+            </Typography>
+            <FollowChart follower={follower} />
           </Box>
+        </Box>
+        <Divider
+          sx={{
+            width: "100%",
+            margin: 2,
+          }}
+        />
+        <Grid
+          container
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h4">
+              ยอดขาย{chartType === "date" ? "วันนี้ " : "เดือนนี้ "}
+              {today} รายการ
+            </Typography>
+            <Grid>
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => setChartType("date")}
+              >
+                รายวัน
+              </Button>
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => setChartType("month")}
+              >
+                รายเดือน
+              </Button>
+            </Grid>
+          </Box>
+
+          {saleData && <BarChart data={saleData} />}
         </Grid>
-        <Pricecenter />
       </Grid>
+      <Pricecenter />
     </Container>
   );
 };

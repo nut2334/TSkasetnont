@@ -146,6 +146,9 @@ function App() {
           })
           .then((res) => {
             setNotification(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
           });
       }, 15000);
       return () => clearInterval(interval);
@@ -309,6 +312,10 @@ function App() {
                     setFollowList={setFollowList}
                   />
                 }
+              />
+              <Route
+                path="/addfarmer"
+                element={<AddUser jwt_token={jwt_token} addfarmer={true} />}
               />
               <Route
                 path="/managefarmer/:username"
