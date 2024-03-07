@@ -398,7 +398,18 @@ const SigleProduct = (prop: {
           </AliceCarousel>
         </Box>
       </Box>
-      <Typography variant="h4">{product.product_name}</Typography>
+      <Typography variant="h4">
+        {product.product_name}{" "}
+        <div
+          style={{
+            color: "red",
+          }}
+        >
+          {product.stock === 0 && product.selectedType == "สินค้าจัดส่งพัสดุ"
+            ? `สินค้าหมด`
+            : ""}
+        </div>
+      </Typography>
       {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
         <Typography
           variant="h6"
@@ -739,6 +750,8 @@ const SigleProduct = (prop: {
                         });
                         return;
                       }
+                      console.log(prop.cartList, product.farmer_id);
+
                       if (
                         prop.cartList.length > 0 &&
                         product.farmer_id !==
@@ -780,21 +793,19 @@ const SigleProduct = (prop: {
                           weight: product.weight,
                           shippingcost: product.shippingcost,
                         };
-                        //ต่อจากตะกร้าเดิม
-                        if (prop.cartList.length > 0) {
-                          let newCart = [...prop.cartList];
-                          let found = newCart.find(
-                            (item) => item.product_id === product.product_id
-                          );
-                          if (found) {
-                            found.quantity += quantity;
-                          } else {
-                            newCart.push(cart);
-                          }
+                        if (
+                          prop.cartList.filter(
+                            (item) => item.product_id == product.product_id
+                          ).length > 0
+                        ) {
+                          let newCart = prop.cartList;
+                          newCart[
+                            prop.cartList.findIndex(
+                              (item) => item.product_id == product.product_id
+                            )
+                          ].quantity += quantity;
                           prop.setCartList(newCart);
-                        } else {
-                          prop.setCartList([cart]);
-                        }
+                        } else prop.setCartList([...prop.cartList, cart]);
                       }
                     }}
                   >
