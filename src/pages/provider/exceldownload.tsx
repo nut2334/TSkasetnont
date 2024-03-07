@@ -22,6 +22,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";
+import EnhancedTable from "../../components/sortabletable";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,18 +33,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-export const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-    title: {
-      display: true,
-      text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
-    },
-  },
-};
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -65,6 +54,48 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+type Order = "asc" | "desc";
+
+function getComparator<Key extends keyof any>(
+  order: Order,
+  orderBy: Key
+): (
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string }
+) => number {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
+// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
+// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
+// with exampleArray.slice().sort(exampleComparator)
+function stableSort<T>(
+  array: readonly T[],
+  comparator: (a: T, b: T) => number
+) {
+  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
 const ExcelDownload = (prop: { jwt_token: string }) => {
   const [registerData, setRegisterData] = useState<
     { createAt: string; register_count: number }[]
@@ -72,8 +103,10 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
   const [pieChart, setPieChart] = useState<
     { label: string; data: number; bgcolor: string }[]
   >([]);
+  const [max, setMax] = useState<number>(0);
   const [farmerData, setFarmerData] = useState<
     {
+      id: number;
       createAt: string;
       email: string;
       farmerstorename: string;
@@ -121,7 +154,8 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           createAt: string;
           register_count: number;
         }[] = res.data.farmers;
-
+        let max = Math.max(...farmers.map((data) => data.register_count));
+        setMax(max);
         setRegisterData(farmers);
       });
     axios
@@ -153,7 +187,20 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           product_count: number;
         }[] = res.data.farmers;
 
-        setFarmerData(farmers);
+        setFarmerData(
+          farmers.map((farmer, index) => {
+            return {
+              id: index,
+              createAt: farmer.createAt,
+              email: farmer.email,
+              farmerstorename: farmer.farmerstorename,
+              firstname: farmer.firstname,
+              lastname: farmer.lastname,
+              phone: farmer.phone,
+              product_count: farmer.product_count,
+            };
+          })
+        );
       });
   }, []);
   return (
@@ -197,7 +244,30 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
             height={"100%"}
           >
             <Line
-              options={options}
+              options={{
+                scales: {
+                  x: {
+                    stacked: true,
+                  },
+                  y: {
+                    stacked: true,
+                    ticks: {
+                      stepSize: 1,
+                    },
+                    max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
+                  },
+                },
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: "top" as const,
+                  },
+                  title: {
+                    display: true,
+                    text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
+                  },
+                },
+              }}
               data={{
                 labels: registerData.map((d) =>
                   new Date(d.createAt).toLocaleDateString()
@@ -256,6 +326,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
       </Box>
       <Button onClick={downloadExcel}>Excel Download</Button>
       {farmerData && (
+        // <EnhancedTable rows={farmerData} />
         <Box width={"70%"}>
           <TableContainer component={Paper}>
             <Table aria-label="simple table">

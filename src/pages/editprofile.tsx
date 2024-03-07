@@ -307,6 +307,7 @@ const EditProfile = (prop: {
                 )[0].tambon
               );
             }
+            console.log(res.data);
 
             if (res.data.shippingcost) {
               setShippingCost(JSON.parse(res.data.shippingcost));
