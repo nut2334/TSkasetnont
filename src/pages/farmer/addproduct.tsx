@@ -54,6 +54,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [weight, setWeight] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
   const [checkUnit, setCheckUnit] = useState<boolean>(true);
+  const [regUnit, setRegUnit] = useState<boolean>(true);
   const [startDate, setStartDate] = useState(null);
   const [checkstartDate, setCheckStartDate] = useState<boolean>(true);
   const [endDate, setEndDate] = useState(null);
@@ -209,6 +210,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
     if (!unit) {
       setCheckUnit(false);
       check = false;
+    } else {
+      let regUnit = /^[ก-๏a-zA-Z0-9\s]+$/;
+      if (!regUnit.test(unit)) {
+        setRegUnit(false);
+        check = false;
+      }
     }
 
     if (!check) {
@@ -314,8 +321,11 @@ const AddProduct = (prop: { jwt_token: string }) => {
         variant="outlined"
         onChange={(e) => setUnit(e.target.value)}
         fullWidth
-        error={!checkUnit}
-        helperText={!checkUnit && "กรุณากรอกหน่วยของสินค้า"}
+        error={!checkUnit || !regUnit}
+        helperText={
+          (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+          (!regUnit && "ห้ามใส่อักขระพิเศษ")
+        }
         required
       />
     );
