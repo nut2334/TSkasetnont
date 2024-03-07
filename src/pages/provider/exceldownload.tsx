@@ -246,7 +246,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                   },
                   title: {
                     display: true,
-                    text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
+                    text: "จำนวนสินค้าในระบบ",
                   },
                 },
               }}

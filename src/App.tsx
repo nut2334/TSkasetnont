@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import TabLogin from "./components/tab-login";
 import TabProducts from "./components/tab-products";
 import Forgot from "./pages/all/forgot";
@@ -157,7 +157,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
+      <HashRouter>
         <Navbar
           role={decodeJWT.role}
           jwt_token={jwt_token}
@@ -324,7 +324,7 @@ function App() {
             </>
           )}
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   );
 }

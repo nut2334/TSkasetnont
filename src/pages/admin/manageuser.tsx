@@ -230,7 +230,7 @@ const ManageUser = (prop: {
                 ค้นหา
               </Button>
               <NavLink
-                to={currentRole == "tambons" ? "/addfarmer" : "adduser"}
+                to={currentRole == "tambons" ? "/addfarmer" : "/adduser"}
                 style={{ textDecoration: "none" }}
               >
                 <Button variant="contained" startIcon={<AddIcon />}>
