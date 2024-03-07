@@ -29,6 +29,7 @@ import { Navigate } from "react-router-dom";
 import ClearIcon from "@mui/icons-material/Clear";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
+import EditIcon from "@mui/icons-material/Edit";
 
 const AddProduct = (prop: { jwt_token: string }) => {
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -49,12 +50,17 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkType, setCheckType] = useState<boolean>(true);
 
   const [description, setDescription] = useState<string>("");
-  const [price, setPrice] = useState<number>();
+  const [price, setPrice] = useState<number>(0);
   const [weight, setWeight] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
+  const [checkUnit, setCheckUnit] = useState<boolean>(true);
+  const [regUnit, setRegUnit] = useState<boolean>(true);
   const [startDate, setStartDate] = useState(null);
+  const [checkstartDate, setCheckStartDate] = useState<boolean>(true);
   const [endDate, setEndDate] = useState(null);
+  const [checkendDate, setCheckEndDate] = useState<boolean>(true);
   const [selectedStatus, setSelectedStatus] = useState<string>();
+  const [checkStatus, setCheckStatus] = useState<boolean>(true);
 
   const [checkStandard, setCheckStandard] = useState<boolean>(true);
   const [selectedStandard, setSelectedStandard] = React.useState<
@@ -187,11 +193,29 @@ const AddProduct = (prop: { jwt_token: string }) => {
       setCheckStandard(true);
     }
     if (selectedType == "จองสินค้าผ่านเว็บไซต์" && selectedStatus == "") {
+      setCheckStatus(false);
       check = false;
     }
 
     if (selectedStatus == "เปิดรับจองตามช่วงเวลา" && !startDate && !endDate) {
+      if (!startDate) {
+        setCheckStartDate(false);
+        check = false;
+      }
+      if (!endDate) {
+        setCheckEndDate(false);
+        check = false;
+      }
+    }
+    if (!unit) {
+      setCheckUnit(false);
       check = false;
+    } else {
+      let regUnit = /^[ก-๏a-zA-Z0-9\s]+$/;
+      if (!regUnit.test(unit)) {
+        setRegUnit(false);
+        check = false;
+      }
     }
 
     if (!check) {
@@ -233,7 +257,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
         username: username,
       };
     }
-    console.log(body);
 
     axios
       .post(apiAddProduct, body, {
@@ -290,6 +313,23 @@ const AddProduct = (prop: { jwt_token: string }) => {
         });
       });
   };
+  const Unitcomponent = () => {
+    return (
+      <TextField
+        id="outlined-basic"
+        label="หน่วย"
+        variant="outlined"
+        onChange={(e) => setUnit(e.target.value)}
+        fullWidth
+        error={!checkUnit || !regUnit}
+        helperText={
+          (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+          (!regUnit && "ห้ามใส่อักขระพิเศษ")
+        }
+        required
+      />
+    );
+  };
   if (isExist) {
     return <Navigate to="/myproducts" />;
   }
@@ -306,10 +346,21 @@ const AddProduct = (prop: { jwt_token: string }) => {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "green" }}>
-            <AddBusinessIcon />
-          </Avatar>
-          <Typography variant="h5">เพิ่มสินค้า</Typography>
+          {productid ? (
+            <>
+              <Avatar sx={{ m: 1, bgcolor: "green" }}>
+                <EditIcon />
+              </Avatar>
+              <Typography variant="h5">แก้ไขสินค้า</Typography>
+            </>
+          ) : (
+            <>
+              <Avatar sx={{ m: 1, bgcolor: "green" }}>
+                <AddBusinessIcon />
+              </Avatar>
+              <Typography variant="h5">เพิ่มสินค้า</Typography>
+            </>
+          )}
         </Box>
         <form>
           <Grid container spacing={2} sx={{ marginBottom: 1 }}>
@@ -345,7 +396,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} lg={6}>
               <Typography>รูปปก*</Typography>
               {checkCoverImage == false && (
                 <Typography color="red">กรุณาใส่รูปปก</Typography>
@@ -402,7 +453,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </div>
               )}
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} lg={6}>
               <Typography>วิดีโอ</Typography>
               <Button
                 onClick={() => {
@@ -547,7 +598,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     คำอธิบายรูปแบบการเก็บข้อมูล
                   </Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={12} md={4}>
                   <Typography
                     sx={{
                       textAlign: "center",
@@ -560,7 +611,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     สินค้าที่เกษตรกรประชาสัมพันธ์เพื่อเป็นการโฆษณาสินค้า
                   </Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={12} md={4}>
                   <Typography
                     sx={{
                       textAlign: "center",
@@ -577,7 +628,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
                 <Grid
                   item
-                  xs={4}
+                  xs={12}
+                  md={4}
                   sx={{
                     paddingLeft: "10px",
                   }}
@@ -602,13 +654,19 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     textAlign: "center",
                   }}
                 >
-                  <Typography>
-                    หากไม่ต้องการให้สมาชิกสั่งซื้อสินค้า โปรดเลือกประชาสัมพันธ์
+                  <Typography
+                    margin={2}
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    หมายเหตุ: หากไม่ต้องการให้สมาชิกสั่งซื้อสินค้า
+                    โปรดเลือกประชาสัมพันธ์
                   </Typography>
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 value={selectedType}
                 select
@@ -631,7 +689,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
             </Grid>
             {selectedType == "ประชาสัมพันธ์" && (
               <React.Fragment>
-                <Grid item xs={4}>
+                <Grid item xs={6} md={3}>
                   <TextField
                     value={price}
                     id="outlined-basic"
@@ -642,15 +700,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                   />
                 </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    value={unit}
-                    id="outlined-basic"
-                    label="หน่วย"
-                    variant="outlined"
-                    onChange={(e) => setUnit(e.target.value)}
-                    fullWidth
-                  />
+                <Grid item xs={6} md={3}>
+                  <Unitcomponent />
                 </Grid>
               </React.Fragment>
             )}
@@ -663,6 +714,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     value={selectedStatus}
                     label="สถานะการจอง"
                     onChange={handleReservationStatusChange}
+                    required
+                    error={!checkStatus}
+                    helperText={!checkStatus && "กรุณาเลือกสถานะการจอง"}
                   >
                     {reservation_status.map((option) => (
                       <MenuItem key={option.statusID} value={option.statusName}>
@@ -672,14 +726,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   </TextField>
                 </Grid>
                 <Grid item xs={6} lg={6}>
-                  <TextField
-                    id="outlined-basic"
-                    label="หน่วย"
-                    value={unit}
-                    variant="outlined"
-                    onChange={(e) => setUnit(e.target.value)}
-                    fullWidth
-                  />
+                  <Unitcomponent />
                 </Grid>
 
                 {selectedStatus == "เปิดรับจองตามช่วงเวลา" && (
@@ -691,12 +738,18 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          defaultValue={startDate ? dayjs(startDate) : null}
+                          defaultValue={startDate ? dayjs(startDate) : dayjs()}
+                          minDate={dayjs()}
                           onChange={(e: any) =>
                             setStartDate(e.format("YYYY-MM-DD"))
                           }
                         />
                       </LocalizationProvider>
+                      {!checkstartDate && (
+                        <Typography color="red">
+                          กรุณาเลือกวันเริ่มรับจอง
+                        </Typography>
+                      )}
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="subtitle1">
@@ -706,11 +759,21 @@ const AddProduct = (prop: { jwt_token: string }) => {
                         <DatePicker
                           sx={{ width: "100%" }}
                           defaultValue={endDate ? dayjs(endDate) : null}
+                          minDate={
+                            startDate
+                              ? dayjs(startDate).add(1, "day")
+                              : dayjs().add(1, "day")
+                          }
                           onChange={(e: any) =>
                             setEndDate(e.format("YYYY-MM-DD"))
                           }
                         />
                       </LocalizationProvider>
+                      {!checkendDate && (
+                        <Typography color="red">
+                          กรุณาเลือกวันสิ้นสุด
+                        </Typography>
+                      )}
                     </Grid>
                   </React.Fragment>
                 )}
@@ -749,14 +812,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   />
                 </Grid>
                 <Grid item xs={4} lg={6}>
-                  <TextField
-                    id="outlined-basic"
-                    label="หน่วย"
-                    value={unit}
-                    variant="outlined"
-                    onChange={(e) => setUnit(e.target.value)}
-                    fullWidth
-                  />
+                  <Unitcomponent />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
