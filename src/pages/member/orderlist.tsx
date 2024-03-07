@@ -22,6 +22,7 @@ import { Box, Button, Chip, Container, ListItem, Stack } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import TableBank from "../../components/tablebank";
+import Orderreservemember from "./orderreservename";
 
 interface orderInterface {
   id: string;
@@ -251,11 +252,7 @@ const Orderlist = (prop: { jwt_token: string }) => {
 
   return (
     <div>
-      {
-        orderList.length === 0 ? (
-          <div>ไม่มีรายการสั่งซื้อ</div>
-        ) : null
-      }
+      {orderList.length === 0 ? <div>ไม่มีรายการสั่งซื้อ</div> : null}
       {orderList.map((order: any, index: number) => {
         return (
           <EachOrder
@@ -266,6 +263,7 @@ const Orderlist = (prop: { jwt_token: string }) => {
           />
         );
       })}
+      <Orderreservemember jwt_token={prop.jwt_token} />
     </div>
   );
 };
