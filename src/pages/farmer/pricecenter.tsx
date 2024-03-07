@@ -8,8 +8,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Button } from "@mui/base";
+import { Button } from "@mui/material";
 import { Line } from "react-chartjs-2";
+import { SearchOutlined } from "@mui/icons-material";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -86,7 +87,7 @@ const Pricecenter = () => {
 
   return (
     <>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <TextField
           select
           label="หมวดหมู่"
@@ -105,7 +106,7 @@ const Pricecenter = () => {
         </TextField>
       </Grid>
       {selectedCategory !== "" && (
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <TextField
             select
             label="สินค้า"
@@ -154,10 +155,16 @@ const Pricecenter = () => {
       )}
       {product_id !== "" && (
         <>
-          <Typography variant="h6" align="center">
-            {product_id}
-          </Typography>
-          <Button onClick={send}>ค้นหา</Button>
+          <Grid item xs={12}>
+            <Button
+              onClick={send}
+              startIcon={<SearchOutlined />}
+              variant="contained"
+              color="info"
+            >
+              ค้นหา
+            </Button>
+          </Grid>
         </>
       )}
       {graph.length > 0 && (

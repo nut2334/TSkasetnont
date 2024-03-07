@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Tab } from "@mui/material";
+import { Box, Divider, Tab, Typography, Container } from "@mui/material";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
@@ -18,7 +18,7 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
     setValue(newValue);
   };
   return (
-    <Box sx={{ width: "100%", typography: "body1", marginTop: 3 }}>
+    <Container maxWidth="lg">
       <TabContext value={value}>
         <Box>
           <TabList
@@ -48,11 +48,14 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
           <Analyze jwt_token={prop.jwt_token} />
         </TabPanel>
         <TabPanel value="3">
+          <Typography variant="h6">ประวัติการซื้อขาย</Typography>
           <Orderhistory jwt_token={prop.jwt_token} />
+          <Divider />
+          <Typography variant="h6">การจองสินค้า</Typography>
           <Orderreserve jwt_token={prop.jwt_token} />
         </TabPanel>
       </TabContext>
-    </Box>
+    </Container>
   );
 };
 

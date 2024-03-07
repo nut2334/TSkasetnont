@@ -780,7 +780,21 @@ const SigleProduct = (prop: {
                           weight: product.weight,
                           shippingcost: product.shippingcost,
                         };
-                        prop.setCartList([cart]);
+                        //ต่อจากตะกร้าเดิม
+                        if (prop.cartList.length > 0) {
+                          let newCart = [...prop.cartList];
+                          let found = newCart.find(
+                            (item) => item.product_id === product.product_id
+                          );
+                          if (found) {
+                            found.quantity += quantity;
+                          } else {
+                            newCart.push(cart);
+                          }
+                          prop.setCartList(newCart);
+                        } else {
+                          prop.setCartList([cart]);
+                        }
                       }
                     }}
                   >

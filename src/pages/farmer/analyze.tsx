@@ -109,91 +109,108 @@ const Analyze = (prop: { jwt_token: string }) => {
       }}
     >
       <Grid container spacing={3}>
-        <Box sx={{ display: "flex", width: "100%", alignItems: "center" }}>
-          {farmerDetail && (
-            <Grid
-              sx={{ display: "flex", flexDirection: "column", width: "35%" }}
-            >
-              <Typography variant="h3">
-                ยินดีต้อนรับ {farmerDetail.farmerstorename}
-              </Typography>
-              {/* ข้อมูลพื้นฐาน */}
-              <Typography variant="h4">ข้อมูลพื้นฐาน</Typography>
-              <Typography variant="h5">
-                ชื่อ: {farmerDetail.firstname} {farmerDetail.lastname}
-              </Typography>
-              <Typography variant="h5">
-                เบอร์โทร: {farmerDetail.phone}
-              </Typography>
-              <Typography variant="h5">อีเมล: {farmerDetail.email}</Typography>
-              <Typography variant="h5">
-                วันที่เริ่มใช้งาน:{" "}
-                {new Date(farmerDetail.createAt).toLocaleDateString()}
-              </Typography>
-              <Typography variant="h5">
-                จำนวนสินค้าทั้งหมด: {farmerDetail.product_count} ชิ้น
-              </Typography>
-            </Grid>
-          )}
-          <Box
-            sx={{
-              width: "65%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+        {farmerDetail && (
+          <Grid
+            xs={12}
+            sx={{ display: "flex", flexDirection: "column", width: "35%" }}
           >
-            <Typography variant="h3">
-              ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+            <Typography variant="h4">
+              ยินดีต้อนรับ {farmerDetail.farmerstorename}
             </Typography>
-            <FollowChart follower={follower} />
-          </Box>
-        </Box>
-        <Divider
-          sx={{
-            width: "100%",
-            margin: 2,
-          }}
-        />
+            <Divider
+              sx={{
+                marginTop: 2,
+                marginBottom: 2,
+              }}
+            />
+            {/* ข้อมูลพื้นฐาน */}
+            <Typography variant="h5">ข้อมูลพื้นฐาน</Typography>
+            <Typography variant="subtitle1">
+              ชื่อ: {farmerDetail.firstname} {farmerDetail.lastname}
+            </Typography>
+            <Typography variant="subtitle1">
+              เบอร์โทร: {farmerDetail.phone}
+            </Typography>
+            <Typography variant="subtitle1">
+              อีเมล: {farmerDetail.email}
+            </Typography>
+            <Typography variant="subtitle1">
+              วันที่เริ่มใช้งาน:{" "}
+              {new Date(farmerDetail.createAt).toLocaleDateString()}
+            </Typography>
+            <Typography variant="subtitle1">
+              จำนวนสินค้าทั้งหมด: {farmerDetail.product_count} ชิ้น
+            </Typography>
+            <Divider
+              sx={{
+                marginTop: 2,
+                marginBottom: 2,
+              }}
+            />
+          </Grid>
+        )}
+        <Grid xs={12}>
+          <Typography variant="h5">
+            ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+          </Typography>
+        </Grid>
+        <Grid xs={12}>
+          <FollowChart follower={follower} />
+        </Grid>
+        <Grid xs={12}>
+          <Divider
+            sx={{
+              width: "100%",
+              margin: 2,
+            }}
+          />
+        </Grid>
         <Grid
-          container
+          xs={12}
           sx={{
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h4">
-              ยอดขาย{chartType === "date" ? "วันนี้ " : "เดือนนี้ "}
-              {today} รายการ
-            </Typography>
-            <Grid>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => setChartType("date")}
-              >
-                รายวัน
-              </Button>
-              <Button
-                variant="contained"
-                color="info"
-                onClick={() => setChartType("month")}
-              >
-                รายเดือน
-              </Button>
-            </Grid>
-          </Box>
-
-          {saleData && <BarChart data={saleData} />}
+          <Typography variant="h5">
+            ยอดขาย{chartType === "date" ? "วันนี้ " : "เดือนนี้ "}
+            {today} รายการ
+          </Typography>
         </Grid>
+
+        <Grid>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => setChartType("date")}
+            sx={{ marginRight: 1 }}
+          >
+            รายวัน
+          </Button>
+
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => setChartType("month")}
+          >
+            รายเดือน
+          </Button>
+        </Grid>
+        <Grid xs={12}>{saleData && <BarChart data={saleData} />}</Grid>
+        <Grid xs={12}>
+          <Divider
+            sx={{
+              width: "100%",
+              margin: 2,
+            }}
+          />
+        </Grid>
+        <Grid xs={12}>
+          <Typography variant="h5">ราคากลาง</Typography>
+        </Grid>
+
+        <Pricecenter />
       </Grid>
-      <Pricecenter />
     </Container>
   );
 };

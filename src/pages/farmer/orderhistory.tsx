@@ -10,7 +10,14 @@ import Collapse from "@mui/material/Collapse";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Box, Button, Chip, Container, ListItem, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  ListItem,
+  Typography,
+} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import withReactContent from "sweetalert2-react-content";
@@ -402,11 +409,9 @@ const Orderhistory = (prop: { jwt_token: string }) => {
   return (
     <div>
       <Container maxWidth="lg">
-        {
-          orderHistory.length === 0 && (
-            <Typography>ไม่มีประวัติการสั่งซื้อ</Typography>
-          )
-        }
+        {orderHistory.length === 0 && (
+          <Typography>ไม่มีประวัติการสั่งซื้อ</Typography>
+        )}
         {orderHistory.map((order, index) => {
           return (
             <EachOrder

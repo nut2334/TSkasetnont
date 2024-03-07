@@ -203,8 +203,8 @@ const ManageUser = (prop: {
                 }
               />
             </Grid>
-            <Grid item xs={6}>
-              {currentRole !== "tambons" && (
+            {currentRole !== "tambons" && (
+              <Grid item xs={6}>
                 <TextField
                   select
                   label="ตำแหน่ง"
@@ -217,8 +217,8 @@ const ManageUser = (prop: {
                     </MenuItem>
                   ))}
                 </TextField>
-              )}
-            </Grid>
+              </Grid>
+            )}
             <Grid item xs={6}>
               <Button
                 variant="contained"
@@ -339,21 +339,25 @@ const ManageUser = (prop: {
           />
         </>
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "right",
-          width: "100%",
-        }}
-      >
-        <Button
-          color="error"
-          variant="contained"
-          onClick={() => setEditingUser(undefined)}
-        >
-          ยกเลิก
-        </Button>
-      </div>
+      {editingUser && currentRole !== "tambons" && (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "right",
+              width: "100%",
+            }}
+          >
+            <Button
+              color="error"
+              variant="contained"
+              onClick={() => setEditingUser(undefined)}
+            >
+              ยกเลิก
+            </Button>
+          </div>
+        </>
+      )}
     </Container>
   );
 };

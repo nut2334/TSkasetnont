@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import * as config from "../config/config";
 import { Chart } from "chart.js/dist";
+import { Grid } from "@mui/material";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -130,16 +131,19 @@ const BarChart = (prop: {
         ></Bar>
       )}
       {max === 0 && (
-        <div
-          style={{
+        <Grid
+          xs={12}
+          item
+          sx={{
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%,-50%)",
+            textAlign: "center",
           }}
         >
           <h1>ไม่มีข้อมูลการขาย</h1>
-        </div>
+        </Grid>
       )}
     </div>
   );
