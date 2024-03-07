@@ -19,7 +19,6 @@ const TabLogin = (prop: {
 
   return (
     <Box sx={{ width: "100%", typography: "body1", marginTop: 3 }}>
-      {prop.jwt_token}
       <div style={{ textAlign: "center" }}>
         <img src={Logo} height="auto" width="100px" />
       </div>

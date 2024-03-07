@@ -707,9 +707,9 @@ const SigleProduct = (prop: {
                                 console.log(error);
                                 Swal.fire({
                                   icon: "error",
-                                  title: "จองสินค้าไม่สำเร็จ",
+                                  title: error.response.data.message,
                                   showConfirmButton: false,
-                                  timer: 1500,
+                                  showCloseButton: true,
                                 });
                               });
                           }

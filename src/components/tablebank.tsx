@@ -103,67 +103,6 @@ const GenerateStart = (prop: {
           }}
         />
       )}
-      {/* <Box>
-        {Array(5)
-          .fill(0)
-          .map((_, index) => {
-            if (product.comment === null || product.comment === undefined) {
-              if (index < hoverScore) {
-                return (
-                  <StarIcon
-                    sx={{
-                      color: "#ffd700",
-                      cursor: "pointer",
-                    }}
-                    key={index}
-                    onMouseOver={() => {
-                      setHoverScore(index + 1);
-                    }}
-                    onMouseOutCapture={() => {
-                      setHoverScore(0);
-                    }}
-                    onClick={() => {
-                      callSwl(
-                        index2,
-                        index + 1,
-                        product.product_id,
-                        haveComment.order_id,
-                        haveComment.jwt_token
-                      );
-                    }}
-                  />
-                );
-              }
-              return (
-                <StarBorderIcon
-                  key={index}
-                  onMouseOver={() => {
-                    setHoverScore(index + 1);
-                  }}
-                  onClick={() => {
-                    callSwl(
-                      index2,
-                      index + 1,
-                      product.product_id,
-                      haveComment.order_id,
-                      haveComment.jwt_token
-                    );
-                  }}
-                />
-              );
-            }
-            return index < product.comment.rating ? (
-              <StarIcon
-                sx={{
-                  color: "#ffd700",
-                }}
-                key={index}
-              />
-            ) : (
-              <StarBorderIcon key={index} />
-            );
-          })}
-      </Box> */}
     </StyledTableCell>
   );
 };

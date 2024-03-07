@@ -9,6 +9,7 @@ import QueryBuilderIcon from "@mui/icons-material/QueryBuilder";
 import Myproducts from "../pages/farmer/myproducts";
 import Orderhistory from "../pages/farmer/orderhistory";
 import Analyze from "../pages/farmer/analyze";
+import Orderreserve from "../pages/farmer/orderreserve";
 
 const TabProducts = (prop: { jwt_token: string; username: string }) => {
   const [value, setValue] = React.useState("1");
@@ -48,6 +49,7 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
         </TabPanel>
         <TabPanel value="3">
           <Orderhistory jwt_token={prop.jwt_token} />
+          <Orderreserve jwt_token={prop.jwt_token} />
         </TabPanel>
       </TabContext>
     </Box>
