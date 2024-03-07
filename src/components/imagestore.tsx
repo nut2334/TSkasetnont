@@ -226,23 +226,23 @@ const Imagestore = (prop: {
           <Button
             variant="contained"
             onClick={() => {
+              prop.setSelectImage(selectedImage);
               prop.closeModal();
             }}
-            color="error"
             sx={{
-              marginRight: "8px",
+              marginRight: "5px",
             }}
           >
-            ยกเลิก
+            ยืนยัน
           </Button>
           <Button
             variant="contained"
             onClick={() => {
-              prop.setSelectImage(selectedImage);
               prop.closeModal();
             }}
+            color="error"
           >
-            ยืนยัน
+            ยกเลิก
           </Button>
         </Grid>
       </Box>

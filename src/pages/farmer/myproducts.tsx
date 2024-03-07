@@ -10,6 +10,7 @@ import {
   CardActions,
   TextField,
   Chip,
+  Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -43,7 +44,11 @@ interface ProductInterface {
   category_name: string;
 }
 
-const Myproducts = (prop: { jwt_token: string; username?: string }) => {
+const Myproducts = (prop: {
+  jwt_token: string;
+  username?: string;
+  padding?: string;
+}) => {
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
   const [navigatePath, setNavigatePath] = useState("");
   const [allCategory, setAllCategory] = useState<
@@ -103,7 +108,13 @@ const Myproducts = (prop: { jwt_token: string; username?: string }) => {
     return <Navigate to={`/editproduct/${navigatePath}`} />;
   }
   return (
-    <Container component="main" maxWidth="md">
+    <Container
+      component="main"
+      maxWidth="md"
+      sx={{
+        padding: username ? "20px" : "",
+      }}
+    >
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <TextField
@@ -140,7 +151,7 @@ const Myproducts = (prop: { jwt_token: string; username?: string }) => {
       <Container sx={{ py: 8 }} maxWidth="md">
         {/* End hero unit */}
         <Grid container spacing={4}>
-          {filterSearch &&
+          {filterSearch.length > 0 ? (
             filterSearch.map((product, index) => {
               let bgcolor = allCategory.find(
                 (item) => item.category_id === product.category_id
@@ -273,7 +284,39 @@ const Myproducts = (prop: { jwt_token: string; username?: string }) => {
                   </Card>
                 </Grid>
               );
-            })}
+            })
+          ) : (
+            <>
+              <Stack
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <Stack>
+                  <img
+                    src={require("../../assets/sad.png")}
+                    alt="sad"
+                    width="200"
+                    height="200"
+                  />
+                </Stack>
+                <Stack>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      color: "gray",
+                    }}
+                  >
+                    ไม่มีสินค้าในระบบ
+                  </Typography>
+                </Stack>
+              </Stack>
+            </>
+          )}
         </Grid>
       </Container>
     </Container>
