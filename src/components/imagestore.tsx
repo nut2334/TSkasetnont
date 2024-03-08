@@ -190,7 +190,7 @@ const Imagestore = (prop: {
             files.forEach((file) => {
               data.append("image", file);
             });
-
+            let s = "http://localhost:3006/imageupload";
             axios
               .post(apiImageUpload, data, {
                 headers: {

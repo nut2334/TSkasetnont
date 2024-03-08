@@ -282,7 +282,7 @@ const Navbar = (prop: {
                     <NotificationsIcon />
                   )}
                 </Badge>
-                {prop.notification.map((noti, index) => (
+                {/* {prop.notification.map((noti, index) => (
                   <Menu
                     anchorEl={anchorEl}
                     anchorOrigin={{
@@ -354,7 +354,7 @@ const Navbar = (prop: {
                       </MenuItem>
                     </NavLink>
                   </Menu>
-                ))}
+                ))} */}
               </>
             ) : null}
             <Box sx={{ flexGrow: 0 }}>

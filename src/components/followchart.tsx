@@ -102,7 +102,7 @@ const FollowChart = (prop: {
             transform: "translate(-50%,-50%)",
           }}
         >
-          <h1>ไม่มีข้อมูลการขาย</h1>
+          <h1>ไม่มีข้อมูลการติดตาม</h1>
         </div>
       )}
     </div>

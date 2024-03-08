@@ -29,7 +29,7 @@ interface OrderReserveInterface {
     phone: string;
   };
   dates: string;
-  date_complete: string | null;
+  dates_complete: string | null;
   status: string;
 }
 interface productInterface {
@@ -136,8 +136,8 @@ const EachReserve = (prop: {
             <ListItem>
               <ListItemText
                 primary={`วันที่สำเร็จ: ${
-                  order.date_complete
-                    ? new Date(order.date_complete).toLocaleDateString(
+                  order.dates_complete
+                    ? new Date(order.dates_complete).toLocaleDateString(
                         "th-TH",
                         {
                           year: "numeric",

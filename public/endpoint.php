@@ -3,7 +3,7 @@ $headers = getallheaders();
 
 // error_reporting(E_ERROR | E_PARSE);
 $method = $_SERVER['REQUEST_METHOD'];
-$port = 3001;
+$port = 3006;
 $url = 'http://localhost:' . $port . '/';
 $Auth = null;
 //find the Authorization header

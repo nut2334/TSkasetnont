@@ -118,7 +118,7 @@ const Payment = (prop: {
           allowEnterKey: false,
         });
         const formData = new FormData();
-        formData.append("productSlip", slip);
+        formData.append("image", slip);
         formData.append("address", address);
         formData.append("shippingcost", prop.shippingcost.toString());
         let allProduct = prop.cartList.map((product) => {

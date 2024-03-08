@@ -319,6 +319,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
         id="outlined-basic"
         label="หน่วย"
         variant="outlined"
+        value={unit}
         onChange={(e) => setUnit(e.target.value)}
         fullWidth
         error={!checkUnit || !regUnit}

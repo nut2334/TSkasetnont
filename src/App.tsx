@@ -168,7 +168,7 @@ function App() {
           setNotification={setNotification}
         />
         <MessengerChat
-          pageId="109287808726963"
+          pageId="232517789953735"
           language="th_TH"
           themeColor={"#2f6e39"}
           bottomSpacing={70}
