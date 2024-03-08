@@ -280,6 +280,10 @@ function App() {
                   />
                 }
               />
+              <Route
+                path="/datafarmer"
+                element={<ExcelDownload jwt_token={jwt_token} />}
+              />
             </React.Fragment>
           )}
           {decodeJWT.role == "members" && (

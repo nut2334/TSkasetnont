@@ -313,24 +313,24 @@ const AddProduct = (prop: { jwt_token: string }) => {
         });
       });
   };
-  const Unitcomponent = () => {
-    return (
-      <TextField
-        id="outlined-basic"
-        label="หน่วย"
-        variant="outlined"
-        value={unit}
-        onChange={(e) => setUnit(e.target.value)}
-        fullWidth
-        error={!checkUnit || !regUnit}
-        helperText={
-          (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
-          (!regUnit && "ห้ามใส่อักขระพิเศษ")
-        }
-        required
-      />
-    );
-  };
+  // const Unitcomponent = () => {
+  //   return (
+  //     <TextField
+  //       id="outlined-basic"
+  //       label="หน่วย"
+  //       variant="outlined"
+  //       value={unit}
+  //       onChange={(e) => setUnit(e.target.value)}
+  //       fullWidth
+  //       error={!checkUnit || !regUnit}
+  //       helperText={
+  //         (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+  //         (!regUnit && "ห้ามใส่อักขระพิเศษ")
+  //       }
+  //       required
+  //     />
+  //   );
+  // };
   if (isExist) {
     return <Navigate to="/myproducts" />;
   }
@@ -702,7 +702,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   />
                 </Grid>
                 <Grid item xs={6} md={3}>
-                  <Unitcomponent />
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                    error={!checkUnit || !regUnit}
+                    helperText={
+                      (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+                      (!regUnit && "ห้ามใส่อักขระพิเศษ")
+                    }
+                    required
+                  />
                 </Grid>
               </React.Fragment>
             )}
@@ -727,7 +740,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   </TextField>
                 </Grid>
                 <Grid item xs={6} lg={6}>
-                  <Unitcomponent />
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                    error={!checkUnit || !regUnit}
+                    helperText={
+                      (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+                      (!regUnit && "ห้ามใส่อักขระพิเศษ")
+                    }
+                    required
+                  />
                 </Grid>
 
                 {selectedStatus == "เปิดรับจองตามช่วงเวลา" && (
@@ -813,7 +839,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   />
                 </Grid>
                 <Grid item xs={4} lg={6}>
-                  <Unitcomponent />
+                  <TextField
+                    id="outlined-basic"
+                    label="หน่วย"
+                    variant="outlined"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    fullWidth
+                    error={!checkUnit || !regUnit}
+                    helperText={
+                      (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
+                      (!regUnit && "ห้ามใส่อักขระพิเศษ")
+                    }
+                    required
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField

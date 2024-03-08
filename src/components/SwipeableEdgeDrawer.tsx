@@ -151,6 +151,7 @@ export default function SwipeableEdgeDrawer(
                   sx={{
                     textAlign: "right",
                   }}
+                  display={{ xs: "none", md: "flex" }}
                 >
                   <img
                     src={`${config.getApiEndpoint(
@@ -163,6 +164,29 @@ export default function SwipeableEdgeDrawer(
                       width: "300px",
                       aspectRatio: 1 / 1,
                       borderRadius: "25px",
+                    }}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={5}
+                  sx={{
+                    textAlign: "right",
+                  }}
+                  display={{ xs: "flex", md: "none" }}
+                >
+                  <img
+                    src={`${config.getApiEndpoint(
+                      `getimage/${props.selectedProduct.product_image
+                        .split("/")
+                        .pop()}`,
+                      "get"
+                    )}`}
+                    style={{
+                      width: "100px",
+                      aspectRatio: 1 / 1,
+                      borderRadius: "25px",
+                      objectFit: "cover",
                     }}
                   />
                 </Grid>
