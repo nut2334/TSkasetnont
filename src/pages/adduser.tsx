@@ -295,8 +295,10 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                onChange={(event) => setComfirmPassword(event.target.value)}
-                onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
+                onChange={(event) => {
+                  if (event.target.value != "") {
+                    setComfirmPassword(event.target.value);
+                  }
                   if (event.target.value != password) {
                     setComfirmPasswordCheck(false);
                   } else {
