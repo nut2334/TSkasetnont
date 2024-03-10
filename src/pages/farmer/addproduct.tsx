@@ -10,6 +10,13 @@ import {
   TextField,
   Divider,
   Stack,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  Checkbox,
+  ListItemText,
+  ListSubheader,
 } from "@mui/material";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -32,7 +39,9 @@ import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
 
 const AddProduct = (prop: { jwt_token: string }) => {
+  const apiCertificate = config.getApiEndpoint("certifarmer", "GET");
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
+
   const [productName, setProductName] = useState<string>("");
   const [checkProductName, setCheckProductName] = useState<boolean>(true);
 
@@ -61,7 +70,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkendDate, setCheckEndDate] = useState<boolean>(true);
   const [selectedStatus, setSelectedStatus] = useState<string>();
   const [checkStatus, setCheckStatus] = useState<boolean>(true);
-
   const [checkStandard, setCheckStandard] = useState<boolean>(true);
   const [selectedStandard, setSelectedStandard] = React.useState<
     {
@@ -80,14 +88,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
       standard_cercification: undefined,
     },
   ]);
-
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
     productid: string;
     username: string;
     shopname: string;
   }>();
-
   const [modalIsOpen, setIsOpen] = useState<{
     isOpen: boolean;
     imageSelect: number;
@@ -96,6 +102,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
   const [isExist, setIsExist] = useState<boolean>(false);
+  const [checked, setChecked] = React.useState([0]);
 
   function closeModal() {
     setIsOpen(null);
@@ -132,7 +139,29 @@ const AddProduct = (prop: { jwt_token: string }) => {
         setSelectedStandard(JSON.parse(res.data.certificate));
       });
     }
+    axios
+      .get(apiCertificate, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
   }, []);
+
+  const handleToggle = (value: number, standard_id: string) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryId = event.target.value;
@@ -313,24 +342,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
         });
       });
   };
-  // const Unitcomponent = () => {
-  //   return (
-  //     <TextField
-  //       id="outlined-basic"
-  //       label="หน่วย"
-  //       variant="outlined"
-  //       value={unit}
-  //       onChange={(e) => setUnit(e.target.value)}
-  //       fullWidth
-  //       error={!checkUnit || !regUnit}
-  //       helperText={
-  //         (!checkUnit && "กรุณากรอกหน่วยของสินค้า") ||
-  //         (!regUnit && "ห้ามใส่อักขระพิเศษ")
-  //       }
-  //       required
-  //     />
-  //   );
-  // };
   if (isExist) {
     return <Navigate to="/myproducts" />;
   }
@@ -568,12 +579,50 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Stack>
               </Container>
             </Grid>
-            <AddStandard
+            {/* <AddStandard
               setSelectedStandard={setSelectedStandard}
               selectedStandard={selectedStandard}
               jwt_token={prop.jwt_token}
               checkStandard={checkStandard}
-            />
+            /> */}
+            <Grid item xs={12}>
+              <List
+                subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    มาตรฐานสินค้า
+                  </ListSubheader>
+                }
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {selectedStandard.map((data, index) => (
+                  <ListItem
+                    key={data.standard_id}
+                    disablePadding
+                    onClick={handleToggle(index, data.standard_id)}
+                  >
+                    <ListItemButton dense>
+                      <ListItemIcon>
+                        <Checkbox
+                          edge="start"
+                          tabIndex={-1}
+                          disableRipple
+                          inputProps={{ "aria-labelledby": data.standard_id }}
+                          checked={checked.indexOf(index) !== -1}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        id={data.standard_id}
+                        primary={data.standard_name}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
             <Grid item xs={12}>
               <Divider />
             </Grid>
