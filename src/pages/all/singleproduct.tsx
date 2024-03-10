@@ -181,6 +181,10 @@ const SigleProduct = (prop: {
     axios.get(apiComments).then((response) => {
       setComment(response.data.reviews);
     });
+    const apiAllStandard = config.getApiEndpoint(`standardproducts`, "get");
+    axios.get(apiAllStandard).then((response) => {
+      console.log(response.data);
+    });
   }, []);
 
   const handleCopy = (text: string) => () => {
