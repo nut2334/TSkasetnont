@@ -101,6 +101,7 @@ const Navbar = (prop: {
         { name: "จัดการสมาชิก", path: "/manageuser" },
         { name: "การตั้งค่า", path: "/setting" },
         { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
+        { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "farmers") {
       setVisiblePages([

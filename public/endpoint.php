@@ -23,8 +23,40 @@ if (isset($endpoint) && isset($method)) {
     if ($str_arr[0] == 'getproduct') {
         $rest_api_url = $url . $str_arr[0] . '/' . urlencode($str_arr[1]) . '/' . $str_arr[2];
     }
+    
+    $allFormData = count($_FILES);
+    if ($allFormData > 0){
+    define('MULTIPART_BOUNDARY', '--------------------------'.microtime(true));
+    $header = 'Content-Type: multipart/form-data; boundary='.MULTIPART_BOUNDARY.
+            "\r\nAuthorization: $Auth\r\n";
+    foreach ($_FILES as $key => $value) {
 
-    if ($method == 'POST') {
+        $post_data = file_get_contents($_FILES[$key]['tmp_name']);
+        define('FORM_FIELD', 'image'); 
+        $content .=  "--".MULTIPART_BOUNDARY."\r\n".
+        "Content-Disposition: form-data; name=\"".FORM_FIELD."\"; filename=\"".basename($_FILES[$key]['name'])."\"\r\n".
+                    "Content-Type: application/zip\r\n\r\n".
+                    $post_data."\r\n";
+    }
+    
+    // add some POST fields to the request too: $_POST['foo'] = 'bar'
+    foreach ($_POST as $key => $value) {
+        $content .= "--".MULTIPART_BOUNDARY."\r\n".
+                    "Content-Disposition: form-data; name=\"$key\"\r\n\r\n".
+                    "$value\r\n";
+    }
+    // signal end of request (note the trailing "--")
+    $content .= "--".MULTIPART_BOUNDARY."--\r\n";
+    $options = array(
+        'http' => array(
+            'method' => $method,
+            'content' => $content,
+            'header' => $header,
+        )
+        );
+    
+    }
+    elseif ($method == 'POST') {
         $post_data = file_get_contents('php://input');
         $options = array(
             'http' => array(
@@ -71,11 +103,11 @@ if (isset($endpoint) && isset($method)) {
         );
     }
     $json_data = file_get_contents($rest_api_url, false, stream_context_create($options));
-    if ($json_data === FALSE) {
+    // if ($json_data === FALSE) {
 
-        http_response_code(500);
-        return json_encode(array('error' => 'API call failed'));
-    }
+    //     http_response_code(500);
+    //     return json_encode(array('error' => 'API call failed'));
+    // }
     header('Content-Type: application/json; charset=utf-8');
     // Reads the JSON file.
     header('Access-Control-Allow-Origin: *');

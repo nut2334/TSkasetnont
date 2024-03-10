@@ -24,6 +24,7 @@ import Orderlist from "./pages/member/orderlist";
 import { MessengerChat } from "react-messenger-chat-plugin";
 import Myproducts from "./pages/farmer/myproducts";
 import ExcelDownload from "./pages/provider/exceldownload";
+import Certification from "./pages/admin/certification";
 
 export interface Cart {
   product_id: string;
@@ -283,6 +284,10 @@ function App() {
               <Route
                 path="/datafarmer"
                 element={<ExcelDownload jwt_token={jwt_token} />}
+              />
+              <Route
+                path="/certification"
+                element={<Certification jwt_token={jwt_token} />}
               />
             </React.Fragment>
           )}
