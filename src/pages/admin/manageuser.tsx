@@ -29,9 +29,7 @@ interface userInterface {
   lastname: string;
   phone: string;
   role: string;
-  certificates: {
-    standard_id: string;
-  }[];
+  certificates: string[];
 }
 const ManageUser = (prop: {
   jwt_token: string;
@@ -163,12 +161,14 @@ const ManageUser = (prop: {
         user.username.includes(searchUsername)
       );
     }
-
     if (searchStandard !== "all" && searchStandard !== "") {
       filteredUsers = filteredUsers.filter((user) => {
-        return user.certificates.some(
-          (certificate) => certificate.standard_id === searchStandard
-        );
+        if (!user.certificates) return false;
+        console.log(user.certificates, "ass", searchStandard);
+        let found = user.certificates.find((cert) => {
+          return cert === searchStandard;
+        });
+        return found;
       });
     }
 
