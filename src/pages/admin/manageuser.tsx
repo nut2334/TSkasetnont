@@ -29,6 +29,9 @@ interface userInterface {
   lastname: string;
   phone: string;
   role: string;
+  certificates: {
+    standard_id: string;
+  }[];
 }
 const ManageUser = (prop: {
   jwt_token: string;
@@ -46,6 +49,7 @@ const ManageUser = (prop: {
   const [filteredUsers, setFilteredUsers] = useState<userInterface[]>([]);
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchUsername, setSearchUsername] = useState<string>("");
+  const [searchStandard, setSearchStandard] = useState<string>("");
   const [role, setRole] = useState("");
   const [currentRole, setCurrentRole] = useState("");
   const [viewFarmer, setViewFarmer] = useState<string>("");
@@ -60,6 +64,12 @@ const ManageUser = (prop: {
     username: string;
     role: string;
   }>();
+  const [allStandardProducts, setAllStandardProducts] = useState<
+    {
+      standard_id: string;
+      standard_name: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     const apiFetchUsers = config.getApiEndpoint("users", "GET");
@@ -72,9 +82,14 @@ const ManageUser = (prop: {
         },
       })
       .then((response: any) => {
+        console.log(response.data);
         setUsers(response.data);
         setFilteredUsers(response.data);
       });
+    axios.get(config.getApiEndpoint("standardproducts", "GET")).then((res) => {
+      console.log(res.data);
+      setAllStandardProducts(res.data);
+    });
   }, []);
 
   useEffect(() => {
@@ -148,6 +163,15 @@ const ManageUser = (prop: {
         user.username.includes(searchUsername)
       );
     }
+
+    if (searchStandard !== "all" && searchStandard !== "") {
+      filteredUsers = filteredUsers.filter((user) => {
+        return user.certificates.some(
+          (certificate) => certificate.standard_id === searchStandard
+        );
+      });
+    }
+
     setFilteredUsers(filteredUsers);
   };
 
@@ -219,10 +243,33 @@ const ManageUser = (prop: {
                 </TextField>
               </Grid>
             )}
+            {
+              <Grid item xs={6}>
+                <TextField
+                  select
+                  label="มาตรฐาน"
+                  fullWidth
+                  onChange={(event) => {
+                    console.log(event.target.value);
+                    setSearchStandard(event.target.value as string);
+                  }}
+                >
+                  <MenuItem value="all">ทั้งหมด</MenuItem>
+                  {allStandardProducts.map((product) => (
+                    <MenuItem
+                      key={product.standard_id}
+                      value={product.standard_id}
+                    >
+                      {product.standard_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            }
             <Grid item xs={6}>
               <Button
                 variant="contained"
-                color="primary"
+                color="info"
                 onClick={handleSearch}
                 sx={{ marginRight: "10px" }}
                 startIcon={<SearchIcon />}

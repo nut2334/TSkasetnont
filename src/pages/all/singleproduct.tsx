@@ -495,9 +495,6 @@ const SigleProduct = (prop: {
                   <TableHead>
                     <TableRow>
                       <TableCell>ชื่อมาตรฐาน</TableCell>
-                      <TableCell align="right">วันหมดอายุ</TableCell>
-                      <TableCell align="right">หมายเลข</TableCell>
-                      <TableCell align="right">หลักฐาน</TableCell>
                     </TableRow>
                   </TableHead>
                   {JSON.parse(product.certificate).map(
@@ -521,33 +518,6 @@ const SigleProduct = (prop: {
                               <TableRow key={item.standard_name}>
                                 <TableCell component="th" scope="row">
                                   {item.standard_name}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {item.standard_expire}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {item.standard_number}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {item.standard_cercification && (
-                                    <Chip
-                                      label="ดูหลักฐาน"
-                                      onClick={() => {
-                                        Swal.fire({
-                                          imageUrl: `${config.getApiEndpoint(
-                                            `getimage/${item.standard_cercification
-                                              .split("/")
-                                              .pop()}`,
-                                            "get"
-                                          )}`,
-                                          showConfirmButton: false,
-                                          showCancelButton: true,
-                                          cancelButtonText: "ปิด",
-                                          padding: "2em",
-                                        });
-                                      }}
-                                    />
-                                  )}
                                 </TableCell>
                               </TableRow>
                             </TableBody>

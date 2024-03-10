@@ -337,7 +337,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                     <StyledTableCell align="right">อีเมล</StyledTableCell>
                     <StyledTableCell align="right">เบอร์โทร</StyledTableCell>
                     <StyledTableCell align="right">
-                      เป็นสมาชิคตั้งแต่
+                      เป็นสมาชิกตั้งแต่
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       สินค้าในระบบ
