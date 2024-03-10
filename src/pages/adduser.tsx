@@ -10,6 +10,13 @@ import {
   IconButton,
   Button,
   MenuItem,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  Checkbox,
+  ListItemText,
+  List,
+  ListSubheader,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -20,6 +27,7 @@ import { AdduserSuccess, AdduserFail } from "../components/popup";
 
 const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   const apiRole = config.getApiEndpoint("role", "GET");
+  const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const [username, setUsername] = React.useState<string>("");
@@ -48,6 +56,33 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   >([{ role_id: "", role_name: "" }]);
   const [role, setRole] = React.useState<string>("");
   const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
+  const [checked, setChecked] = React.useState([0]);
+  const [standard, setStandard] = React.useState<
+    {
+      standard_id: string;
+      standard_name: string;
+    }[]
+  >([]);
+  const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
+
+  const handleToggle = (value: number, standard_id: string) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+
+    if (newChecked.length > 0) {
+      setSelectedStandard(newChecked.map((data) => standard[data].standard_id));
+    } else {
+      setSelectedStandard([]);
+    }
+  };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -66,6 +101,30 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
 
           setAllrole(res.data);
         }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .get(apiStandard)
+      .then((res) => {
+        console.log(res.data);
+        setStandard(
+          res.data.filter(
+            (data: { standard_id: string; standard_name: string }) => {
+              console.log(data.standard_id);
+              if (
+                data.standard_name !== "ไม่มี" &&
+                data.standard_name !== "อื่นๆ"
+              ) {
+                return {
+                  standard_id: data.standard_id,
+                  standard_name: data.standard_name,
+                };
+              }
+            }
+          )
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -103,6 +162,12 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
       .catch((err) => {
         console.log(err);
       });
+    const usernameRegExp = new RegExp("^[a-zA-Z0-9]{6,}$");
+    if (usernameRegExp.test(event.target.value)) {
+      setUsernameReg(true);
+    } else {
+      setUsernameReg(false);
+    }
   };
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -163,6 +228,20 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!username) {
+      setUsernameCheck(false);
+    }
+    if (!password) {
+      setPasswordCheck(false);
+    }
+    if (!comfirmPassword) {
+      setComfirmPasswordCheck(false);
+    }
+    if (!role) {
+      setRoleCheck(false);
+      return;
+    }
+
     const data = {
       username: username,
       email: email,
@@ -171,11 +250,10 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
       lastName: lastName,
       tel: tel,
       role: role,
+      certificateList: selectedStandard,
     };
-    if (role == "") {
-      setRoleCheck(false);
-      return;
-    }
+    console.log(data);
+
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
     const apiAddFarmer = config.getApiEndpoint("addfarmer", "POST");
 
@@ -429,6 +507,46 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
                 ))}
               </TextField>
             </Grid>
+            {role == "farmers" ? (
+              <Grid item xs={12}>
+                <List
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      มาตรฐานสินค้า
+                    </ListSubheader>
+                  }
+                  sx={{
+                    width: "100%",
+                    maxWidth: 360,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  {standard.map((data, index) => (
+                    <ListItem
+                      key={data.standard_id}
+                      disablePadding
+                      onClick={handleToggle(index, data.standard_id)}
+                    >
+                      <ListItemButton dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ "aria-labelledby": data.standard_id }}
+                            checked={checked.indexOf(index) !== -1}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          id={data.standard_id}
+                          primary={data.standard_name}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+            ) : null}
           </Grid>
           <Button
             type="submit"
