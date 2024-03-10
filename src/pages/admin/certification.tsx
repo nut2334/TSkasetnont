@@ -44,7 +44,11 @@ interface requestInterface {
   certificate_number: string;
   name?: string;
 }
-const EachRow = (prop: { row: requestInterface; jwt_token: string }) => {
+const EachRow = (prop: {
+  row: requestInterface;
+  jwt_token: string;
+  setAllRequest: React.Dispatch<React.SetStateAction<requestInterface[]>>;
+}) => {
   const [open, setOpen] = useState(false);
   const handleClick = (isAccept: boolean, id: string) => {
     let apiCert = config.getApiEndpoint("certificate", "patch");
@@ -67,6 +71,16 @@ const EachRow = (prop: { row: requestInterface; jwt_token: string }) => {
             icon: "success",
             confirmButtonText: "Cool",
           });
+          axios
+            .get(config.getApiEndpoint("getadmincertificate", "GET"), {
+              headers: {
+                Authorization: `Bearer ${prop.jwt_token}`,
+              },
+            })
+            .then((response) => {
+              let temp: requestInterface[] = response.data.certificate;
+              prop.setAllRequest(temp);
+            });
         })
         .catch((error) => {
           console.log(error);
@@ -104,6 +118,16 @@ const EachRow = (prop: { row: requestInterface; jwt_token: string }) => {
                   icon: "success",
                   confirmButtonText: "Cool",
                 });
+                axios
+                  .get(config.getApiEndpoint("getadmincertificate", "GET"), {
+                    headers: {
+                      Authorization: `Bearer ${prop.jwt_token}`,
+                    },
+                  })
+                  .then((response) => {
+                    let temp: requestInterface[] = response.data.certificate;
+                    prop.setAllRequest(temp);
+                  });
               })
               .catch((error) => {
                 console.log(error);
@@ -227,7 +251,11 @@ const Certification = (prop: { jwt_token: string }) => {
           </TableHead>
           <TableBody>
             {allRequest.map((row) => (
-              <EachRow row={row} jwt_token={prop.jwt_token} />
+              <EachRow
+                row={row}
+                jwt_token={prop.jwt_token}
+                setAllRequest={setAllRequest}
+              />
             ))}
           </TableBody>
         </Table>

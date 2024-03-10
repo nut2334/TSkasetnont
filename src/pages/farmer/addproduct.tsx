@@ -45,6 +45,8 @@ interface certificateInterface {
   id: string;
   name: string;
   standard_id: string;
+  status: string;
+  certificate_number?: string;
 }
 
 interface allStandardInterface {
@@ -175,22 +177,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
       );
     });
   }, []);
-
-  const handleToggle = (value: number, id: string) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-    if (newChecked.length > 0) {
-      setSelectedStandard(newChecked.map((index) => standard[index].id));
-    }
-  };
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategoryId = event.target.value;
@@ -619,18 +605,29 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 }}
               >
                 {standard.map((data, index) => (
-                  <ListItem
-                    key={data.id}
-                    disablePadding
-                    onClick={handleToggle(index, data.id)}
-                  >
+                  <ListItem key={data.id} disablePadding>
                     <ListItemButton dense>
                       <ListItemIcon>
                         <Checkbox
                           edge="start"
                           tabIndex={-1}
                           disableRipple
+                          defaultChecked={selectedStandard.includes(data.id)}
                           inputProps={{ "aria-labelledby": data.id }}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedStandard([
+                                ...selectedStandard,
+                                data.id,
+                              ]);
+                            } else {
+                              setSelectedStandard(
+                                selectedStandard.filter(
+                                  (standard) => standard !== data.id
+                                )
+                              );
+                            }
+                          }}
                         />
                       </ListItemIcon>
                       <ListItemText
@@ -641,6 +638,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
                               standard.standard_id === data.standard_id
                           )?.standard_name
                         }
+                        secondary={`${
+                          data.certificate_number
+                            ? "หมายเลขมาตรฐาน : " + data.certificate_number
+                            : ""
+                        } ${
+                          data.status === "pending"
+                            ? "รออนุมัติ"
+                            : "อนุมัติแล้ว"
+                        }`}
+                        sx={{
+                          color: `${
+                            data.status === "pending" ? "red" : "green"
+                          }`,
+                        }}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -760,6 +771,15 @@ const AddProduct = (prop: { jwt_token: string }) => {
                             title: "บันทึกข้อมูลสำเร็จ",
                             text: "รอการอนุมัติจากผู้ดูแลระบบ",
                           });
+                          axios
+                            .get(apiCertificate, {
+                              headers: {
+                                Authorization: `Bearer ${prop.jwt_token}`,
+                              },
+                            })
+                            .then((res) => {
+                              setStandard(res.data.data);
+                            });
                           setAdd(false);
                         });
                     }}
