@@ -1,4 +1,4 @@
-import { Box, Button, Table, Typography } from "@mui/material";
+import { Box, Button, Table, Typography, Grid, Container } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as config from "../../config/config";
@@ -9,6 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
+import DownloadIcon from "@mui/icons-material/Download";
 
 import {
   Chart as ChartJS,
@@ -78,10 +79,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(
   array: readonly T[],
   comparator: (a: T, b: T) => number
@@ -204,45 +201,39 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
       });
   }, []);
   return (
-    <Box
+    <Container
+      maxWidth="lg"
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
+        marginTop: 5,
       }}
     >
-      <Typography variant="h4" align="center">
-        สถิติการลงทะเบียนเกษตกร
-      </Typography>
-      {registerData && (
-        <Typography variant="h6" align="center">
-          {`จำนวนเกษตกรที่ลงทะเบียนทั้งหมด: ${registerData.reduce(
-            (acc, cur) => acc + cur.register_count,
-            0
-          )}`}
-        </Typography>
-      )}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "20px",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        {registerData && (
-          <Box
-            sx={{
-              display: "box",
-            }}
-            width={"45%"}
-            height={"100%"}
-          >
+      <Grid container>
+        <Grid
+          item
+          xs={12}
+          display={{ xs: "none", md: "flex" }}
+          sx={{
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h4">สถิติการลงทะเบียนเกษตกร</Typography>
+        </Grid>
+        <Grid item xs={12} display={{ xs: "flex", md: "none" }}>
+          <Typography variant="h5">สถิติการลงทะเบียนเกษตกร</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          {registerData && (
+            <Typography variant="h6" align="center">
+              {`จำนวนเกษตกรที่ลงทะเบียนทั้งหมด: ${registerData.reduce(
+                (acc, cur) => acc + cur.register_count,
+                0
+              )}`}
+            </Typography>
+          )}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {registerData && (
             <Line
               options={{
                 scales: {
@@ -282,10 +273,10 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 ],
               }}
             />
-          </Box>
-        )}
-        {pieChart && (
-          <Box width={"30%"} height={"100%"}>
+          )}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {pieChart && (
             <Pie
               data={{
                 labels: pieChart.map((d) => d.label),
@@ -321,54 +312,69 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 },
               }}
             />
-          </Box>
-        )}
-      </Box>
-      <Button onClick={downloadExcel}>Excel Download</Button>
-      {farmerData && (
-        // <EnhancedTable rows={farmerData} />
-        <Box width={"70%"}>
-          <TableContainer component={Paper}>
-            <Table aria-label="simple table">
-              <TableHead>
-                <StyledTableRow>
-                  <StyledTableCell>ชื่อร้านค้า</StyledTableCell>
-                  <StyledTableCell>ชื่อ</StyledTableCell>
-                  <StyledTableCell align="right">นามสกุล</StyledTableCell>
-                  <StyledTableCell align="right">อีเมล</StyledTableCell>
-                  <StyledTableCell align="right">เบอร์โทร</StyledTableCell>
-                  <StyledTableCell align="right">
-                    เป็นสมาชิคตั้งแต่
-                  </StyledTableCell>
-                  <StyledTableCell align="right">สินค้าในระบบ</StyledTableCell>
-                </StyledTableRow>
-              </TableHead>
-              <TableBody>
-                {farmerData.map((row) => (
-                  <StyledTableRow key={row.email}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.farmerstorename}
-                    </StyledTableCell>
-                    <StyledTableCell>{row.firstname}</StyledTableCell>
+          )}
+        </Grid>
+        <Grid item xs={12} margin={2}>
+          <Button
+            onClick={downloadExcel}
+            variant="contained"
+            startIcon={<DownloadIcon />}
+          >
+            Excel Download
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          {farmerData && (
+            // <EnhancedTable rows={farmerData} />
+
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <StyledTableRow>
+                    <StyledTableCell>ชื่อร้านค้า</StyledTableCell>
+                    <StyledTableCell>ชื่อ</StyledTableCell>
+                    <StyledTableCell align="right">นามสกุล</StyledTableCell>
+                    <StyledTableCell align="right">อีเมล</StyledTableCell>
+                    <StyledTableCell align="right">เบอร์โทร</StyledTableCell>
                     <StyledTableCell align="right">
-                      {row.lastname}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">{row.email}</StyledTableCell>
-                    <StyledTableCell align="right">{row.phone}</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {new Date(row.createAt).toLocaleDateString()}
+                      เป็นสมาชิคตั้งแต่
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {row.product_count}
+                      สินค้าในระบบ
                     </StyledTableCell>
                   </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      )}
-    </Box>
+                </TableHead>
+                <TableBody>
+                  {farmerData.map((row) => (
+                    <StyledTableRow key={row.email}>
+                      <StyledTableCell component="th" scope="row">
+                        {row.farmerstorename}
+                      </StyledTableCell>
+                      <StyledTableCell>{row.firstname}</StyledTableCell>
+                      <StyledTableCell align="right">
+                        {row.lastname}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {row.email}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {row.phone}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {new Date(row.createAt).toLocaleDateString()}
+                      </StyledTableCell>
+                      <StyledTableCell align="right">
+                        {row.product_count}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

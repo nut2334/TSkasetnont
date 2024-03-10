@@ -107,6 +107,7 @@ export default function SwipeableEdgeDrawer(
             },
           }}
         />
+
         <SwipeableDrawer
           container={container}
           anchor="bottom"

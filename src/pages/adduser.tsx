@@ -65,7 +65,7 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   >([]);
   const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
 
-  const handleToggle = (value: number, standard_id: string) => () => {
+  const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
@@ -525,7 +525,7 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
                     <ListItem
                       key={data.standard_id}
                       disablePadding
-                      onClick={handleToggle(index, data.standard_id)}
+                      onClick={handleToggle(index)}
                     >
                       <ListItemButton dense>
                         <ListItemIcon>
@@ -534,7 +534,6 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
                             tabIndex={-1}
                             disableRipple
                             inputProps={{ "aria-labelledby": data.standard_id }}
-                            checked={checked.indexOf(index) !== -1}
                           />
                         </ListItemIcon>
                         <ListItemText

@@ -24,7 +24,7 @@ import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import axios from "axios";
+import axios, { all } from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
@@ -37,9 +37,27 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { styled } from "@mui/system";
+
+interface certificateInterface {
+  id: string;
+  name: string;
+  standard_id: string;
+}
+
+interface allStandardInterface {
+  standard_id: string;
+  standard_name: string;
+  expire: boolean;
+  available: boolean;
+}
 
 const AddProduct = (prop: { jwt_token: string }) => {
   const apiCertificate = config.getApiEndpoint("certifarmer", "GET");
+  const apiAddCertificate = config.getApiEndpoint("certifarmer", "POST");
+  const apiAllStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
 
   const [productName, setProductName] = useState<string>("");
@@ -68,26 +86,16 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkstartDate, setCheckStartDate] = useState<boolean>(true);
   const [endDate, setEndDate] = useState(null);
   const [checkendDate, setCheckEndDate] = useState<boolean>(true);
+  const [standard, setStandard] = useState<certificateInterface[]>([]);
+  const [allStandard, setAllStandard] = useState<allStandardInterface[]>([]);
+  const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
+  const [dropdownStandard, setDropdownStandard] = useState<string>("");
+  const [nameStandard, setNameStandard] = useState<string>("");
+  const [imageStandard, setImageStandard] = useState<File | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>();
+  const [certificateNumber, setCertificateNumber] = useState<string>("");
   const [checkStatus, setCheckStatus] = useState<boolean>(true);
-  const [checkStandard, setCheckStandard] = useState<boolean>(true);
-  const [selectedStandard, setSelectedStandard] = React.useState<
-    {
-      standard_id: string;
-      standard_name: string;
-      standard_number: string;
-      standard_expire: Date | undefined;
-      standard_cercification: string | undefined;
-    }[]
-  >([
-    {
-      standard_id: "",
-      standard_name: "",
-      standard_number: "",
-      standard_expire: undefined,
-      standard_cercification: undefined,
-    },
-  ]);
+
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
     productid: string;
@@ -103,6 +111,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   } | null>();
   const [isExist, setIsExist] = useState<boolean>(false);
   const [checked, setChecked] = React.useState([0]);
+  const [add, setAdd] = useState<boolean>(false);
 
   function closeModal() {
     setIsOpen(null);
@@ -146,11 +155,28 @@ const AddProduct = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
+        console.log(res.data.data);
+        setStandard(res.data.data);
       });
+    axios.get(apiAllStandard).then((res) => {
+      console.log(res.data);
+      setAllStandard(
+        res.data.filter(
+          (data: { standard_id: string; standard_name: string }) => {
+            console.log(data.standard_id);
+            if (data.standard_name !== "ไม่มี") {
+              return {
+                standard_id: data.standard_id,
+                standard_name: data.standard_name,
+              };
+            }
+          }
+        )
+      );
+    });
   }, []);
 
-  const handleToggle = (value: number, standard_id: string) => () => {
+  const handleToggle = (value: number, id: string) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
@@ -161,6 +187,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
     }
 
     setChecked(newChecked);
+    if (newChecked.length > 0) {
+      setSelectedStandard(newChecked.map((index) => standard[index].id));
+    }
   };
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,6 +218,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
     }
   };
   const onSubmit = () => {
+    console.log(selectedStandard);
     let check = true;
     if (productName == "") {
       setCheckProductName(false);
@@ -214,12 +244,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
       check = false;
     } else {
       setCheckCoverImage(true);
-    }
-    if (selectedStandard.length == 0) {
-      setCheckStandard(false);
-      check = false;
-    } else {
-      setCheckStandard(true);
     }
     if (selectedType == "จองสินค้าผ่านเว็บไซต์" && selectedStatus == "") {
       setCheckStatus(false);
@@ -318,15 +342,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
               setCoverImage([]);
               setProductVideo([]);
               setSelectImage([]);
-              setSelectedStandard([
-                {
-                  standard_id: "",
-                  standard_name: "",
-                  standard_number: "",
-                  standard_expire: undefined,
-                  standard_cercification: undefined,
-                },
-              ]);
               setSelectedType("");
             }
           })
@@ -342,6 +357,17 @@ const AddProduct = (prop: { jwt_token: string }) => {
         });
       });
   };
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
   if (isExist) {
     return <Navigate to="/myproducts" />;
   }
@@ -579,12 +605,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Stack>
               </Container>
             </Grid>
-            {/* <AddStandard
-              setSelectedStandard={setSelectedStandard}
-              selectedStandard={selectedStandard}
-              jwt_token={prop.jwt_token}
-              checkStandard={checkStandard}
-            /> */}
             <Grid item xs={12}>
               <List
                 subheader={
@@ -598,11 +618,11 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   bgcolor: "background.paper",
                 }}
               >
-                {selectedStandard.map((data, index) => (
+                {standard.map((data, index) => (
                   <ListItem
-                    key={data.standard_id}
+                    key={data.id}
                     disablePadding
-                    onClick={handleToggle(index, data.standard_id)}
+                    onClick={handleToggle(index, data.id)}
                   >
                     <ListItemButton dense>
                       <ListItemIcon>
@@ -610,19 +630,145 @@ const AddProduct = (prop: { jwt_token: string }) => {
                           edge="start"
                           tabIndex={-1}
                           disableRipple
-                          inputProps={{ "aria-labelledby": data.standard_id }}
-                          checked={checked.indexOf(index) !== -1}
+                          inputProps={{ "aria-labelledby": data.id }}
                         />
                       </ListItemIcon>
                       <ListItemText
                         id={data.standard_id}
-                        primary={data.standard_name}
+                        primary={
+                          allStandard.find(
+                            (standard) =>
+                              standard.standard_id === data.standard_id
+                          )?.standard_name
+                        }
                       />
                     </ListItemButton>
                   </ListItem>
                 ))}
               </List>
             </Grid>
+            <Grid item xs={12}>
+              <Button
+                startIcon={<AddIcon />}
+                variant="contained"
+                onClick={() => {
+                  setAdd(true);
+                }}
+                sx={{
+                  marginRight: "10px",
+                }}
+              >
+                เพิ่มมาตรฐาน
+              </Button>
+
+              <Button
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  setAdd(false);
+                }}
+              >
+                -
+              </Button>
+            </Grid>
+            {add && (
+              <>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    fullWidth
+                    onChange={(e) => {
+                      setDropdownStandard(e.target.value);
+                    }}
+                    label="เลือกมาตรฐาน"
+                  >
+                    {allStandard.map((option) => (
+                      <MenuItem
+                        key={option.standard_id}
+                        value={option.standard_id}
+                      >
+                        {option.standard_name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                {allStandard.filter(
+                  (standard) => standard.standard_id === dropdownStandard
+                )[0]?.standard_name === "อื่นๆ" && (
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      label="ชื่อมาตรฐาน"
+                      value={nameStandard}
+                      onChange={(e) => setNameStandard(e.target.value)}
+                    />
+                  </Grid>
+                )}
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    label="หมายเลขใบรับรอง"
+                    onChange={(e) => {
+                      setCertificateNumber(e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    component="label"
+                    variant="contained"
+                    color="info"
+                    tabIndex={-1}
+                    startIcon={<CloudUploadIcon />}
+                    sx={{
+                      marginTop: "10px",
+                    }}
+                  >
+                    อัพโหลดรูปใบรับรอง
+                    <VisuallyHiddenInput
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files !== null) {
+                          setImageStandard(e.target.files[0]);
+                        }
+                      }}
+                    />
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      const add = new FormData();
+                      add.append("standard_id", dropdownStandard);
+                      add.append("name", nameStandard);
+                      add.append("certificate_number", certificateNumber);
+                      if (imageStandard !== null) {
+                        add.append("image", imageStandard);
+                      }
+                      axios
+                        .post(apiAddCertificate, add, {
+                          headers: {
+                            Authorization: `Bearer ${prop.jwt_token}`,
+                          },
+                        })
+                        .then((res) => {
+                          console.log(res.data);
+                          Swal.fire({
+                            icon: "success",
+                            title: "บันทึกข้อมูลสำเร็จ",
+                            text: "รอการอนุมัติจากผู้ดูแลระบบ",
+                          });
+                          setAdd(false);
+                        });
+                    }}
+                  >
+                    ยืนยัน
+                  </Button>
+                </Grid>
+              </>
+            )}
             <Grid item xs={12}>
               <Divider />
             </Grid>

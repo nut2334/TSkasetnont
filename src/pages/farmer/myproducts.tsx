@@ -75,7 +75,7 @@ const Myproducts = (prop: {
       "GET"
     );
     axios.get(apiMyproducts).then((response: any) => {
-      console.log(response.data);
+      console.log("apiMyproducts", response.data);
       setAllProduct(response.data);
       setFilterSearch(response.data);
     });

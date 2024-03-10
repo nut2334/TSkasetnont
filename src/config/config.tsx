@@ -3,7 +3,7 @@ export const ip = process.env.REACT_APP_IP
   : "localhost";
 export const port = process.env.REACT_APP_PORT
   ? process.env.REACT_APP_PORT
-  : "3001";
+  : "3006";
 export function getApiEndpoint(endpoint: string, method: string) {
   if (process.env.REACT_APP_DEVELOPMENT === "false") {
     return `https://${ip}/endpoint.php?endpoint=${endpoint}`;
