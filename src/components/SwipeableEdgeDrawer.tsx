@@ -235,6 +235,9 @@ export default function SwipeableEdgeDrawer(
                           variant="contained"
                           color="primary"
                           startIcon={<StoreIcon />}
+                          sx={{
+                            marginBottom: "10px",
+                          }}
                         >
                           เยี่ยมชมสินค้า
                         </Button>

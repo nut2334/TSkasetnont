@@ -171,7 +171,10 @@ const SigleProduct = (prop: {
     console.log(apiSingleProduct);
 
     axios.get(apiSingleProduct).then((response) => {
-      setProduct(response.data);
+      setProduct({
+        ...response.data,
+        certificate: JSON.parse(response.data.certificate),
+      });
       console.log(response.data);
     });
 
@@ -189,6 +192,7 @@ const SigleProduct = (prop: {
         console.log(response.data);
         setAllStandardShow(response.data.standardNames);
       });
+    console.log(product);
   }, []);
 
   useEffect(() => {
@@ -454,7 +458,9 @@ const SigleProduct = (prop: {
         <Stack>
           <Typography variant="body1">{product.view_count}</Typography>
         </Stack>
-
+        <Stack>
+          <Typography variant="body1"> | แชร์ : </Typography>
+        </Stack>
         <Stack>
           <FacebookShareButton url={window.location.href}>
             <FacebookIcon
@@ -627,8 +633,10 @@ const SigleProduct = (prop: {
                   <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
                     <Button
                       disabled={
-                        (jwtDecode(prop.jwt_token) as { role: string }).role !==
-                        "members"
+                        prop.jwt_token
+                          ? (jwtDecode(prop.jwt_token) as { role: string })
+                              .role !== "members"
+                          : false
                       }
                       variant="contained"
                       color="secondary"
@@ -898,97 +906,97 @@ const SigleProduct = (prop: {
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
           <Stack>
-            {(prop.jwt_token == "" ||
+            {prop.jwt_token &&
               (jwtDecode(prop.jwt_token) as { role: string }).role ==
-                "members") && (
-              <Chip
-                label="ติดตาม"
-                icon={
-                  prop.followList.filter((item) => {
-                    return item.id === product.farmer_id;
-                  }).length > 0 ? (
-                    <FavoriteIcon
-                      sx={{
-                        fill: "white",
-                      }}
-                    />
-                  ) : (
-                    <FavoriteBorderIcon />
-                  )
-                }
-                sx={
-                  prop.followList.filter((item) => {
-                    return item.id === product.farmer_id;
-                  }).length > 0
-                    ? {
-                        backgroundColor: "#ee4267",
-                        color: "white",
-                      }
-                    : {}
-                }
-                onClick={() => {
-                  const apiFollow = config.getApiEndpoint(
-                    `followfarmer`,
-                    "post"
-                  );
-                  const apiUnFollow = config.getApiEndpoint(
-                    `followfarmer`,
-                    "delete"
-                  );
-                  if (
+                "members" && (
+                <Chip
+                  label="ติดตาม"
+                  icon={
                     prop.followList.filter((item) => {
                       return item.id === product.farmer_id;
-                    }).length > 0 &&
-                    prop.jwt_token !== ""
-                  ) {
-                    axios
-                      .delete(apiUnFollow, {
-                        data: {
-                          farmer_id: product.farmer_id,
-                        },
-                        headers: {
-                          Authorization: `Bearer ${prop.jwt_token}`,
-                        },
-                      })
-                      .then(() => {
-                        prop.setFollowList(
-                          prop.followList.filter((item) => {
-                            return item.id !== product.farmer_id;
-                          })
-                        );
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                      });
-                  } else {
-                    axios
-                      .post(
-                        apiFollow,
-                        {
-                          farmer_id: product.farmer_id,
-                        },
-                        {
+                    }).length > 0 ? (
+                      <FavoriteIcon
+                        sx={{
+                          fill: "white",
+                        }}
+                      />
+                    ) : (
+                      <FavoriteBorderIcon />
+                    )
+                  }
+                  sx={
+                    prop.followList.filter((item) => {
+                      return item.id === product.farmer_id;
+                    }).length > 0
+                      ? {
+                          backgroundColor: "#ee4267",
+                          color: "white",
+                        }
+                      : {}
+                  }
+                  onClick={() => {
+                    const apiFollow = config.getApiEndpoint(
+                      `followfarmer`,
+                      "post"
+                    );
+                    const apiUnFollow = config.getApiEndpoint(
+                      `followfarmer`,
+                      "delete"
+                    );
+                    if (
+                      prop.followList.filter((item) => {
+                        return item.id === product.farmer_id;
+                      }).length > 0 &&
+                      prop.jwt_token !== ""
+                    ) {
+                      axios
+                        .delete(apiUnFollow, {
+                          data: {
+                            farmer_id: product.farmer_id,
+                          },
                           headers: {
                             Authorization: `Bearer ${prop.jwt_token}`,
                           },
-                        }
-                      )
-                      .then(() => {
-                        prop.setFollowList([
-                          ...prop.followList,
+                        })
+                        .then(() => {
+                          prop.setFollowList(
+                            prop.followList.filter((item) => {
+                              return item.id !== product.farmer_id;
+                            })
+                          );
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    } else {
+                      axios
+                        .post(
+                          apiFollow,
                           {
-                            id: product.farmer_id,
-                            farmerstorename: shopname ? shopname : "",
+                            farmer_id: product.farmer_id,
                           },
-                        ]);
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                      });
-                  }
-                }}
-              />
-            )}
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        )
+                        .then(() => {
+                          prop.setFollowList([
+                            ...prop.followList,
+                            {
+                              id: product.farmer_id,
+                              farmerstorename: shopname ? shopname : "",
+                            },
+                          ]);
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    }
+                  }}
+                />
+              )}
           </Stack>
         </Stack>
         <Typography>
@@ -1012,7 +1020,12 @@ const SigleProduct = (prop: {
           >
             <Stack>
               <FacebookIcon
-                style={{ borderRadius: "100%", width: 30, height: "auto" }}
+                style={{
+                  borderRadius: "100%",
+                  width: 30,
+                  height: "auto",
+                  marginBottom: 4,
+                }}
               />
             </Stack>
             <Stack>
