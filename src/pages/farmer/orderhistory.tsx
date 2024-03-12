@@ -407,23 +407,21 @@ const Orderhistory = (prop: { jwt_token: string }) => {
     fetchOrderHistory();
   }, []);
   return (
-    <div>
-      <Container maxWidth="lg">
-        {orderHistory.length === 0 && (
-          <Typography>ไม่มีประวัติการสั่งซื้อ</Typography>
-        )}
-        {orderHistory.map((order, index) => {
-          return (
-            <EachOrder
-              key={index}
-              order={order}
-              jwt_token={prop.jwt_token}
-              fetchOrderHistory={fetchOrderHistory}
-            />
-          );
-        })}
-      </Container>
-    </div>
+    <>
+      {orderHistory.length === 0 && (
+        <Typography>ไม่มีประวัติการสั่งซื้อ</Typography>
+      )}
+      {orderHistory.map((order, index) => {
+        return (
+          <EachOrder
+            key={index}
+            order={order}
+            jwt_token={prop.jwt_token}
+            fetchOrderHistory={fetchOrderHistory}
+          />
+        );
+      })}
+    </>
   );
 };
 

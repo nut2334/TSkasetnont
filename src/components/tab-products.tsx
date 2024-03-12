@@ -20,27 +20,26 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
   return (
     <Container maxWidth="lg">
       <TabContext value={value}>
-        <Box>
-          <TabList
-            onChange={handleChange}
-            aria-label="lab API tabs example"
-            indicatorColor="primary"
-            textColor="primary"
-            centered
-          >
-            <Tab
-              icon={<LocalGroceryStoreIcon />}
-              label="จัดการสินค้า"
-              value="1"
-            />
-            <Tab icon={<PieChartIcon />} label="วิเคราะห์สินค้า" value="2" />
-            <Tab
-              icon={<QueryBuilderIcon />}
-              label="ประวัติการซื้อขาย"
-              value="3"
-            />
-          </TabList>
-        </Box>
+        <TabList
+          onChange={handleChange}
+          aria-label="lab API tabs example"
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+        >
+          <Tab
+            icon={<LocalGroceryStoreIcon />}
+            label="จัดการสินค้า"
+            value="1"
+          />
+          <Tab icon={<PieChartIcon />} label="วิเคราะห์สินค้า" value="2" />
+          <Tab
+            icon={<QueryBuilderIcon />}
+            label="ประวัติการซื้อขาย"
+            value="3"
+          />
+        </TabList>
+
         <TabPanel value="1">
           <Myproducts jwt_token={prop.jwt_token} username={prop.username} />
         </TabPanel>

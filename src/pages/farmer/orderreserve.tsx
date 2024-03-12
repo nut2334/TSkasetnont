@@ -108,16 +108,18 @@ const EachReserve = (prop: {
           <ListSubheader>รายละเอียดการจอง</ListSubheader>
           <Box display={"flex"}>
             <ListItem alignItems="flex-start">
-              <ListItemText>
-                สถานะการจอง:{" "}
-                {order.status === "complete" ? (
-                  <Chip label="สำเร็จ" color="success" />
-                ) : order.status === "pending" ? (
-                  <Chip label="รอการตรวจสอบ" color="info" />
-                ) : (
-                  <Chip label="ยกเลิก" color="error" />
-                )}
-              </ListItemText>
+              <Box display={{ xs: "none", lg: "flex" }}>
+                <ListItemText>
+                  สถานะการจอง:{" "}
+                  {order.status === "complete" ? (
+                    <Chip label="สำเร็จ" color="success" />
+                  ) : order.status === "pending" ? (
+                    <Chip label="รอการตรวจสอบ" color="info" />
+                  ) : (
+                    <Chip label="ยกเลิก" color="error" />
+                  )}
+                </ListItemText>
+              </Box>
             </ListItem>
             <Divider orientation="vertical" flexItem />
             <ListItem>
@@ -160,26 +162,53 @@ const EachReserve = (prop: {
             }}
           />
           <ListSubheader>รายละเอียดผู้ซื้อ</ListSubheader>
-          <Box display={"flex"}>
+          <Box
+            display={{
+              xs: "none",
+              lg: "flex",
+            }}
+          >
+            <Box display={"flex"}>
+              <ListItem>
+                <ListItemText>
+                  ชื่อ : {order.customer_info.firstname}{" "}
+                  {order.customer_info.lastname}
+                </ListItemText>
+              </ListItem>
+
+              <Divider orientation="vertical" flexItem />
+              <ListItem>
+                <ListItemText>
+                  เบอร์โทร : {order.customer_info.phone}
+                </ListItemText>
+              </ListItem>
+              <Divider orientation="vertical" flexItem />
+              <ListItem>
+                <ListItemText>
+                  LINE ID : {order.customer_info.line}
+                </ListItemText>
+              </ListItem>
+              <Divider orientation="vertical" flexItem />
+            </Box>
+          </Box>
+          <Box
+            display={{
+              xs: "flex",
+              lg: "none",
+            }}
+          >
             <ListItem>
               <ListItemText>
                 ชื่อ : {order.customer_info.firstname}{" "}
                 {order.customer_info.lastname}
-              </ListItemText>
-            </ListItem>
-
-            <Divider orientation="vertical" flexItem />
-            <ListItem>
-              <ListItemText>
+                <br />
                 เบอร์โทร : {order.customer_info.phone}
+                <br />
+                LINE ID : {order.customer_info.line}
               </ListItemText>
             </ListItem>
-            <Divider orientation="vertical" flexItem />
-            <ListItem>
-              <ListItemText>LINE ID : {order.customer_info.line}</ListItemText>
-            </ListItem>
-            <Divider orientation="vertical" flexItem />
           </Box>
+
           <Divider />
           <ListSubheader>สินค้าที่จอง</ListSubheader>
           <Box display={"flex"}>
@@ -196,112 +225,220 @@ const EachReserve = (prop: {
                 {order.reserve_products.unit}
               </ListItemText>
 
-              <ListItemText
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Chip
-                  label="ปฎิเสธการจอง"
-                  color="error"
-                  disabled={
-                    order.status === "reject" || order.status === "complete"
-                      ? true
-                      : false
-                  }
+              <Box display={{ xs: "none", lg: "flex" }}>
+                <ListItemText
                   sx={{
-                    cursor: `${
-                      order.status === "pending" ? "pointer" : "not-allowed"
-                    }`,
+                    display: "flex",
+                    justifyContent: "flex-end",
                   }}
-                  onClick={() => {
-                    axios
-                      .patch(
-                        config.getApiEndpoint("reserve", "PATCH"),
-                        {
-                          status: "reject",
-                          reserve_id: order.id,
-                        },
-                        {
-                          headers: {
-                            Authorization: `Bearer ${prop.jwt_token}`,
+                >
+                  <Chip
+                    label="ปฎิเสธการจอง"
+                    color="error"
+                    disabled={
+                      order.status === "reject" || order.status === "complete"
+                        ? true
+                        : false
+                    }
+                    sx={{
+                      cursor: `${
+                        order.status === "pending" ? "pointer" : "not-allowed"
+                      }`,
+                    }}
+                    onClick={() => {
+                      axios
+                        .patch(
+                          config.getApiEndpoint("reserve", "PATCH"),
+                          {
+                            status: "reject",
+                            reserve_id: order.id,
                           },
-                        }
-                      )
-                      .then((response) => {
-                        console.log(response.data);
-                        Swal.fire({
-                          icon: "success",
-                          title: "สำเร็จ",
-                          showConfirmButton: false,
-                          timer: 1500,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          console.log(response.data);
+                          Swal.fire({
+                            icon: "success",
+                            title: "สำเร็จ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
+                          prop.fetchOrderHistory();
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                          Swal.fire({
+                            icon: "error",
+                            title: "ไม่สำเร็จ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
                         });
-                        prop.fetchOrderHistory();
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                        Swal.fire({
-                          icon: "error",
-                          title: "ไม่สำเร็จ",
-                          showConfirmButton: false,
-                          timer: 1500,
-                        });
-                      });
-                  }}
-                />
-                <Chip
-                  sx={{
-                    marginLeft: "10px",
-                    cursor: `${
-                      order.status === "pending" ? "pointer" : "not-allowed"
-                    }`,
-                  }}
-                  label="ยอมรับการจอง"
-                  color="success"
-                  disabled={
-                    order.status === "complete" || order.status === "reject"
-                      ? true
-                      : false
-                  }
-                  onClick={() => {
-                    axios
-                      .patch(
-                        config.getApiEndpoint("reserve", "PATCH"),
-                        {
-                          status: "complete",
-                          reserve_id: order.id,
-                        },
-                        {
-                          headers: {
-                            Authorization: `Bearer ${prop.jwt_token}`,
+                    }}
+                  />
+                  <Chip
+                    sx={{
+                      marginLeft: "10px",
+                      cursor: `${
+                        order.status === "pending" ? "pointer" : "not-allowed"
+                      }`,
+                    }}
+                    label="ยอมรับการจอง"
+                    color="success"
+                    disabled={
+                      order.status === "complete" || order.status === "reject"
+                        ? true
+                        : false
+                    }
+                    onClick={() => {
+                      axios
+                        .patch(
+                          config.getApiEndpoint("reserve", "PATCH"),
+                          {
+                            status: "complete",
+                            reserve_id: order.id,
                           },
-                        }
-                      )
-                      .then((response) => {
-                        console.log(response.data);
-                        Swal.fire({
-                          icon: "success",
-                          title: "สำเร็จ",
-                          showConfirmButton: false,
-                          timer: 1500,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          console.log(response.data);
+                          Swal.fire({
+                            icon: "success",
+                            title: "สำเร็จ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
+                          prop.fetchOrderHistory();
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                          Swal.fire({
+                            icon: "error",
+                            title: "ไม่สำเร็จ",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
                         });
-                        prop.fetchOrderHistory();
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                        Swal.fire({
-                          icon: "error",
-                          title: "ไม่สำเร็จ",
-                          showConfirmButton: false,
-                          timer: 1500,
-                        });
-                      });
-                  }}
-                />
-              </ListItemText>
+                    }}
+                  />
+                </ListItemText>
+              </Box>
             </ListItem>
             <Divider orientation="vertical" flexItem />
+          </Box>
+          <Box display={{ xs: "flex", lg: "none" }}>
+            <ListItemText
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Chip
+                label="ปฎิเสธการจอง"
+                color="error"
+                disabled={
+                  order.status === "reject" || order.status === "complete"
+                    ? true
+                    : false
+                }
+                sx={{
+                  cursor: `${
+                    order.status === "pending" ? "pointer" : "not-allowed"
+                  }`,
+                }}
+                onClick={() => {
+                  axios
+                    .patch(
+                      config.getApiEndpoint("reserve", "PATCH"),
+                      {
+                        status: "reject",
+                        reserve_id: order.id,
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                      }
+                    )
+                    .then((response) => {
+                      console.log(response.data);
+                      Swal.fire({
+                        icon: "success",
+                        title: "สำเร็จ",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                      prop.fetchOrderHistory();
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      Swal.fire({
+                        icon: "error",
+                        title: "ไม่สำเร็จ",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                    });
+                }}
+              />
+              <Chip
+                sx={{
+                  marginLeft: "10px",
+                  cursor: `${
+                    order.status === "pending" ? "pointer" : "not-allowed"
+                  }`,
+                }}
+                label="ยอมรับการจอง"
+                color="success"
+                disabled={
+                  order.status === "complete" || order.status === "reject"
+                    ? true
+                    : false
+                }
+                onClick={() => {
+                  axios
+                    .patch(
+                      config.getApiEndpoint("reserve", "PATCH"),
+                      {
+                        status: "complete",
+                        reserve_id: order.id,
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                      }
+                    )
+                    .then((response) => {
+                      console.log(response.data);
+                      Swal.fire({
+                        icon: "success",
+                        title: "สำเร็จ",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                      prop.fetchOrderHistory();
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      Swal.fire({
+                        icon: "error",
+                        title: "ไม่สำเร็จ",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                    });
+                }}
+              />
+            </ListItemText>
           </Box>
         </List>
       </Collapse>
@@ -334,7 +471,7 @@ const Orderreserve = (prop: { jwt_token: string }) => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <>
       {orderReserve.length === 0 && <Typography>ไม่มีประวัติการจอง</Typography>}
       {orderReserve.map((order, index) => {
         return (
@@ -346,7 +483,7 @@ const Orderreserve = (prop: { jwt_token: string }) => {
           />
         );
       })}
-    </Container>
+    </>
   );
 };
 

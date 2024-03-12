@@ -73,7 +73,7 @@ interface FullProductInterface {
   farmer_id: string;
   weight: number;
   address: string;
-  certificate: string;
+  certificate: string[];
   facebooklink: string;
   lineid: string;
   lat: number | undefined;
@@ -128,7 +128,7 @@ const SigleProduct = (prop: {
     farmer_id: "",
     weight: 0,
     address: "",
-    certificate: "",
+    certificate: [],
     facebooklink: "",
     lineid: "",
     lat: undefined,
@@ -153,6 +153,15 @@ const SigleProduct = (prop: {
   >([]);
   const [goCart, setGoCart] = useState(false);
   const [copiedText, copy] = useCopyToClipboard();
+  const [allStandard, setAllStandard] = useState<
+    {
+      standard_name: string;
+      standard_number: string;
+      standard_expire: string;
+      standard_cercification: string;
+    }[]
+  >([]);
+  const [allStandardShow, setAllStandardShow] = useState<string[]>([]);
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -174,6 +183,12 @@ const SigleProduct = (prop: {
       console.log(error);
     });
     console.log(prop.followList);
+    axios
+      .get(config.getApiEndpoint(`certiconver/${productid}`, "get"))
+      .then((response) => {
+        console.log(response.data);
+        setAllStandardShow(response.data.standardNames);
+      });
   }, []);
 
   useEffect(() => {
@@ -184,6 +199,7 @@ const SigleProduct = (prop: {
     const apiAllStandard = config.getApiEndpoint(`standardproducts`, "get");
     axios.get(apiAllStandard).then((response) => {
       console.log(response.data);
+      setAllStandard(response.data);
     });
   }, []);
 
@@ -475,66 +491,47 @@ const SigleProduct = (prop: {
       <Typography variant="h6">รายละเอียดสินค้า</Typography>
       <Typography>{product.product_description}</Typography>
 
-      {product.certificate &&
-        JSON.parse(product.certificate)[0].standard_name !== "ไม่มี" && (
+      {product.certificate && (
+        <Box
+          sx={{
+            paddingTop: "10px",
+          }}
+        >
+          <Typography variant="h6">มาตรฐาน</Typography>
           <Box
             sx={{
-              paddingTop: "10px",
+              padding: "10px",
             }}
           >
-            <Typography variant="h6">มาตรฐาน</Typography>
-            <Box
+            <TableContainer
+              component={Paper}
               sx={{
-                padding: "10px",
+                width: "100%",
+                marginBottom: 2,
               }}
             >
-              <TableContainer
-                component={Paper}
-                sx={{
-                  width: "100%",
-                  marginBottom: 2,
-                }}
-              >
-                <Table aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>ชื่อมาตรฐาน</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  {JSON.parse(product.certificate).map(
-                    (item: {
-                      standard_name: string;
-                      standard_number: string;
-                      standard_expire: string;
-                      standard_cercification: string;
-                    }) => {
-                      console.log(item);
-
-                      if (
-                        item.standard_name == "ไม่มี" ||
-                        !item.standard_name
-                      ) {
-                        return;
-                      } else {
-                        return (
-                          <>
-                            <TableBody>
-                              <TableRow key={item.standard_name}>
-                                <TableCell component="th" scope="row">
-                                  {item.standard_name}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </>
-                        );
-                      }
-                    }
-                  )}
-                </Table>
-              </TableContainer>
-            </Box>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ชื่อมาตรฐาน</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {allStandardShow.map((item) => {
+                    return (
+                      <TableRow key={item}>
+                        <TableCell component="th" scope="row">
+                          {item}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
-        )}
+        </Box>
+      )}
 
       {product.selectedType !== "ประชาสัมพันธ์" && (
         <>
