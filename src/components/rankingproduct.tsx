@@ -59,7 +59,11 @@ const RankingproductChart = (prop: {
             datasets: [
               {
                 label: prop.rankingType === "quantity" ? "จำนวน" : "ราคา",
-                data: showData.map((data) => data.total_quantity),
+                data: showData.map((data) =>
+                  prop.rankingType === "quantity"
+                    ? data.total_quantity
+                    : data.total_price
+                ),
                 //green
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
                 borderColor: "rgba(75, 192, 192, 1)",

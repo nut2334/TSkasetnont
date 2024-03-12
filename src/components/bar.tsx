@@ -58,7 +58,7 @@ const BarChart = (prop: {
     setCategory(category);
     let max = Math.max(...prop.data.map((data) => data.order_sale));
     setMax(max);
-  }, []);
+  }, [prop.data]);
 
   const options = {
     scales: {
