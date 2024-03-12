@@ -626,6 +626,10 @@ const SigleProduct = (prop: {
                 <Stack>
                   <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
                     <Button
+                      disabled={
+                        (jwtDecode(prop.jwt_token) as { role: string }).role !==
+                        "members"
+                      }
                       variant="contained"
                       color="secondary"
                       startIcon={<PointOfSaleIcon />}
@@ -710,7 +714,11 @@ const SigleProduct = (prop: {
                     variant="contained"
                     color="secondary"
                     startIcon={<AddShoppingCartIcon />}
-                    disabled={product.stock == 0}
+                    disabled={
+                      product.stock == 0 ||
+                      (jwtDecode(prop.jwt_token) as { role: string }).role !==
+                        "members"
+                    }
                     onClick={() => {
                       if (prop.jwt_token == "") {
                         Swal.fire({

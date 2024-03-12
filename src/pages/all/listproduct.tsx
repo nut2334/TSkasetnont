@@ -405,16 +405,23 @@ const ListProduct = () => {
                           <Typography gutterBottom variant="h5">
                             {product.product_name}
                           </Typography>
-                          <Chip label={product.selectedType} />
+                          <Chip
+                            label={product.selectedType}
+                            sx={{
+                              marginRight: "5px",
+                            }}
+                          />
                           <Chip
                             label={nameCategory}
                             sx={{
                               backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
                               color: isDark(bgcolor) ? "white" : "black",
+                              marginRight: "5px",
                             }}
                           />
                           <Typography
                             sx={{
+                              marginTop: "10px",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               display: "-webkit-box",
@@ -424,8 +431,8 @@ const ListProduct = () => {
                           >
                             {product.product_description}
                           </Typography>
-                        </CardContent>{" "}
-                        <CardActions>
+                        </CardContent>
+                        <CardActions sx={{ padding: "20px" }}>
                           {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
                             <Typography
                               sx={{
