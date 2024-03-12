@@ -654,23 +654,49 @@ const SigleProduct = (prop: {
                         Swal.fire({
                           title: "จองสินค้า",
                           html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}
-                        <br/>Line ID <input type="text" id="lineid">
-                        `,
+                                  <br/>Line ID <input type="text" id="lineid">`,
                           showCancelButton: true,
                           confirmButtonText: "จอง",
                           cancelButtonText: "ยกเลิก",
+                          focusConfirm: false,
+                          preConfirm: () => {
+                            const quantity = document.getElementById(
+                              "quantity"
+                            ) as HTMLInputElement;
+                            const lineId = document.getElementById(
+                              "lineid"
+                            ) as HTMLInputElement;
+
+                            // ตรวจสอบว่ามีข้อมูลใน input ทั้งหมดหรือไม่
+                            if (!quantity.value || !lineId.value) {
+                              Swal.showValidationMessage(
+                                "กรุณากรอกข้อมูลให้ครบทุกช่อง"
+                              );
+                            }
+
+                            // ตรวจสอบว่าเลขจำนวนไม่ติดลบ
+                            if (Number(quantity.value) < 0) {
+                              Swal.showValidationMessage(
+                                "กรุณากรอกจำนวนที่มากกว่าหรือเท่ากับ 1"
+                              );
+                            }
+
+                            // ตรวจสอบว่า Line ID ไม่เป็นภาษาไทย
+                            const thaiRegex = /[ก-๙]/;
+                            if (thaiRegex.test(lineId.value)) {
+                              Swal.showValidationMessage(
+                                "Line ID ต้องเป็นภาษาอังกฤษเท่านั้น"
+                              );
+                            }
+                          },
                         }).then((result) => {
                           if (result.isConfirmed) {
-                            let quantity = (
-                              document.getElementById(
-                                "quantity"
-                              ) as HTMLInputElement
-                            ).value;
-                            let lineid = (
-                              document.getElementById(
-                                "lineid"
-                              ) as HTMLInputElement
-                            ).value;
+                            let quantity = document.getElementById(
+                              "quantity"
+                            ) as HTMLInputElement;
+                            let lineid = document.getElementById(
+                              "lineid"
+                            ) as HTMLInputElement;
                             const apiReserve = config.getApiEndpoint(
                               `reserve`,
                               "post"
@@ -679,8 +705,8 @@ const SigleProduct = (prop: {
                               .post(
                                 apiReserve,
                                 {
-                                  quantity: quantity,
-                                  lineid: lineid,
+                                  quantity: quantity.value,
+                                  lineid: lineid.value,
                                   product_id: product.product_id,
                                 },
                                 {
