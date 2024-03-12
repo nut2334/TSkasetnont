@@ -38,6 +38,7 @@ const Forgot = () => {
             icon: "success",
             confirmButtonText: "ปิด",
           });
+          setIsSubmit(true);
         } else {
           Swal.fire({
             title: "เกิดข้อผิดพลาด",
@@ -94,9 +95,7 @@ const Forgot = () => {
           variant="contained"
           sx={{ mt: 3, mb: 2, color: "white" }}
           color="primary"
-          type="submit"
           onClick={() => {
-            setIsSubmit(true);
             handleSubmit();
           }}
         >

@@ -240,7 +240,7 @@ const Home = (prop: { jwt_token: string }) => {
             flexDirection: "row",
             justifyContent: "center",
             backgroundColor: "white",
-            paddingLeft: "10px",
+            paddingLeft: "30px",
             boxShadow:
               "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
           }}
@@ -250,13 +250,18 @@ const Home = (prop: { jwt_token: string }) => {
               width: "100%",
             }}
             placeholder="ค้นหาสินค้า"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSearchContent(search);
+              }
+            }}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
           />
           <IconButton
             type="button"
-            sx={{ p: "10px" }}
+            sx={{ p: "10px", background: "#F5F5F5" }}
             aria-label="search"
             onClick={() => {
               setSearchContent(search);
