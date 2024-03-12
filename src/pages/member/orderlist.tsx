@@ -18,13 +18,25 @@ import Paper from "@mui/material/Paper";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
-import { Box, Button, Chip, Container, ListItem, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  ListItem,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddCircle from "@mui/icons-material/AddCircle";
 import TableBank from "../../components/tablebank";
 import Orderreservemember from "./orderreservename";
 
 interface orderInterface {
+  address: string;
+  fristname: string;
+  lastname: string;
+  phone: string;
   id: string;
   status: string;
   shippingcost: number;
@@ -115,7 +127,6 @@ const EachOrder = (prop: {
           <List component="div" disablePadding>
             {/* table */}
             <ListSubheader>รายละเอียดคำสั่งซื้อ</ListSubheader>
-
             <Box display={"flex"}>
               {/* make all item flex */}
               <ListItem alignItems="flex-start">
@@ -197,9 +208,24 @@ const EachOrder = (prop: {
                 />
               </ListItem>
             </Box>
-
             <Divider />
-
+            <ListItem alignItems="flex-start">
+              <ListSubheader>รายละเอียดผู้สั่งซื้อ</ListSubheader>
+              <ListItem>
+                <ListItemText
+                  primary={`ชื่อ: ${order.fristname} ${order.lastname}`}
+                />
+              </ListItem>
+              <Divider orientation="vertical" flexItem />
+              <ListItem>
+                <ListItemText primary={`เบอร์โทร: ${order.phone}`} />
+              </ListItem>
+              <Divider orientation="vertical" flexItem />
+              <ListItem>
+                <ListItemText primary={`ที่อยู่: ${order.address}`} />
+              </ListItem>
+            </ListItem>
+            <Divider />
             <ListSubheader>สินค้าทั้งหมด</ListSubheader>
             <TableBank
               products={order.products}
@@ -232,6 +258,8 @@ const Orderlist = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
+        console.log(res.data);
+
         const sortedOrders = res.data.orders.sort(
           (a: orderInterface, b: orderInterface) => {
             return (
@@ -239,7 +267,7 @@ const Orderlist = (prop: { jwt_token: string }) => {
             );
           }
         );
-        console.log(sortedOrders);
+        // console.log(sortedOrders);
         setOrderList(sortedOrders);
       })
       .catch((err) => {
