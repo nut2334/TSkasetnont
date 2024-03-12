@@ -1002,6 +1002,12 @@ const EditProfile = (prop: {
                 variant="contained"
                 fullWidth
                 onClick={changePassword}
+                disabled={
+                  passwordNew == "" ||
+                  comfirmPassword == "" ||
+                  !comfirmPasswordCheck ||
+                  !passwordCheck
+                }
               >
                 เปลี่ยนรหัสผ่าน
               </Button>
