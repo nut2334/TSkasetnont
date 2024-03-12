@@ -142,14 +142,22 @@ const Navbar = (prop: {
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             {/* computer */}
-            <IconButton sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
-              <img
-                src={require("../assets/karsetnont.png")}
-                alt="Italian Trulli"
-                height="40px"
-              ></img>
-            </IconButton>
-            <NavLink to="/" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <IconButton sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+                <img
+                  src={require("../assets/karsetnont.png")}
+                  alt="Italian Trulli"
+                  height="40px"
+                ></img>
+              </IconButton>
+
               <Typography
                 variant="h6"
                 noWrap

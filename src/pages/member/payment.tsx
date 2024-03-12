@@ -257,8 +257,10 @@ const Payment = (prop: {
                 id="upload-slip"
                 name="upload-slip"
                 onChange={(e) => {
-                  if (e.target.files !== null) {
+                  if (e.target.files && e.target.files?.length > 0) {
                     setSlip(e.target.files[0]);
+                  } else {
+                    setSlip(null);
                   }
                 }}
               />

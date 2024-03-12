@@ -5,6 +5,10 @@ import {
   Box,
   Divider,
   Button,
+  TextField,
+  Select,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import * as config from "../../config/config";
@@ -14,6 +18,7 @@ import BarChart from "../../components/bar";
 import axios from "axios";
 import FollowChart from "../../components/followchart";
 import Pricecenter from "./pricecenter";
+import RankingproductChart from "../../components/rankingproduct";
 
 const Analyze = (prop: { jwt_token: string }) => {
   const [farmerDetail, setFarmerDetail] = React.useState<{
@@ -44,11 +49,19 @@ const Analyze = (prop: { jwt_token: string }) => {
     }[]
   >([]);
   const [allfollowers, setAllfollowers] = React.useState<number>(0);
+  const [allSum, setAllSum] = React.useState();
   const [chartType, setChartType] = React.useState<"date" | "month">("date");
+  const [rankingLimit, setRankingLimit] = React.useState<
+    10 | 20 | 30 | 40 | 50
+  >(10);
+  const [rankingType, setRankingType] = React.useState<"quantity" | "price">(
+    "quantity"
+  );
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
     const apiSelfInfo = config.getApiEndpoint("farmerselfinfo", "GET");
+    const apiAllsum = config.getApiEndpoint("allsum", "GET");
     axios
       .get(apiFollowMember, {
         headers: {
@@ -83,6 +96,16 @@ const Analyze = (prop: { jwt_token: string }) => {
         console.log(res.data);
 
         setFarmerDetail(selfData);
+      });
+    axios
+      .get(apiAllsum, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        setAllSum(res.data.data);
       });
   }, []);
 
@@ -149,6 +172,48 @@ const Analyze = (prop: { jwt_token: string }) => {
             />
           </Grid>
         )}
+        <Box>
+          <Typography variant="h5">ยอดขายทั้งหมด</Typography>
+          <Button
+            variant="contained"
+            color="info"
+            sx={{ marginRight: 1 }}
+            onClick={() => setRankingType("quantity")}
+          >
+            จำนวน
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={() => setRankingType("price")}
+          >
+            ราคา
+          </Button>
+          {/* ranking limit */}
+          <TextField
+            select
+            value={rankingLimit}
+            onChange={(e) =>
+              setRankingLimit(Number(e.target.value) as 10 | 20 | 30 | 40 | 50)
+            }
+            sx={{ marginLeft: 2 }}
+          >
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={30}>30</MenuItem>
+            <MenuItem value={40}>40</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+          </TextField>
+        </Box>
+
+        {allSum && (
+          <RankingproductChart
+            data={allSum}
+            rankingType={rankingType}
+            rankingLimit={rankingLimit}
+          />
+        )}
+        {/* <BarChart data={allSum} /> */}
         <Grid xs={12}>
           <Typography variant="h5">
             ยอดผู้ติดตามทั้งหมด {allfollowers} คน
