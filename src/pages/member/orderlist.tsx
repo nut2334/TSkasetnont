@@ -34,7 +34,7 @@ import Orderreservemember from "./orderreservename";
 
 interface orderInterface {
   address: string;
-  fristname: string;
+  firstname: string;
   lastname: string;
   phone: string;
   id: string;
@@ -209,11 +209,12 @@ const EachOrder = (prop: {
               </ListItem>
             </Box>
             <Divider />
+
+            <ListSubheader>รายละเอียดผู้สั่งซื้อ</ListSubheader>
             <ListItem alignItems="flex-start">
-              <ListSubheader>รายละเอียดผู้สั่งซื้อ</ListSubheader>
               <ListItem>
                 <ListItemText
-                  primary={`ชื่อ: ${order.fristname} ${order.lastname}`}
+                  primary={`ชื่อ: ${order.firstname} ${order.lastname}`}
                 />
               </ListItem>
               <Divider orientation="vertical" flexItem />
@@ -279,8 +280,11 @@ const Orderlist = (prop: { jwt_token: string }) => {
   }, []);
 
   return (
-    <div>
+    <Container maxWidth="lg">
       {orderList.length === 0 ? <div>ไม่มีรายการสั่งซื้อ</div> : null}
+      <Typography variant="h4" sx={{ marginTop: 2 }}>
+        รายการสั่งซื้อ
+      </Typography>
       {orderList.map((order: any, index: number) => {
         return (
           <EachOrder
@@ -291,8 +295,11 @@ const Orderlist = (prop: { jwt_token: string }) => {
           />
         );
       })}
+      <Typography variant="h4" sx={{ marginTop: 2 }}>
+        รายการจอง
+      </Typography>
       <Orderreservemember jwt_token={prop.jwt_token} />
-    </div>
+    </Container>
   );
 };
 
