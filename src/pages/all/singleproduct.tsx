@@ -636,7 +636,7 @@ const SigleProduct = (prop: {
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
-                          : false
+                          : true
                       }
                       variant="contained"
                       color="secondary"
@@ -723,9 +723,10 @@ const SigleProduct = (prop: {
                     color="secondary"
                     startIcon={<AddShoppingCartIcon />}
                     disabled={
-                      product.stock == 0 ||
-                      (jwtDecode(prop.jwt_token) as { role: string }).role !==
-                        "members"
+                      product.stock == 0 || prop.jwt_token
+                        ? (jwtDecode(prop.jwt_token) as { role: string })
+                            .role !== "members"
+                        : true
                     }
                     onClick={() => {
                       if (prop.jwt_token == "") {
@@ -805,7 +806,12 @@ const SigleProduct = (prop: {
                     variant="contained"
                     color="secondary"
                     startIcon={<PointOfSaleIcon />}
-                    disabled={product.stock == 0}
+                    disabled={
+                      product.stock == 0 || prop.jwt_token
+                        ? (jwtDecode(prop.jwt_token) as { role: string })
+                            .role !== "members"
+                        : true
+                    }
                     onClick={() => {
                       if (prop.jwt_token == "") {
                         Swal.fire({
