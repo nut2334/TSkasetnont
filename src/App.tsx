@@ -168,34 +168,6 @@ function App() {
           notification={notification}
           setNotification={setNotification}
         />
-        <MessengerChat
-          pageId="232517789953735"
-          language="th_TH"
-          themeColor={"#2f6e39"}
-          bottomSpacing={70}
-          loggedInGreeting="loggedInGreeting"
-          loggedOutGreeting="loggedOutGreeting"
-          greetingDialogDisplay={"show"}
-          debugMode={true}
-          onMessengerShow={() => {
-            console.log("onMessengerShow");
-          }}
-          onMessengerHide={() => {
-            console.log("onMessengerHide");
-          }}
-          onMessengerDialogShow={() => {
-            console.log("onMessengerDialogShow");
-          }}
-          onMessengerDialogHide={() => {
-            console.log("onMessengerDialogHide");
-          }}
-          onMessengerMounted={() => {
-            console.log("onMessengerMounted");
-          }}
-          onMessengerLoad={() => {
-            console.log("onMessengerLoad");
-          }}
-        />
 
         <Routes>
           <Route path="/" element={<Home jwt_token={jwt_token} />} />

@@ -176,6 +176,7 @@ const Home = (prop: { jwt_token: string }) => {
           zIndex: 1,
           maxHeight: "calc(100vh - 80px)",
         }}
+        zoomControl={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {data.map((item, index) => {

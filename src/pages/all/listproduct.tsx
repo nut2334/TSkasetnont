@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import TabPanel from "@mui/lab/TabPanel";
 import SearchBar from "../../components/searchbar";
 import { styled, alpha } from "@mui/material/styles";
@@ -17,6 +17,7 @@ import {
   InputBase,
   IconButton,
   ButtonGroup,
+  Box,
 } from "@mui/material";
 import { useSearchParams, Link, useParams, Navigate } from "react-router-dom";
 import * as config from "../../config/config";
@@ -28,6 +29,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { RGBColor } from "react-color";
 import Pagination from "@mui/material/Pagination";
+import { MessengerChat } from "react-messenger-chat-plugin";
 
 interface sortInterface {
   title: string;
@@ -90,6 +92,7 @@ const ListProduct = () => {
   const [showProduct, setShowProduct] = React.useState<ProductInterface[]>([]);
   const [value, setValue] = React.useState(0);
   const [maxPage, setMaxPage] = React.useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const { shopname } = useParams<{ shopname: string }>();
 
   useEffect(() => {
@@ -138,6 +141,7 @@ const ListProduct = () => {
     if (paramsPage) {
       setPage(searchParams.get("page") as string);
     }
+    window.addEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -203,9 +207,39 @@ const ListProduct = () => {
     setPage(value.toString());
   };
 
+  const handleResize = () => {
+    if (window.innerWidth < 720) {
+      console.log("mobile");
+      setIsMobile(true);
+    } else {
+      console.log("desktop");
+      setIsMobile(false);
+    }
+  };
+
   return (
     <div>
       <Container maxWidth="lg">
+        <Box
+          sx={{
+            width: "100%",
+          }}
+        >
+          <MessengerChat
+            pageId="232517789953735"
+            language="th_TH"
+            themeColor={"#2f6e39"}
+            bottomSpacing={20}
+            loggedInGreeting="ยินดีต้อนรับสู่เว็บของเรา มีอะไรให้ช่วยเราไหมครับ"
+            loggedOutGreeting="ยินดีต้อนรับสู่เว็บของเรา มีอะไรให้ช่วยเราไหมครับ"
+            greetingDialogDisplay={"show"}
+            debugMode={true}
+            onMessengerShow={() => {
+              console.log("onMessengerShow");
+            }}
+          />
+        </Box>
+
         <Tabs
           value={value}
           onChange={handleChange}
