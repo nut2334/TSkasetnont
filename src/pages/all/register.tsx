@@ -475,6 +475,15 @@ const Register = (prop: {
             color="primary"
             sx={{ mt: 3, mb: 2 }}
             style={{ color: "#fff" }}
+            disabled={
+              !usernameCheck ||
+              !emailCheck ||
+              !passwordCheck ||
+              !comfirmPasswordCheck ||
+              !firstNameValidate ||
+              !lastNameValidate ||
+              !telValidate
+            }
           >
             ยืนยัน
           </Button>

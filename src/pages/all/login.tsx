@@ -53,10 +53,15 @@ const Login = (prop: {
     event.preventDefault();
     if (password == "") {
       setPasswordCheck(true);
+    } else {
+      setPasswordCheck(false);
     }
     if (username == "") {
       setUsernameReg(false);
+    } else {
+      setUsernameReg(true);
     }
+
     if (usernameReg && !passwordCheck) {
       const userData = {
         username: username.trim(),
