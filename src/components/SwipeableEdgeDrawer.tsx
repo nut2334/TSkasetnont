@@ -146,14 +146,7 @@ export default function SwipeableEdgeDrawer(
           >
             {
               <Grid container spacing={2} padding={2}>
-                <Grid
-                  item
-                  xs={5}
-                  sx={{
-                    textAlign: "right",
-                  }}
-                  display={{ xs: "none", md: "flex" }}
-                >
+                <Grid item md={6} sm={12}>
                   <img
                     src={`${config.getApiEndpoint(
                       `getimage/${props.selectedProduct.product_image
@@ -162,37 +155,16 @@ export default function SwipeableEdgeDrawer(
                       "get"
                     )}`}
                     style={{
-                      width: "300px",
-                      aspectRatio: 1 / 1,
-                      borderRadius: "25px",
-                    }}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={5}
-                  sx={{
-                    textAlign: "right",
-                  }}
-                  display={{ xs: "flex", md: "none" }}
-                >
-                  <img
-                    src={`${config.getApiEndpoint(
-                      `getimage/${props.selectedProduct.product_image
-                        .split("/")
-                        .pop()}`,
-                      "get"
-                    )}`}
-                    style={{
-                      width: "100px",
-                      aspectRatio: 1 / 1,
+                      width: "100%",
+                      maxHeight: "300px",
                       borderRadius: "25px",
                       objectFit: "cover",
                     }}
                   />
                 </Grid>
-                <Grid item xs={7}>
-                  <Grid container spacing={2}>
+
+                <Grid item md={6} xs={12}>
+                  <Grid container>
                     <Grid item xs={12}>
                       <Typography variant="h4" gutterBottom>
                         {props.selectedProduct.product_name}
@@ -255,7 +227,7 @@ export default function SwipeableEdgeDrawer(
                         {props.selectedProduct.unit}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item md={12} sm={12}>
                       <NavLink
                         to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
                       >
@@ -268,7 +240,7 @@ export default function SwipeableEdgeDrawer(
                         </Button>
                       </NavLink>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item md={12} sm={12}>
                       <RWebShare
                         data={{
                           text: `https://www.google.com/maps/search/?api=1&query=${props.selectedProduct.lat},${props.selectedProduct.lng}`,

@@ -40,6 +40,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
+import Pricecenter from "./pricecenter";
 
 interface certificateInterface {
   id: string;
@@ -388,6 +389,14 @@ const AddProduct = (prop: { jwt_token: string }) => {
         </Box>
         <form>
           <Grid container spacing={2} sx={{ marginBottom: 1 }}>
+            <Grid xs={12}>
+              <Typography variant="h5">ราคากลาง</Typography>
+            </Grid>
+
+            <Pricecenter />
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
             <Grid item xs={6}>
               <TextField
                 id="outlined-basic"

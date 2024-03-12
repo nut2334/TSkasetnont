@@ -205,11 +205,6 @@ const Analyze = (prop: { jwt_token: string }) => {
             }}
           />
         </Grid>
-        <Grid xs={12}>
-          <Typography variant="h5">ราคากลาง</Typography>
-        </Grid>
-
-        <Pricecenter />
       </Grid>
     </Container>
   );

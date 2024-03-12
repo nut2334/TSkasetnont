@@ -47,6 +47,7 @@ const Pricecenter = () => {
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [selectedSellType, setSelectedSellType] = useState<string>("");
   const [product_id, setProduct_id] = useState<string>("");
+  const [unit, setUnit] = useState<string>("");
   const [graph, setGraph] = useState<
     { date: string; price_min: number; price_max: number }[]
   >([]);
@@ -81,6 +82,8 @@ const Pricecenter = () => {
         }`
       )
       .then((res) => {
+        console.log(res.data);
+        setUnit(res.data.unit);
         setGraph(res.data.price_list);
       });
   };
@@ -177,7 +180,7 @@ const Pricecenter = () => {
               },
               title: {
                 display: true,
-                text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
+                text: `ราคากลางสินค้า ณ ปัจจุบัน (${unit})`,
               },
             },
           }}
