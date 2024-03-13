@@ -58,7 +58,6 @@ interface allStandardInterface {
 }
 
 const AddProduct = (prop: { jwt_token: string }) => {
-  const apiCertificate = config.getApiEndpoint("certifarmer", "GET");
   const apiAddCertificate = config.getApiEndpoint("certifarmer", "POST");
   const apiAllStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
@@ -105,6 +104,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
     username: string;
     shopname: string;
   }>();
+
+  const apiCertificate = config.getApiEndpoint(
+    `certifarmer/${username}`,
+    "GET"
+  );
+
   const [modalIsOpen, setIsOpen] = useState<{
     isOpen: boolean;
     imageSelect: number;
@@ -151,6 +156,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
         setSelectedStandard(JSON.parse(res.data.certificate));
       });
     }
+    console.log(apiCertificate);
+
     axios
       .get(apiCertificate, {
         headers: {
@@ -291,7 +298,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       ID: string;
       username: string;
     };
-    if (jwt.role === "tambons") {
+    if (jwt.role === "tambons" || jwt.role === "admins") {
       body = {
         ...body,
         username: username,
@@ -764,6 +771,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       add.append("standard_id", dropdownStandard);
                       add.append("name", nameStandard);
                       add.append("certificate_number", certificateNumber);
+                      if (username) {
+                        add.append("username", username);
+                      }
                       if (imageStandard !== null) {
                         add.append("image", imageStandard);
                       }
