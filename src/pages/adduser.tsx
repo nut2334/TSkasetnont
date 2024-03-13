@@ -24,8 +24,9 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
+import { useParams } from "react-router-dom";
 
-const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
+const AddUser = (prop: { jwt_token: string }) => {
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
@@ -51,10 +52,6 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
-  const [allrole, setAllrole] = React.useState<
-    [{ role_id: string; role_name: string }]
-  >([{ role_id: "", role_name: "" }]);
-  const [role, setRole] = React.useState<string>("");
   const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
   const [checked, setChecked] = React.useState([0]);
   const [standard, setStandard] = React.useState<
@@ -64,7 +61,9 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
     }[]
   >([]);
   const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
-
+  const { role } = useParams() as {
+    role: "admins" | "tambons" | "farmers" | "provider" | "members";
+  };
   const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -89,22 +88,6 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
   };
 
   useEffect(() => {
-    if (prop.addfarmer) {
-      setAllrole([{ role_id: "farmers", role_name: "เกษตรกร" }]);
-      return;
-    }
-    axios
-      .get(apiRole)
-      .then((res) => {
-        if (res.data) {
-          console.log(res.data);
-
-          setAllrole(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
     axios
       .get(apiStandard)
       .then((res) => {
@@ -255,10 +238,9 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
     console.log(data);
 
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
-    const apiAddFarmer = config.getApiEndpoint("addfarmer", "POST");
 
     axios
-      .post(prop.addfarmer ? apiAddFarmer : apiAddUser, data, {
+      .post(apiAddUser, data, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
@@ -285,7 +267,18 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
           <AddIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          เพิ่มเจ้าหน้าที่
+          เพิ่ม
+          {role == "admins"
+            ? "ผู้ดูแลระบบ"
+            : role == "tambons"
+            ? "เจ้าหน้าที่ตำบล"
+            : role == "farmers"
+            ? "เกษตรกร"
+            : role == "provider"
+            ? "ผู้จัดส่ง"
+            : role == "members"
+            ? "สมาชิก"
+            : ""}
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
@@ -484,28 +477,6 @@ const AddUser = (prop: { jwt_token: string; addfarmer?: boolean }) => {
                     : ""
                 }
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                error={!roleCheck}
-                helperText={roleCheck == false ? "กรุณาเลือกตำแหน่ง" : ""}
-                fullWidth
-                id="role"
-                label="ตำแหน่ง"
-                name="role"
-                select
-                required
-                onChange={(event: React.FocusEvent<HTMLInputElement>) => {
-                  setRole(event.target.value);
-                  setRoleCheck(true);
-                }}
-              >
-                {allrole.map((data) => (
-                  <MenuItem key={data.role_id} value={data.role_id}>
-                    {data.role_name}
-                  </MenuItem>
-                ))}
-              </TextField>
             </Grid>
             {role == "farmers" ? (
               <Grid item xs={12}>

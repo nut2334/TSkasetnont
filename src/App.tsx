@@ -240,11 +240,11 @@ function App() {
                 element={<SettingAdmin jwt_token={jwt_token} />}
               />
               <Route
-                path="/adduser"
+                path="/adduser/:role"
                 element={<AddUser jwt_token={jwt_token} />}
               />
               <Route
-                path="/manageuser"
+                path="/manageuser/:role"
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
@@ -253,6 +253,14 @@ function App() {
                   />
                 }
               />
+              <Route
+                path="/manageuser/farmers/:username"
+                element={<Myproducts jwt_token={jwt_token} />}
+              />
+              {/* <Route
+                path="/managefarmer/:username"
+                element={<Myproducts jwt_token={jwt_token} />}
+              /> */}
               <Route
                 path="/datafarmer"
                 element={<ExcelDownload jwt_token={jwt_token} />}
@@ -285,7 +293,7 @@ function App() {
           {decodeJWT.role == "tambons" && (
             <>
               <Route
-                path="/managefarmer"
+                path="/manageuser/:role"
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
@@ -295,11 +303,11 @@ function App() {
                 }
               />
               <Route
-                path="/addfarmer"
-                element={<AddUser jwt_token={jwt_token} addfarmer={true} />}
+                path="/adduser/:role"
+                element={<AddUser jwt_token={jwt_token} />}
               />
               <Route
-                path="/managefarmer/:username"
+                path="/manageuser/:role/:username"
                 element={<Myproducts jwt_token={jwt_token} />}
               />
             </>

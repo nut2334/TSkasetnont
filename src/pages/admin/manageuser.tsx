@@ -9,7 +9,7 @@ import Paper from "@mui/material/Paper";
 import { Button, Container, Grid, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import { NavLink, Navigate } from "react-router-dom";
+import { NavLink, Navigate, useParams } from "react-router-dom";
 import * as config from "../../config/config";
 import axios from "axios";
 import EditProfile from "../editprofile";
@@ -48,7 +48,7 @@ const ManageUser = (prop: {
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchUsername, setSearchUsername] = useState<string>("");
   const [searchStandard, setSearchStandard] = useState<string>("");
-  const [role, setRole] = useState("");
+  // const [role, setRole] = useState("");
   const [currentRole, setCurrentRole] = useState("");
   const [viewFarmer, setViewFarmer] = useState<string>("");
   const [allRole, setAllrole] = useState<
@@ -68,9 +68,12 @@ const ManageUser = (prop: {
       standard_name: string;
     }[]
   >([]);
+  const { role } = useParams() as {
+    role: "admins" | "tambons" | "farmers" | "providers" | "members";
+  };
 
   useEffect(() => {
-    const apiFetchUsers = config.getApiEndpoint("users", "GET");
+    const apiFetchUsers = config.getApiEndpoint(`users/${role}`, "GET");
     const jwtD = jwtDecode(prop.jwt_token) as { role: string };
     setCurrentRole(jwtD.role);
     axios
@@ -83,12 +86,15 @@ const ManageUser = (prop: {
         console.log(response.data);
         setUsers(response.data);
         setFilteredUsers(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
     axios.get(config.getApiEndpoint("standardproducts", "GET")).then((res) => {
       console.log(res.data);
       setAllStandardProducts(res.data);
     });
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     if (currentRole !== "tambons") {
@@ -147,10 +153,6 @@ const ManageUser = (prop: {
   };
   const handleSearch = () => {
     let filteredUsers = users;
-
-    if (role !== "all" && role !== "") {
-      filteredUsers = users.filter((user) => user.role == role);
-    }
     if (searchUser !== "") {
       filteredUsers = filteredUsers.filter((user) =>
         user.firstname.includes(searchUser)
@@ -175,8 +177,19 @@ const ManageUser = (prop: {
     setFilteredUsers(filteredUsers);
   };
 
+  if (
+    role !== "admins" &&
+    role !== "farmers" &&
+    role !== "members" &&
+    role !== "tambons" &&
+    role !== "providers"
+  ) {
+    return <Navigate to="/" />;
+  }
   if (viewFarmer !== "") {
-    return <Navigate to={`/managefarmer/${viewFarmer}`} />;
+    console.log();
+
+    return <Navigate to={`/manageuser/farmers/${viewFarmer}`} />;
   }
 
   return (
@@ -197,7 +210,16 @@ const ManageUser = (prop: {
             <Grid item xs={12}>
               {currentRole != "tambons" && (
                 <Typography component="h1" variant="h5">
-                  จัดการสมาชิก
+                  จัดการ{" "}
+                  {role === "admins"
+                    ? "ผู้ดูแลระบบ"
+                    : role === "farmers"
+                    ? "เกษตรกร"
+                    : role === "members"
+                    ? "สมาชิก"
+                    : role === "providers"
+                    ? "ผู้ว่าราชการจังหวัด"
+                    : "เกษตรกร"}
                 </Typography>
               )}
               {currentRole == "tambons" && (
@@ -227,23 +249,7 @@ const ManageUser = (prop: {
                 }
               />
             </Grid>
-            {currentRole !== "tambons" && (
-              <Grid item xs={6}>
-                <TextField
-                  select
-                  label="ตำแหน่ง"
-                  fullWidth
-                  onChange={(event) => setRole(event.target.value as string)}
-                >
-                  {allRole.map((role) => (
-                    <MenuItem key={role.role_id} value={role.role_id}>
-                      {role.role_name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-            )}
-            {
+            {role === "farmers" && (
               <Grid item xs={6}>
                 <TextField
                   select
@@ -265,7 +271,7 @@ const ManageUser = (prop: {
                   ))}
                 </TextField>
               </Grid>
-            }
+            )}
             <Grid item xs={6}>
               <Button
                 variant="contained"
@@ -277,11 +283,20 @@ const ManageUser = (prop: {
                 ค้นหา
               </Button>
               <NavLink
-                to={currentRole == "tambons" ? "/addfarmer" : "/adduser"}
+                to={`/adduser/${role}`}
                 style={{ textDecoration: "none" }}
               >
                 <Button variant="contained" startIcon={<AddIcon />}>
-                  เพิ่มสมาชิก
+                  เพิ่ม
+                  {role === "admins"
+                    ? "ผู้ดูแลระบบ"
+                    : role === "farmers"
+                    ? "เกษตรกร"
+                    : role === "members"
+                    ? "สมาชิก"
+                    : role === "providers"
+                    ? "ผู้ว่าราชการจังหวัด"
+                    : "เกษตรกร"}
                 </Button>
               </NavLink>
             </Grid>
@@ -332,8 +347,7 @@ const ManageUser = (prop: {
                         }}
                         onClick={() => {
                           console.log(user.username);
-
-                          if (currentRole === "tambons") {
+                          if (role === "farmers") {
                             setViewFarmer(user.username);
                           }
                         }}
@@ -386,7 +400,7 @@ const ManageUser = (prop: {
           />
         </>
       )}
-      {editingUser && currentRole !== "tambons" && (
+      {editingUser && role == "farmers" && (
         <>
           <div
             style={{
