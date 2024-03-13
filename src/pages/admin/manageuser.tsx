@@ -374,7 +374,14 @@ const ManageUser = (prop: {
     return <Navigate to={`/manageuser/farmers/${viewFarmer}`} />;
   }
 
-  if (role === "all") return <Searchtable jwt_token={prop.jwt_token} />;
+  if (role === "all")
+    return (
+      <Searchtable
+        jwt_token={prop.jwt_token}
+        followList={prop.followList}
+        setFollowList={prop.setFollowList}
+      />
+    );
 
   return (
     <Container
@@ -388,7 +395,7 @@ const ManageUser = (prop: {
       }}
       maxWidth="lg"
     >
-      <ExcelDownload jwt_token={prop.jwt_token} />
+      {role == "farmers" && <ExcelDownload jwt_token={prop.jwt_token} />}
       {!editingUser ? (
         <>
           <Grid container spacing={2}>
