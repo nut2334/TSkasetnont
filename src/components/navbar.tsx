@@ -70,6 +70,7 @@ const Navbar = (prop: {
     { name: "จัดการเกษตรตำบล", path: "/manageuser/tambons" },
     { name: "จัดการสมาชิก", path: "/manageuser/members" },
     { name: "จัดการผู้ว่าราชการจังหวัด", path: "/manageuser/providers" },
+    { name: "ผู้ใช้งานทั้งหมด", path: "/manageuser/all" },
   ];
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null

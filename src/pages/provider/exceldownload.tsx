@@ -225,10 +225,21 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
             justifyContent: "center",
           }}
         >
-          <Typography variant="h4">สถิติการลงทะเบียนเกษตกร</Typography>
+          <Typography variant="h4">
+            สถิติการลงทะเบียนเกษตกร ณ วันที่ {new Date().toLocaleDateString()}
+          </Typography>
         </Grid>
-        <Grid item xs={12} display={{ xs: "flex", md: "none" }}>
-          <Typography variant="h5">สถิติการลงทะเบียนเกษตกร</Typography>
+        <Grid
+          item
+          xs={12}
+          display={{ xs: "flex", md: "none" }}
+          sx={{
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h5">
+            สถิติการลงทะเบียนเกษตกร ณ วันที่ {new Date().toLocaleDateString()}
+          </Typography>
         </Grid>
 
         <Grid item xs={12}>
@@ -240,6 +251,9 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               )}`}
             </Typography>
           )}
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
         </Grid>
         <Grid item xs={12} md={6}>
           {registerData && (
@@ -334,65 +348,6 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
             />
           )}
         </Grid>
-        {/* <Grid item xs={12} margin={2}>
-          <Button
-            onClick={downloadExcel}
-            variant="contained"
-            startIcon={<DownloadIcon />}
-          >
-            Excel Download
-          </Button>
-        </Grid> 
-        <Grid item xs={12}>
-          {farmerData && (
-            // <EnhancedTable rows={farmerData} />
-
-            <TableContainer component={Paper}>
-              <Table aria-label="simple table">
-                <TableHead>
-                  <StyledTableRow>
-                    <StyledTableCell>ชื่อร้านค้า</StyledTableCell>
-                    <StyledTableCell>ชื่อ</StyledTableCell>
-                    <StyledTableCell align="right">นามสกุล</StyledTableCell>
-                    <StyledTableCell align="right">อีเมล</StyledTableCell>
-                    <StyledTableCell align="right">เบอร์โทร</StyledTableCell>
-                    <StyledTableCell align="right">
-                      เป็นสมาชิกตั้งแต่
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      สินค้าในระบบ
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                  {farmerData.map((row) => (
-                    <StyledTableRow key={row.email}>
-                      <StyledTableCell component="th" scope="row">
-                        {row.farmerstorename}
-                      </StyledTableCell>
-                      <StyledTableCell>{row.firstname}</StyledTableCell>
-                      <StyledTableCell align="right">
-                        {row.lastname}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        {row.email}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        {row.phone}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        {new Date(row.createAt).toLocaleDateString()}
-                      </StyledTableCell>
-                      <StyledTableCell align="right">
-                        {row.product_count}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Grid> */}
       </Grid>
     </Container>
   );

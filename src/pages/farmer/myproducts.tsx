@@ -11,6 +11,7 @@ import {
   TextField,
   Chip,
   Stack,
+  Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,6 +30,7 @@ import Swal from "sweetalert2";
 import { MenuItem } from "@mui/material";
 import { web_activity } from "../../config/dataDropdown";
 import { RGBColor } from "react-color";
+import { jwtDecode } from "jwt-decode";
 
 interface ProductInterface {
   product_id: string;
@@ -58,8 +60,18 @@ const Myproducts = (prop: {
       bgcolor: string;
     }[]
   >([]);
+  const [dataFarmer, setDataFarmer] = useState<{
+    firstname: string;
+    lastname: string;
+    farmerstorename: string;
+  }>({
+    firstname: "",
+    lastname: "",
+    farmerstorename: "",
+  });
   const [searchType, setSearchType] = useState("");
   const [filterSearch, setFilterSearch] = useState<ProductInterface[]>([]);
+
   const { username } = useParams<{ username: string }>();
 
   useEffect(() => {
@@ -67,6 +79,22 @@ const Myproducts = (prop: {
     axios.get(config.getApiEndpoint("categories", "GET")).then((response) => {
       setAllCategory(response.data);
     });
+    let role = (jwtDecode(prop.jwt_token) as { role: string }).role;
+    let apiGet = config.getApiEndpoint(
+      `getuseradmin/farmers/${username}`,
+      "GET"
+    );
+    let api = config.getApiEndpoint(`getinfo`, "GET");
+    axios
+      .get(role == "farmers" ? api : apiGet, {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        setDataFarmer(response.data);
+      });
   }, []);
 
   const fetchProduct = () => {
@@ -116,6 +144,17 @@ const Myproducts = (prop: {
       }}
     >
       <Grid container spacing={2}>
+        {((jwtDecode(prop.jwt_token) as { role: string }).role == "admins" ||
+          (jwtDecode(prop.jwt_token) as { role: string }).role ==
+            "tambons") && (
+          <>
+            <Grid item xs={12} mb={12}>
+              <Typography variant="h4">
+                จัดการสินค้าของ {dataFarmer.firstname} {dataFarmer.lastname}
+              </Typography>
+            </Grid>
+          </>
+        )}
         <Grid item xs={12} sm={6}>
           <TextField
             select

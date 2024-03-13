@@ -18,6 +18,7 @@ import { RWebShare } from "react-web-share";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
+import { Rating } from "@mui/material";
 
 const drawerBleeding = 56;
 
@@ -178,41 +179,12 @@ export default function SwipeableEdgeDrawer(
                               คะแนนเฉลี่ย {average.toFixed(1)}
                             </Typography>
                           )}
-                          {average >= 1 ? (
-                            <StarIcon />
-                          ) : average >= 0.5 ? (
-                            <StarHalfIcon />
-                          ) : (
-                            <StarBorderIcon />
-                          )}
-                          {average >= 2 ? (
-                            <StarIcon />
-                          ) : average >= 1.5 ? (
-                            <StarHalfIcon />
-                          ) : (
-                            <StarBorderIcon />
-                          )}
-                          {average >= 3 ? (
-                            <StarIcon />
-                          ) : average >= 2.5 ? (
-                            <StarHalfIcon />
-                          ) : (
-                            <StarBorderIcon />
-                          )}
-                          {average >= 4 ? (
-                            <StarIcon />
-                          ) : average >= 3.5 ? (
-                            <StarHalfIcon />
-                          ) : (
-                            <StarBorderIcon />
-                          )}
-                          {average >= 5 ? (
-                            <StarIcon />
-                          ) : average >= 4.5 ? (
-                            <StarHalfIcon />
-                          ) : (
-                            <StarBorderIcon />
-                          )}
+                          <Rating
+                            value={average}
+                            readOnly
+                            precision={0.5}
+                            size="large"
+                          />
                         </div>
                       }
                     </Grid>

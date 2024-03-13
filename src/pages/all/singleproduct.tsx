@@ -51,6 +51,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
+import { Rating } from "@mui/material";
 
 interface FullProductInterface {
   product_id: string;
@@ -1139,41 +1140,12 @@ const SigleProduct = (prop: {
                       <Typography variant="h6">
                         {item.rating.toFixed(1)}
                       </Typography>
-                      {item.rating >= 1 ? (
-                        <StarIcon />
-                      ) : item.rating >= 0.5 ? (
-                        <StarHalfIcon />
-                      ) : (
-                        <StarBorderIcon />
-                      )}
-                      {item.rating >= 2 ? (
-                        <StarIcon />
-                      ) : item.rating >= 1.5 ? (
-                        <StarHalfIcon />
-                      ) : (
-                        <StarBorderIcon />
-                      )}
-                      {item.rating >= 3 ? (
-                        <StarIcon />
-                      ) : item.rating >= 2.5 ? (
-                        <StarHalfIcon />
-                      ) : (
-                        <StarBorderIcon />
-                      )}
-                      {item.rating >= 4 ? (
-                        <StarIcon />
-                      ) : item.rating >= 3.5 ? (
-                        <StarHalfIcon />
-                      ) : (
-                        <StarBorderIcon />
-                      )}
-                      {item.rating >= 5 ? (
-                        <StarIcon />
-                      ) : item.rating >= 4.5 ? (
-                        <StarHalfIcon />
-                      ) : (
-                        <StarBorderIcon />
-                      )}
+                      <Rating
+                        name="read-only"
+                        value={item.rating}
+                        readOnly
+                        precision={0.5}
+                      />
                     </div>
                   }
                 </Box>
