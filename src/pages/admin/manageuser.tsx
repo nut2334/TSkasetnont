@@ -24,6 +24,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import ExcelDownload from "../provider/exceldownload";
 import DownloadIcon from "@mui/icons-material/Download";
 import Searchtable from "../../components/searchTable";
+import { useCallback } from "react";
 
 interface userInterface {
   id: string;
@@ -267,8 +268,10 @@ const ManageUser = (prop: {
       field: "lastLogin",
       headerName: "เข้าสู่ระบบล่าสุด",
       flex: 1,
+
       renderCell: (params) => {
         function datediff(first: string, second: string) {
+          console.log(second, first);
           return Math.round(
             (Date.parse(second) - Date.parse(first)) / (1000 * 60 * 60 * 24)
           );
@@ -419,9 +422,9 @@ const ManageUser = (prop: {
                 label="ชื่อ"
                 variant="outlined"
                 fullWidth
-                onChange={(event) =>
-                  setSearchUser(event.target.value as string)
-                }
+                onChange={(event) => {
+                  setSearchUser(event.target.value);
+                }}
               />
             </Grid>
             <Grid item xs={6}>
@@ -429,79 +432,85 @@ const ManageUser = (prop: {
                 label="Username"
                 variant="outlined"
                 fullWidth
-                onChange={(event) =>
-                  setSearchUsername(event.target.value as string)
-                }
+                onChange={(event) => {
+                  setSearchUsername(event.target.value);
+                }}
               />
             </Grid>
             {role === "farmers" && (
-              <Grid item xs={6}>
-                <TextField
-                  select
-                  label="มาตรฐาน"
-                  fullWidth
-                  onChange={(event) => {
-                    console.log(event.target.value);
-                    setSearchStandard(event.target.value as string);
-                  }}
-                >
-                  <MenuItem value="all">ทั้งหมด</MenuItem>
-                  {allStandardProducts.map((product) => (
-                    <MenuItem
-                      key={product.standard_id}
-                      value={product.standard_id}
-                    >
-                      {product.standard_name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  select
-                  label="อำเภอ"
-                  fullWidth
-                  onChange={(event) => {
-                    setAmpher(
-                      event.target.value as
-                        | "จังหวัดอื่นๆ"
-                        | "เมืองนนทบุรี"
-                        | "บางบัวทอง"
-                        | "บางกรวย"
-                        | "บางใหญ่"
-                        | "ปากเกร็ด"
-                        | "ไทรน้อย"
-                        | "ทั้งหมด"
-                        | ""
-                    );
-                  }}
-                >
-                  <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
-                  <MenuItem value="เมืองนนทบุรี">เมืองนนทบุรี</MenuItem>
-                  <MenuItem value="บางบัวทอง">บางบัวทอง</MenuItem>
-                  <MenuItem value="บางกรวย">บางกรวย</MenuItem>
-                  <MenuItem value="บางใหญ่">บางใหญ่</MenuItem>
-                  <MenuItem value="ปากเกร็ด">ปากเกร็ด</MenuItem>
-                  <MenuItem value="ไทรน้อย">ไทรน้อย</MenuItem>
-                  <MenuItem value="จังหวัดอื่นๆ">จังหวัดอื่นๆ</MenuItem>
-                </TextField>
-                <TextField
-                  select
-                  label="หมวดหมู่"
-                  fullWidth
-                  onChange={(event) => {
-                    setCategories(event.target.value as string);
-                  }}
-                >
-                  <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
-                  {allCategories.map((cate: { category_name: string }) => (
-                    <MenuItem
-                      key={cate.category_name}
-                      value={cate.category_name}
-                    >
-                      {cate.category_name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+              <>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="มาตรฐาน"
+                    fullWidth
+                    onChange={(event) => {
+                      console.log(event.target.value);
+                      setSearchStandard(event.target.value as string);
+                    }}
+                  >
+                    <MenuItem value="all">ทั้งหมด</MenuItem>
+                    {allStandardProducts.map((product) => (
+                      <MenuItem
+                        key={product.standard_id}
+                        value={product.standard_id}
+                      >
+                        {product.standard_name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="อำเภอ"
+                    fullWidth
+                    onChange={(event) => {
+                      setAmpher(
+                        event.target.value as
+                          | "จังหวัดอื่นๆ"
+                          | "เมืองนนทบุรี"
+                          | "บางบัวทอง"
+                          | "บางกรวย"
+                          | "บางใหญ่"
+                          | "ปากเกร็ด"
+                          | "ไทรน้อย"
+                          | "ทั้งหมด"
+                          | ""
+                      );
+                    }}
+                  >
+                    <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
+                    <MenuItem value="เมืองนนทบุรี">เมืองนนทบุรี</MenuItem>
+                    <MenuItem value="บางบัวทอง">บางบัวทอง</MenuItem>
+                    <MenuItem value="บางกรวย">บางกรวย</MenuItem>
+                    <MenuItem value="บางใหญ่">บางใหญ่</MenuItem>
+                    <MenuItem value="ปากเกร็ด">ปากเกร็ด</MenuItem>
+                    <MenuItem value="ไทรน้อย">ไทรน้อย</MenuItem>
+                    <MenuItem value="จังหวัดอื่นๆ">จังหวัดอื่นๆ</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="หมวดหมู่"
+                    fullWidth
+                    onChange={(event) => {
+                      setCategories(event.target.value as string);
+                    }}
+                  >
+                    <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
+                    {allCategories.map((cate: { category_name: string }) => (
+                      <MenuItem
+                        key={cate.category_name}
+                        value={cate.category_name}
+                      >
+                        {cate.category_name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </>
             )}
             <Grid item xs={12} md={6}>
               <Button
@@ -549,7 +558,6 @@ const ManageUser = (prop: {
                 Excel Download
               </Button>
             </Grid>
-            <Grid item xs={6}></Grid>
           </Grid>
 
           <div style={{ height: 500, width: "100%", marginTop: "10px" }}>

@@ -12,8 +12,9 @@ import StarIcon from "@mui/icons-material/Star";
 import Swal from "sweetalert2";
 import axios from "axios";
 import * as config from "../../config/config";
-import { Box, Chip } from "@mui/material";
+import { Box, Chip, Typography } from "@mui/material";
 import { RemoveRedEye } from "@mui/icons-material";
+import { Container } from "@mui/system";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -237,7 +238,16 @@ const Certification = (prop: { jwt_token: string }) => {
   }, []);
 
   return (
-    <div>
+    <Container maxWidth="lg">
+      <Typography
+        variant="h4"
+        sx={{
+          marginTop: 5,
+          marginBottom: 2,
+        }}
+      >
+        เกษตรกรขอเพิ่มมาตรฐาน
+      </Typography>
       <TableContainer component={Paper}>
         <Table aria-label="simple table">
           <TableHead>
@@ -249,6 +259,15 @@ const Certification = (prop: { jwt_token: string }) => {
               <StyledTableCell align="right">การกระทำ</StyledTableCell>
             </StyledTableRow>
           </TableHead>
+          {allRequest.length == 0 && (
+            <TableBody>
+              <StyledTableRow>
+                <StyledTableCell colSpan={5} align="center">
+                  ไม่มีข้อมูล
+                </StyledTableCell>
+              </StyledTableRow>
+            </TableBody>
+          )}
           <TableBody>
             {allRequest.map((row) => (
               <EachRow
@@ -260,7 +279,7 @@ const Certification = (prop: { jwt_token: string }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 
