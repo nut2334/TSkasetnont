@@ -213,10 +213,12 @@ const ManageUser = (prop: {
     }
     if (searchStandard !== "all" && searchStandard !== "") {
       filteredUsers = filteredUsers.filter((user) => {
-        console.log(searchStandard);
+        console.log(searchStandard == "ST000" && user.certificates.length == 0);
 
-        if (user.certificates.length == 0 && searchStandard == "ST000")
-          return true;
+        if (user.certificates.length == 0 && searchStandard == "ST000") {
+          console.log("sdlsdksdkff");
+          return user;
+        }
         if (user.certificates.length == 0) return false;
         console.log(user.certificates, "ass", searchStandard);
         let found = user.certificates.find((cert) => {
@@ -233,7 +235,7 @@ const ManageUser = (prop: {
       });
     }
 
-    if (categories !== "ทั้งหมด") {
+    if (categories !== "ทั้งหมด" && categories !== "") {
       filteredUsers = filteredUsers.filter((user) => {
         let found = user.categories.find((cate) => {
           return cate.category_name === categories;
