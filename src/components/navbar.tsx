@@ -21,7 +21,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Cart } from "../App";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-
 import * as config from "../config/config";
 import axios from "axios";
 
@@ -110,7 +109,7 @@ const Navbar = (prop: {
         ...defaultPages,
         { name: "จัดการผู้ใช้งาน", path: "" },
         { name: "การตั้งค่า", path: "/setting" },
-        { name: "ข้อมูลเกษตรกร", path: "/manageuser/farmers" },
+        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
         { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "farmers") {

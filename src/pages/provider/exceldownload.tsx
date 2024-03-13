@@ -1,4 +1,12 @@
-import { Box, Button, Table, Typography, Grid, Container } from "@mui/material";
+import {
+  Box,
+  Button,
+  Table,
+  Typography,
+  Grid,
+  Container,
+  Divider,
+} from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as config from "../../config/config";
@@ -222,6 +230,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
         <Grid item xs={12} display={{ xs: "flex", md: "none" }}>
           <Typography variant="h5">สถิติการลงทะเบียนเกษตกร</Typography>
         </Grid>
+
         <Grid item xs={12}>
           {registerData && (
             <Typography variant="h6" align="center">
@@ -255,7 +264,18 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                   },
                   title: {
                     display: true,
-                    text: "จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน",
+                    text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง${
+                      registerData.length > 0
+                        ? `${new Date(
+                            registerData[0].createAt
+                          ).toLocaleDateString()} ถึง ${new Date(
+                            registerData[registerData.length - 1].createAt
+                          ).toLocaleDateString()}`
+                        : ""
+                    }`,
+                    font: {
+                      size: 15,
+                    },
                   },
                 },
               }}
@@ -314,7 +334,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
             />
           )}
         </Grid>
-        <Grid item xs={12} margin={2}>
+        {/* <Grid item xs={12} margin={2}>
           <Button
             onClick={downloadExcel}
             variant="contained"
@@ -322,7 +342,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           >
             Excel Download
           </Button>
-        </Grid>
+        </Grid> 
         <Grid item xs={12}>
           {farmerData && (
             // <EnhancedTable rows={farmerData} />
@@ -372,7 +392,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               </Table>
             </TableContainer>
           )}
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

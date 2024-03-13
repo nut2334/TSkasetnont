@@ -20,6 +20,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import ExcelDownload from "../provider/exceldownload";
+import DownloadIcon from "@mui/icons-material/Download";
 
 interface userInterface {
   id: string;
@@ -30,6 +33,9 @@ interface userInterface {
   phone: string;
   role: string;
   certificates: string[];
+  certificateCount: number;
+  productCount: number;
+  lastLogin: Date;
 }
 const ManageUser = (prop: {
   jwt_token: string;
@@ -176,6 +182,85 @@ const ManageUser = (prop: {
 
     setFilteredUsers(filteredUsers);
   };
+  const columns: GridColDef[] = [
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "username", headerName: "Username", flex: 1 },
+    { field: "firstname", headerName: "ชื่อ", flex: 1 },
+    { field: "lastname", headerName: "นามสกุล", flex: 1 },
+    { field: "phone", headerName: "เบอร์โทรศัพท์", flex: 1 },
+    {
+      field: "action",
+      headerName: "การกระทำ",
+      renderCell: (params) => (
+        <>
+          <RemoveRedEyeIcon
+            sx={{
+              color: "#36AE7C",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              console.log(params.row.username);
+              if (role === "farmers") {
+                setViewFarmer(params.row.username);
+              }
+            }}
+          />
+          <EditIcon
+            sx={{
+              color: "#F9D923",
+              cursor: "pointer",
+            }}
+            onClick={() => editUser(params.row.username, params.row.role)}
+          />
+          <DeleteIcon
+            sx={{
+              color: "#EB5353",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              Swal.fire({
+                title: "คุณแน่ใจหรือไม่?",
+                text: "คุณจะไม่สามารถกู้คืนข้อมูลนี้ได้!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "ใช่, ลบข้อมูล!",
+                cancelButtonText: "ยกเลิก",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteUser(params.row.username, params.row.role);
+                }
+              });
+            }}
+          />
+        </>
+      ),
+    },
+  ];
+
+  const downloadExcel = () => {
+    const apiExcelDownload = config.getApiEndpoint("excel", "GET");
+    axios
+      .get(apiExcelDownload, {
+        responseType: "blob",
+      })
+      .then((response) => {
+        console.log(response);
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `TheBestKasetNont-รายชื่อและข้อมูลของเกษตกรที่อยู่ในระบบ(${
+            new Date().toISOString().split("T")[0]
+          }).xlsx`
+        );
+        document.body.appendChild(link);
+        link.click();
+      });
+  };
 
   if (
     role !== "admins" &&
@@ -204,13 +289,14 @@ const ManageUser = (prop: {
       }}
       maxWidth="lg"
     >
+      <ExcelDownload jwt_token={prop.jwt_token} />
       {!editingUser ? (
         <>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               {currentRole != "tambons" && (
                 <Typography component="h1" variant="h5">
-                  จัดการ{" "}
+                  จัดการ
                   {role === "admins"
                     ? "ผู้ดูแลระบบ"
                     : role === "farmers"
@@ -286,7 +372,13 @@ const ManageUser = (prop: {
                 to={`/adduser/${role}`}
                 style={{ textDecoration: "none" }}
               >
-                <Button variant="contained" startIcon={<AddIcon />}>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  sx={{
+                    marginRight: "10px",
+                  }}
+                >
                   เพิ่ม
                   {role === "admins"
                     ? "ผู้ดูแลระบบ"
@@ -299,11 +391,31 @@ const ManageUser = (prop: {
                     : "เกษตรกร"}
                 </Button>
               </NavLink>
+              <Button
+                onClick={downloadExcel}
+                variant="contained"
+                startIcon={<DownloadIcon />}
+              >
+                Excel Download
+              </Button>
             </Grid>
             <Grid item xs={6}></Grid>
           </Grid>
 
-          <TableContainer
+          <div style={{ height: 500, width: "100%", marginTop: "10px" }}>
+            <DataGrid
+              rows={filteredUsers}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 10 },
+                },
+              }}
+              pageSizeOptions={[10, 20, 50]}
+            />
+          </div>
+
+          {/* <TableContainer
             component={Paper}
             sx={{
               marginTop: "20px",
@@ -388,7 +500,7 @@ const ManageUser = (prop: {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </TableContainer> */}
         </>
       ) : (
         <>
