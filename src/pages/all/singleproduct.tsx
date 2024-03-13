@@ -929,11 +929,11 @@ const SigleProduct = (prop: {
         sx={{
           boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
           borderRadius: 2,
-          padding: 2,
-          margin: "20px 0",
+          padding: 3,
+          marginBottom: 2,
         }}
       >
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row">
           <Stack>
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
@@ -1036,7 +1036,14 @@ const SigleProduct = (prop: {
         </Typography>
 
         {product.facebooklink || product.lineid ? (
-          <Typography variant="h6">ช่องทางการติดต่อ</Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              marginBottom: 2,
+            }}
+          >
+            ช่องทางการติดต่อ
+          </Typography>
         ) : null}
 
         {product.facebooklink && (
@@ -1056,7 +1063,6 @@ const SigleProduct = (prop: {
                   borderRadius: "100%",
                   width: 30,
                   height: "auto",
-                  marginBottom: 4,
                 }}
               />
             </Stack>
@@ -1072,6 +1078,7 @@ const SigleProduct = (prop: {
               spacing={2}
               sx={{
                 cursor: "pointer",
+                marginTop: 2,
               }}
               onClick={handleCopy(product.lineid)}
             >

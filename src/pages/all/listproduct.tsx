@@ -367,7 +367,7 @@ const ListProduct = () => {
                     )?.category_name
                   : "OTHER";
                 return (
-                  <Grid item key={index} lg={4} xs={12} sm={6}>
+                  <Grid item key={index} lg={4} xs={12} sm={6} padding={1}>
                     <NavLink
                       to={`/shop/${product.farmerstorename}/${product.product_id}`}
                       style={{
@@ -409,6 +409,7 @@ const ListProduct = () => {
                             label={product.selectedType}
                             sx={{
                               marginRight: "5px",
+                              marginBottom: "10px",
                             }}
                           />
                           <Chip
@@ -417,6 +418,7 @@ const ListProduct = () => {
                               backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
                               color: isDark(bgcolor) ? "white" : "black",
                               marginRight: "5px",
+                              marginBottom: "10px",
                             }}
                           />
                           <Typography

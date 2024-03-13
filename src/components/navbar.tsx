@@ -64,6 +64,14 @@ const Navbar = (prop: {
     { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },
     { name: "ออกจากระบบ", path: "/" },
   ];
+
+  const manageUser = [
+    { name: "จัดการเกษตรกร", path: "/manageuser/farmers" },
+    { name: "จัดการผู้ดูแลระบบ", path: "/manageuser/admins" },
+    { name: "จัดการเกษตรตำบล", path: "/manageuser/tambons" },
+    { name: "จัดการสมาชิก", path: "/manageuser/members" },
+    { name: "จัดการผู้ว่าราชการจังหวัด", path: "/manageuser/providers" },
+  ];
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -71,6 +79,8 @@ const Navbar = (prop: {
     null
   );
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -98,9 +108,9 @@ const Navbar = (prop: {
     } else if (prop.role == "admins") {
       setVisiblePages([
         ...defaultPages,
-        { name: "จัดการสมาชิก", path: "/manageuser" },
+        { name: "จัดการผู้ใช้งาน", path: "" },
         { name: "การตั้งค่า", path: "/setting" },
-        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
+        { name: "ข้อมูลเกษตรกร", path: "/manageuser/farmers" },
         { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "farmers") {
@@ -117,7 +127,7 @@ const Navbar = (prop: {
       setVisiblePages([
         ...defaultPages,
         { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
-        { name: "จัดการเกษตรกร", path: "/managefarmer" },
+        { name: "จัดการเกษตรกร", path: "/manageuser/farmers" },
       ]);
     } else if (prop.role == "members") {
       setVisiblePages([
@@ -128,6 +138,13 @@ const Navbar = (prop: {
       setVisiblePages([...defaultPages]);
     }
   }, [prop.role]);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <React.Fragment>
@@ -207,6 +224,18 @@ const Navbar = (prop: {
                     to={page.path}
                     style={{ textDecoration: "none", color: "black" }}
                   >
+                    {page.path !== "" && (
+                      <MenuItem key={index} onClick={handleCloseNavMenu}>
+                        <Typography textAlign="center">{page.name}</Typography>
+                      </MenuItem>
+                    )}
+                  </NavLink>
+                ))}
+                {manageUser.map((page, index) => (
+                  <NavLink
+                    to={page.path}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
                     <MenuItem key={index} onClick={handleCloseNavMenu}>
                       <Typography textAlign="center">{page.name}</Typography>
                     </MenuItem>
@@ -246,20 +275,56 @@ const Navbar = (prop: {
 
             {/* computer */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {visiblePages.map((page, index) => (
-                <NavLink to={page.path} style={{ textDecoration: "none" }}>
+              {visiblePages.map((page, index) =>
+                page.path == "" ? (
                   <Button
-                    key={index}
-                    onClick={handleCloseNavMenu}
+                    id="basic-button"
+                    aria-controls={open ? "basic-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={handleClick}
                     sx={{ my: 2, color: "black", display: "block" }}
                   >
                     <Typography textAlign="center" sx={{ color: "black" }}>
                       {page.name}
                     </Typography>
                   </Button>
-                </NavLink>
-              ))}
+                ) : (
+                  <NavLink to={page.path} style={{ textDecoration: "none" }}>
+                    <Button
+                      key={index}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "black", display: "block" }}
+                    >
+                      <Typography textAlign="center" sx={{ color: "black" }}>
+                        {page.name}
+                      </Typography>
+                    </Button>
+                  </NavLink>
+                )
+              )}
+
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+              >
+                {manageUser.map((page, index) => (
+                  <NavLink to={page.path} style={{ textDecoration: "none" }}>
+                    <MenuItem key={index} onClick={handleClose}>
+                      <Typography textAlign="center" sx={{ color: "black" }}>
+                        {page.name}
+                      </Typography>
+                    </MenuItem>
+                  </NavLink>
+                ))}
+              </Menu>
             </Box>
+
             {prop.role == "members" && (
               <>
                 <Badge badgeContent={prop.cartList.length} color="primary">

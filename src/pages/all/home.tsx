@@ -295,12 +295,16 @@ const Home = (prop: { jwt_token: string }) => {
                 label={item.category_name}
                 icon={
                   <LocationOnIcon
-                    sx={{ fill: isDark(bgcolor) ? "white" : "black" }}
+                    sx={{
+                      fill: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                    }}
                   />
                 }
                 sx={{
-                  backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                  color: `${isDark(bgcolor) ? "white" : "black"}`,
+                  // backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                  backgroundColor: "white",
+                  color: "black",
+                  // color: `${isDark(bgcolor) ? "white" : "black"}`,
                   marginRight: "5px",
                   boxShadow:
                     "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
