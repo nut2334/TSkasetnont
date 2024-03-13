@@ -33,14 +33,12 @@ import {
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";
 import EnhancedTable from "../../components/sortabletable";
-import "chartjs-adapter-moment";
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   ArcElement,
-  TimeScale,
   Title,
   Tooltip,
   Legend
@@ -204,20 +202,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               options={{
                 scales: {
                   x: {
-                    type: "time",
-                    time: {
-                      unit: "day",
-
-                      displayFormats: {
-                        day: "DD/MM/YYYY",
-                      },
-                    },
-                    min: new Date(
-                      registerData[0].createAt
-                    ).toLocaleDateString(),
-                    max: new Date(
-                      registerData[registerData.length - 1].createAt
-                    ).toLocaleDateString(),
+                    stacked: true,
                   },
                   y: {
                     stacked: true,
@@ -252,9 +237,9 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                       registerData.length > 0
                         ? `${new Date(
                             registerData[0].createAt
-                          ).toLocaleDateString("th-TH")} ถึง ${new Date(
+                          ).toLocaleDateString()} ถึง ${new Date(
                             registerData[registerData.length - 1].createAt
-                          ).toLocaleDateString("th-TH")}`
+                          ).toLocaleDateString()}`
                         : ""
                     }`,
                     font: {

@@ -270,18 +270,12 @@ const ManageUser = (prop: {
       flex: 1,
 
       renderCell: (params) => {
-        function datediff(first: string, second: string) {
-          console.log(second, first);
-          return Math.round(
-            (Date.parse(second) - Date.parse(first)) / (1000 * 60 * 60 * 24)
-          );
-        }
         return (
-          new Date(params.row.createAt).toLocaleDateString("th-TH") +
+          new Date(params.row.lastLogin).toLocaleDateString("th-TH") +
           " (" +
-          datediff(
-            new Date().toLocaleDateString(),
-            new Date(params.row.lastLogin).toLocaleDateString()
+          Math.round(
+            (new Date().getTime() - new Date(params.row.lastLogin).getTime()) /
+              (1000 * 3600 * 24)
           ) +
           " วันที่แล้ว)"
         );
@@ -377,7 +371,14 @@ const ManageUser = (prop: {
     return <Navigate to={`/manageuser/farmers/${viewFarmer}`} />;
   }
 
-  if (role === "all") return <Searchtable jwt_token={prop.jwt_token} />;
+  if (role === "all")
+    return (
+      <Searchtable
+        jwt_token={prop.jwt_token}
+        followList={prop.followList}
+        setFollowList={prop.setFollowList}
+      />
+    );
 
   return (
     <Container
@@ -391,7 +392,7 @@ const ManageUser = (prop: {
       }}
       maxWidth="lg"
     >
-      <ExcelDownload jwt_token={prop.jwt_token} />
+      {role == "farmers" && <ExcelDownload jwt_token={prop.jwt_token} />}
       {!editingUser ? (
         <>
           <Grid container spacing={2}>
@@ -546,17 +547,19 @@ const ManageUser = (prop: {
                     : "เกษตรกร"}
                 </Button>
               </NavLink>
-              <Button
-                sx={{
-                  marginRight: "10px",
-                  marginBottom: "10px",
-                }}
-                onClick={downloadExcel}
-                variant="contained"
-                startIcon={<DownloadIcon />}
-              >
-                Excel Download
-              </Button>
+              {role == "farmers" && (
+                <Button
+                  sx={{
+                    marginRight: "10px",
+                    marginBottom: "10px",
+                  }}
+                  onClick={downloadExcel}
+                  variant="contained"
+                  startIcon={<DownloadIcon />}
+                >
+                  Excel Download
+                </Button>
+              )}
             </Grid>
           </Grid>
 
