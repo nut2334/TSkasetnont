@@ -62,7 +62,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   >([]);
   const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
   const { role } = useParams() as {
-    role: "admins" | "tambons" | "farmers" | "provider" | "members";
+    role: "admins" | "tambons" | "farmers" | "providers" | "members";
   };
   const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
@@ -274,8 +274,8 @@ const AddUser = (prop: { jwt_token: string }) => {
             ? "เจ้าหน้าที่ตำบล"
             : role == "farmers"
             ? "เกษตรกร"
-            : role == "provider"
-            ? "ผู้จัดส่ง"
+            : role == "providers"
+            ? "ผู้ว่าราชการจังหวัด"
             : role == "members"
             ? "สมาชิก"
             : ""}

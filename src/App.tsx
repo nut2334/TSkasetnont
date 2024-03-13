@@ -215,7 +215,9 @@ function App() {
               }
             />
           )}
-          {(decodeJWT.role == "farmers" || decodeJWT.role == "tambons") && (
+          {(decodeJWT.role == "farmers" ||
+            decodeJWT.role == "tambons" ||
+            decodeJWT.role == "admins") && (
             <React.Fragment>
               <Route
                 path="/addproduct/:username"
