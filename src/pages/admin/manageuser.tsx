@@ -23,6 +23,7 @@ import Swal from "sweetalert2";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import ExcelDownload from "../provider/exceldownload";
 import DownloadIcon from "@mui/icons-material/Download";
+import Searchtable from "../../components/searchTable";
 
 interface userInterface {
   id: string;
@@ -101,10 +102,11 @@ const ManageUser = (prop: {
     }[]
   >([]);
   const { role } = useParams() as {
-    role: "admins" | "tambons" | "farmers" | "providers" | "members";
+    role: "admins" | "tambons" | "farmers" | "providers" | "members" | "all";
   };
 
   useEffect(() => {
+    if (role === "all") return;
     const apiFetchUsers = config.getApiEndpoint(`users/${role}`, "GET");
     const jwtD = jwtDecode(prop.jwt_token) as { role: string };
     setCurrentRole(jwtD.role);
@@ -361,7 +363,8 @@ const ManageUser = (prop: {
     role !== "farmers" &&
     role !== "members" &&
     role !== "tambons" &&
-    role !== "providers"
+    role !== "providers" &&
+    role !== "all"
   ) {
     return <Navigate to="/" />;
   }
@@ -370,6 +373,8 @@ const ManageUser = (prop: {
 
     return <Navigate to={`/manageuser/farmers/${viewFarmer}`} />;
   }
+
+  if (role === "all") return <Searchtable jwt_token={prop.jwt_token} />;
 
   return (
     <Container
@@ -498,12 +503,12 @@ const ManageUser = (prop: {
                 </TextField>
               </Grid>
             )}
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <Button
                 variant="contained"
                 color="info"
                 onClick={handleSearch}
-                sx={{ marginRight: "10px" }}
+                sx={{ marginRight: "10px", marginBottom: "10px" }}
                 startIcon={<SearchIcon />}
               >
                 ค้นหา
@@ -517,6 +522,7 @@ const ManageUser = (prop: {
                   startIcon={<AddIcon />}
                   sx={{
                     marginRight: "10px",
+                    marginBottom: "10px",
                   }}
                 >
                   เพิ่ม
@@ -532,6 +538,10 @@ const ManageUser = (prop: {
                 </Button>
               </NavLink>
               <Button
+                sx={{
+                  marginRight: "10px",
+                  marginBottom: "10px",
+                }}
                 onClick={downloadExcel}
                 variant="contained"
                 startIcon={<DownloadIcon />}
