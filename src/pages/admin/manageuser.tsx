@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Button, Container, Grid, Typography } from "@mui/material";
+import { Button, Chip, Container, Grid, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink, Navigate, useParams } from "react-router-dom";
@@ -32,10 +32,19 @@ interface userInterface {
   lastname: string;
   phone: string;
   role: string;
-  certificates: string[];
+  amphure: string;
+  certificates: {
+    standard_id: string;
+  }[];
+  categories: {
+    category_name: string;
+    count: number;
+    bgcolor: string;
+  }[];
   certificateCount: number;
   productCount: number;
   lastLogin: Date;
+  createAt: Date;
 }
 const ManageUser = (prop: {
   jwt_token: string;
@@ -68,6 +77,23 @@ const ManageUser = (prop: {
     username: string;
     role: string;
   }>();
+  const [allCategories, setAllCategories] = useState<
+    {
+      category_name: string;
+    }[]
+  >([]);
+  const [categories, setCategories] = useState("");
+  const [ampher, setAmpher] = useState<
+    | "จังหวัดอื่นๆ"
+    | "เมืองนนทบุรี"
+    | "บางบัวทอง"
+    | "บางกรวย"
+    | "บางใหญ่"
+    | "ปากเกร็ด"
+    | "ไทรน้อย"
+    | "ทั้งหมด"
+    | ""
+  >("");
   const [allStandardProducts, setAllStandardProducts] = useState<
     {
       standard_id: string;
@@ -110,6 +136,19 @@ const ManageUser = (prop: {
         .then((res) => {
           if (res.data) {
             setAllrole([{ role_id: "all", role_name: "ทั้งหมด" }, ...res.data]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    if (role === "farmers") {
+      const apiCategory = config.getApiEndpoint("categories", "GET");
+      axios
+        .get(apiCategory)
+        .then((res) => {
+          if (res.data) {
+            setAllCategories(res.data);
           }
         })
         .catch((err) => {
@@ -171,23 +210,78 @@ const ManageUser = (prop: {
     }
     if (searchStandard !== "all" && searchStandard !== "") {
       filteredUsers = filteredUsers.filter((user) => {
-        if (!user.certificates) return false;
+        console.log(searchStandard);
+
+        if (user.certificates.length == 0 && searchStandard == "ST000")
+          return true;
+        if (user.certificates.length == 0) return false;
         console.log(user.certificates, "ass", searchStandard);
         let found = user.certificates.find((cert) => {
-          return cert === searchStandard;
+          return cert.standard_id === searchStandard;
         });
         return found;
       });
     }
 
+    if (ampher !== "ทั้งหมด" && ampher !== "") {
+      filteredUsers = filteredUsers.filter((user) => {
+        if (user.amphure == "" && ampher == "จังหวัดอื่นๆ") return true;
+        return user.amphure == ampher;
+      });
+    }
+
+    if (categories !== "ทั้งหมด") {
+      filteredUsers = filteredUsers.filter((user) => {
+        let found = user.categories.find((cate) => {
+          return cate.category_name === categories;
+        });
+        return found;
+      });
+    }
     setFilteredUsers(filteredUsers);
   };
   const columns: GridColDef[] = [
     { field: "email", headerName: "Email", flex: 1 },
     { field: "username", headerName: "Username", flex: 1 },
-    { field: "firstname", headerName: "ชื่อ", flex: 1 },
-    { field: "lastname", headerName: "นามสกุล", flex: 1 },
+    {
+      field: "firstnamelastname",
+      headerName: "ชื่อ",
+      flex: 1,
+      renderCell: (params) => {
+        return `${params.row.firstname} ${params.row.lastname}`;
+      },
+    },
+
     { field: "phone", headerName: "เบอร์โทรศัพท์", flex: 1 },
+
+    {
+      field: "createAt",
+      headerName: "เป็นสมาชิกตั้งแต่",
+      flex: 1,
+      renderCell: (params) =>
+        new Date(params.row.createAt).toLocaleDateString("th-TH"),
+    },
+    {
+      field: "lastLogin",
+      headerName: "เข้าสู่ระบบล่าสุด",
+      flex: 1,
+      renderCell: (params) => {
+        function datediff(first: string, second: string) {
+          return Math.round(
+            (Date.parse(second) - Date.parse(first)) / (1000 * 60 * 60 * 24)
+          );
+        }
+        return (
+          new Date(params.row.createAt).toLocaleDateString("th-TH") +
+          " (" +
+          datediff(
+            new Date().toLocaleDateString(),
+            new Date(params.row.lastLogin).toLocaleDateString()
+          ) +
+          " วันที่แล้ว)"
+        );
+      },
+    },
     {
       field: "action",
       headerName: "การกระทำ",
@@ -356,6 +450,52 @@ const ManageUser = (prop: {
                     </MenuItem>
                   ))}
                 </TextField>
+                <TextField
+                  select
+                  label="อำเภอ"
+                  fullWidth
+                  onChange={(event) => {
+                    setAmpher(
+                      event.target.value as
+                        | "จังหวัดอื่นๆ"
+                        | "เมืองนนทบุรี"
+                        | "บางบัวทอง"
+                        | "บางกรวย"
+                        | "บางใหญ่"
+                        | "ปากเกร็ด"
+                        | "ไทรน้อย"
+                        | "ทั้งหมด"
+                        | ""
+                    );
+                  }}
+                >
+                  <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
+                  <MenuItem value="เมืองนนทบุรี">เมืองนนทบุรี</MenuItem>
+                  <MenuItem value="บางบัวทอง">บางบัวทอง</MenuItem>
+                  <MenuItem value="บางกรวย">บางกรวย</MenuItem>
+                  <MenuItem value="บางใหญ่">บางใหญ่</MenuItem>
+                  <MenuItem value="ปากเกร็ด">ปากเกร็ด</MenuItem>
+                  <MenuItem value="ไทรน้อย">ไทรน้อย</MenuItem>
+                  <MenuItem value="จังหวัดอื่นๆ">จังหวัดอื่นๆ</MenuItem>
+                </TextField>
+                <TextField
+                  select
+                  label="หมวดหมู่"
+                  fullWidth
+                  onChange={(event) => {
+                    setCategories(event.target.value as string);
+                  }}
+                >
+                  <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
+                  {allCategories.map((cate: { category_name: string }) => (
+                    <MenuItem
+                      key={cate.category_name}
+                      value={cate.category_name}
+                    >
+                      {cate.category_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
             )}
             <Grid item xs={6}>
@@ -405,7 +545,25 @@ const ManageUser = (prop: {
           <div style={{ height: 500, width: "100%", marginTop: "10px" }}>
             <DataGrid
               rows={filteredUsers}
-              columns={columns}
+              columns={
+                role === "farmers"
+                  ? [
+                      //insert before การกระทำ
+                      ...columns.slice(0, columns.length - 3),
+                      {
+                        field: "certiCount",
+                        headerName: "จำนวนมาตรฐาน",
+                        flex: 1,
+                      },
+                      {
+                        field: "productCount",
+                        headerName: "จำนวนสินค้า",
+                        flex: 1,
+                      },
+                      ...columns.slice(columns.length - 3, columns.length),
+                    ]
+                  : columns
+              }
               initialState={{
                 pagination: {
                   paginationModel: { page: 0, pageSize: 10 },

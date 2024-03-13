@@ -29,15 +29,18 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  TimeScale,
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";
 import EnhancedTable from "../../components/sortabletable";
+import "chartjs-adapter-moment";
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   ArcElement,
+  TimeScale,
   Title,
   Tooltip,
   Legend
@@ -63,44 +66,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = "asc" | "desc";
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
-) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
 const ExcelDownload = (prop: { jwt_token: string }) => {
   const [registerData, setRegisterData] = useState<
     { createAt: string; register_count: number }[]
@@ -121,28 +86,6 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
       product_count: number;
     }[]
   >([]);
-  const downloadExcel = () => {
-    const apiExcelDownload = config.getApiEndpoint("excel", "GET");
-    axios
-      .get(apiExcelDownload, {
-        responseType: "blob",
-      })
-      .then((response) => {
-        console.log(response);
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute(
-          "download",
-          `TheBestKasetNont-รายชื่อและข้อมูลของเกษตกรที่อยู่ในระบบ(${
-            new Date().toISOString().split("T")[0]
-          }).xlsx`
-        );
-        document.body.appendChild(link);
-        link.click();
-      });
-  };
 
   useEffect(() => {
     const apiFarmerRegister = config.getApiEndpoint("farmerregister", "GET");
@@ -242,12 +185,25 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           )}
         </Grid>
         <Grid item xs={12} md={6}>
-          {registerData && (
+          {registerData.length > 0 && (
             <Line
               options={{
                 scales: {
                   x: {
-                    stacked: true,
+                    type: "time",
+                    time: {
+                      unit: "day",
+
+                      displayFormats: {
+                        day: "DD/MM/YYYY",
+                      },
+                    },
+                    min: new Date(
+                      registerData[0].createAt
+                    ).toLocaleDateString(),
+                    max: new Date(
+                      registerData[registerData.length - 1].createAt
+                    ).toLocaleDateString(),
                   },
                   y: {
                     stacked: true,
@@ -262,15 +218,29 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                   legend: {
                     position: "top" as const,
                   },
+                  tooltip: {
+                    callbacks: {
+                      title: function (context) {
+                        return new Date(context[0].label).toLocaleDateString(
+                          "th-TH",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        );
+                      },
+                    },
+                  },
                   title: {
                     display: true,
                     text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง${
                       registerData.length > 0
                         ? `${new Date(
                             registerData[0].createAt
-                          ).toLocaleDateString()} ถึง ${new Date(
+                          ).toLocaleDateString("th-TH")} ถึง ${new Date(
                             registerData[registerData.length - 1].createAt
-                          ).toLocaleDateString()}`
+                          ).toLocaleDateString("th-TH")}`
                         : ""
                     }`,
                     font: {
@@ -280,13 +250,15 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 },
               }}
               data={{
-                labels: registerData.map((d) =>
-                  new Date(d.createAt).toLocaleDateString()
-                ),
+                labels: registerData.map((d) => {
+                  return new Date(d.createAt).toLocaleDateString();
+                }),
                 datasets: [
                   {
                     label: "จำนวนเกษตกร",
-                    data: registerData.map((d) => d.register_count),
+                    data: registerData.map((d) => {
+                      return d.register_count;
+                    }),
                     borderColor: "rgb(255, 99, 132)",
                     backgroundColor: "rgba(255, 99, 132, 0.5)",
                   },
