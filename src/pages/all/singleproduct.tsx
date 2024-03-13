@@ -750,10 +750,10 @@ const SigleProduct = (prop: {
                     color="secondary"
                     startIcon={<AddShoppingCartIcon />}
                     disabled={
-                      product.stock == 0 || prop.jwt_token
+                      prop.jwt_token
                         ? (jwtDecode(prop.jwt_token) as { role: string })
                             .role !== "members"
-                        : true
+                        : product.stock === 0
                     }
                     onClick={() => {
                       if (prop.jwt_token == "") {
@@ -834,10 +834,10 @@ const SigleProduct = (prop: {
                     color="secondary"
                     startIcon={<PointOfSaleIcon />}
                     disabled={
-                      product.stock == 0 || prop.jwt_token
+                      prop.jwt_token
                         ? (jwtDecode(prop.jwt_token) as { role: string })
                             .role !== "members"
-                        : true
+                        : product.stock === 0
                     }
                     onClick={() => {
                       if (prop.jwt_token == "") {
