@@ -44,6 +44,7 @@ interface ProductInterface {
   selectedType: string;
   category_id: string;
   category_name: string;
+  cerfitication: string;
 }
 
 const Myproducts = (prop: {
@@ -71,6 +72,13 @@ const Myproducts = (prop: {
   });
   const [searchType, setSearchType] = useState("");
   const [filterSearch, setFilterSearch] = useState<ProductInterface[]>([]);
+  const [searchStandard, setSearchStandard] = useState("");
+  const [allStandard, setAllStandard] = useState<
+    {
+      standard_id: string;
+      standard_name: string;
+    }[]
+  >([]);
 
   const { username } = useParams<{ username: string }>();
 
@@ -95,6 +103,16 @@ const Myproducts = (prop: {
         console.log(response);
         setDataFarmer(response.data);
       });
+    axios
+      .get(config.getApiEndpoint("standardproducts", "GET"))
+      .then((response) => {
+        let all = {
+          standard_id: "all",
+          standard_name: "ทั้งหมด",
+        };
+        response.data.push(all);
+        setAllStandard(response.data);
+      });
   }, []);
 
   const fetchProduct = () => {
@@ -104,7 +122,9 @@ const Myproducts = (prop: {
     );
     axios.get(apiMyproducts).then((response: any) => {
       console.log("apiMyproducts", response.data);
+
       setAllProduct(response.data);
+
       setFilterSearch(response.data);
     });
   };
@@ -127,6 +147,14 @@ const Myproducts = (prop: {
     }
     if (searchType === "all") {
       filter = allProduct;
+    }
+    if (searchStandard !== "") {
+      filter = filter.filter((product) => {
+        return product.cerfitication === searchStandard;
+      });
+    }
+    if (searchStandard === "all") {
+      filter = filter;
     }
     setFilterSearch(filter);
     console.log(filter);
@@ -153,6 +181,11 @@ const Myproducts = (prop: {
                 จัดการสินค้าของ {dataFarmer.firstname} {dataFarmer.lastname}
               </Typography>
             </Grid>
+            <Grid item xs={12} mb={12}>
+              <Typography variant="h6">
+                มีสินค้าทั้งหมด {allProduct.length} รายการ
+              </Typography>
+            </Grid>
           </>
         )}
         <Grid item xs={12} sm={6}>
@@ -166,6 +199,20 @@ const Myproducts = (prop: {
             {web_activity.map((option) => (
               <MenuItem key={option.activityID} value={option.activityName}>
                 {option.activityName}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            label="มาตรฐานสินค้า"
+            fullWidth
+            onChange={(e) => setSearchStandard(e.target.value as string)}
+          >
+            {allStandard.map((option) => (
+              <MenuItem key={option.standard_id} value={option.standard_name}>
+                {option.standard_name}
               </MenuItem>
             ))}
           </TextField>

@@ -110,7 +110,7 @@ const Navbar = (prop: {
         ...defaultPages,
         { name: "จัดการผู้ใช้งาน", path: "" },
         { name: "การตั้งค่า", path: "/setting" },
-        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
+
         { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "farmers") {

@@ -24,7 +24,6 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import ExcelDownload from "../provider/exceldownload";
 import DownloadIcon from "@mui/icons-material/Download";
 import Searchtable from "../../components/searchTable";
-import { useCallback } from "react";
 
 interface userInterface {
   id: string;
@@ -416,6 +415,7 @@ const ManageUser = (prop: {
                   จัดการเกษตรกร
                 </Typography>
               )}
+              <Typography>จำนวนทั้งหมด {filteredUsers.length} คน</Typography>
             </Grid>
             <Grid item xs={6}>
               <TextField
