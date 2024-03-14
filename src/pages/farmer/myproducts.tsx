@@ -44,7 +44,7 @@ interface ProductInterface {
   selectedType: string;
   category_id: string;
   category_name: string;
-  cerfitication: string;
+  cerfitication: string[];
 }
 
 const Myproducts = (prop: {
@@ -121,6 +121,7 @@ const Myproducts = (prop: {
       "GET"
     );
     axios.get(apiMyproducts).then((response: any) => {
+      console.log(response.data.result);
       setAllProduct(response.data.result);
       setFilterSearch(response.data.result);
     });
@@ -138,20 +139,25 @@ const Myproducts = (prop: {
     let filter = allProduct;
     console.log(searchType);
     if (searchType !== "") {
-      filter = allProduct.filter((product) => {
+      filter = filter.filter((product) => {
         return product.selectedType === searchType;
       });
     }
     if (searchType === "all") {
-      filter = allProduct;
+      filter = filter;
     }
+    console.log(searchStandard);
     if (searchStandard !== "") {
       filter = filter.filter((product) => {
-        return product.cerfitication === searchStandard;
+        console.log(product);
+        let found = product.cerfitication.find(
+          (item) => item === searchStandard
+        );
+        return found;
       });
     }
     if (searchStandard === "all") {
-      filter = filter;
+      filter = allProduct;
     }
     setFilterSearch(filter);
     console.log(filter);
