@@ -121,11 +121,8 @@ const Myproducts = (prop: {
       "GET"
     );
     axios.get(apiMyproducts).then((response: any) => {
-      console.log("apiMyproducts", response.data);
-
-      setAllProduct(response.data);
-
-      setFilterSearch(response.data);
+      setAllProduct(response.data.result);
+      setFilterSearch(response.data.result);
     });
   };
 
