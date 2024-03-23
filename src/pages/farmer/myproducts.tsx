@@ -12,8 +12,11 @@ import {
   Chip,
   Stack,
   Divider,
+  ButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AddIcon from "@mui/icons-material/Add";
 import {
   NavLink,
@@ -26,6 +29,9 @@ import * as config from "../../config/config";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import Swal from "sweetalert2";
 import { MenuItem } from "@mui/material";
 import { web_activity } from "../../config/dataDropdown";
@@ -45,13 +51,38 @@ interface ProductInterface {
   category_id: string;
   category_name: string;
   cerfitication: string[];
+  phone: string;
+  email: string;
+  address: string;
 }
+
+interface sortInterface {
+  title: string;
+  type: "last_modified" | "price" | "view_count";
+}
+
+const sortType = [
+  {
+    title: "สินค้าล่าสุด",
+    type: "last_modified",
+  },
+  {
+    title: "ราคา",
+    type: "price",
+  },
+  {
+    title: "ยอดเข้าชม",
+    type: "view_count",
+  },
+] as sortInterface[];
 
 const Myproducts = (prop: {
   jwt_token: string;
   username?: string;
   padding?: string;
 }) => {
+  const [sortBy, setSortBy] = useState("last_modified");
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [allProduct, setAllProduct] = useState<ProductInterface[]>([]);
   const [navigatePath, setNavigatePath] = useState("");
   const [allCategory, setAllCategory] = useState<
@@ -65,10 +96,20 @@ const Myproducts = (prop: {
     firstname: string;
     lastname: string;
     farmerstorename: string;
+    address: string;
+    email: string;
+    phone: string;
+    createAt: Date;
+    lastLogin: Date;
   }>({
     firstname: "",
     lastname: "",
     farmerstorename: "",
+    address: "",
+    email: "",
+    phone: "",
+    createAt: new Date(),
+    lastLogin: new Date(),
   });
   const [searchType, setSearchType] = useState("");
   const [filterSearch, setFilterSearch] = useState<ProductInterface[]>([]);
@@ -114,6 +155,44 @@ const Myproducts = (prop: {
         setAllStandard(response.data);
       });
   }, []);
+
+  useEffect(() => {
+    console.log(sortBy);
+    let filter = allProduct;
+    if (sortBy === "last_modified") {
+      filter = filter.sort((a, b) => {
+        if (order === "asc") {
+          return (
+            new Date(a.last_modified).getTime() -
+            new Date(b.last_modified).getTime()
+          );
+        } else {
+          return (
+            new Date(b.last_modified).getTime() -
+            new Date(a.last_modified).getTime()
+          );
+        }
+      });
+    } else if (sortBy === "price") {
+      filter = filter.sort((a, b) => {
+        if (order === "asc") {
+          return a.price - b.price;
+        } else {
+          return b.price - a.price;
+        }
+      });
+    } else if (sortBy === "view_count") {
+      filter = filter.sort((a, b) => {
+        if (order === "asc") {
+          return a.product_viewed - b.product_viewed;
+        } else {
+          return b.product_viewed - a.product_viewed;
+        }
+      });
+    }
+    setFilterSearch(filter);
+    console.log(filter);
+  }, [sortBy, order]);
 
   const fetchProduct = () => {
     const apiMyproducts = config.getApiEndpoint(
@@ -179,12 +258,67 @@ const Myproducts = (prop: {
           (jwtDecode(prop.jwt_token) as { role: string }).role ==
             "tambons") && (
           <>
-            <Grid item xs={12} mb={12}>
+            <Grid item xs={12}>
               <Typography variant="h4">
                 จัดการสินค้าของ {dataFarmer.firstname} {dataFarmer.lastname}
               </Typography>
             </Grid>
-            <Grid item xs={12} mb={12}>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6">ข้อมูลพื้นฐาน</Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                ชื่อร้านค้า: {dataFarmer.farmerstorename}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                ชื่อ: {dataFarmer.firstname} {dataFarmer.lastname}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                อีเมล: {dataFarmer.email}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                เบอร์โทร:{dataFarmer.phone}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1">
+                ที่อยู่:{dataFarmer.address}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                วันที่ลงทะเบียน:
+                {new Date(dataFarmer.createAt).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">
+                วันที่เข้าใช้งานล่าสุด:
+                {new Date(dataFarmer.lastLogin).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
               <Typography variant="h6">
                 มีสินค้าทั้งหมด {allProduct.length} รายการ
               </Typography>
@@ -194,7 +328,8 @@ const Myproducts = (prop: {
         <Grid item xs={12} sm={6}>
           <TextField
             select
-            label="รูปแบบการเก็บข้อมูล"
+            // label="รูปแบบการเก็บข้อมูล"
+            label="รูปแบบการขาย"
             fullWidth
             onChange={(e) => setSearchType(e.target.value as string)}
           >
@@ -237,9 +372,45 @@ const Myproducts = (prop: {
           </NavLink>
         </Grid>
       </Grid>
-      <Container sx={{ py: 8 }} maxWidth="md">
-        {/* End hero unit */}
+      <Container sx={{ py: 8 }} maxWidth="lg">
         <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <ButtonGroup variant="text" aria-label="Basic button group">
+                {sortType.map((item, index) => {
+                  return (
+                    <Button
+                      endIcon={
+                        sortBy === item.type ? (
+                          order === "asc" ? (
+                            <KeyboardArrowUpIcon />
+                          ) : (
+                            <KeyboardArrowDownIcon />
+                          )
+                        ) : (
+                          <UnfoldMoreIcon />
+                        )
+                      }
+                      key={index}
+                      onClick={() => {
+                        let newOrder = ["asc", "desc"].filter(
+                          (item) => item !== order
+                        )[0] as "asc" | "desc";
+                        setSortBy(item.type);
+                        setOrder(newOrder);
+                      }}
+                      sx={{
+                        color: sortBy === item.type ? "primary" : "black",
+                      }}
+                    >
+                      {item.title}
+                    </Button>
+                  );
+                })}
+              </ButtonGroup>
+            </div>
+          </Grid>
+
           {filterSearch.length > 0 ? (
             filterSearch.map((product, index) => {
               let bgcolor = allCategory.find(
@@ -268,7 +439,6 @@ const Myproducts = (prop: {
                     <CardMedia
                       component="div"
                       sx={{
-                        // 16:9
                         pt: "56.25%",
                       }}
                       image={
@@ -291,10 +461,55 @@ const Myproducts = (prop: {
                         sx={{
                           backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
                           color: isDark(bgcolor) ? "white" : "black",
+                          marginBottom: "8px",
                         }}
                       />
-                      <Chip label={product.selectedType} />
-                      <Typography>{product.product_description}</Typography>
+                      <Chip
+                        label={product.selectedType}
+                        sx={{
+                          marginBottom: "8px",
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          marginTop: "10px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 4, // จำนวนบรรทัดที่ต้องการแสดง
+                        }}
+                      >
+                        {product.product_description}
+                      </Typography>
+
+                      <Tooltip title="วันที่แก้ไขล่าสุด" placement="bottom-end">
+                        <Typography
+                          sx={{
+                            marginTop: "8px",
+                            textAlign: "right",
+                            fontSize: "0.8rem",
+                            color: "gray",
+                            alignItems: "center",
+                          }}
+                        >
+                          <EditCalendarIcon
+                            sx={{
+                              fontSize: "1rem",
+                              color: "gray",
+                            }}
+                          />
+                          {" " +
+                            new Date(product.last_modified).toLocaleDateString(
+                              "th-TH",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                        </Typography>
+                      </Tooltip>
                     </CardContent>
                     <CardActions>
                       <NavLink

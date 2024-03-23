@@ -251,6 +251,7 @@ const ManageUser = (prop: {
       field: "firstnamelastname",
       headerName: "ชื่อ",
       flex: 1,
+
       renderCell: (params) => {
         return `${params.row.firstname} ${params.row.lastname}`;
       },
@@ -263,7 +264,11 @@ const ManageUser = (prop: {
       headerName: "เป็นสมาชิกตั้งแต่",
       flex: 1,
       renderCell: (params) =>
-        new Date(params.row.createAt).toLocaleDateString("th-TH"),
+        new Date(params.row.createAt).toLocaleDateString("th-TH", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
     },
     {
       field: "lastLogin",
@@ -271,20 +276,34 @@ const ManageUser = (prop: {
       flex: 1,
 
       renderCell: (params) => {
-        return (
-          new Date(params.row.lastLogin).toLocaleDateString("th-TH") +
-          " (" +
-          Math.round(
-            (new Date().getTime() - new Date(params.row.lastLogin).getTime()) /
-              (1000 * 3600 * 24)
-          ) +
-          " วันที่แล้ว)"
+        const daysAgo = Math.round(
+          (new Date().getTime() - new Date(params.row.lastLogin).getTime()) /
+            (1000 * 3600 * 24)
         );
+        return (
+          <span style={{ color: daysAgo === 30 ? "red" : "inherit" }}>
+            {daysAgo === 30 ? "30" : daysAgo} วันที่แล้ว
+          </span>
+        );
+        // return (
+        // " (" +
+        // Math.round(
+        //   (new Date().getTime() - new Date(params.row.lastLogin).getTime()) /
+        //     (1000 * 3600 * 24)
+        // ) + " วันที่แล้ว"
+        // +
+        // new Date(params.row.lastLogin).toLocaleDateString("th-TH", {
+        //   year: "numeric",
+        //   month: "long",
+        //   day: "numeric",
+        // })
+        // );
       },
     },
     {
       field: "action",
       headerName: "การกระทำ",
+      flex: 1,
       renderCell: (params) => (
         <>
           <RemoveRedEyeIcon
@@ -571,7 +590,6 @@ const ManageUser = (prop: {
               columns={
                 role === "farmers"
                   ? [
-                      //insert before การกระทำ
                       ...columns.slice(0, columns.length - 3),
                       {
                         field: "certiCount",
