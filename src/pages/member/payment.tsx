@@ -149,9 +149,13 @@ const Payment = (prop: {
             setRedirect(true);
           })
           .catch((err) => {
+            console.log(err);
+
             Swal.fire({
               title: "เกิดข้อผิดพลาด",
-              text: "กรุณาลองใหม่อีกครั้ง",
+              text:
+                err.response.data.error ||
+                `เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งภายหลัง`,
               icon: "error",
             });
           });
