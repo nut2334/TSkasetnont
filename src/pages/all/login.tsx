@@ -73,12 +73,11 @@ const Login = (prop: {
         .then((res) => {
           console.log(res.data);
           if (res.data.token) {
-            if (rememberMe) {
               const cookies = new Cookies();
-              cookies.set("jwt_token", res.data.token, {
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 720),
-              });
-            }
+              cookies.set("jwt_token", res.data.token
+              , { path: "/", sameSite: "strict", secure: true }
+              );
+
             prop.setJwt_token(res.data.token);
             setIsLogin(true);
           }

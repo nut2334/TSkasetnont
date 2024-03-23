@@ -52,8 +52,6 @@ const Home = (prop: { jwt_token: string }) => {
       category_name: "ทั้งหมด",
     });
   const [value, setValue] = React.useState("1");
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [page, setPage] = React.useState("0");
   const [open, setOpen] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState<{
     product_id: string;
@@ -80,26 +78,13 @@ const Home = (prop: { jwt_token: string }) => {
   });
 
   useEffect(() => {
-    console.log(searchParams, selectedCategory.category_id, page);
-
-    if (searchParams.get("category") !== selectedCategory.category_id) {
-      setPage("0");
-    }
-
-    setSearchParams({
-      ["search"]: searchContent,
-      ["category"]: selectedCategory.category_id,
-      ["sort"]: "view_count",
-      ["order"]: "desc",
-      ["page"]: page,
-    });
 
     axios
       .get(apiProducts, {
         params: {
           ["search"]: searchContent,
           ["category"]: selectedCategory.category_id,
-          ["page"]: (parseInt(page) - 1).toString(),
+          ["page"]: "0",
           ["sort"]: "view_count",
           ["order"]: "desc",
           ["perPage"]: "999999999",
@@ -113,7 +98,7 @@ const Home = (prop: { jwt_token: string }) => {
       .catch((err) => {
         console.log(err);
       });
-  }, [selectedCategory, page, searchContent]);
+  }, [selectedCategory, searchContent]);
 
   useEffect(() => {
     axios.get(apiCategories).then((res) => {
@@ -125,6 +110,8 @@ const Home = (prop: { jwt_token: string }) => {
         },
         ...res.data,
       ]);
+    }).catch((err) => {
+      console.log(err);
     });
   }, []);
 
@@ -149,7 +136,7 @@ const Home = (prop: { jwt_token: string }) => {
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setValue(value.toString());
   };
-
+  
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
     if (luma < 128) {

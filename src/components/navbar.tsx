@@ -23,6 +23,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import * as config from "../config/config";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 interface Page {
   name: string;
@@ -72,6 +73,10 @@ const Navbar = (prop: {
     { name: "จัดการผู้ว่าราชการจังหวัด", path: "/manageuser/providers" },
     { name: "ผู้ใช้งานทั้งหมด", path: "/manageuser/all" },
   ];
+  const manageUserProviderTambon = [
+    { name: "จัดการเกษตรกร", path: "/manageuser/farmers" },
+  ];
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -110,7 +115,6 @@ const Navbar = (prop: {
         ...defaultPages,
         { name: "จัดการผู้ใช้งาน", path: "" },
         { name: "การตั้งค่า", path: "/setting" },
-
         { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "farmers") {
@@ -119,16 +123,9 @@ const Navbar = (prop: {
         { name: "ข้อมูลสินค้าของฉัน", path: "/myproducts" },
       ]);
     } else if (prop.role == "providers") {
-      setVisiblePages([
-        ...defaultPages,
-        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
-      ]);
+      setVisiblePages([...defaultPages, { name: "จัดการผู้ใช้งาน", path: "" }]);
     } else if (prop.role == "tambons") {
-      setVisiblePages([
-        ...defaultPages,
-        { name: "ข้อมูลเกษตรกร", path: "/datafarmer" },
-        { name: "จัดการเกษตรกร", path: "/manageuser/farmers" },
-      ]);
+      setVisiblePages([...defaultPages, { name: "จัดการผู้ใช้งาน", path: "" }]);
     } else if (prop.role == "members") {
       setVisiblePages([
         ...defaultPages,
@@ -241,6 +238,33 @@ const Navbar = (prop: {
                     </MenuItem>
                   </NavLink>
                 ))}
+
+                {prop.jwt_token &&
+                  (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                    "admins" &&
+                  manageUser.map((page, index) => (
+                    <NavLink
+                      to={page.path}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <MenuItem key={index} onClick={handleCloseNavMenu}>
+                        <Typography textAlign="center">{page.name}</Typography>
+                      </MenuItem>
+                    </NavLink>
+                  ))}
+                {prop.jwt_token &&
+                  (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                    "providers" &&
+                  manageUserProviderTambon.map((page, index) => (
+                    <NavLink
+                      to={page.path}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <MenuItem key={index} onClick={handleCloseNavMenu}>
+                        <Typography textAlign="center">{page.name}</Typography>
+                      </MenuItem>
+                    </NavLink>
+                  ))}
               </Menu>
             </Box>
             {/* phone */}

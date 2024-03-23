@@ -25,6 +25,7 @@ import { MessengerChat } from "react-messenger-chat-plugin";
 import Myproducts from "./pages/farmer/myproducts";
 import ExcelDownload from "./pages/provider/exceldownload";
 import Certification from "./pages/admin/certification";
+import Confirm from "./pages/all/confirm";
 
 export interface Cart {
   product_id: string;
@@ -178,6 +179,7 @@ function App() {
             }
           />
           <Route path="/forgot" element={<Forgot />} />
+          <Route path="/confirm/:email/:hashed" element={<Confirm />} />
           <Route path="/listproduct" element={<ListProduct />} />
           <Route path="/shop/:shopname" element={<ListProduct />} />
           <Route
