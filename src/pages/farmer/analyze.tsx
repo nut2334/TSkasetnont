@@ -6,18 +6,13 @@ import {
   Divider,
   Button,
   TextField,
-  Select,
-  Menu,
   MenuItem,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import * as config from "../../config/config";
-import PieChart from "../../components/pie";
-import { Bar } from "react-chartjs-2";
 import BarChart from "../../components/bar";
 import axios from "axios";
 import FollowChart from "../../components/followchart";
-import Pricecenter from "./pricecenter";
 import RankingproductChart from "../../components/rankingproduct";
 
 const Analyze = (prop: { jwt_token: string }) => {
