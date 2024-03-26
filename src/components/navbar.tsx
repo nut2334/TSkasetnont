@@ -58,6 +58,7 @@ const Navbar = (prop: {
   >;
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
+
   const defaultPages = [{ name: "สินค้าทั้งหมด", path: "/listproduct" }];
 
   const settings = [
@@ -78,6 +79,9 @@ const Navbar = (prop: {
   ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+    null
+  );
+  const [notification, setNotification] = React.useState<null | HTMLElement>(
     null
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -367,6 +371,9 @@ const Navbar = (prop: {
             {prop.role == "members" || prop.role == "farmers" ? (
               <>
                 <Badge
+                  onClick={(event) => {
+                    setNotification(event.currentTarget);
+                  }}
                   badgeContent={
                     prop.notification ? prop.notification.length : 0
                   }
@@ -378,26 +385,27 @@ const Navbar = (prop: {
                     <NotificationsIcon />
                   )}
                 </Badge>
-                {prop.notification.map((noti, index) => (
-                  <Menu
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    open={Boolean(anchorEl)}
-                    onClose={() => {
-                      setAnchorEl(null);
-                    }}
-                    sx={{
-                      marginTop: "40px",
-                    }}
-                  >
+                <Menu
+                  anchorEl={notification}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(notification)}
+                  onClose={() => {
+                    // setAnchorEl(null);
+                    setNotification(null);
+                  }}
+                  sx={{
+                    marginTop: "40px",
+                  }}
+                >
+                  {prop.notification.map((noti, index) => (
                     <NavLink to={noti.link} style={{ textDecoration: "none" }}>
                       <MenuItem
                         key={index}
@@ -443,14 +451,20 @@ const Navbar = (prop: {
                             <Typography
                               sx={{ color: "gray", textAlign: "right" }}
                             >
-                              {new Date(noti.timesent).toLocaleString()}
+                              {new Date(noti.timesent).toLocaleString("th-TH", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                              })}
                             </Typography>
                           </Stack>
                         </Stack>
                       </MenuItem>
                     </NavLink>
-                  </Menu>
-                ))}
+                  ))}
+                </Menu>
               </>
             ) : null}
             <Box sx={{ flexGrow: 0 }}>

@@ -258,6 +258,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       setCheckUnit(false);
       check = false;
     } else {
+      setCheckUnit(true);
       let regUnit = /^[ก-๏a-zA-Z0-9\s]+$/;
       if (!regUnit.test(unit)) {
         setRegUnit(false);
@@ -402,7 +403,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
 
             <Pricecenter />
             <Grid item xs={12}>
-              <Divider />
+              <Divider>
+                <Typography variant="h5">จัดการสินค้า</Typography>
+              </Divider>
             </Grid>
             <Grid item xs={6}>
               <TextField
