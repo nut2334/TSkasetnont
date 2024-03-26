@@ -261,10 +261,6 @@ function App() {
                 path="/manageuser/farmers/:username"
                 element={<Myproducts jwt_token={jwt_token} />}
               />
-              {/* <Route
-                path="/managefarmer/:username"
-                element={<Myproducts jwt_token={jwt_token} />}
-              /> */}
               <Route
                 path="/datafarmer"
                 element={<ExcelDownload jwt_token={jwt_token} />}
