@@ -263,11 +263,6 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               options={{
                 responsive: true,
                 plugins: {
-                  datalabels: {
-                    formatter: (value, ctx) => {
-                      console.log(value, ctx);
-                    },
-                  },
                   legend: {
                     position: "top" as const,
                   },
