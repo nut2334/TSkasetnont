@@ -16,6 +16,7 @@ import {
   Chip,
   Container,
   ListItem,
+  Pagination,
   Typography,
 } from "@mui/material";
 import Divider from "@mui/material/Divider";
@@ -380,6 +381,11 @@ const EachOrder = (prop: {
 
 const Orderhistory = (prop: { jwt_token: string }) => {
   const [orderHistory, setOrderHistory] = useState<OrderHistoryInterface[]>([]);
+  const [orderHistoryPage, setOrderHistoryPage] = useState<
+    OrderHistoryInterface[]
+  >([]);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const fetchOrderHistory = () => {
     let apiOrderHistory = config.getApiEndpoint("farmerorder", "GET");
     axios
@@ -397,7 +403,9 @@ const Orderhistory = (prop: { jwt_token: string }) => {
             );
           }
         );
+
         setOrderHistory(sortedOrders);
+        setTotalPage(Math.ceil(res.data.length / 10));
       })
       .catch((err) => {
         console.log(err);
@@ -406,12 +414,16 @@ const Orderhistory = (prop: { jwt_token: string }) => {
   useEffect(() => {
     fetchOrderHistory();
   }, []);
+  useEffect(() => {
+    setOrderHistoryPage(orderHistory.slice((page - 1) * 10, page * 10));
+  }, [page, orderHistory]);
+
   return (
     <>
       {orderHistory.length === 0 && (
         <Typography>ไม่มีประวัติการสั่งซื้อ</Typography>
       )}
-      {orderHistory.map((order, index) => {
+      {orderHistoryPage.map((order, index) => {
         return (
           <EachOrder
             key={index}
@@ -421,6 +433,23 @@ const Orderhistory = (prop: { jwt_token: string }) => {
           />
         );
       })}
+      {orderHistory.length > 0 && (
+        <Container
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Pagination
+            count={totalPage}
+            page={page}
+            onChange={(e, value) => {
+              setPage(value);
+            }}
+          />
+        </Container>
+      )}
     </>
   );
 };

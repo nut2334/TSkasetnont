@@ -194,7 +194,7 @@ const SigleProduct = (prop: {
         setAllStandardShow(response.data.standardNames);
       });
     console.log(product);
-  }, []);
+  }, [productid, shopname]);
 
   useEffect(() => {
     const apiComments = config.getApiEndpoint(`getcomment/${productid}`, "get");

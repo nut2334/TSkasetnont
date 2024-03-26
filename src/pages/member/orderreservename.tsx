@@ -12,6 +12,7 @@ import {
   Collapse,
   ListItem,
   Divider,
+  Pagination,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -198,10 +199,19 @@ const Orderreservemember = (prop: { jwt_token: string }) => {
   const [orderReserve, setOrderReserve] = React.useState<
     OrderReserveInterface[]
   >([]);
+  const [filterOrderReserve, setFilterOrderReserve] = React.useState<
+    OrderReserveInterface[]
+  >([]);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   useEffect(() => {
     fetchOrderHistory();
   }, []);
+
+  useEffect(() => {
+    setFilterOrderReserve(orderReserve.slice((page - 1) * 10, page * 10));
+  }, [page, orderReserve]);
 
   const fetchOrderHistory = () => {
     axios
@@ -213,6 +223,7 @@ const Orderreservemember = (prop: { jwt_token: string }) => {
       .then((response) => {
         console.log(response.data);
         setOrderReserve(response.data.data);
+        setTotalPage(Math.ceil(response.data.data.length / 10));
       })
       .catch((error) => {
         console.log(error);
@@ -222,7 +233,7 @@ const Orderreservemember = (prop: { jwt_token: string }) => {
   return (
     <Container maxWidth="lg">
       {orderReserve.length === 0 && <Typography>ไม่มีประวัติการจอง</Typography>}
-      {orderReserve.map((order, index) => {
+      {filterOrderReserve.map((order, index) => {
         return (
           <EachReserve
             key={index}
@@ -232,6 +243,23 @@ const Orderreservemember = (prop: { jwt_token: string }) => {
           />
         );
       })}
+      {orderReserve.length > 0 && (
+        <Container
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Pagination
+            count={totalPage}
+            page={page}
+            onChange={(e, value) => {
+              setPage(value);
+            }}
+          />
+        </Container>
+      )}
     </Container>
   );
 };

@@ -8,16 +8,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/material/styles";
+import Pagination from "@mui/material/Pagination";
 import {
   Box,
   Button,
@@ -271,6 +264,9 @@ const EachOrder = (prop: {
 
 const Orderlist = (prop: { jwt_token: string }) => {
   const [orderList, setOrderList] = useState<orderInterface[]>([]);
+  const [orderListPage, setOrderListPage] = useState<orderInterface[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const fecthOrder = () => {
     let apiOrderList = config.getApiEndpoint("orderlist", "GET");
     axios
@@ -290,6 +286,7 @@ const Orderlist = (prop: { jwt_token: string }) => {
           }
         );
         setOrderList(sortedOrders);
+        setTotalPage(Math.ceil(sortedOrders.length / 10));
       })
       .catch((err) => {
         console.log(err);
@@ -299,13 +296,18 @@ const Orderlist = (prop: { jwt_token: string }) => {
     fecthOrder();
   }, []);
 
+  useEffect(() => {
+    let newOrderListPage = orderList.slice((page - 1) * 10, page * 10);
+    setOrderListPage(newOrderListPage);
+  }, [orderList, page]);
+
   return (
     <Container maxWidth="lg">
       {orderList.length === 0 ? <div>ไม่มีรายการสั่งซื้อ</div> : null}
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         รายการสั่งซื้อ
       </Typography>
-      {orderList.map((order: any, index: number) => {
+      {orderListPage.map((order: any, index: number) => {
         return (
           <EachOrder
             key={index}
@@ -315,6 +317,24 @@ const Orderlist = (prop: { jwt_token: string }) => {
           />
         );
       })}
+      {orderList.length > 0 && (
+        <Container
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Pagination
+            count={totalPage}
+            page={page}
+            onChange={(e, value) => {
+              setPage(value);
+            }}
+          />
+        </Container>
+      )}
+
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         รายการจอง
       </Typography>
