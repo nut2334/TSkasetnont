@@ -78,7 +78,6 @@ const Home = (prop: { jwt_token: string }) => {
   });
 
   useEffect(() => {
-
     axios
       .get(apiProducts, {
         params: {
@@ -101,18 +100,21 @@ const Home = (prop: { jwt_token: string }) => {
   }, [selectedCategory, searchContent]);
 
   useEffect(() => {
-    axios.get(apiCategories).then((res) => {
-      setAllCategory([
-        {
-          category_id: "",
-          category_name: "ทั้งหมด",
-          bgcolor: "",
-        },
-        ...res.data,
-      ]);
-    }).catch((err) => {
-      console.log(err);
-    });
+    axios
+      .get(apiCategories)
+      .then((res) => {
+        setAllCategory([
+          {
+            category_id: "",
+            category_name: "ทั้งหมด",
+            bgcolor: "",
+          },
+          ...res.data,
+        ]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const myCustomColour = (id: string) => {
@@ -136,7 +138,7 @@ const Home = (prop: { jwt_token: string }) => {
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setValue(value.toString());
   };
-  
+
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
     if (luma < 128) {
@@ -167,23 +169,96 @@ const Home = (prop: { jwt_token: string }) => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {data.map((item, index) => {
+          // const markerHtmlStyles = `
+          //   background-color: ${myCustomColour(item.category_id)};
+          //   width: 3rem;
+          //   height: 3rem;
+          //   display: block;
+          //   left: -1.5rem;
+          //   top: -1.5rem;
+          //   position: relative;
+          //   border-radius: 3rem 3rem 0;
+          //   transform: rotate(45deg);
+          //   border: 1px solid #FFFFFF`;
           const markerHtmlStyles = `
-            background-color: ${myCustomColour(item.category_id)};
-            width: 3rem;
-            height: 3rem;
-            display: block;
-            left: -1.5rem;
-            top: -1.5rem;
-            position: relative;
-            border-radius: 3rem 3rem 0;
-            transform: rotate(45deg);
-            border: 1px solid #FFFFFF`;
+          transform: perspective(40px) rotateX(20deg) rotateZ(-45deg);
+          transform-origin: 50% 50%;
+          border-radius: 50% 50% 50% 0;
+          padding: 0 3px 3px 0;
+          width: 40px;
+          height: 40px;
+          background: ${myCustomColour(item.category_id)};
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          margin: -2.2em 0 0 -1.3em;
+          -webkit-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+          -moz-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+          box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+
+          :after {
+            content: '';
+            width: 1em;
+            height: 1em;
+            margin: 1em 0 0 .7em;
+            background: #ffffff;
+            position: absolute;
+            border-radius: 50%;
+              -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            -moz-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+            -webkit-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+            box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+          }
+          
+          `;
 
           const iconMarker = divIcon({
             className: "my-custom-pin",
             iconAnchor: [0, 24],
             popupAnchor: [0, -36],
-            html: `<span style="${markerHtmlStyles}" />`,
+            html: `<div class="marker"
+              style="
+                background-color: ${myCustomColour(item.category_id)}
+              "
+            ></div>
+              <style>
+                
+                .marker {
+                  transform: perspective(40px) rotateX(20deg) rotateZ(-45deg);
+                  transform-origin: 50% 50%;
+                  border-radius: 50% 50% 50% 0;
+                  padding: 0 3px 3px 0;
+                  width: 40px;
+                  height: 40px;
+                  
+                  position: relative;
+                  left: 50%;
+                  top: 50%;
+                  margin: -2.2em 0 0 -1.3em;
+                  -webkit-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+                  -moz-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+                  box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+                }
+
+                .marker:after {
+                  content: '';
+                  width: 1.55em;
+                  height: 1.55em;
+                  margin: 1em 0 0 .7em;
+                  background: #ffffff;
+                  position: absolute;
+                  border-radius: 50%;
+                    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+                  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+                  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+                  -moz-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+                  -webkit-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+                  box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+                }
+              </style>
+            `,
           });
 
           return (
