@@ -18,7 +18,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import DownloadIcon from "@mui/icons-material/Download";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,6 +38,7 @@ ChartJS.register(
   PointElement,
   LineElement,
   ArcElement,
+
   Title,
   Tooltip,
   Legend
@@ -113,6 +113,8 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
       .then((res) => {
         let categories: { label: string; data: number; bgcolor: string }[] =
           res.data.categories;
+        console.log(categories);
+
         setPieChart(categories);
       });
 
@@ -296,6 +298,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                   legend: {
                     position: "top" as const,
                   },
+
                   title: {
                     display: true,
                     text: "จำนวนสินค้าในระบบ",
