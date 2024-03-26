@@ -1,11 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { Button, Chip, Container, Grid, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
@@ -64,7 +57,6 @@ const ManageUser = (prop: {
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchUsername, setSearchUsername] = useState<string>("");
   const [searchStandard, setSearchStandard] = useState<string>("");
-  // const [role, setRole] = useState("");
   const [currentRole, setCurrentRole] = useState("");
   const [viewFarmer, setViewFarmer] = useState<string>("");
   const [allRole, setAllrole] = useState<
@@ -215,7 +207,6 @@ const ManageUser = (prop: {
         console.log(searchStandard == "ST000" && user.certificates.length == 0);
 
         if (user.certificates.length == 0 && searchStandard == "ST000") {
-          console.log("sdlsdksdkff");
           return user;
         }
         if (user.certificates.length == 0) return false;

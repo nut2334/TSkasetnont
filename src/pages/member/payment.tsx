@@ -102,6 +102,13 @@ const Payment = (prop: {
       });
       return;
     }
+    if (address === "") {
+      Swal.fire({
+        title: "กรุณากรอกที่อยู่สำหรับจัดส่ง",
+        icon: "error",
+      });
+      return;
+    }
     Swal.fire({
       title: "ยืนยันการชำระเงิน",
       text: "คุณต้องการยืนยันการชำระเงินใช่หรือไม่",
@@ -283,7 +290,13 @@ const Payment = (prop: {
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={
+                slip === null || address === "" || products.length === 0
+              }
+            >
               ยืนยันการชำระเงิน
             </Button>
           </Grid>

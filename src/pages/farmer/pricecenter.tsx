@@ -180,12 +180,33 @@ const Pricecenter = () => {
               },
               title: {
                 display: true,
-                text: `ราคากลางสินค้า ณ ปัจจุบัน (${unit})`,
+                text: `ราคากลางสินค้า ณ ช่วงวันที่ ${new Date(
+                  graph[0].date
+                ).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })} ถึง ${new Date(
+                  graph[graph.length - 1].date
+                ).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })} (${unit}) `,
+                font: {
+                  size: 15,
+                },
               },
             },
           }}
           data={{
-            labels: graph.map((d) => new Date(d.date).toLocaleDateString()),
+            labels: graph.map((d) =>
+              new Date(d.date).toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            ),
             datasets: [
               {
                 label: "ราคาต่ำสุด",

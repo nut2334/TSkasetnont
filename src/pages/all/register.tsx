@@ -55,11 +55,11 @@ const Register = (prop: {
 
   const [isRegister, setIsRegister] = React.useState<boolean>(false);
 
-  const onBlurUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onBlurUsername = (event: string) => {
     const userData = {
-      username: event.target.value,
+      username: event,
     };
-    const reg = new RegExp("^[a-zA-Z0-9_]{6,}$");
+    const reg = new RegExp("^[a-zA-Z0-9]{6,}$");
     if (reg.test(userData.username)) {
       setUsernameReg(true);
       sendToBackend(userData);
@@ -72,9 +72,8 @@ const Register = (prop: {
     const userData = {
       email: event.target.value,
     };
-    const emailRegExp = new RegExp(
-      "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$"
-    );
+    const emailRegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
     if (emailRegExp.test(userData.email)) {
       setEmailReg(true);
       sendToBackend(userData);
@@ -181,6 +180,8 @@ const Register = (prop: {
     const data = new FormData(event.currentTarget);
     if (data.get("username") == "") {
       setUsernameCheck(false);
+    } else {
+      onBlurUsername(username);
     }
     if (data.get("email") == "") {
       setEmailCheck(false);
@@ -279,13 +280,13 @@ const Register = (prop: {
                     : "" || !usernameCheck
                     ? "Username นี้มีผู้ใช้งานแล้ว"
                     : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                    ? "ต้องมีอักษร 6 ตัวขึ้นไป และไม่มีอักขระพิเศษ"
                     : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
-                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                  onBlurUsername(event)
-                }
+                // onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
+                //   onBlurUsername(event)
+                // }
                 placeholder="ห้ามเป็นภาษาไทย และอักขระพิเศษ"
               />
             </Grid>
@@ -477,7 +478,9 @@ const Register = (prop: {
             style={{ color: "#fff" }}
             disabled={
               !usernameCheck ||
+              !usernameReg ||
               !emailCheck ||
+              !emailReg ||
               !passwordCheck ||
               !comfirmPasswordCheck ||
               !firstNameValidate ||

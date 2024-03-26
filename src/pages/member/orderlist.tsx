@@ -197,13 +197,34 @@ const EachOrder = (prop: {
               </ListItem>
               <Divider orientation="vertical" flexItem />
               <ListItem>
-                <ListItemText primary={`วันที่สั่งซื้อ: ${order.date_buys}`} />
+                <ListItemText
+                  primary={`วันที่สั่งซื้อ: ${new Date(
+                    order.date_buys
+                  ).toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}`}
+                />
               </ListItem>
               <Divider orientation="vertical" flexItem />
               <ListItem>
                 <ListItemText
                   primary={`วันที่สำเร็จ: ${
-                    order.date_complete ? order.date_complete : "ยังไม่สำเร็จ"
+                    order.date_complete
+                      ? new Date(order.date_complete).toLocaleDateString(
+                          "th-TH",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )
+                      : "ยังไม่สำเร็จ"
                   }`}
                 />
               </ListItem>
@@ -268,7 +289,6 @@ const Orderlist = (prop: { jwt_token: string }) => {
             );
           }
         );
-        // console.log(sortedOrders);
         setOrderList(sortedOrders);
       })
       .catch((err) => {

@@ -98,6 +98,29 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
         category_id: id,
         bgcolor: JSON.stringify(bgColor),
       };
+      axios
+        .put(config.getApiEndpoint("categories", "PUT"), body, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          axios.get(config.getApiEndpoint("categories", "GET")).then((res) => {
+            setCategory(res.data);
+            Swal.fire({
+              title: "บันทึกสำเร็จ",
+              icon: "success",
+            });
+          });
+        })
+        .catch((err) => {
+          Swal.fire({
+            title: `เกิดข้อผิดพลาด ${err.response.data.message}`,
+            icon: "error",
+          });
+          console.log(err);
+        });
+      return;
     } else {
       body = {
         ...body,
@@ -133,11 +156,38 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
       name: paramName ? paramName : name,
     } as { name: string; id?: string };
 
+    //เปลี่ยนชื่อมาตรฐาน
     if (!isNewEdit) {
+      console.log("idStandard", idStandard);
       body = {
         ...body,
         id: idStandard,
       };
+      axios
+        .put(config.getApiEndpoint("certificate", "PUT"), body, {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          axios
+            .get(config.getApiEndpoint("standardproducts", "GET"))
+            .then((res) => {
+              setStandard(res.data);
+              Swal.fire({
+                title: "บันทึกสำเร็จ",
+                icon: "success",
+              });
+            });
+        })
+        .catch((err) => {
+          Swal.fire({
+            title: `เกิดข้อผิดพลาด ${err.response.data.message}`,
+            icon: "error",
+          });
+          console.log(err);
+        });
+      return;
     }
     axios
       .post(config.getApiEndpoint("certificate", "POST"), body, {

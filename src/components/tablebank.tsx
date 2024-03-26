@@ -10,7 +10,7 @@ import { styled } from "@mui/material/styles";
 import Swal from "sweetalert2";
 import axios from "axios";
 import * as config from "../config/config";
-import { Box, Chip } from "@mui/material";
+import { Box, Chip, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { Rating } from "@mui/material";
 
@@ -100,6 +100,17 @@ const GenerateStart = (prop: {
             setToggleEdit(!toggleEdit);
           }}
         />
+      )}
+      {toggleEdit && (
+        <Typography
+          sx={{
+            fontSize: 15,
+            color: "gray",
+            fontWeight: "bold",
+          }}
+        >
+          กรุณาเลือกจำนวนดาว
+        </Typography>
       )}
     </StyledTableCell>
   );

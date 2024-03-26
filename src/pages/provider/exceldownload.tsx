@@ -1,23 +1,11 @@
-import {
-  Box,
-  Button,
-  Table,
-  Typography,
-  Grid,
-  Container,
-  Divider,
-} from "@mui/material";
+import { Typography, Grid, Container, Divider } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as config from "../../config/config";
-import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
-import DownloadIcon from "@mui/icons-material/Download";
+import "chartjs-plugin-datalabels";
 
 import {
   Chart as ChartJS,
@@ -43,26 +31,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#3f51b5",
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
 
 const ExcelDownload = (prop: { jwt_token: string }) => {
   const [registerData, setRegisterData] = useState<
@@ -273,7 +241,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 labels: pieChart.map((d) => d.label),
                 datasets: [
                   {
-                    label: "ยอดขาย",
+                    label: "จำนวนสินค้าในระบบ",
                     data: pieChart.map((d) => d.data),
                     backgroundColor: pieChart.map((d) => {
                       let color = d.bgcolor
@@ -293,6 +261,11 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               options={{
                 responsive: true,
                 plugins: {
+                  datalabels: {
+                    formatter: (value, ctx) => {
+                      console.log(value, ctx);
+                    },
+                  },
                   legend: {
                     position: "top" as const,
                   },

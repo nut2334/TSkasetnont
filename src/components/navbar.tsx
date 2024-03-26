@@ -371,9 +371,6 @@ const Navbar = (prop: {
                     prop.notification ? prop.notification.length : 0
                   }
                   color="primary"
-                  onClick={(event) => {
-                    setAnchorEl(event.currentTarget);
-                  }}
                 >
                   {prop.notification.length > 0 ? (
                     <NotificationsActiveIcon />
