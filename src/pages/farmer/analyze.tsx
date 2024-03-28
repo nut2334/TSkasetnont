@@ -154,7 +154,11 @@ const Analyze = (prop: { jwt_token: string }) => {
             </Typography>
             <Typography variant="subtitle1">
               วันที่เริ่มใช้งาน:{" "}
-              {new Date(farmerDetail.createAt).toLocaleDateString()}
+              {new Date(farmerDetail.createAt).toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </Typography>
             <Typography variant="subtitle1">
               จำนวนสินค้าทั้งหมด: {farmerDetail.product_count} ชิ้น
@@ -208,7 +212,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             rankingLimit={rankingLimit}
           />
         )}
-        {/* <BarChart data={allSum} /> */}
+
         <Grid xs={12}>
           <Typography variant="h5">
             ยอดผู้ติดตามทั้งหมด {allfollowers} คน

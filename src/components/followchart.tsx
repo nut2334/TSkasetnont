@@ -11,7 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -76,11 +76,15 @@ const FollowChart = (prop: {
             options={options}
             data={{
               labels: prop.follower.map((follower) => {
-                return follower.createAt;
+                return new Date(follower.createAt).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                });
               }),
               datasets: [
                 {
-                  label: "Followers",
+                  label: "จำนวนผู้ติดตาม",
                   data: prop.follower.map((follower) => {
                     return follower.follow_count;
                   }),
@@ -102,7 +106,7 @@ const FollowChart = (prop: {
             transform: "translate(-50%,-50%)",
           }}
         >
-          <h1>ไม่มีข้อมูลการติดตาม</h1>
+          <Typography>ไม่มีข้อมูลการติดตาม</Typography>
         </div>
       )}
     </div>

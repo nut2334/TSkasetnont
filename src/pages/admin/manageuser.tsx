@@ -257,7 +257,7 @@ const ManageUser = (prop: {
       renderCell: (params) =>
         new Date(params.row.createAt).toLocaleDateString("th-TH", {
           year: "numeric",
-          month: "long",
+          month: "short",
           day: "numeric",
         }),
     },

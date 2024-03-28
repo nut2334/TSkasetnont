@@ -2,10 +2,7 @@ import { Typography, Grid, Container, Divider } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as config from "../../config/config";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableRow from "@mui/material/TableRow";
-import { styled } from "@mui/material/styles";
-import DownloadIcon from "@mui/icons-material/Download";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -137,7 +134,12 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           }}
         >
           <Typography variant="h4">
-            สถิติการลงทะเบียนเกษตกร ณ วันที่ {new Date().toLocaleDateString()}
+            สถิติการลงทะเบียนเกษตกร ณ วันที่{" "}
+            {new Date().toLocaleDateString("th-TH", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </Typography>
         </Grid>
         <Grid
@@ -149,7 +151,12 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
           }}
         >
           <Typography variant="h5">
-            สถิติการลงทะเบียนเกษตกร ณ วันที่ {new Date().toLocaleDateString()}
+            สถิติการลงทะเบียนเกษตกร ณ วันที่{" "}
+            {new Date().toLocaleDateString("th-TH", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </Typography>
         </Grid>
 
@@ -187,29 +194,24 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                   legend: {
                     position: "top" as const,
                   },
-                  tooltip: {
-                    callbacks: {
-                      title: function (context) {
-                        return new Date(context[0].label).toLocaleDateString(
-                          "th-TH",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        );
-                      },
-                    },
-                  },
+
                   title: {
                     display: true,
-                    text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง${
+                    text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง ${
                       registerData.length > 0
                         ? `${new Date(
                             registerData[0].createAt
-                          ).toLocaleDateString()} ถึง ${new Date(
+                          ).toLocaleDateString("th-TH", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })} ถึง ${new Date(
                             registerData[registerData.length - 1].createAt
-                          ).toLocaleDateString()}`
+                          ).toLocaleDateString("th-TH", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}`
                         : ""
                     }`,
                     font: {
@@ -220,7 +222,10 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               }}
               data={{
                 labels: registerData.map((d) => {
-                  return new Date(d.createAt).toLocaleDateString();
+                  return new Date(d.createAt).toLocaleDateString("th-TH", {
+                    month: "short",
+                    day: "numeric",
+                  });
                 }),
                 datasets: [
                   {

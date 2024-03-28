@@ -8,10 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import axios from "axios";
-import * as config from "../config/config";
-import { Chart } from "chart.js/dist";
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -98,7 +95,35 @@ const BarChart = (prop: {
             filter: `${max === 0 ? "blur(5px)" : "none"}`,
           }}
           data={{
-            labels: prop.data.map((data) => data.date),
+            labels: prop.data.map((data) => {
+              let spilt = data.date.split("/");
+              if (spilt.length === 3) {
+                return new Date(data.date).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                });
+              }
+
+              let allMonth = [
+                "มกราคม",
+                "กุมภาพันธ์",
+                "มีนาคม",
+                "เมษายน",
+                "พฤษภาคม",
+                "มิถุนายน",
+                "กรกฎาคม",
+                "สิงหาคม",
+                "กันยายน",
+                "ตุลาคม",
+                "พฤศจิกายน",
+                "ธันวาคม",
+              ];
+
+              return `${allMonth[parseInt(spilt[0]) - 1]} ${
+                parseInt(spilt[1]) + 543
+              }`;
+            }),
             datasets: [
               ...category.map((cate) => {
                 let color = cate.bgcolor
@@ -142,7 +167,7 @@ const BarChart = (prop: {
             textAlign: "center",
           }}
         >
-          <h1>ไม่มีข้อมูลการขาย</h1>
+          <Typography>ไม่มีข้อมูลการขาย</Typography>
         </Grid>
       )}
     </div>

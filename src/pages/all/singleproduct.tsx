@@ -932,6 +932,7 @@ const SigleProduct = (prop: {
           borderRadius: 2,
           padding: 3,
           marginBottom: 2,
+          marginTop: 2,
         }}
       >
         <Stack direction="row">
