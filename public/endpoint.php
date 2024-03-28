@@ -103,15 +103,16 @@ if (isset($endpoint) && isset($method)) {
         );
     }
     $json_data = file_get_contents($rest_api_url, false, stream_context_create($options));
-    // if ($json_data === FALSE) {
 
-    //     http_response_code(500);
-    //     return json_encode(array('error' => 'API call failed'));
-    // }
     header('Content-Type: application/json; charset=utf-8');
     // Reads the JSON file.
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Headers: *');
+
+    if ($json_data === FALSE) {
+        http_response_code(404);
+        return json_encode(array('error' => 'API call failed'));
+    }
     echo $json_data;
 } else {
     http_response_code(404);
