@@ -125,7 +125,10 @@ const Navbar = (prop: {
     } else if (prop.role == "providers") {
       setVisiblePages([...defaultPages, { name: "จัดการผู้ใช้งาน", path: "" }]);
     } else if (prop.role == "tambons") {
-      setVisiblePages([...defaultPages, { name: "จัดการผู้ใช้งาน", path: "" }]);
+      setVisiblePages([
+        ...defaultPages,
+        { name: "จัดการเกษตกร", path: "/manageuser/farmers" },
+      ]);
     } else if (prop.role == "members") {
       setVisiblePages([
         ...defaultPages,

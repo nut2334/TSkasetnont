@@ -64,24 +64,6 @@ const AddUser = (prop: { jwt_token: string }) => {
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
   };
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-
-    if (newChecked.length > 0) {
-      setSelectedStandard(newChecked.map((data) => standard[data].standard_id));
-    } else {
-      setSelectedStandard([]);
-    }
-  };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -493,11 +475,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                   }}
                 >
                   {standard.map((data, index) => (
-                    <ListItem
-                      key={data.standard_id}
-                      disablePadding
-                      onClick={handleToggle(index)}
-                    >
+                    <ListItem key={data.standard_id} disablePadding>
                       <ListItemButton dense>
                         <ListItemIcon>
                           <Checkbox
@@ -505,6 +483,20 @@ const AddUser = (prop: { jwt_token: string }) => {
                             tabIndex={-1}
                             disableRipple
                             inputProps={{ "aria-labelledby": data.standard_id }}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedStandard([
+                                  ...selectedStandard,
+                                  data.standard_id,
+                                ]);
+                              } else {
+                                setSelectedStandard(
+                                  selectedStandard.filter(
+                                    (standard) => standard !== data.standard_id
+                                  )
+                                );
+                              }
+                            }}
                           />
                         </ListItemIcon>
                         <ListItemText
