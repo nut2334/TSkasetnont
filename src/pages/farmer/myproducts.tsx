@@ -50,7 +50,7 @@ interface ProductInterface {
   selectedType: string;
   category_id: string;
   category_name: string;
-  cerfitication: string[];
+  certification: string[];
   phone: string;
   email: string;
   address: string;
@@ -147,11 +147,6 @@ const Myproducts = (prop: {
     axios
       .get(config.getApiEndpoint("standardproducts", "GET"))
       .then((response) => {
-        let all = {
-          standard_id: "all",
-          standard_name: "ทั้งหมด",
-        };
-        response.data.push(all);
         setAllStandard(response.data);
       });
   }, []);
@@ -217,29 +212,26 @@ const Myproducts = (prop: {
   const handleSearch = () => {
     let filter = allProduct;
     console.log(searchType);
-    if (searchType !== "") {
+    if (searchType === "all") {
+      filter = filter;
+    } else if (searchType !== "") {
       filter = filter.filter((product) => {
         return product.selectedType === searchType;
       });
     }
-    if (searchType === "all") {
-      filter = filter;
-    }
     console.log(searchStandard);
-    if (searchStandard !== "") {
+    if (searchStandard === "all") {
+      filter = allProduct;
+    } else if (searchStandard !== "") {
       filter = filter.filter((product) => {
-        console.log(product);
-        let found = product.cerfitication.find(
+        let found = product.certification.find(
           (item) => item === searchStandard
         );
         return found;
       });
     }
-    if (searchStandard === "all") {
-      filter = allProduct;
-    }
+
     setFilterSearch(filter);
-    console.log(filter);
   };
 
   if (navigatePath) {
@@ -348,6 +340,7 @@ const Myproducts = (prop: {
             fullWidth
             onChange={(e) => setSearchStandard(e.target.value as string)}
           >
+            <MenuItem value="all">ทั้งหมด</MenuItem>
             {allStandard.map((option) => (
               <MenuItem key={option.standard_id} value={option.standard_name}>
                 {option.standard_name}
@@ -553,11 +546,23 @@ const Myproducts = (prop: {
                                 `deleteproduct/${product.product_id}`,
                                 "POST"
                               );
+                              let role = (
+                                jwtDecode(prop.jwt_token) as {
+                                  role: string;
+                                }
+                              ).role;
+                              let body = {};
+                              if (role !== "farmers") {
+                                body = {
+                                  username: username,
+                                };
+                              }
                               axios
                                 .delete(apiDeleteProduct, {
                                   headers: {
                                     Authorization: `Bearer ${prop.jwt_token}`,
                                   },
+                                  data: body,
                                 })
                                 .then(() => {
                                   Swal.fire(
