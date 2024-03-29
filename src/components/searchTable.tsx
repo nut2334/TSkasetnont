@@ -247,7 +247,12 @@ const Searchtable = (prop: {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container
+      maxWidth="lg"
+      sx={{
+        marginTop: 5,
+      }}
+    >
       {!editingUser ? (
         <>
           <Grid container spacing={2}>
@@ -299,7 +304,7 @@ const Searchtable = (prop: {
             <Grid item xs={6}>
               <TextField
                 select
-                label="บทบาท"
+                label="ตำแหน่ง"
                 fullWidth
                 onChange={(event) => {
                   setRole(
@@ -315,9 +320,9 @@ const Searchtable = (prop: {
               >
                 <MenuItem value="all">ทั้งหมด</MenuItem>
                 <MenuItem value="admins">ผู้ดูแลระบบ</MenuItem>
-                <MenuItem value="tambons">ผู้ดูแลตำบล</MenuItem>
+                <MenuItem value="tambons">เกษตรตำบล</MenuItem>
                 <MenuItem value="farmers">เกษตรกร</MenuItem>
-                <MenuItem value="providers">ผู้ว่าราชการจังหวัด</MenuItem>
+                <MenuItem value="providers">เกษตรจังหวัด</MenuItem>
                 <MenuItem value="members">สมาชิก</MenuItem>
               </TextField>
             </Grid>

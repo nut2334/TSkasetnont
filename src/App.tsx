@@ -233,8 +233,14 @@ function App() {
           )}
           {(decodeJWT.role == "tambons" || decodeJWT.role == "providers") && (
             <Route
-              path="/datafarmer"
-              element={<ExcelDownload jwt_token={jwt_token} />}
+              path="/manageuser/:role"
+              element={
+                <ManageUser
+                  jwt_token={jwt_token}
+                  followList={followList}
+                  setFollowList={setFollowList}
+                />
+              }
             />
           )}
           {decodeJWT.role == "admins" && (
@@ -292,16 +298,6 @@ function App() {
           )}
           {decodeJWT.role == "tambons" && (
             <>
-              <Route
-                path="/manageuser/:role"
-                element={
-                  <ManageUser
-                    jwt_token={jwt_token}
-                    followList={followList}
-                    setFollowList={setFollowList}
-                  />
-                }
-              />
               <Route
                 path="/adduser/:role"
                 element={<AddUser jwt_token={jwt_token} />}

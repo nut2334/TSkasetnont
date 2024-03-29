@@ -309,35 +309,41 @@ const ManageUser = (prop: {
               }
             }}
           />
-          <EditIcon
-            sx={{
-              color: "#F9D923",
-              cursor: "pointer",
-            }}
-            onClick={() => editUser(params.row.username, params.row.role)}
-          />
-          <DeleteIcon
-            sx={{
-              color: "#EB5353",
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              Swal.fire({
-                title: "คุณแน่ใจหรือไม่?",
-                text: "คุณจะไม่สามารถกู้คืนข้อมูลนี้ได้!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "ใช่, ลบข้อมูล!",
-                cancelButtonText: "ยกเลิก",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  deleteUser(params.row.username, params.row.role);
-                }
-              });
-            }}
-          />
+          {prop.jwt_token &&
+            (jwtDecode(prop.jwt_token) as { role: string }).role !==
+              "providers" && (
+              <>
+                <EditIcon
+                  sx={{
+                    color: "#F9D923",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => editUser(params.row.username, params.row.role)}
+                />
+                <DeleteIcon
+                  sx={{
+                    color: "#EB5353",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    Swal.fire({
+                      title: "คุณแน่ใจหรือไม่?",
+                      text: "คุณจะไม่สามารถกู้คืนข้อมูลนี้ได้!",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#3085d6",
+                      cancelButtonColor: "#d33",
+                      confirmButtonText: "ใช่, ลบข้อมูล!",
+                      cancelButtonText: "ยกเลิก",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        deleteUser(params.row.username, params.row.role);
+                      }
+                    });
+                  }}
+                />
+              </>
+            )}
         </>
       ),
     },
@@ -403,9 +409,9 @@ const ManageUser = (prop: {
       }}
       maxWidth="lg"
     >
-      {role == "farmers" && <ExcelDownload jwt_token={prop.jwt_token} />}
       {!editingUser ? (
         <>
+          {role == "farmers" && <ExcelDownload jwt_token={prop.jwt_token} />}
           <Grid container spacing={2}>
             <Grid item xs={12}>
               {currentRole != "tambons" && (
@@ -418,7 +424,7 @@ const ManageUser = (prop: {
                     : role === "members"
                     ? "สมาชิก"
                     : role === "providers"
-                    ? "ผู้ว่าราชการจังหวัด"
+                    ? "เกษตรจังหวัด"
                     : "เกษตรกร"}
                 </Typography>
               )}
@@ -535,30 +541,34 @@ const ManageUser = (prop: {
               >
                 ค้นหา
               </Button>
-              <NavLink
-                to={`/adduser/${role}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  sx={{
-                    marginRight: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  เพิ่ม
-                  {role === "admins"
-                    ? "ผู้ดูแลระบบ"
-                    : role === "farmers"
-                    ? "เกษตรกร"
-                    : role === "members"
-                    ? "สมาชิก"
-                    : role === "providers"
-                    ? "ผู้ว่าราชการจังหวัด"
-                    : "เกษตรกร"}
-                </Button>
-              </NavLink>
+              {prop.jwt_token &&
+                (jwtDecode(prop.jwt_token) as { role: string }).role !==
+                  "providers" && (
+                  <NavLink
+                    to={`/adduser/${role}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      sx={{
+                        marginRight: "10px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      เพิ่ม
+                      {role === "admins"
+                        ? "ผู้ดูแลระบบ"
+                        : role === "farmers"
+                        ? "เกษตรกร"
+                        : role === "members"
+                        ? "สมาชิก"
+                        : role === "providers"
+                        ? "เกษตรจังหวัด"
+                        : "เกษตรกร"}
+                    </Button>
+                  </NavLink>
+                )}
               {role == "farmers" && (
                 <Button
                   sx={{
@@ -604,93 +614,6 @@ const ManageUser = (prop: {
               pageSizeOptions={[10, 20, 50]}
             />
           </div>
-
-          {/* <TableContainer
-            component={Paper}
-            sx={{
-              marginTop: "20px",
-              boxShadow: 0,
-              borderRadius: "10px",
-              padding: "20px",
-              border: "1px solid #e0e0e0",
-            }}
-          >
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center">Email</TableCell>
-                  <TableCell align="center">Username</TableCell>
-                  <TableCell align="center">ชื่อ</TableCell>
-                  <TableCell align="center">นามสกุล</TableCell>
-                  <TableCell align="center">เบอร์โทรศัพท์</TableCell>
-                  <TableCell align="center">ตำแหน่ง</TableCell>
-                  <TableCell align="center">การกระทำ</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredUsers.map((user, index) => (
-                  <TableRow
-                    key={index}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {user.email}
-                    </TableCell>
-                    <TableCell align="center">{user.username}</TableCell>
-                    <TableCell align="center">{user.firstname}</TableCell>
-                    <TableCell align="center">{user.lastname}</TableCell>
-                    <TableCell align="center">{user.phone}</TableCell>
-                    <TableCell align="center">{user.role}</TableCell>
-                    <TableCell align="center">
-                      <RemoveRedEyeIcon
-                        sx={{
-                          color: "#36AE7C",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          console.log(user.username);
-                          if (role === "farmers") {
-                            setViewFarmer(user.username);
-                          }
-                        }}
-                      />
-                      <EditIcon
-                        sx={{
-                          color: "#F9D923",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => editUser(user.username, user.role)}
-                      />
-                      <DeleteIcon
-                        sx={{
-                          color: "#EB5353",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          Swal.fire({
-                            title: "คุณแน่ใจหรือไม่?",
-                            text: "คุณจะไม่สามารถกู้คืนข้อมูลนี้ได้!",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#3085d6",
-                            cancelButtonColor: "#d33",
-                            confirmButtonText: "ใช่, ลบข้อมูล!",
-                            cancelButtonText: "ยกเลิก",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              {
-                                deleteUser(user.username, user.role);
-                              }
-                            }
-                          });
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer> */}
         </>
       ) : (
         <>

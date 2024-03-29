@@ -257,7 +257,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             : role == "farmers"
             ? "เกษตรกร"
             : role == "providers"
-            ? "ผู้ว่าราชการจังหวัด"
+            ? "เกษตรจังหวัด"
             : role == "members"
             ? "สมาชิก"
             : ""}

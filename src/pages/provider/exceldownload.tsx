@@ -67,6 +67,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
         }[] = res.data.farmers;
         let max = Math.max(...farmers.map((data) => data.register_count));
         setMax(max);
+        console.log(farmers);
         setRegisterData(farmers);
       });
     axios
@@ -79,7 +80,6 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
         let categories: { label: string; data: number; bgcolor: string }[] =
           res.data.categories;
         console.log(categories);
-
         setPieChart(categories);
       });
 
@@ -116,6 +116,12 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
         );
       });
   }, []);
+
+  function convertDateFormat(dateString: string) {
+    const [day, month, year] = dateString.split("/");
+    return `${month}/${day}/${year}`;
+  }
+
   return (
     <Container
       maxWidth="lg"
@@ -200,13 +206,15 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                     text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง ${
                       registerData.length > 0
                         ? `${new Date(
-                            registerData[0].createAt
+                            convertDateFormat(registerData[0].createAt)
                           ).toLocaleDateString("th-TH", {
                             year: "numeric",
                             month: "short",
                             day: "numeric",
                           })} ถึง ${new Date(
-                            registerData[registerData.length - 1].createAt
+                            convertDateFormat(
+                              registerData[registerData.length - 1].createAt
+                            )
                           ).toLocaleDateString("th-TH", {
                             year: "numeric",
                             month: "short",
@@ -222,7 +230,9 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               }}
               data={{
                 labels: registerData.map((d) => {
-                  return new Date(d.createAt).toLocaleDateString("th-TH", {
+                  return new Date(
+                    convertDateFormat(d.createAt)
+                  ).toLocaleDateString("th-TH", {
                     month: "short",
                     day: "numeric",
                   });

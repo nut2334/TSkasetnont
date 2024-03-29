@@ -72,11 +72,17 @@ const Login = (prop: {
         .post(apiLogin, userData)
         .then((res) => {
           console.log(res.data);
+          if (res.data == null || res.data.status == false) {
+            setError(true);
+          }
+
           if (res.data.token) {
-              const cookies = new Cookies();
-              cookies.set("jwt_token", res.data.token
-              , { path: "/", sameSite: "strict", secure: true }
-              );
+            const cookies = new Cookies();
+            cookies.set("jwt_token", res.data.token, {
+              path: "/",
+              sameSite: "strict",
+              secure: true,
+            });
 
             prop.setJwt_token(res.data.token);
             setIsLogin(true);

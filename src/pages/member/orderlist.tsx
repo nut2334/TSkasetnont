@@ -303,10 +303,12 @@ const Orderlist = (prop: { jwt_token: string }) => {
 
   return (
     <Container maxWidth="lg">
-      {orderList.length === 0 ? <div>ไม่มีรายการสั่งซื้อ</div> : null}
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         รายการสั่งซื้อ
       </Typography>
+      {orderList.length === 0 ? (
+        <Typography>ไม่มีรายการสั่งซื้อ</Typography>
+      ) : null}
       {orderListPage.map((order: any, index: number) => {
         return (
           <EachOrder
