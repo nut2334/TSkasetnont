@@ -232,16 +232,22 @@ function App() {
             </React.Fragment>
           )}
           {(decodeJWT.role == "tambons" || decodeJWT.role == "providers") && (
-            <Route
-              path="/manageuser/:role"
-              element={
-                <ManageUser
-                  jwt_token={jwt_token}
-                  followList={followList}
-                  setFollowList={setFollowList}
-                />
-              }
-            />
+            <>
+              <Route
+                path="/manageuser/:role"
+                element={
+                  <ManageUser
+                    jwt_token={jwt_token}
+                    followList={followList}
+                    setFollowList={setFollowList}
+                  />
+                }
+              />
+              <Route
+                path="/manageuser/farmers/:username"
+                element={<Myproducts jwt_token={jwt_token} />}
+              />
+            </>
           )}
           {decodeJWT.role == "admins" && (
             <React.Fragment>

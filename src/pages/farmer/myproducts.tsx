@@ -247,8 +247,9 @@ const Myproducts = (prop: {
     >
       <Grid container spacing={2}>
         {((jwtDecode(prop.jwt_token) as { role: string }).role == "admins" ||
+          (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons" ||
           (jwtDecode(prop.jwt_token) as { role: string }).role ==
-            "tambons") && (
+            "provinces") && (
           <>
             <Grid item xs={12}>
               <Typography variant="h4">
@@ -516,79 +517,85 @@ const Myproducts = (prop: {
                           />
                         </Button>
                       </NavLink>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          setNavigatePath(
-                            `${product.farmerstorename}/${
-                              username ? username : prop.username
-                            }/${product.product_id}`
-                          );
-                        }}
-                      >
-                        <EditIcon sx={{ color: "#FFD23F" }} />
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          Swal.fire({
-                            title: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
-                            text: "คุณจะไม่สามารถกู้คืนสินค้านี้ได้อีก",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#3085d6",
-                            cancelButtonColor: "#d33",
-                            confirmButtonText: "ใช่",
-                            cancelButtonText: "ไม่",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              const apiDeleteProduct = config.getApiEndpoint(
-                                `deleteproduct/${product.product_id}`,
-                                "POST"
+                      {(jwtDecode(prop.jwt_token) as { role: string }).role !==
+                        "provinces" && (
+                        <>
+                          <Button
+                            size="small"
+                            onClick={() => {
+                              setNavigatePath(
+                                `${product.farmerstorename}/${
+                                  username ? username : prop.username
+                                }/${product.product_id}`
                               );
-                              let role = (
-                                jwtDecode(prop.jwt_token) as {
-                                  role: string;
+                            }}
+                          >
+                            <EditIcon sx={{ color: "#FFD23F" }} />
+                          </Button>
+                          <Button
+                            size="small"
+                            onClick={() => {
+                              Swal.fire({
+                                title: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
+                                text: "คุณจะไม่สามารถกู้คืนสินค้านี้ได้อีก",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "ใช่",
+                                cancelButtonText: "ไม่",
+                              }).then((result) => {
+                                if (result.isConfirmed) {
+                                  const apiDeleteProduct =
+                                    config.getApiEndpoint(
+                                      `deleteproduct/${product.product_id}`,
+                                      "POST"
+                                    );
+                                  let role = (
+                                    jwtDecode(prop.jwt_token) as {
+                                      role: string;
+                                    }
+                                  ).role;
+                                  let body = {};
+                                  if (role !== "farmers") {
+                                    body = {
+                                      username: username,
+                                    };
+                                  }
+                                  axios
+                                    .delete(apiDeleteProduct, {
+                                      headers: {
+                                        Authorization: `Bearer ${prop.jwt_token}`,
+                                      },
+                                      data: body,
+                                    })
+                                    .then(() => {
+                                      Swal.fire(
+                                        "ลบสินค้าสำเร็จ",
+                                        "สินค้าของคุณถูกลบเรียบร้อยแล้ว",
+                                        "success"
+                                      );
+                                      fetchProduct();
+                                    })
+                                    .catch((error) => {
+                                      Swal.fire(
+                                        "ลบสินค้าไม่สำเร็จ",
+                                        "กรุณาลองใหม่อีกครั้ง",
+                                        "error"
+                                      );
+                                    });
                                 }
-                              ).role;
-                              let body = {};
-                              if (role !== "farmers") {
-                                body = {
-                                  username: username,
-                                };
-                              }
-                              axios
-                                .delete(apiDeleteProduct, {
-                                  headers: {
-                                    Authorization: `Bearer ${prop.jwt_token}`,
-                                  },
-                                  data: body,
-                                })
-                                .then(() => {
-                                  Swal.fire(
-                                    "ลบสินค้าสำเร็จ",
-                                    "สินค้าของคุณถูกลบเรียบร้อยแล้ว",
-                                    "success"
-                                  );
-                                  fetchProduct();
-                                })
-                                .catch((error) => {
-                                  Swal.fire(
-                                    "ลบสินค้าไม่สำเร็จ",
-                                    "กรุณาลองใหม่อีกครั้ง",
-                                    "error"
-                                  );
-                                });
-                            }
-                          });
-                        }}
-                      >
-                        <DeleteIcon
-                          sx={{
-                            color: "#EE4266",
-                          }}
-                        />
-                      </Button>
+                              });
+                            }}
+                          >
+                            <DeleteIcon
+                              sx={{
+                                color: "#EE4266",
+                              }}
+                            />
+                          </Button>
+                        </>
+                      )}
                     </CardActions>
                   </Card>
                 </Grid>
