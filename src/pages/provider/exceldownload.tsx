@@ -23,7 +23,6 @@ ChartJS.register(
   PointElement,
   LineElement,
   ArcElement,
-
   Title,
   Tooltip,
   Legend
@@ -206,15 +205,13 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                     text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง ${
                       registerData.length > 0
                         ? `${new Date(
-                            convertDateFormat(registerData[0].createAt)
+                            registerData[0].createAt
                           ).toLocaleDateString("th-TH", {
                             year: "numeric",
                             month: "short",
                             day: "numeric",
                           })} ถึง ${new Date(
-                            convertDateFormat(
-                              registerData[registerData.length - 1].createAt
-                            )
+                            registerData[registerData.length - 1].createAt
                           ).toLocaleDateString("th-TH", {
                             year: "numeric",
                             month: "short",
@@ -230,9 +227,7 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
               }}
               data={{
                 labels: registerData.map((d) => {
-                  return new Date(
-                    convertDateFormat(d.createAt)
-                  ).toLocaleDateString("th-TH", {
+                  return new Date(d.createAt).toLocaleDateString("th-TH", {
                     month: "short",
                     day: "numeric",
                   });

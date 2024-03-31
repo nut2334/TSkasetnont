@@ -355,6 +355,17 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                   color="error"
                   variant="contained"
                   onClick={() => {
+                    Swal.fire({
+                      title: "คุณแน่ใจหรือไม่ที่จะลบ",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonText: "ใช่",
+                      cancelButtonText: "ไม่ใช่",
+                    }).then((res) => {
+                      if (!res.isConfirmed) {
+                        return;
+                      }
+                    });
                     axios
                       .delete(config.getApiEndpoint("categories", "DELETE"), {
                         headers: {
@@ -469,6 +480,17 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
               color="error"
               variant="contained"
               onClick={() => {
+                Swal.fire({
+                  title: "คุณแน่ใจหรือไม่ที่จะลบ",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: "ใช่",
+                  cancelButtonText: "ไม่ใช่",
+                }).then((res) => {
+                  if (!res.isConfirmed) {
+                    return;
+                  }
+                });
                 axios
                   .delete(config.getApiEndpoint("certificate", "DELETE"), {
                     headers: {
