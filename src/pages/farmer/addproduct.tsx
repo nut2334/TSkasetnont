@@ -79,7 +79,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkType, setCheckType] = useState<boolean>(true);
 
   const [description, setDescription] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number>(1);
   const [weight, setWeight] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
   const [checkUnit, setCheckUnit] = useState<boolean>(true);
@@ -936,6 +936,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     fullWidth
                     type="number"
                     onChange={(e) => setPrice(parseInt(e.target.value))}
+                    inputProps={{ min: 1 }}
                   />
                 </Grid>
                 <Grid item xs={6} md={3}>
@@ -1057,6 +1058,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     InputProps={{
                       endAdornment: <Typography>บาท</Typography>,
                     }}
+                    inputProps={{ min: 1 }}
                   />
                 </Grid>
                 <Grid item xs={8} lg={6}>
@@ -1123,6 +1125,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 sx={{
                   marginRight: "10px",
                 }}
+                disabled={!productName || !coverImage || !selectedCategory}
               >
                 ยืนยัน
               </Button>

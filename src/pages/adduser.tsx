@@ -125,7 +125,9 @@ const AddUser = (prop: { jwt_token: string }) => {
       .catch((err) => {
         console.log(err);
       });
-    const usernameRegExp = new RegExp("^[a-zA-Z0-9]{6,}$");
+    const usernameRegExp = new RegExp(
+      /^(?=.*[A-Za-z0-9])[A-Za-z0-9@#$%^&+=]{8,}$/
+    );
     if (usernameRegExp.test(event.target.value)) {
       setUsernameReg(true);
     } else {
