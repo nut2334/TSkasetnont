@@ -833,7 +833,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     }}
                     variant="h6"
                   >
-                    คำอธิบายรูปแบบการเก็บข้อมูล
+                    คำอธิบายรูปแบบการขาย
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -909,10 +909,10 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 value={selectedType}
                 select
                 fullWidth
-                label="รูปแบบการเก็บข้อมูล"
+                label="รูปแบบการขาย"
                 required
                 error={!checkType}
-                helperText={!checkType && "กรุณาเลือกรูปแบบการเก็บข้อมูล"}
+                helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
               >
                 {web_activity.map((activity) => (
                   <MenuItem

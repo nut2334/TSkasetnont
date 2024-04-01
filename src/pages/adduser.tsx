@@ -9,7 +9,6 @@ import {
   InputAdornment,
   IconButton,
   Button,
-  MenuItem,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -53,7 +52,6 @@ const AddUser = (prop: { jwt_token: string }) => {
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
   const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
-  const [checked, setChecked] = React.useState([0]);
   const [standard, setStandard] = React.useState<
     {
       standard_id: string;
