@@ -52,6 +52,7 @@ import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
+import { Margin } from "@mui/icons-material";
 
 interface FullProductInterface {
   product_id: string;
@@ -936,7 +937,11 @@ const SigleProduct = (prop: {
         }}
       >
         <Stack direction="row">
-          <Stack>
+          <Stack
+            sx={{
+              marginRight: 1,
+            }}
+          >
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
           <Stack>

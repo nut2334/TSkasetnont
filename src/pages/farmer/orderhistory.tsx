@@ -314,6 +314,7 @@ const EachOrder = (prop: {
                 <Button
                   variant="contained"
                   color="primary"
+                  disabled={!trackingNumber}
                   onClick={() => {
                     const reg = /^[A-Za-z0-9]*$/;
 

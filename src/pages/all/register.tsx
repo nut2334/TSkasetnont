@@ -61,6 +61,7 @@ const Register = (prop: {
     };
     const reg = new RegExp("^[a-zA-Z0-9]{6,}$");
     if (reg.test(userData.username)) {
+      console.log("true");
       setUsernameReg(true);
       sendToBackend(userData);
     } else {
@@ -116,7 +117,7 @@ const Register = (prop: {
   };
 
   const validatePassword = (event: React.FocusEvent<HTMLInputElement>) => {
-    const regExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const regExp = /^(?=.*[A-Za-z0-9])[A-Za-z0-9@#$%^&+=]{8,}$/;
     if (regExp.test(event.target.value)) {
       setPasswordCheck(true);
     } else {
@@ -284,9 +285,6 @@ const Register = (prop: {
                     : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
-                // onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                //   onBlurUsername(event)
-                // }
                 placeholder="ห้ามเป็นภาษาไทย และอักขระพิเศษ"
               />
             </Grid>
@@ -326,7 +324,7 @@ const Register = (prop: {
                   (password == "" || password == null) && passwordCheck == false
                     ? "กรุณากรอกรหัสผ่าน"
                     : "" || !passwordCheck
-                    ? "ต้องมีตัวอักษร 8 ตัวขึ้นไป และมีตัวเลขอย่างน้อย 1 ตัว"
+                    ? "ต้องมีตัวขระหรือตัวเลข 8 ตัวขึ้นไป"
                     : ""
                 }
                 id="password"
@@ -477,15 +475,12 @@ const Register = (prop: {
             sx={{ mt: 3, mb: 2 }}
             style={{ color: "#fff" }}
             disabled={
-              !usernameCheck ||
-              !usernameReg ||
-              !emailCheck ||
-              !emailReg ||
-              !passwordCheck ||
-              !comfirmPasswordCheck ||
-              !firstNameValidate ||
-              !lastNameValidate ||
-              !telValidate
+              !username ||
+              !email ||
+              !password ||
+              !firstName ||
+              !lastName ||
+              !tel
             }
           >
             ยืนยัน

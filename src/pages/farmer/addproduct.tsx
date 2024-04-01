@@ -79,7 +79,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkType, setCheckType] = useState<boolean>(true);
 
   const [description, setDescription] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number>(1);
   const [weight, setWeight] = useState<number>(0);
   const [unit, setUnit] = useState<string>("");
   const [checkUnit, setCheckUnit] = useState<boolean>(true);
@@ -833,7 +833,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     }}
                     variant="h6"
                   >
-                    คำอธิบายรูปแบบการเก็บข้อมูล
+                    คำอธิบายรูปแบบการขาย
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -909,10 +909,10 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 value={selectedType}
                 select
                 fullWidth
-                label="รูปแบบการเก็บข้อมูล"
+                label="รูปแบบการขาย"
                 required
                 error={!checkType}
-                helperText={!checkType && "กรุณาเลือกรูปแบบการเก็บข้อมูล"}
+                helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
               >
                 {web_activity.map((activity) => (
                   <MenuItem
@@ -936,6 +936,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     fullWidth
                     type="number"
                     onChange={(e) => setPrice(parseInt(e.target.value))}
+                    inputProps={{ min: 1 }}
                   />
                 </Grid>
                 <Grid item xs={6} md={3}>
@@ -1057,6 +1058,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     InputProps={{
                       endAdornment: <Typography>บาท</Typography>,
                     }}
+                    inputProps={{ min: 1 }}
                   />
                 </Grid>
                 <Grid item xs={8} lg={6}>
@@ -1103,6 +1105,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     InputProps={{
                       endAdornment: <Typography>{unit}</Typography>,
                     }}
+                    inputProps={{ min: 0 }}
                   />
                 </Grid>
               </>
@@ -1123,6 +1126,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 sx={{
                   marginRight: "10px",
                 }}
+                disabled={!productName || !coverImage || !selectedCategory}
               >
                 ยืนยัน
               </Button>
