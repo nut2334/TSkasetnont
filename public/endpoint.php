@@ -1,7 +1,7 @@
 <?php
 $headers = getallheaders();
 
-// error_reporting(E_ERROR | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 $method = $_SERVER['REQUEST_METHOD'];
 $port = 3006;
 $url = 'http://localhost:' . $port . '/';
@@ -51,6 +51,7 @@ if (isset($endpoint) && isset($method)) {
         'http' => array(
             'method' => $method,
             'content' => $content,
+            'ignore_errors' => true,
             'header' => $header,
         )
         );
@@ -62,6 +63,7 @@ if (isset($endpoint) && isset($method)) {
             'http' => array(
                 'method' => $method,
                 'content' => $post_data,
+                'ignore_errors' => true,
                 'header' => "Content-type: $content_type\r\n" .
                     "Authorization: $Auth\r\n",
             )
@@ -88,6 +90,7 @@ if (isset($endpoint) && isset($method)) {
         $options = array(
             'http' => array(
                 'method' => $method,
+                'ignore_errors' => true,
                 'header' => "Content-type: application/json\r\n" .
                 "Authorization: $Auth\r\n",
             )
@@ -97,6 +100,7 @@ if (isset($endpoint) && isset($method)) {
         $options = array(
             'http' => array(
                 'method' => $method,
+                'ignore_errors' => true,
                 'header' => "Content-type: application/json\r\n" .
                 "Authorization: $Auth\r\n",
             )
@@ -104,15 +108,13 @@ if (isset($endpoint) && isset($method)) {
     }
     $json_data = file_get_contents($rest_api_url, false, stream_context_create($options));
 
+    foreach ($http_response_header as $value) {
+        header($value);
+    }
     header('Content-Type: application/json; charset=utf-8');
     // Reads the JSON file.
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Headers: *');
-
-    if ($json_data === FALSE) {
-        http_response_code(404);
-        return json_encode(array('error' => 'API call failed'));
-    }
     echo $json_data;
 } else {
     http_response_code(404);
