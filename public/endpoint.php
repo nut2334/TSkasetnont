@@ -57,7 +57,7 @@ if (isset($endpoint) && isset($method)) {
         );
     
     }
-    elseif ($method == 'POST' || $method == 'PUT' || $method == 'DELETE') {
+    elseif ($method == 'POST' || $method == 'PUT' || $method == 'DELETE' || $method == 'PATCH') {
         $post_data = file_get_contents('php://input');
         $options = array(
             'http' => array(
