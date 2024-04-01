@@ -25,6 +25,7 @@ if (isset($endpoint) && isset($method)) {
     }
     
     $allFormData = count($_FILES);
+
     if ($allFormData > 0){
     define('MULTIPART_BOUNDARY', '--------------------------'.microtime(true));
     $header = 'Content-Type: multipart/form-data; boundary='.MULTIPART_BOUNDARY.
@@ -58,7 +59,12 @@ if (isset($endpoint) && isset($method)) {
     
     }
     elseif ($method == 'POST' || $method == 'PUT' || $method == 'DELETE' || $method == 'PATCH') {
-        $post_data = file_get_contents('php://input');
+        $post_data = array();
+        if ($_POST) {
+            $post_data = json_encode($_POST);
+        } else {
+            $post_data = file_get_contents('php://input');
+        }
         $options = array(
             'http' => array(
                 'method' => $method,
@@ -68,6 +74,8 @@ if (isset($endpoint) && isset($method)) {
                     "Authorization: $Auth\r\n",
             )
         );
+        
+
     } elseif ($method == 'GET'){
         function getAllParams() {
             $allParam = array();
@@ -106,15 +114,14 @@ if (isset($endpoint) && isset($method)) {
             )
         );
     }
+
     $json_data = file_get_contents($rest_api_url, false, stream_context_create($options));
 
-    foreach ($http_response_header as $value) {
-        header($value);
-    }
     header('Content-Type: application/json; charset=utf-8');
     // Reads the JSON file.
     header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Headers: *');
+    header("Access-Control-Allow-Methods: *");
+    header("Access-Control-Allow-Headers: *");
     echo $json_data;
 } else {
     http_response_code(404);
