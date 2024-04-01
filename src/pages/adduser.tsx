@@ -398,6 +398,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   checkLang(event)
                 }
+                required
                 autoComplete="given-name"
                 name="firstName"
                 fullWidth
@@ -420,6 +421,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                   checkLang(event)
                 }
                 fullWidth
+                required
                 id="lastName"
                 label="นามสกุล"
                 name="lastName"

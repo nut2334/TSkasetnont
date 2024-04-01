@@ -1105,6 +1105,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     InputProps={{
                       endAdornment: <Typography>{unit}</Typography>,
                     }}
+                    inputProps={{ min: 0 }}
                   />
                 </Grid>
               </>
