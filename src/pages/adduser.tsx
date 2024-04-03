@@ -45,6 +45,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
+
   const [username, setUsername] = useState<string>("");
   const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
   const [usernameReg, setUsernameReg] = useState<boolean>(true);
@@ -374,6 +375,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 fullWidth
                 id="username"
                 label="Username"
+                value={username}
                 error={!usernameCheck || !usernameReg}
                 helperText={
                   username == "" && usernameCheck == false
@@ -398,6 +400,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 label="Email"
                 name="email"
                 autoComplete="email"
+                value={email}
                 error={
                   (!emailCheck && email != "") || (!emailReg && email != "")
                 }
@@ -433,6 +436,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
                 id="password"
                 required
+                value={password}
                 label="รหัสผ่าน"
                 variant="outlined"
                 type={showPassword ? "text" : "password"}
@@ -453,6 +457,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={comfirmPassword}
                 onChange={(event) => {
                   if (event.target.value != "") {
                     setComfirmPassword(event.target.value);
@@ -499,6 +504,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                value={firstName}
                 onChange={(event) => setFirstName(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   checkLang(event)
@@ -521,6 +527,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                value={lastName}
                 onChange={(event) => setLastName(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   checkLang(event)
@@ -543,6 +550,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={tel}
                 onChange={(event) => setTel(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
                   const telRegExp = /^[0-9]{10}$/;
@@ -576,6 +584,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                   name="amphure"
                   select
                   required
+                  value={selectedAmphure}
                   error={!checkAmphure}
                   helperText={checkAmphure == false ? "กรุณาเลือกอำเภอ" : ""}
                   onChange={(event) => {
