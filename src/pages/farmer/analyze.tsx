@@ -243,6 +243,26 @@ const Analyze = (prop: { jwt_token: string }) => {
         </Grid>
 
         <Grid>
+          <Grid xs={12}>
+            {chartType == "date" ? (
+              <Typography>
+                ณ วันที่{" "}
+                {new Date().toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Typography>
+            ) : (
+              <Typography>
+                ณ เดือน{" "}
+                {new Date().toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                })}
+              </Typography>
+            )}
+          </Grid>
           <Button
             variant="contained"
             color="info"
@@ -260,6 +280,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             รายเดือน
           </Button>
         </Grid>
+
         <Grid xs={12}>{saleData && <BarChart data={saleData} />}</Grid>
         <Grid xs={12}>
           <Divider
