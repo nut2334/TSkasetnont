@@ -253,6 +253,7 @@ const AddUser = (prop: { jwt_token: string }) => {
       tel: tel,
       certificateList: selectedStandard,
       amphure: selectedAmphure,
+      role: role,
     };
 
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
