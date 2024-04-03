@@ -74,9 +74,6 @@ const Navbar = (prop: {
     { name: "จัดการเกษตรจังหวัด", path: "/manageuser/providers" },
     { name: "ผู้ใช้งานทั้งหมด", path: "/manageuser/all" },
   ];
-  const manageUserProviderTambon = [
-    { name: "จัดการเกษตรกร", path: "/manageuser/farmers" },
-  ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -134,7 +131,12 @@ const Navbar = (prop: {
     } else if (prop.role == "tambons") {
       setVisiblePages([
         ...defaultPages,
-        { name: "จัดการเกษตกร", path: "/manageuser/farmers" },
+        {
+          name: "จัดการเกษตกร",
+          path: `/manageuser/farmers/${
+            (jwtDecode(prop.jwt_token) as { amphure: string }).amphure
+          }`,
+        },
       ]);
     } else if (prop.role == "members") {
       setVisiblePages([
@@ -252,19 +254,6 @@ const Navbar = (prop: {
                       </MenuItem>
                     </NavLink>
                   ))}
-                {/* {prop.jwt_token &&
-                  (jwtDecode(prop.jwt_token) as { role: string }).role ==
-                    "providers" &&
-                  manageUserProviderTambon.map((page, index) => (
-                    <NavLink
-                      to={page.path}
-                      style={{ textDecoration: "none", color: "black" }}
-                    >
-                      <MenuItem key={index} onClick={handleCloseNavMenu}>
-                        <Typography textAlign="center">{page.name}</Typography>
-                      </MenuItem>
-                    </NavLink>
-                  ))} */}
               </Menu>
             </Box>
             {/* phone */}

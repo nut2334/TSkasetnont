@@ -309,6 +309,10 @@ function App() {
                 element={<AddUser jwt_token={jwt_token} />}
               />
               <Route
+                path="/adduser/:role/:district"
+                element={<AddUser jwt_token={jwt_token} />}
+              />
+              <Route
                 path="/manageuser/:role/:username"
                 element={<Myproducts jwt_token={jwt_token} />}
               />

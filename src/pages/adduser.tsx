@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -16,6 +16,7 @@ import {
   ListItemText,
   List,
   ListSubheader,
+  MenuItem,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -23,42 +24,61 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import { Icon, LatLngLiteral } from "leaflet";
+import { useMap } from "react-leaflet";
+
+interface amphure {
+  id: string;
+  name_th: string;
+}
 
 const AddUser = (prop: { jwt_token: string }) => {
-  const apiRole = config.getApiEndpoint("role", "GET");
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
-  const [username, setUsername] = React.useState<string>("");
-  const [usernameCheck, setUsernameCheck] = React.useState<boolean>(true);
-  const [usernameReg, setUsernameReg] = React.useState<boolean>(true);
-  const [email, setEmail] = React.useState<string>("");
-  const [emailCheck, setEmailCheck] = React.useState<boolean>(true);
-  const [emailReg, setEmailReg] = React.useState<boolean>(true);
-  const [password, setPassword] = React.useState<string>("");
-  const [passwordCheck, setPasswordCheck] = React.useState<boolean>(true);
-  const [comfirmPassword, setComfirmPassword] = React.useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
+  const [usernameReg, setUsernameReg] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>("");
+  const [emailCheck, setEmailCheck] = useState<boolean>(true);
+  const [emailReg, setEmailReg] = useState<boolean>(true);
+  const [password, setPassword] = useState<string>("");
+  const [passwordCheck, setPasswordCheck] = useState<boolean>(true);
+  const [comfirmPassword, setComfirmPassword] = useState<string>("");
   const [comfirmPasswordCheck, setComfirmPasswordCheck] =
-    React.useState<boolean>(true);
-  const [firstName, setFirstName] = React.useState<string>("");
-  const [firstNameValidate, setFirstNameValidate] =
-    React.useState<boolean>(true);
-  const [lastName, setLastName] = React.useState<string>("");
-  const [lastNameValidate, setLastNameValidate] = React.useState<boolean>(true);
-  const [tel, setTel] = React.useState<string>("");
-  const [telValidate, setTelValidate] = React.useState<boolean>(true);
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+    useState<boolean>(true);
+  const [firstName, setFirstName] = useState<string>("");
+  const [firstNameValidate, setFirstNameValidate] = useState<boolean>(true);
+  const [lastName, setLastName] = useState<string>("");
+  const [lastNameValidate, setLastNameValidate] = useState<boolean>(true);
+  const [tel, setTel] = useState<string>("");
+  const [telValidate, setTelValidate] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showComfirmPassword, setShowComfirmPassword] =
-    React.useState<boolean>(false);
-  const [roleCheck, setRoleCheck] = React.useState<boolean>(true);
-  const [standard, setStandard] = React.useState<
+    useState<boolean>(false);
+  const [standard, setStandard] = useState<
     {
       standard_id: string;
       standard_name: string;
     }[]
   >([]);
-  const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
+  const [selectedStandard, setSelectedStandard] = useState<string[]>([]);
+  const [amphure, setAmphure] = useState<amphure[]>([]);
+  const [selectedAmphure, setSelectedAmphure] = useState<string>("");
+  const [checkAmphure, setCheckAmphure] = useState<boolean>(true);
+  const [exist, setExist] = useState<boolean>(false);
+  const [position, setPosition] = useState<LatLngLiteral>();
+  const [current, setCurrent] = useState<boolean>(false);
+
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
   };
@@ -71,11 +91,9 @@ const AddUser = (prop: { jwt_token: string }) => {
     axios
       .get(apiStandard)
       .then((res) => {
-        console.log(res.data);
         setStandard(
           res.data.filter(
             (data: { standard_id: string; standard_name: string }) => {
-              console.log(data.standard_id);
               if (
                 data.standard_name !== "ไม่มี" &&
                 data.standard_name !== "อื่นๆ"
@@ -91,6 +109,17 @@ const AddUser = (prop: { jwt_token: string }) => {
       })
       .catch((err) => {
         console.log(err);
+      });
+    axios
+      .get(
+        "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+      )
+      .then((res) => {
+        res.data.find((data: { name_th: string; amphure: amphure[] }) => {
+          if (data.name_th == "นนทบุรี") {
+            setAmphure(data.amphure);
+          }
+        });
       });
   }, []);
 
@@ -126,7 +155,7 @@ const AddUser = (prop: { jwt_token: string }) => {
         console.log(err);
       });
     const usernameRegExp = new RegExp(
-      /^(?=.*[A-Za-z0-9])[A-Za-z0-9@#$%^&+=]{8,}$/
+      /^(?=.*[A-Za-z0-9])[A-Za-z0-9@#$%^&+=]{6,}$/
     );
     if (usernameRegExp.test(event.target.value)) {
       setUsernameReg(true);
@@ -136,6 +165,10 @@ const AddUser = (prop: { jwt_token: string }) => {
   };
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (event.target.value == "" || event.target.value == null) {
+      setEmailCheck(true);
+      setEmailReg(true);
+    }
     const userData = {
       email: event.target.value,
     };
@@ -195,6 +228,8 @@ const AddUser = (prop: { jwt_token: string }) => {
     event.preventDefault();
     if (!username) {
       setUsernameCheck(false);
+    } else {
+      setUsernameCheck(true);
     }
     if (!password) {
       setPasswordCheck(false);
@@ -202,9 +237,11 @@ const AddUser = (prop: { jwt_token: string }) => {
     if (!comfirmPassword) {
       setComfirmPasswordCheck(false);
     }
-    if (!role) {
-      setRoleCheck(false);
+    if (!selectedAmphure && role == "tambons") {
+      setCheckAmphure(false);
       return;
+    } else {
+      setCheckAmphure(true);
     }
 
     const data = {
@@ -214,10 +251,9 @@ const AddUser = (prop: { jwt_token: string }) => {
       firstName: firstName,
       lastName: lastName,
       tel: tel,
-      role: role,
       certificateList: selectedStandard,
+      amphure: selectedAmphure,
     };
-    console.log(data);
 
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
 
@@ -228,12 +264,82 @@ const AddUser = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        AdduserSuccess();
+        Swal.fire({
+          title: "เพิ่มผู้ใช้งานสำเร็จ",
+          icon: "success",
+          confirmButtonText: "ตกลง",
+        });
+        Swal.fire({
+          title: "ต้องการเพิ่มผู้ใช้งานอีกหรือไม่",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "ใช่",
+          cancelButtonText: "ไม่",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setUsername("");
+            setEmail("");
+            setPassword("");
+            setComfirmPassword("");
+            setFirstName("");
+            setLastName("");
+            setTel("");
+            setSelectedStandard([]);
+            setSelectedAmphure("");
+          } else {
+            setExist(true);
+          }
+        });
       })
       .catch((err) => {
         AdduserFail();
       });
   };
+  const CreateMarker = (prop: { current: boolean }) => {
+    const map = useMap();
+    const [initialFly, setInitialFly] = useState<boolean>(true);
+    useMapEvents({
+      click(e) {
+        setPosition(e.latlng);
+        map.flyTo(e.latlng, map.getZoom());
+        if (prop.current) {
+          setCurrent(false);
+        }
+      },
+    });
+    useEffect(() => {
+      if (position && initialFly) {
+        map.flyTo(position, map.getZoom());
+        setInitialFly(false);
+      }
+    }, []);
+    useEffect(() => {
+      if (prop.current && position == undefined) {
+        map.locate().on("locationfound", function (e) {
+          setPosition(e.latlng);
+          map.flyTo(e.latlng, map.getZoom());
+        });
+      }
+    }, [map]);
+
+    return position ? (
+      <Marker position={position} icon={iconMarker}>
+        <Popup>
+          You are here. <br />
+        </Popup>
+      </Marker>
+    ) : null;
+  };
+  const iconMarker = new Icon({
+    iconUrl: require("../assets/icon.svg").default,
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -40],
+  });
+
+  if (exist) {
+    return <Navigate to="/manageuser" />;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -295,10 +401,12 @@ const AddUser = (prop: { jwt_token: string }) => {
                 label="Email"
                 name="email"
                 autoComplete="email"
-                error={!emailCheck || !emailReg}
+                error={
+                  (!emailCheck && email != "") || (!emailReg && email != "")
+                }
                 helperText={
-                  email == "" && emailCheck == false
-                    ? "กรุณากรอก Email"
+                  email == ""
+                    ? ""
                     : "" || !emailCheck
                     ? "Email นี้มีผู้ใช้งานแล้ว"
                     : "" || !emailReg
@@ -462,7 +570,59 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
               />
             </Grid>
+            {role == "tambons" ? (
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  id="amphure"
+                  label="อำเภอ"
+                  name="amphure"
+                  select
+                  required
+                  error={!checkAmphure}
+                  helperText={checkAmphure == false ? "กรุณาเลือกอำเภอ" : ""}
+                  onChange={(event) => {
+                    // console.log(event.target.value);
+                    setSelectedAmphure(event.target.value);
+                  }}
+                >
+                  {/* เฉพาะจังหวัดนนทบุรี */}
+                  {amphure.map((amphure: amphure) => (
+                    <MenuItem value={amphure.name_th}>
+                      {amphure.name_th}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            ) : null}
             {role == "farmers" ? (
+              <>
+                <Grid item xs={12}>
+                  <MapContainer
+                    center={[13.736717, 100.523186]}
+                    zoom={13}
+                    scrollWheelZoom={true}
+                    style={{ height: "250px", width: "100%" }}
+                  >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <CreateMarker current={current} />
+                  </MapContainer>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    color={`${current ? "warning" : "success"}`}
+                    onClick={() => {
+                      setPosition(undefined);
+                      setCurrent(!current);
+                    }}
+                  >
+                    ตำแหน่งปัจจุบัน
+                  </Button>
+                </Grid>
+              </>
+            ) : null}
+            {/* {role == "farmers" ? (
               <Grid item xs={12}>
                 <List
                   subheader={
@@ -510,7 +670,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                   ))}
                 </List>
               </Grid>
-            ) : null}
+            ) : null} */}
           </Grid>
           <Button
             type="submit"
@@ -519,6 +679,7 @@ const AddUser = (prop: { jwt_token: string }) => {
             color="primary"
             sx={{ mt: 3, mb: 2 }}
             style={{ color: "#fff" }}
+            disabled={!username || !password}
           >
             ยืนยัน
           </Button>

@@ -212,7 +212,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
     }
   };
   const onSubmit = () => {
-    console.log(selectedStandard);
     let check = true;
     if (productName == "") {
       setCheckProductName(false);
@@ -239,6 +238,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
     } else {
       setCheckCoverImage(true);
     }
+
     if (selectedType == "จองสินค้าผ่านเว็บไซต์" && selectedStatus == "") {
       setCheckStatus(false);
       check = false;
@@ -288,6 +288,15 @@ const AddProduct = (prop: { jwt_token: string }) => {
       certificate: JSON.stringify(selectedStandard),
     } as any;
 
+    if (selectedType == "สินค้าจัดส่งพัสดุ") {
+      if (stock == null) {
+        body = {
+          ...body,
+          stock: 0,
+        };
+      }
+    }
+
     if (productid) {
       body = {
         ...body,
@@ -305,7 +314,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
         username: username,
       };
     }
-
+    console.log(body);
     axios
       .post(apiAddProduct, body, {
         headers: {

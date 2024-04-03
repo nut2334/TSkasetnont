@@ -109,7 +109,6 @@ const ManageUser = (prop: {
         },
       })
       .then((response: any) => {
-        console.log(response.data);
         setUsers(response.data);
         setFilteredUsers(response.data);
       })
@@ -117,7 +116,6 @@ const ManageUser = (prop: {
         console.log(err);
       });
     axios.get(config.getApiEndpoint("standardproducts", "GET")).then((res) => {
-      console.log(res.data);
       setAllStandardProducts(res.data);
     });
   }, [role]);
@@ -210,7 +208,6 @@ const ManageUser = (prop: {
           return user;
         }
         if (user.certificates.length == 0) return false;
-        console.log(user.certificates, "ass", searchStandard);
         let found = user.certificates.find((cert) => {
           return cert.standard_id === searchStandard;
         });
@@ -276,19 +273,6 @@ const ManageUser = (prop: {
             {daysAgo === 30 ? "30" : daysAgo} วันที่แล้ว
           </span>
         );
-        // return (
-        // " (" +
-        // Math.round(
-        //   (new Date().getTime() - new Date(params.row.lastLogin).getTime()) /
-        //     (1000 * 3600 * 24)
-        // ) + " วันที่แล้ว"
-        // +
-        // new Date(params.row.lastLogin).toLocaleDateString("th-TH", {
-        //   year: "numeric",
-        //   month: "long",
-        //   day: "numeric",
-        // })
-        // );
       },
     },
     {
@@ -297,18 +281,19 @@ const ManageUser = (prop: {
       flex: 1,
       renderCell: (params) => (
         <>
-          <RemoveRedEyeIcon
-            sx={{
-              color: "#36AE7C",
-              cursor: "pointer",
-            }}
-            onClick={() => {
-              console.log(params.row.username);
-              if (role === "farmers") {
-                setViewFarmer(params.row.username);
-              }
-            }}
-          />
+          {role === "farmers" && (
+            <RemoveRedEyeIcon
+              sx={{
+                color: "#36AE7C",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                if (role === "farmers") {
+                  setViewFarmer(params.row.username);
+                }
+              }}
+            />
+          )}
           {prop.jwt_token &&
             (jwtDecode(prop.jwt_token) as { role: string }).role !==
               "providers" && (
@@ -356,8 +341,6 @@ const ManageUser = (prop: {
         responseType: "blob",
       })
       .then((response) => {
-        console.log(response);
-
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
@@ -383,8 +366,6 @@ const ManageUser = (prop: {
     return <Navigate to="/" />;
   }
   if (viewFarmer !== "") {
-    console.log();
-
     return <Navigate to={`/manageuser/farmers/${viewFarmer}`} />;
   }
 
@@ -464,7 +445,6 @@ const ManageUser = (prop: {
                     label="มาตรฐาน"
                     fullWidth
                     onChange={(event) => {
-                      console.log(event.target.value);
                       setSearchStandard(event.target.value as string);
                     }}
                   >
@@ -575,6 +555,10 @@ const ManageUser = (prop: {
                     marginRight: "10px",
                     marginBottom: "10px",
                   }}
+                  disabled={
+                    (jwtDecode(prop.jwt_token) as { role: string }).role ===
+                    "providers"
+                  }
                   onClick={downloadExcel}
                   variant="contained"
                   startIcon={<DownloadIcon />}

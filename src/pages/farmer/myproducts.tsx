@@ -249,7 +249,7 @@ const Myproducts = (prop: {
         {((jwtDecode(prop.jwt_token) as { role: string }).role == "admins" ||
           (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons" ||
           (jwtDecode(prop.jwt_token) as { role: string }).role ==
-            "provinces") && (
+            "providers") && (
           <>
             <Grid item xs={12}>
               <Typography variant="h4">
@@ -518,7 +518,7 @@ const Myproducts = (prop: {
                         </Button>
                       </NavLink>
                       {(jwtDecode(prop.jwt_token) as { role: string }).role !==
-                        "provinces" && (
+                        "providers" && (
                         <>
                           <Button
                             size="small"
