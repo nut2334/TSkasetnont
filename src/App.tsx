@@ -234,7 +234,7 @@ function App() {
           {(decodeJWT.role == "tambons" || decodeJWT.role == "providers") && (
             <>
               <Route
-                path="/manageuser/:role"
+                path="/adduser/:role"
                 element={
                   <ManageUser
                     jwt_token={jwt_token}

@@ -26,6 +26,7 @@ import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
 import { Navigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import * as L from "leaflet";
 import {
   MapContainer,
   TileLayer,
@@ -83,6 +84,17 @@ const AddUser = (prop: { jwt_token: string }) => {
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
   };
+  const osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+  const mqi = L.tileLayer(
+    "http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png",
+    { subdomains: ["otile1", "otile2", "otile3", "otile4"] }
+  );
+  const baseMaps = {
+    OpenStreetMap: osm,
+    MapQuestImagery: mqi,
+  };
+  const map = L.map("map");
+  L.control.layers(baseMaps, {}, { position: "bottomleft" }).addTo(map);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
