@@ -9,13 +9,6 @@ import {
   InputAdornment,
   IconButton,
   Button,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  Checkbox,
-  ListItemText,
-  List,
-  ListSubheader,
   MenuItem,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
@@ -33,6 +26,8 @@ import {
   Marker,
   Popup,
   useMapEvents,
+  LayerGroup,
+  LayersControl,
 } from "react-leaflet";
 import { Icon, LatLngLiteral } from "leaflet";
 import { useMap } from "react-leaflet";
@@ -84,17 +79,6 @@ const AddUser = (prop: { jwt_token: string }) => {
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
   };
-  const osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-  const mqi = L.tileLayer(
-    "http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png",
-    { subdomains: ["otile1", "otile2", "otile3", "otile4"] }
-  );
-  const baseMaps = {
-    OpenStreetMap: osm,
-    MapQuestImagery: mqi,
-  };
-  const map = L.map("map");
-  L.control.layers(baseMaps, {}, { position: "bottomleft" }).addTo(map);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -346,6 +330,14 @@ const AddUser = (prop: { jwt_token: string }) => {
     iconAnchor: [25, 50],
     popupAnchor: [0, -40],
   });
+  const SatelliteStyle = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution:
+        'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }
+  );
 
   if (exist) {
     return <Navigate to={`/manageuser/${role}`} />;
@@ -622,7 +614,15 @@ const AddUser = (prop: { jwt_token: string }) => {
                     scrollWheelZoom={true}
                     style={{ height: "250px", width: "100%" }}
                   >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    {/* 
+                    <TileLayer url="https://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png" />
+                 */}
+
+                    <TileLayer
+                      attribution="Google Maps Satellite"
+                      url="https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
+                    />
+                    <TileLayer url="https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}" />
                     <CreateMarker current={current} />
                   </MapContainer>
                 </Grid>
