@@ -268,11 +268,7 @@ const AddUser = (prop: { jwt_token: string }) => {
         Swal.fire({
           title: "เพิ่มผู้ใช้งานสำเร็จ",
           icon: "success",
-          confirmButtonText: "ตกลง",
-        });
-        Swal.fire({
-          title: "ต้องการเพิ่มผู้ใช้งานอีกหรือไม่",
-          icon: "question",
+          text: "คุณต้องการเพิ่มผู้ใช้งานอีกหรือไม่",
           showCancelButton: true,
           confirmButtonText: "ใช่",
           cancelButtonText: "ไม่",
