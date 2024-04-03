@@ -335,7 +335,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   });
 
   if (exist) {
-    return <Navigate to="/manageuser" />;
+    return <Navigate to={`/manageuser/${role}`} />;
   }
 
   return (
