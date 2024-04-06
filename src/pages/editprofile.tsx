@@ -386,10 +386,10 @@ const EditProfile = (prop: {
       phone: tel,
     } as {
       username: string;
-      email: string;
-      firstname: string;
-      lastname: string;
-      phone: string;
+      email?: string;
+      firstname?: string;
+      lastname?: string;
+      phone?: string;
       farmerstorename?: string;
       province?: string;
       amphure?: string;
@@ -437,7 +437,12 @@ const EditProfile = (prop: {
     if (role === "members" || prop.admin?.role === "members") {
       data = { ...data, address: address };
     }
-    console.log(data);
+    if (role === "tambons" || prop.admin?.role === "tambons") {
+      data = {
+        ...data,
+        amphure: selected.amphure_name_th,
+      };
+    }
 
     axios
       .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {

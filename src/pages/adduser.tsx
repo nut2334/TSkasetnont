@@ -272,6 +272,7 @@ const AddUser = (prop: { jwt_token: string }) => {
         (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons")
     ) {
       setCheckAmphure(false);
+      return;
     } else {
       setCheckAmphure(true);
     }
@@ -305,10 +306,10 @@ const AddUser = (prop: { jwt_token: string }) => {
         Swal.fire({
           icon: "success",
           title: "เพิ่มผู้ใช้งานสำเร็จ",
-          text: "ต้องการเพิ่มสินค้าของเกษตรกรคนนี้หรือไม่",
+          text: "ต้องการเพิ่มสินค้าของเกษตรกรคนนี้หรือไม่?",
           showCancelButton: true,
-          confirmButtonText: "เพิ่มสินค้า",
-          cancelButtonText: "กลับไปหน้าจัดการเกษตรกร",
+          confirmButtonText: "ย้อนกลับ",
+          cancelButtonText: "เพิ่มสินค้า",
         }).then((result) => {
           if (result.isConfirmed) {
             setExist(true);
