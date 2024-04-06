@@ -76,7 +76,7 @@ const ManageUser = (prop: {
     }[]
   >([]);
   const [categories, setCategories] = useState("");
-  const [ampher, setAmpher] = useState<
+  const [amphure, setAmphure] = useState<
     | "จังหวัดอื่นๆ"
     | "เมืองนนทบุรี"
     | "บางบัวทอง"
@@ -215,10 +215,10 @@ const ManageUser = (prop: {
       });
     }
 
-    if (ampher !== "ทั้งหมด" && ampher !== "") {
+    if (amphure !== "ทั้งหมด" && amphure !== "") {
       filteredUsers = filteredUsers.filter((user) => {
-        if (user.amphure == "" && ampher == "จังหวัดอื่นๆ") return true;
-        return user.amphure == ampher;
+        if (user.amphure == "" && amphure == "จังหวัดอื่นๆ") return true;
+        return user.amphure == amphure;
       });
     }
 
@@ -465,7 +465,7 @@ const ManageUser = (prop: {
                     label="อำเภอ"
                     fullWidth
                     onChange={(event) => {
-                      setAmpher(
+                      setAmphure(
                         event.target.value as
                           | "จังหวัดอื่นๆ"
                           | "เมืองนนทบุรี"

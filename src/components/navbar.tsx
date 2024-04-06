@@ -133,9 +133,7 @@ const Navbar = (prop: {
         ...defaultPages,
         {
           name: "จัดการเกษตกร",
-          path: `/manageuser/farmers/${
-            (jwtDecode(prop.jwt_token) as { amphure: string }).amphure
-          }`,
+          path: `/manageuser/farmers`,
         },
       ]);
     } else if (prop.role == "members") {

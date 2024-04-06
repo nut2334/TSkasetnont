@@ -29,3 +29,30 @@ export const web_activity = [
     activityName: "สินค้าจัดส่งพัสดุ",
   },
 ];
+
+export const nonthaburi_amphure = [
+  {
+    amphureID: "1001",
+    amphureName: "เมืองนนทบุรี",
+  },
+  {
+    amphureID: "1002",
+    amphureName: "บางกรวย",
+  },
+  {
+    amphureID: "1003",
+    amphureName: "บางใหญ่",
+  },
+  {
+    amphureID: "1004",
+    amphureName: "บางบัวทอง",
+  },
+  {
+    amphureID: "1005",
+    amphureName: "ไทรน้อย",
+  },
+  {
+    amphureID: "1006",
+    amphureName: "ปากเกร็ด",
+  },
+];

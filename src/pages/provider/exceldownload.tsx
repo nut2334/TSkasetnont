@@ -164,17 +164,6 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
             })}
           </Typography>
         </Grid>
-
-        <Grid item xs={12}>
-          {registerData && (
-            <Typography variant="h6" align="center">
-              {`จำนวนเกษตกรที่ลงทะเบียนทั้งหมด: ${registerData.reduce(
-                (acc, cur) => acc + cur.register_count,
-                0
-              )}`}
-            </Typography>
-          )}
-        </Grid>
         <Grid item xs={12}>
           <Divider />
         </Grid>

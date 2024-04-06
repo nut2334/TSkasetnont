@@ -10,6 +10,7 @@ import {
   IconButton,
   Button,
   MenuItem,
+  Divider,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -31,12 +32,26 @@ import {
 } from "react-leaflet";
 import { Icon, LatLngLiteral } from "leaflet";
 import { useMap } from "react-leaflet";
+import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
+import SearchIcon from "@mui/icons-material/Search";
+import Myproducts from "./farmer/myproducts";
+import { jwtDecode } from "jwt-decode";
 
 interface amphure {
   id: string;
   name_th: string;
+  tambon: tambon[];
 }
-
+interface tambon {
+  id: string;
+  name_th: string;
+  zip_code: number;
+}
+interface province {
+  id: string;
+  name_th: string;
+  amphure: amphure[];
+}
 const AddUser = (prop: { jwt_token: string }) => {
   const apiStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
@@ -69,12 +84,28 @@ const AddUser = (prop: { jwt_token: string }) => {
     }[]
   >([]);
   const [selectedStandard, setSelectedStandard] = useState<string[]>([]);
+  const [province, setProvince] = useState<province[]>([]);
   const [amphure, setAmphure] = useState<amphure[]>([]);
   const [selectedAmphure, setSelectedAmphure] = useState<string>("");
   const [checkAmphure, setCheckAmphure] = useState<boolean>(true);
   const [exist, setExist] = useState<boolean>(false);
   const [position, setPosition] = useState<LatLngLiteral>();
   const [current, setCurrent] = useState<boolean>(false);
+  const [amphures, setAmphures] = useState<amphure[]>([]);
+  const [tambons, setTambons] = useState<tambon[]>([]);
+  const [zipCode, setZipCode] = useState<number>();
+  const [address, setAddress] = useState<string>("");
+  const [selected, setSelected] = useState<{
+    province_name_th: string;
+    amphure_name_th: string;
+    tambon_name_th: string;
+  }>({
+    province_name_th: "",
+    amphure_name_th: "",
+    tambon_name_th: "",
+  });
+  const [changelat, setChangelat] = useState<number>(0);
+  const [changelng, setChangelng] = useState<number>(0);
 
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
@@ -114,7 +145,8 @@ const AddUser = (prop: { jwt_token: string }) => {
       .then((res) => {
         res.data.find((data: { name_th: string; amphure: amphure[] }) => {
           if (data.name_th == "นนทบุรี") {
-            setAmphure(data.amphure);
+            console.log(data.amphure);
+            setAmphures(data.amphure);
           }
         });
       });
@@ -234,9 +266,12 @@ const AddUser = (prop: { jwt_token: string }) => {
     if (!comfirmPassword) {
       setComfirmPasswordCheck(false);
     }
-    if (!selectedAmphure && role == "tambons") {
+    if (
+      !selected.amphure_name_th &&
+      ((jwtDecode(prop.jwt_token) as { role: string }).role == "admins" ||
+        (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons")
+    ) {
       setCheckAmphure(false);
-      return;
     } else {
       setCheckAmphure(true);
     }
@@ -249,8 +284,13 @@ const AddUser = (prop: { jwt_token: string }) => {
       lastName: lastName,
       tel: tel,
       certificateList: selectedStandard,
-      amphure: selectedAmphure,
       role: role,
+      province: "นนทบุรี",
+      amphure: selected.amphure_name_th,
+      tambon: selected.tambon_name_th,
+      address: address,
+      lat: position?.lat,
+      lng: position?.lng,
     };
 
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
@@ -263,23 +303,15 @@ const AddUser = (prop: { jwt_token: string }) => {
       })
       .then((res) => {
         Swal.fire({
-          title: "เพิ่มผู้ใช้งานสำเร็จ",
           icon: "success",
-          text: "คุณต้องการเพิ่มผู้ใช้งานอีกหรือไม่",
+          title: "เพิ่มผู้ใช้งานสำเร็จ",
+          text: "ต้องการเพิ่มสินค้าของเกษตรกรคนนี้หรือไม่",
           showCancelButton: true,
-          confirmButtonText: "ใช่",
-          cancelButtonText: "ไม่",
+          confirmButtonText: "เพิ่มสินค้า",
+          cancelButtonText: "กลับไปหน้าจัดการเกษตรกร",
         }).then((result) => {
           if (result.isConfirmed) {
-            setUsername("");
-            setEmail("");
-            setPassword("");
-            setComfirmPassword("");
-            setFirstName("");
-            setLastName("");
-            setTel("");
-            setSelectedStandard([]);
-            setSelectedAmphure("");
+            setExist(true);
           } else {
             setExist(true);
           }
@@ -295,6 +327,8 @@ const AddUser = (prop: { jwt_token: string }) => {
     useMapEvents({
       click(e) {
         setPosition(e.latlng);
+        setChangelat(e.latlng.lat);
+        setChangelng(e.latlng.lng);
         map.flyTo(e.latlng, map.getZoom());
         if (prop.current) {
           setCurrent(false);
@@ -311,6 +345,8 @@ const AddUser = (prop: { jwt_token: string }) => {
       if (prop.current && position == undefined) {
         map.locate().on("locationfound", function (e) {
           setPosition(e.latlng);
+          setChangelat(e.latlng.lat);
+          setChangelng(e.latlng.lng);
           map.flyTo(e.latlng, map.getZoom());
         });
       }
@@ -319,7 +355,7 @@ const AddUser = (prop: { jwt_token: string }) => {
     return position ? (
       <Marker position={position} icon={iconMarker}>
         <Popup>
-          You are here. <br />
+          ละติจูด: {position.lat} <br /> ลองจิจูด: {position.lng}
         </Popup>
       </Marker>
     ) : null;
@@ -344,7 +380,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="lg">
       <Box
         sx={{
           marginTop: 8,
@@ -387,7 +423,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                     : "" || !usernameCheck
                     ? "Username นี้มีผู้ใช้งานแล้ว"
                     : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
+                    ? "ต้องเป็นภาษาอังกฤษหรือตัวเลขเท่านั้น และมีความยาว 6 ตัวขึ้นไป"
                     : ""
                 }
                 onChange={(event) => setUsername(event.target.value)}
@@ -513,7 +549,6 @@ const AddUser = (prop: { jwt_token: string }) => {
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   checkLang(event)
                 }
-                required
                 autoComplete="given-name"
                 name="firstName"
                 fullWidth
@@ -537,7 +572,6 @@ const AddUser = (prop: { jwt_token: string }) => {
                   checkLang(event)
                 }
                 fullWidth
-                required
                 id="lastName"
                 label="นามสกุล"
                 name="lastName"
@@ -608,6 +642,106 @@ const AddUser = (prop: { jwt_token: string }) => {
             {role == "farmers" ? (
               <>
                 <Grid item xs={12}>
+                  <Divider textAlign="left">
+                    <Typography>ที่อยู่</Typography>
+                  </Divider>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="จังหวัด"
+                    fullWidth
+                    disabled
+                    value="นนทบุรี"
+                  ></TextField>
+                </Grid>
+                {amphures.length > 0 && (
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="เขต/อำเภอ"
+                      fullWidth
+                      required
+                      value={selected.amphure_name_th}
+                      error={!checkAmphure}
+                      helperText={
+                        selected.amphure_name_th == "" && checkAmphure == false
+                          ? "กรุณาเลือกเขต/อำเภอ"
+                          : ""
+                      }
+                      onChange={(event) => {
+                        setTambons(
+                          amphures.filter(
+                            (amphures) => amphures.name_th == event.target.value
+                          )[0].tambon
+                        );
+
+                        setSelected({
+                          ...selected,
+                          amphure_name_th: event.target.value
+                            ? event.target.value
+                            : selected.amphure_name_th,
+                          tambon_name_th: "",
+                        });
+                      }}
+                    >
+                      {amphures.map((amphure: amphure) => (
+                        <MenuItem value={amphure.name_th}>
+                          {amphure.name_th}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                )}
+                {tambons.length > 0 && (
+                  <>
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        label="แขวง/ตำบล"
+                        fullWidth
+                        value={selected.tambon_name_th}
+                        onChange={(event) => {
+                          setSelected({
+                            ...selected,
+                            tambon_name_th: event.target.value
+                              ? event.target.value
+                              : selected.tambon_name_th,
+                          });
+                          setZipCode(tambons[0].zip_code);
+                        }}
+                      >
+                        {tambons.map((tambon: tambon) => (
+                          <MenuItem value={tambon.name_th}>
+                            {tambon.name_th}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {zipCode && (
+                        <TextField
+                          label="รหัสไปรษณีย์"
+                          fullWidth
+                          disabled
+                          value={zipCode}
+                        />
+                      )}
+                    </Grid>
+                  </>
+                )}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="ที่อยู่"
+                    value={address}
+                    onChange={(event) => {
+                      setAddress(event.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <MapContainer
                     center={[13.736717, 100.523186]}
                     zoom={13}
@@ -626,8 +760,9 @@ const AddUser = (prop: { jwt_token: string }) => {
                     <CreateMarker current={current} />
                   </MapContainer>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={2}>
                   <Button
+                    startIcon={<LocationSearchingIcon />}
                     variant="contained"
                     color={`${current ? "warning" : "success"}`}
                     onClick={() => {
@@ -638,8 +773,38 @@ const AddUser = (prop: { jwt_token: string }) => {
                     ตำแหน่งปัจจุบัน
                   </Button>
                 </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    size="small"
+                    label="ละติจูด"
+                    value={changelat}
+                    onChange={(e) => setChangelat(parseFloat(e.target.value))}
+                    inputProps={{ min: 0 }}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    label="ลองจิจูด"
+                    size="small"
+                    value={changelng}
+                    onChange={(e) => setChangelng(parseFloat(e.target.value))}
+                    inputProps={{ min: 0 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SearchIcon />}
+                    onClick={() => {
+                      setPosition({ lat: changelat, lng: changelng });
+                    }}
+                  >
+                    ค้นหา
+                  </Button>
+                </Grid>
               </>
             ) : null}
+
             {/* {role == "farmers" ? (
               <Grid item xs={12}>
                 <List
@@ -689,6 +854,9 @@ const AddUser = (prop: { jwt_token: string }) => {
                 </List>
               </Grid>
             ) : null} */}
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
           </Grid>
           <Button
             type="submit"

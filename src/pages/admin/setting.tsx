@@ -365,35 +365,40 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                       if (!res.isConfirmed) {
                         return;
                       }
-                    });
-                    axios
-                      .delete(config.getApiEndpoint("categories", "DELETE"), {
-                        headers: {
-                          Authorization: `Bearer ${prop.jwt_token}`,
-                        },
-                        data: {
-                          category_id: id,
-                        },
-                      })
-                      .then((res) => {
+                      if (res.isConfirmed) {
                         axios
-                          .get(config.getApiEndpoint("categories", "GET"))
+                          .delete(
+                            config.getApiEndpoint("categories", "DELETE"),
+                            {
+                              headers: {
+                                Authorization: `Bearer ${prop.jwt_token}`,
+                              },
+                              data: {
+                                category_id: id,
+                              },
+                            }
+                          )
                           .then((res) => {
-                            Swal.fire({
-                              title: "ลบสำเร็จ",
-                              icon: "success",
-                            });
-                            setId("");
-                            setCategory(res.data);
-                          })
-                          .catch((err) => {
-                            Swal.fire({
-                              title: "เกิดข้อผิดพลาด",
-                              icon: "error",
-                            });
-                            console.log(err);
+                            axios
+                              .get(config.getApiEndpoint("categories", "GET"))
+                              .then((res) => {
+                                Swal.fire({
+                                  title: "ลบสำเร็จ",
+                                  icon: "success",
+                                });
+                                setId("");
+                                setCategory(res.data);
+                              })
+                              .catch((err) => {
+                                Swal.fire({
+                                  title: "เกิดข้อผิดพลาด",
+                                  icon: "error",
+                                });
+                                console.log(err);
+                              });
                           });
-                      });
+                      }
+                    });
                   }}
                 >
                   ลบ
@@ -490,35 +495,37 @@ const SettingAdmin = (prop: { jwt_token: string }) => {
                   if (!res.isConfirmed) {
                     return;
                   }
-                });
-                axios
-                  .delete(config.getApiEndpoint("certificate", "DELETE"), {
-                    headers: {
-                      Authorization: `Bearer ${prop.jwt_token}`,
-                    },
-                    data: {
-                      id: idStandard,
-                    },
-                  })
-                  .then((res) => {
+                  if (res.isConfirmed) {
                     axios
-                      .get(config.getApiEndpoint("standardproducts", "GET"))
-                      .then((res) => {
-                        Swal.fire({
-                          title: "ลบสำเร็จ",
-                          icon: "success",
-                        });
-                        setIdStandard("");
-                        setStandard(res.data);
+                      .delete(config.getApiEndpoint("certificate", "DELETE"), {
+                        headers: {
+                          Authorization: `Bearer ${prop.jwt_token}`,
+                        },
+                        data: {
+                          id: idStandard,
+                        },
                       })
-                      .catch((err) => {
-                        Swal.fire({
-                          title: "เกิดข้อผิดพลาด",
-                          icon: "error",
-                        });
-                        console.log(err);
+                      .then((res) => {
+                        axios
+                          .get(config.getApiEndpoint("standardproducts", "GET"))
+                          .then((res) => {
+                            Swal.fire({
+                              title: "ลบสำเร็จ",
+                              icon: "success",
+                            });
+                            setIdStandard("");
+                            setStandard(res.data);
+                          })
+                          .catch((err) => {
+                            Swal.fire({
+                              title: "เกิดข้อผิดพลาด",
+                              icon: "error",
+                            });
+                            console.log(err);
+                          });
                       });
-                  });
+                  }
+                });
               }}
             >
               ลบ

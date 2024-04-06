@@ -373,7 +373,11 @@ const AddProduct = (prop: { jwt_token: string }) => {
     width: 1,
   });
   if (isExist) {
-    return <Navigate to="/myproducts" />;
+    if ((jwtDecode(prop.jwt_token) as { role: string }).role === "farmers") {
+      return <Navigate to="/myproducts" />;
+    } else {
+      return <Navigate to={`/manageuser/farmers/${username}`} />;
+    }
   }
 
   return (

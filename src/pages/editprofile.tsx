@@ -31,6 +31,7 @@ import { EdituserSuccess, EdituserFail } from "../components/popup";
 import Swal from "sweetalert2";
 import SetDataCarriage from "../components/setDataCarriage";
 import Follow from "./member/follow";
+import { nonthaburi_amphure } from "../config/dataDropdown";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -117,6 +118,7 @@ const EditProfile = (prop: {
     amphure_name_th: "",
     tambon_name_th: "",
   });
+  const [checkAmphure, setCheckAmphure] = useState<boolean>(true);
   const [zipCode, setZipCode] = useState<number>();
   const [facebookLink, setFacebookLink] = useState<string>("");
   const [lineId, setLineId] = useState<string>("");
@@ -367,6 +369,15 @@ const EditProfile = (prop: {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (role == "tambons" || prop.admin?.role == "tambons") {
+      console.log(selected.amphure_name_th);
+      if (selected.amphure_name_th == undefined) {
+        setCheckAmphure(false);
+      } else {
+        setCheckAmphure(true);
+      }
+    }
+
     var data = {
       username: username,
       email: email,
@@ -393,6 +404,7 @@ const EditProfile = (prop: {
       payment?: string;
       shippingcost?: { weight: number; price: number }[];
     };
+    console.log(data);
     if (prop.admin) {
       data = { ...data, role: prop.admin.role };
     }
@@ -767,6 +779,12 @@ const EditProfile = (prop: {
                       label="เขต/อำเภอ"
                       fullWidth
                       value={selected.amphure_name_th}
+                      error={!checkAmphure}
+                      helperText={
+                        selected.amphure_name_th == "" && checkAmphure == false
+                          ? "กรุณาเลือกเขต/อำเภอ"
+                          : ""
+                      }
                       onChange={(event) => {
                         setTambons(
                           amphures.filter(
@@ -871,6 +889,37 @@ const EditProfile = (prop: {
                 />
               </Grid>
             )}
+            {role == "tambons" || prop.admin?.role == "tambons" ? (
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  select
+                  fullWidth
+                  label="อำเภอ"
+                  error={!checkAmphure}
+                  helperText={
+                    selected.amphure_name_th == undefined &&
+                    checkAmphure == false
+                      ? "กรุณาเลือกอำเภอ"
+                      : ""
+                  }
+                  value={selected.amphure_name_th}
+                  onChange={(event) => {
+                    setSelected({
+                      province_name_th: "นนทบุรี",
+                      amphure_name_th: event.target.value,
+                      tambon_name_th: "",
+                    });
+                  }}
+                >
+                  {nonthaburi_amphure.map((amphure) => (
+                    <MenuItem value={amphure.amphureName}>
+                      {amphure.amphureName}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            ) : null}
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -879,6 +928,7 @@ const EditProfile = (prop: {
                 color="primary"
                 sx={{ mt: 3, mb: 2 }}
                 style={{ color: "#fff" }}
+                disabled={!selected.amphure_name_th}
               >
                 ยืนยัน
               </Button>
