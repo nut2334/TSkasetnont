@@ -72,11 +72,11 @@ const EditProfile = (prop: {
   >;
 }) => {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
+  const apiUpdateInfoadmin = config.getApiEndpoint("updateinfoadmin", "GET");
   const apiRole = config.getApiEndpoint("role", "GET");
   const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
-  const apiUpdateInfoadmin = config.getApiEndpoint("updateinfoadmin", "GET");
 
   const [username, setUsername] = useState<string>("");
   const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
@@ -233,12 +233,25 @@ const EditProfile = (prop: {
       .catch((err) => {
         console.log(err);
       });
+    axios
+      .get(
+        "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+      )
+      .then((res) => {
+        res.data.find((data: { name_th: string; amphure: amphure[] }) => {
+          if (data.name_th == "นนทบุรี") {
+            console.log(data.amphure);
+            setAmphures(data.amphure);
+          }
+        });
+      });
   }, []);
   useEffect(() => {
     (async () => {
       let dataProvinces = await axios.get(
         "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
       );
+
       let provinces = dataProvinces.data as province[];
       if (!prop.admin) {
         axios
@@ -280,7 +293,6 @@ const EditProfile = (prop: {
                 JSON.parse(res.data.shippingcost.replace("'", ""))
               );
             }
-            setProvinces(provinces);
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
             setStoreName(res.data.farmerstorename);
@@ -317,21 +329,7 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
-            let amphures;
-            if (res.data.province) {
-              amphures = provinces.filter(
-                (province) => province.name_th == res.data.province
-              )[0].amphure;
-              setAmphures(amphures);
-            }
 
-            if (res.data.amphure && amphures) {
-              setTambons(
-                amphures.filter(
-                  (amphures) => amphures.name_th == res.data.amphure
-                )[0].tambon
-              );
-            }
             console.log(res.data);
 
             if (res.data.shippingcost) {
@@ -392,6 +390,7 @@ const EditProfile = (prop: {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (role == "tambons" || prop.admin?.role == "tambons") {
       console.log(selected.amphure_name_th);
       if (selected.amphure_name_th == undefined) {
@@ -400,36 +399,46 @@ const EditProfile = (prop: {
         setCheckAmphure(true);
       }
     }
+
     const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
     formData.append("phone", tel);
+    console.log(1);
     if (prop.admin) {
       formData.append("role", prop.admin.role);
     }
+
     if (
       jwtDecode<{
         role: string;
       }>(prop.jwt_token).role == "farmers" ||
       prop.admin?.role == "farmers"
     ) {
-      formData.append("address", address);
-      formData.append("farmerstorename", storeName);
-      formData.append("province", selected.province_name_th);
-      formData.append("amphure", selected.amphure_name_th);
-      formData.append("tambon", selected.tambon_name_th);
+      console.log(2);
       formData.append("lat", position?.lat.toString() as string);
       formData.append("lng", position?.lng.toString() as string);
+      formData.append("address", address);
+      formData.append("farmerstorename", storeName);
+
+      formData.append("province", "นนทบุรี");
+      console.log(3);
+      formData.append("amphure", selected.amphure_name_th);
+      formData.append("tambon", selected.tambon_name_th);
       formData.append("facebooklink", facebookLink);
       formData.append("lineid", lineId);
       if (zipCode) {
         formData.append("zipcode", zipCode.toString());
       }
+      console.log(4);
       formData.append("shippingcost", JSON.stringify(shippingcost));
+      console.log(qrCode);
       if (qrCode) {
         formData.append("image", qrCode);
+      } else {
+        console.log("no qrCode");
       }
     }
     if (role == "members" || prop.admin?.role == "members") {
@@ -438,11 +447,14 @@ const EditProfile = (prop: {
     if (role == "tambons" || prop.admin?.role == "tambons") {
       formData.append("amphure", selected.amphure_name_th);
     }
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+
     axios
       .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, formData, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
-          "Content-Type": "application/json",
         },
       })
       .then((res) => {
@@ -793,27 +805,31 @@ const EditProfile = (prop: {
                     onChange={(event) => setPayment(event.target.value)}
                   />
                 </Grid> */}
-                <Grid item xs={12}>
-                  <Button
-                    component="label"
-                    variant="contained"
-                    tabIndex={-1}
-                    startIcon={<CloudUploadIcon />}
-                  >
-                    QR Code การชำระเงิน
-                    <VisuallyHiddenInput
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files?.length > 0) {
-                          setQrCode(e.target.files[0]);
-                        } else {
-                          setQrCode(null);
-                        }
-                      }}
-                    />
-                  </Button>
-                </Grid>
+                {role == "farmers" && (
+                  <Grid item xs={12}>
+                    <Button
+                      component="label"
+                      variant="contained"
+                      tabIndex={-1}
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      QR Code การชำระเงิน
+                      <VisuallyHiddenInput
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files?.length > 0) {
+                            setQrCode(e.target.files[0]);
+                            console.log(e.target.files);
+                          } else {
+                            console.log("no file");
+                            setQrCode(null);
+                          }
+                        }}
+                      />
+                    </Button>
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <TextField
                     label="Facebook Link"
@@ -841,32 +857,11 @@ const EditProfile = (prop: {
 
                 <Grid item xs={12}>
                   <TextField
-                    select
                     label="จังหวัด"
                     fullWidth
-                    value={selected.province_name_th}
-                    onChange={(event) => {
-                      setAmphures(
-                        provinces.filter(
-                          (province) => province.name_th == event.target.value
-                        )[0].amphure
-                      );
-
-                      setSelected({
-                        province_name_th: event.target.value
-                          ? event.target.value
-                          : selected.province_name_th,
-                        amphure_name_th: "",
-                        tambon_name_th: "",
-                      });
-                    }}
-                  >
-                    {provinces.map((province: province) => (
-                      <MenuItem value={province.name_th}>
-                        {province.name_th}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                    disabled
+                    value="นนทบุรี"
+                  ></TextField>
                 </Grid>
                 {amphures.length > 0 && (
                   <Grid item xs={12}>
@@ -874,6 +869,7 @@ const EditProfile = (prop: {
                       select
                       label="เขต/อำเภอ"
                       fullWidth
+                      required
                       value={selected.amphure_name_th}
                       error={!checkAmphure}
                       helperText={

@@ -134,7 +134,7 @@ const Home = (prop: { jwt_token: string }) => {
   }, [selectedCategory, searchContent]);
 
   useEffect(() => {
-    setProductPage(data.slice((page - 1) * 2, page * 2));
+    setProductPage(data.slice((page - 1) * 10, page * 10));
   }, [page, data]);
 
   useEffect(() => {
@@ -309,13 +309,23 @@ const Home = (prop: { jwt_token: string }) => {
             </Typography>
           );
         })}
-        <Pagination
-          count={Math.ceil(data.length / 2)}
-          page={parseInt(value)}
-          onChange={(e, value) => {
-            setPage(value);
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px",
+            marginBottom: "10px",
           }}
-        />
+        >
+          <Pagination
+            count={Math.ceil(data.length / 10)}
+            page={page}
+            onChange={(e, value) => {
+              setPage(value);
+            }}
+          />
+        </Box>
       </Box>
       <MapContainer
         center={[13.849861759515747, 100.52318572998047]}

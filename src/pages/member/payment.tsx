@@ -86,7 +86,7 @@ const Payment = (prop: {
       "GET"
     );
     axios
-      .post(apiPayment)
+      .get(apiPayment)
       .then((res) => {
         console.log(res.data);
         setPayment(res.data.payment);
