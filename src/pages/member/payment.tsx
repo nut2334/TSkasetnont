@@ -43,6 +43,7 @@ const Payment = (prop: {
 }) => {
   const [address, setAddress] = React.useState<string>("");
   const [payment, setPayment] = React.useState<string>("");
+  const [qrcode, setQrcode] = React.useState<string>("");
   const [products, setProducts] = React.useState<productInterface[]>([]);
   const [checkAddress, setCheckAdress] = React.useState<boolean>(true);
   const [slip, setSlip] = React.useState<File | null>(null);
@@ -89,6 +90,7 @@ const Payment = (prop: {
       .then((res) => {
         console.log(res.data);
         setPayment(res.data.payment);
+        setQrcode(res.data.qrcode);
       })
       .catch((err) => {
         console.log(err);
@@ -160,9 +162,7 @@ const Payment = (prop: {
 
             Swal.fire({
               title: "เกิดข้อผิดพลาด",
-              text:
-                err.response.data.error ||
-                `เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งภายหลัง`,
+              text: err.response.data.error,
               icon: "error",
             });
           });
@@ -249,8 +249,19 @@ const Payment = (prop: {
             }}
           >
             <Typography variant="h6">ช่องทางการชำระเงิน</Typography>
-            <Typography>{payment}</Typography>
-
+            {/* <Typography>{payment}</Typography> */}
+            {qrcode ? (
+              <img
+                src={`${config.getApiEndpoint(
+                  `getimage/${qrcode.split("/").pop()}`,
+                  "get"
+                )}`}
+                alt="qrcode"
+                width="100"
+              />
+            ) : (
+              <Typography>ไม่พบช่องทางการชำระเงิน</Typography>
+            )}
             <Button
               component="label"
               variant="contained"

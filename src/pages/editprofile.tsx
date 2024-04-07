@@ -429,7 +429,7 @@ const EditProfile = (prop: {
       }
       formData.append("shippingcost", JSON.stringify(shippingcost));
       if (qrCode) {
-        formData.append("qrCode", qrCode);
+        formData.append("image", qrCode);
       }
     }
     if (role == "members" || prop.admin?.role == "members") {

@@ -2,7 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { InputBase, IconButton, Container, Chip } from "@mui/material";
+import {
+  InputBase,
+  IconButton,
+  Container,
+  Chip,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Typography,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 import { Icon, LatLngLiteral, divIcon } from "leaflet";
@@ -12,11 +25,26 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useSearchParams } from "react-router-dom";
 import { RGBColor } from "react-color";
 import SwipeableEdgeDrawer from "../../components/SwipeableEdgeDrawer";
+import { useMap } from "react-leaflet";
+import { Pagination } from "@mui/material";
 
 interface CateagoryInterface {
   category_id: string;
   category_name: string;
   bgcolor?: string;
+}
+
+interface ProductInterface {
+  product_id: string;
+  product_name: string;
+  product_description: string;
+  price: string;
+  product_image: string;
+  category_id: string;
+  lat: string;
+  lng: string;
+  farmerstorename: string;
+  unit: string;
 }
 
 const Home = (prop: { jwt_token: string }) => {
@@ -76,6 +104,12 @@ const Home = (prop: { jwt_token: string }) => {
     farmerstorename: "",
     unit: "",
   });
+  const [position, setPosition] = useState<LatLngLiteral>({
+    lat: 13.849861759515747,
+    lng: 100.52318572998047,
+  });
+  const [productPage, setProductPage] = useState<ProductInterface[]>([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     axios
@@ -98,6 +132,10 @@ const Home = (prop: { jwt_token: string }) => {
         console.log(err);
       });
   }, [selectedCategory, searchContent]);
+
+  useEffect(() => {
+    setProductPage(data.slice((parseInt(page) - 1) * 2, parseInt(page) * 2));
+  }, [page, data]);
 
   useEffect(() => {
     axios
@@ -148,6 +186,86 @@ const Home = (prop: { jwt_token: string }) => {
     }
   };
 
+  const CreateMarker = (props: {
+    item: {
+      product_id: string;
+      product_name: string;
+      product_description: string;
+      price: string;
+      product_image: string;
+      category_id: string;
+      lat: string;
+      lng: string;
+      farmerstorename: string;
+      unit: string;
+    };
+  }) => {
+    const map = useMap();
+    useEffect(() => {
+      map.flyTo([position.lat, position.lng], 17);
+    }, [position]);
+    const { item } = props;
+    const iconMarker = divIcon({
+      className: "my-custom-pin",
+      iconAnchor: [0, 24],
+      popupAnchor: [0, -36],
+      html: `<div class="marker"
+        style="
+          background-color: ${myCustomColour(item.category_id)}
+        "
+      ></div>
+        <style>
+          
+          .marker {
+            transform: perspective(40px) rotateX(20deg) rotateZ(-45deg);
+            transform-origin: 50% 50%;
+            border-radius: 50% 50% 50% 0;
+            padding: 0 3px 3px 0;
+            width: 40px;
+            height: 40px;
+            
+            position: relative;
+            left: 50%;
+            top: 50%;
+            margin: -2.2em 0 0 -1.3em;
+            -webkit-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+            -moz-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+            box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
+          }
+
+          .marker:after {
+            content: '';
+            width: 1.55em;
+            height: 1.55em;
+            margin: 1em 0 0 .7em;
+            background: #ffffff;
+            position: absolute;
+            border-radius: 50%;
+              -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            -moz-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+            -webkit-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+            box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
+          }
+        </style>
+      `,
+    });
+
+    return item.lat ? (
+      <Marker
+        position={[parseFloat(item.lat), parseFloat(item.lng)]}
+        icon={iconMarker}
+        eventHandlers={{
+          click: () => {
+            setOpen(true);
+            setSelectedProduct(item);
+          },
+        }}
+      ></Marker>
+    ) : null;
+  };
+
   return (
     <div>
       <SwipeableEdgeDrawer
@@ -155,8 +273,50 @@ const Home = (prop: { jwt_token: string }) => {
         setOpen={setOpen}
         selectedProduct={selectedProduct}
       />
+      <Box
+        sx={{
+          height: "100%",
+          width: "250px",
+          position: "absolute",
+          zIndex: 2,
+          backgroundColor: "#ffffff",
+          padding: "10px",
+          boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px",
+        }}
+      >
+        {data.map((item, index) => {
+          return (
+            <Typography
+              key={index}
+              sx={{
+                cursor: "pointer",
+                "&:hover": {
+                  color: "green",
+                },
+              }}
+              onClick={() => {
+                setOpen(true);
+                setSelectedProduct(item);
+                if (item.lat && item.lng) {
+                  setPosition({
+                    lat: parseFloat(item.lat),
+                    lng: parseFloat(item.lng),
+                  });
+                }
+              }}
+            >
+              {item.product_name}
+            </Typography>
+          );
+        })}
+        <Pagination
+          count={Math.ceil(data.length / 2)}
+          page={parseInt(value)}
+          onChange={handleChange}
+        />
+      </Box>
       <MapContainer
-        center={[13.736717, 100.523186]}
+        center={[13.849861759515747, 100.52318572998047]}
         zoom={13}
         scrollWheelZoom={true}
         style={{
@@ -169,113 +329,7 @@ const Home = (prop: { jwt_token: string }) => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {data.map((item, index) => {
-          // const markerHtmlStyles = `
-          //   background-color: ${myCustomColour(item.category_id)};
-          //   width: 3rem;
-          //   height: 3rem;
-          //   display: block;
-          //   left: -1.5rem;
-          //   top: -1.5rem;
-          //   position: relative;
-          //   border-radius: 3rem 3rem 0;
-          //   transform: rotate(45deg);
-          //   border: 1px solid #FFFFFF`;
-          const markerHtmlStyles = `
-          transform: perspective(40px) rotateX(20deg) rotateZ(-45deg);
-          transform-origin: 50% 50%;
-          border-radius: 50% 50% 50% 0;
-          padding: 0 3px 3px 0;
-          width: 40px;
-          height: 40px;
-          background: ${myCustomColour(item.category_id)};
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          margin: -2.2em 0 0 -1.3em;
-          -webkit-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-          -moz-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-          box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-
-          :after {
-            content: '';
-            width: 1em;
-            height: 1em;
-            margin: 1em 0 0 .7em;
-            background: #ffffff;
-            position: absolute;
-            border-radius: 50%;
-              -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-            -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-            box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-            -moz-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-            -webkit-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-            box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-          }
-          
-          `;
-
-          const iconMarker = divIcon({
-            className: "my-custom-pin",
-            iconAnchor: [0, 24],
-            popupAnchor: [0, -36],
-            html: `<div class="marker"
-              style="
-                background-color: ${myCustomColour(item.category_id)}
-              "
-            ></div>
-              <style>
-                
-                .marker {
-                  transform: perspective(40px) rotateX(20deg) rotateZ(-45deg);
-                  transform-origin: 50% 50%;
-                  border-radius: 50% 50% 50% 0;
-                  padding: 0 3px 3px 0;
-                  width: 40px;
-                  height: 40px;
-                  
-                  position: relative;
-                  left: 50%;
-                  top: 50%;
-                  margin: -2.2em 0 0 -1.3em;
-                  -webkit-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-                  -moz-box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-                  box-shadow: -1px 1px 4px rgba(0, 0, 0, .5);
-                }
-
-                .marker:after {
-                  content: '';
-                  width: 1.55em;
-                  height: 1.55em;
-                  margin: 1em 0 0 .7em;
-                  background: #ffffff;
-                  position: absolute;
-                  border-radius: 50%;
-                    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-                  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-                  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-                  -moz-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-                  -webkit-box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-                  box-shadow: inset -2px 2px 4px hsla(0, 0, 0, .5);
-                }
-              </style>
-            `,
-          });
-
-          return (
-            item.lat && (
-              <Marker
-                key={index}
-                position={[parseFloat(item.lat), parseFloat(item.lng)]}
-                icon={iconMarker}
-                eventHandlers={{
-                  click: () => {
-                    setOpen(true);
-                    setSelectedProduct(item);
-                  },
-                }}
-              ></Marker>
-            )
-          );
+          return <CreateMarker key={index} item={item} />;
         })}
       </MapContainer>
       <Container
