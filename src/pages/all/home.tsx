@@ -133,9 +133,7 @@ const Home = (prop: { jwt_token: string }) => {
       });
   }, [selectedCategory, searchContent]);
 
-  useEffect(() => {
-    setProductPage(data.slice((parseInt(page) - 1) * 2, parseInt(page) * 2));
-  }, [page, data]);
+  useEffect(() => {}, [page, data]);
 
   useEffect(() => {
     axios
