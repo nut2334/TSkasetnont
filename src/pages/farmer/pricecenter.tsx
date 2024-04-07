@@ -83,8 +83,15 @@ const Pricecenter = () => {
       )
       .then((res) => {
         console.log(res.data);
+        if (res.data.error) {
+          setGraph([]);
+          return;
+        }
         setUnit(res.data.unit);
         setGraph(res.data.price_list);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -130,7 +137,7 @@ const Pricecenter = () => {
         </Grid>
       )}
       {selectedProduct !== "" && (
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <TextField
             select
             label="ประเภทการขาย"
@@ -158,7 +165,7 @@ const Pricecenter = () => {
       )}
       {product_id !== "" && (
         <>
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <Button
               onClick={send}
               startIcon={<SearchOutlined />}
@@ -170,7 +177,7 @@ const Pricecenter = () => {
           </Grid>
         </>
       )}
-      {graph.length > 0 && (
+      {graph.length > 0 ? (
         <Line
           options={{
             responsive: true,
@@ -225,7 +232,17 @@ const Pricecenter = () => {
             ],
           }}
         />
-      )}
+      ) : selectedSellType !== "" && !(graph.length > 0) ? (
+        <Grid item xs={12} textAlign="center">
+          <Typography
+            sx={{
+              color: "gray",
+            }}
+          >
+            ยังไม่มีข้อมูลราคาสินค้าในช่วงเวลานี้
+          </Typography>
+        </Grid>
+      ) : null}
     </>
   );
 };

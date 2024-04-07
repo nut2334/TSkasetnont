@@ -97,14 +97,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [selectedStatus, setSelectedStatus] = useState<string>();
   const [certificateNumber, setCertificateNumber] = useState<string>("");
   const [checkStatus, setCheckStatus] = useState<boolean>(true);
-
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
     productid: string;
     username: string;
     shopname: string;
   }>();
-
   const apiCertificate = config.getApiEndpoint(
     `certifarmer/${username}`,
     "GET"
@@ -167,22 +165,31 @@ const AddProduct = (prop: { jwt_token: string }) => {
       .then((res) => {
         console.log(res.data.data);
         setStandard(res.data.data);
+        if (
+          (jwtDecode(prop.jwt_token) as { role: string }).role !== "farmers"
+        ) {
+          setSelectedType("ประชาสัมพันธ์");
+        }
       });
+    // axios.get(apiAllStandard).then((res) => {
+    //   console.log(res.data);
+    //   setAllStandard(
+    //     res.data.filter(
+    //       (data: { standard_id: string; standard_name: string }) => {
+    //         console.log(data.standard_id);
+    //         if (data.standard_name !== "ไม่มี") {
+    //           return {
+    //             standard_id: data.standard_id,
+    //             standard_name: data.standard_name,
+    //           };
+    //         }
+    //       }
+    //     )
+    //   );
+    // });
     axios.get(apiAllStandard).then((res) => {
       console.log(res.data);
-      setAllStandard(
-        res.data.filter(
-          (data: { standard_id: string; standard_name: string }) => {
-            console.log(data.standard_id);
-            if (data.standard_name !== "ไม่มี") {
-              return {
-                standard_id: data.standard_id,
-                standard_name: data.standard_name,
-              };
-            }
-          }
-        )
-      );
+      setAllStandard(res.data);
     });
   }, []);
 
@@ -411,13 +418,15 @@ const AddProduct = (prop: { jwt_token: string }) => {
         <form>
           <Grid container spacing={2} sx={{ marginBottom: 1 }}>
             <Grid xs={12}>
-              <Typography variant="h5">ราคากลาง</Typography>
+              <Divider textAlign="left">
+                <Typography>ตรวจสอบราคากลาง</Typography>
+              </Divider>
             </Grid>
 
             <Pricecenter />
             <Grid item xs={12}>
-              <Divider>
-                <Typography variant="h5">จัดการสินค้า</Typography>
+              <Divider textAlign="left">
+                <Typography>จัดการสินค้า</Typography>
               </Divider>
             </Grid>
             <Grid item xs={6}>
@@ -623,97 +632,150 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Stack>
               </Container>
             </Grid>
-            <Grid item xs={12}>
-              <List
-                subheader={
-                  <ListSubheader component="div" id="nested-list-subheader">
-                    มาตรฐานสินค้า
-                  </ListSubheader>
-                }
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "background.paper",
-                }}
-              >
-                {standard.map((data, index) => (
-                  <ListItem key={data.id} disablePadding>
-                    <ListItemButton dense>
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          tabIndex={-1}
-                          disableRipple
-                          defaultChecked={selectedStandard.includes(data.id)}
-                          inputProps={{ "aria-labelledby": data.id }}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedStandard([
-                                ...selectedStandard,
-                                data.id,
-                              ]);
-                            } else {
-                              setSelectedStandard(
-                                selectedStandard.filter(
-                                  (standard) => standard !== data.id
-                                )
-                              );
-                            }
+            {((jwtDecode(prop.jwt_token) as { role: string }).role ===
+              "tambons" ||
+              (jwtDecode(prop.jwt_token) as { role: string }).role ===
+                "admins") && (
+              <Grid item xs={12}>
+                <List
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      มาตรฐานสินค้า
+                    </ListSubheader>
+                  }
+                  sx={{
+                    width: "100%",
+                    maxWidth: 360,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  {/* {standard.map((data, index) => (
+                    <ListItem key={data.id} disablePadding>
+                      <ListItemButton dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            tabIndex={-1}
+                            disableRipple
+                            defaultChecked={selectedStandard.includes(data.id)}
+                            inputProps={{ "aria-labelledby": data.id }}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedStandard([
+                                  ...selectedStandard,
+                                  data.id,
+                                ]);
+                              } else {
+                                setSelectedStandard(
+                                  selectedStandard.filter(
+                                    (standard) => standard !== data.id
+                                  )
+                                );
+                              }
+                            }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          id={data.standard_id}
+                          primary={
+                            allStandard.find(
+                              (standard) =>
+                                standard.standard_id === data.standard_id
+                            )?.standard_name
+                          }
+                          secondary={`${
+                            data.certificate_number
+                              ? "หมายเลขมาตรฐาน : " + data.certificate_number
+                              : ""
+                          } ${
+                            data.status === "pending"
+                              ? "รออนุมัติ"
+                              : "อนุมัติแล้ว"
+                          }`}
+                          sx={{
+                            color: `${
+                              data.status === "pending" ? "red" : "green"
+                            }`,
                           }}
                         />
-                      </ListItemIcon>
-                      <ListItemText
-                        id={data.standard_id}
-                        primary={
-                          allStandard.find(
-                            (standard) =>
-                              standard.standard_id === data.standard_id
-                          )?.standard_name
-                        }
-                        secondary={`${
-                          data.certificate_number
-                            ? "หมายเลขมาตรฐาน : " + data.certificate_number
-                            : ""
-                        } ${
-                          data.status === "pending"
-                            ? "รออนุมัติ"
-                            : "อนุมัติแล้ว"
-                        }`}
-                        sx={{
-                          color: `${
-                            data.status === "pending" ? "red" : "green"
-                          }`,
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                startIcon={<AddIcon />}
-                variant="contained"
-                onClick={() => {
-                  setAdd(true);
-                }}
-                sx={{
-                  marginRight: "10px",
-                }}
-              >
-                เพิ่มมาตรฐาน
-              </Button>
+                      </ListItemButton>
+                    </ListItem>
+                  ))} */}
+                  {allStandard.map((data, index) => {
+                    if (
+                      data.standard_name !== "ไม่มี" &&
+                      data.standard_name !== "อื่นๆ"
+                    ) {
+                      return (
+                        <ListItem key={data.standard_id} disablePadding>
+                          <ListItemButton dense>
+                            <ListItemIcon>
+                              <Checkbox
+                                edge="start"
+                                tabIndex={-1}
+                                disableRipple
+                                defaultChecked={selectedStandard.includes(
+                                  data.standard_id
+                                )}
+                                inputProps={{
+                                  "aria-labelledby": data.standard_id,
+                                }}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedStandard([
+                                      ...selectedStandard,
+                                      data.standard_id,
+                                    ]);
+                                  } else {
+                                    setSelectedStandard(
+                                      selectedStandard.filter(
+                                        (standard) =>
+                                          standard !== data.standard_id
+                                      )
+                                    );
+                                  }
+                                }}
+                              />
+                            </ListItemIcon>
+                            <ListItemText
+                              id={data.standard_id}
+                              primary={data.standard_name}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    }
+                  })}
+                </List>
+              </Grid>
+            )}
+            {(jwtDecode(prop.jwt_token) as { role: string }).role ===
+              "farmers" && (
+              <Grid item xs={12}>
+                <Button
+                  startIcon={<AddIcon />}
+                  variant="contained"
+                  onClick={() => {
+                    setAdd(true);
+                  }}
+                  sx={{
+                    marginRight: "10px",
+                  }}
+                >
+                  เพิ่มมาตรฐาน
+                </Button>
 
-              <Button
-                color="error"
-                variant="contained"
-                onClick={() => {
-                  setAdd(false);
-                }}
-              >
-                -
-              </Button>
-            </Grid>
+                <Button
+                  color="error"
+                  variant="contained"
+                  onClick={() => {
+                    setAdd(false);
+                  }}
+                >
+                  -
+                </Button>
+              </Grid>
+            )}
             {add && (
               <>
                 <Grid item xs={6}>
@@ -917,27 +979,42 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                value={selectedType}
-                select
-                fullWidth
-                label="รูปแบบการขาย"
-                required
-                error={!checkType}
-                helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
-              >
-                {web_activity.map((activity) => (
-                  <MenuItem
-                    key={activity.activityID}
-                    value={activity.activityName}
-                    onClick={() => setSelectedType(activity.activityName)}
-                  >
-                    {activity.activityName}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
+            {(jwtDecode(prop.jwt_token) as { role: string }).role ===
+            "farmers" ? (
+              <Grid item xs={12} md={6}>
+                <TextField
+                  value={selectedType}
+                  select
+                  fullWidth
+                  disabled={productid ? true : false}
+                  label="รูปแบบการขาย"
+                  required
+                  error={!checkType}
+                  helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
+                >
+                  {web_activity.map((activity) => (
+                    <MenuItem
+                      key={activity.activityID}
+                      value={activity.activityName}
+                      onClick={() => setSelectedType(activity.activityName)}
+                    >
+                      {activity.activityName}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            ) : (
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="รูปแบบการขาย"
+                  value="ประชาสัมพันธ์"
+                  fullWidth
+                  disabled
+                  required
+                />
+              </Grid>
+            )}
+
             {selectedType == "ประชาสัมพันธ์" && (
               <React.Fragment>
                 <Grid item xs={6} md={3}>
@@ -948,6 +1025,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     variant="outlined"
                     fullWidth
                     type="number"
+                    required
                     onChange={(e) => setPrice(parseInt(e.target.value))}
                     inputProps={{ min: 1 }}
                   />

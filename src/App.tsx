@@ -316,6 +316,10 @@ function App() {
                 path="/manageuser/:role/:username"
                 element={<Myproducts jwt_token={jwt_token} />}
               />
+              <Route
+                path="/certification"
+                element={<Certification jwt_token={jwt_token} />}
+              />
             </>
           )}
         </Routes>

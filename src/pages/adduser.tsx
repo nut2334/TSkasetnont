@@ -89,6 +89,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   const [selectedAmphure, setSelectedAmphure] = useState<string>("");
   const [checkAmphure, setCheckAmphure] = useState<boolean>(true);
   const [exist, setExist] = useState<boolean>(false);
+  const [addProduct, setAddProduct] = useState<boolean>(false);
   const [position, setPosition] = useState<LatLngLiteral>();
   const [current, setCurrent] = useState<boolean>(false);
   const [amphures, setAmphures] = useState<amphure[]>([]);
@@ -201,9 +202,7 @@ const AddUser = (prop: { jwt_token: string }) => {
     const userData = {
       email: event.target.value,
     };
-    const emailRegExp = new RegExp(
-      "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$"
-    );
+    const emailRegExp = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
     if (emailRegExp.test(userData.email)) {
       setEmailReg(true);
       sendToBackend(userData);
@@ -255,6 +254,20 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    axios
+      .post(apiCheckinguser, {
+        username: username,
+      })
+      .then((res) => {
+        if (res.data.exist == true) {
+          setUsernameCheck(false);
+        } else {
+          setUsernameCheck(true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     if (!username) {
       setUsernameCheck(false);
     } else {
@@ -272,9 +285,11 @@ const AddUser = (prop: { jwt_token: string }) => {
         (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons")
     ) {
       setCheckAmphure(false);
-      return;
     } else {
       setCheckAmphure(true);
+    }
+    if (emailReg == false || usernameReg == false || telValidate == false) {
+      return;
     }
 
     const data = {
@@ -286,14 +301,16 @@ const AddUser = (prop: { jwt_token: string }) => {
       tel: tel,
       certificateList: selectedStandard,
       role: role,
-      province: "นนทบุรี",
+      province: selected.province_name_th,
       amphure: selected.amphure_name_th,
       tambon: selected.tambon_name_th,
       address: address,
       lat: position?.lat,
       lng: position?.lng,
     };
-
+    if (role == "farmers" || role == "tambons") {
+      data["province"] = "นนทบุรี";
+    }
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
 
     axios
@@ -314,7 +331,7 @@ const AddUser = (prop: { jwt_token: string }) => {
           if (result.isConfirmed) {
             setExist(true);
           } else {
-            setExist(true);
+            setAddProduct(true);
           }
         });
       })
@@ -378,6 +395,9 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   if (exist) {
     return <Navigate to={`/manageuser/${role}`} />;
+  }
+  if (addProduct) {
+    return <Navigate to={`/manageuser/farmers/${username}`} />;
   }
 
   return (
@@ -624,11 +644,15 @@ const AddUser = (prop: { jwt_token: string }) => {
                   select
                   required
                   value={selectedAmphure}
-                  error={!checkAmphure}
+                  error={!checkAmphure && selectedAmphure == ""}
                   helperText={checkAmphure == false ? "กรุณาเลือกอำเภอ" : ""}
                   onChange={(event) => {
                     // console.log(event.target.value);
                     setSelectedAmphure(event.target.value);
+                    setSelected({
+                      ...selected,
+                      amphure_name_th: event.target.value,
+                    });
                   }}
                 >
                   {/* เฉพาะจังหวัดนนทบุรี */}

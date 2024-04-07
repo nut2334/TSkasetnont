@@ -135,6 +135,7 @@ const Navbar = (prop: {
           name: "จัดการเกษตกร",
           path: `/manageuser/farmers`,
         },
+        { name: "จัดการมาตรฐาน", path: "/certification" },
       ]);
     } else if (prop.role == "members") {
       setVisiblePages([

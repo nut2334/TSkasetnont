@@ -361,7 +361,7 @@ const Myproducts = (prop: {
           </Button>
           <NavLink to={`/addproduct/${username ? username : prop.username}`}>
             <Button variant="contained" color="primary" startIcon={<AddIcon />}>
-              เพิ่มสินค้า
+              ไปหน้าเพิ่มสินค้า
             </Button>
           </NavLink>
         </Grid>

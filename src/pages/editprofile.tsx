@@ -32,6 +32,8 @@ import Swal from "sweetalert2";
 import SetDataCarriage from "../components/setDataCarriage";
 import Follow from "./member/follow";
 import { nonthaburi_amphure } from "../config/dataDropdown";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { styled } from "@mui/system";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -99,7 +101,6 @@ const EditProfile = (prop: {
   const [showComfirmPassword, setShowComfirmPassword] =
     React.useState<boolean>(false);
   const [showPasswordNew, setShowPasswordNew] = useState<boolean>(false);
-
   const [allrole, setAllrole] = useState<
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
@@ -131,6 +132,20 @@ const EditProfile = (prop: {
       price: number;
     }[]
   >([{ weight: 0, price: 0 }]);
+  const [qrCode, setQrCode] = useState<File | null>(null);
+
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -160,6 +175,12 @@ const EditProfile = (prop: {
   };
 
   const onBlurUsername = (event: React.FocusEvent<HTMLInputElement>) => {
+    const usernameRegExp = /^[a-zA-Z0-9]{6,}$/;
+    if (usernameRegExp.test(event.target.value)) {
+      setUsernameReg(true);
+    } else {
+      setUsernameReg(false);
+    }
     axios
       .post(apiCheckinguser, {
         username: event.target.value,
@@ -177,6 +198,12 @@ const EditProfile = (prop: {
   };
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
+    const emailRegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (emailRegExp.test(event.target.value)) {
+      setEmailReg(true);
+    } else {
+      setEmailReg(false);
+    }
     axios
       .post(apiCheckingemail, {
         email: event.target.value,
@@ -222,13 +249,11 @@ const EditProfile = (prop: {
           })
           .then((res) => {
             console.log(res.data);
-
             setUsername(res.data.username);
             setEmail(res.data.email);
             setFirstName(res.data.firstname);
             setLastName(res.data.lastname);
             setTel(res.data.phone);
-            setPayment(res.data.payment);
             setSelected({
               province_name_th: res.data.province,
               amphure_name_th: res.data.amphure,
@@ -255,7 +280,6 @@ const EditProfile = (prop: {
                 JSON.parse(res.data.shippingcost.replace("'", ""))
               );
             }
-
             setProvinces(provinces);
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
@@ -288,7 +312,6 @@ const EditProfile = (prop: {
             setFirstName(res.data.firstname);
             setLastName(res.data.lastname);
             setTel(res.data.phone);
-            setPayment(res.data.payment);
             setSelected({
               province_name_th: res.data.province,
               amphure_name_th: res.data.amphure,
@@ -377,75 +400,46 @@ const EditProfile = (prop: {
         setCheckAmphure(true);
       }
     }
-
-    var data = {
-      username: username,
-      email: email,
-      firstname: firstName,
-      lastname: lastName,
-      phone: tel,
-    } as {
-      username: string;
-      email?: string;
-      firstname?: string;
-      lastname?: string;
-      phone?: string;
-      farmerstorename?: string;
-      province?: string;
-      amphure?: string;
-      tambon?: string;
-      role?: string;
-      lat?: number;
-      lng?: number;
-      facebooklink?: string;
-      lineid?: string;
-      address?: string;
-      zipcode?: number;
-      payment?: string;
-      shippingcost?: { weight: number; price: number }[];
-    };
-    console.log(data);
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("firstname", firstName);
+    formData.append("lastname", lastName);
+    formData.append("phone", tel);
     if (prop.admin) {
-      data = { ...data, role: prop.admin.role };
+      formData.append("role", prop.admin.role);
     }
-
     if (
       jwtDecode<{
         role: string;
       }>(prop.jwt_token).role == "farmers" ||
       prop.admin?.role == "farmers"
     ) {
-      console.log(position);
-
-      data = {
-        ...data,
-        address: address,
-        farmerstorename: storeName,
-        province: selected.province_name_th,
-        amphure: selected.amphure_name_th,
-        tambon: selected.tambon_name_th,
-        lat: position?.lat,
-        lng: position?.lng,
-        facebooklink: facebookLink,
-        lineid: lineId,
-        zipcode: zipCode,
-        payment: payment,
-        shippingcost: shippingcost,
-      };
+      formData.append("address", address);
+      formData.append("farmerstorename", storeName);
+      formData.append("province", selected.province_name_th);
+      formData.append("amphure", selected.amphure_name_th);
+      formData.append("tambon", selected.tambon_name_th);
+      formData.append("lat", position?.lat.toString() as string);
+      formData.append("lng", position?.lng.toString() as string);
+      formData.append("facebooklink", facebookLink);
+      formData.append("lineid", lineId);
+      if (zipCode) {
+        formData.append("zipcode", zipCode.toString());
+      }
+      formData.append("shippingcost", JSON.stringify(shippingcost));
+      if (qrCode) {
+        formData.append("qrCode", qrCode);
+      }
     }
-
-    if (role === "members" || prop.admin?.role === "members") {
-      data = { ...data, address: address };
+    if (role == "members" || prop.admin?.role == "members") {
+      formData.append("address", address);
     }
-    if (role === "tambons" || prop.admin?.role === "tambons") {
-      data = {
-        ...data,
-        amphure: selected.amphure_name_th,
-      };
+    if (role == "tambons" || prop.admin?.role == "tambons") {
+      formData.append("amphure", selected.amphure_name_th);
     }
-
     axios
-      .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
+      .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, formData, {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
           "Content-Type": "application/json",
@@ -459,6 +453,88 @@ const EditProfile = (prop: {
         console.log(err);
         EdituserFail();
       });
+
+    // var data = {
+    //   username: username,
+    //   email: email,
+    //   firstname: firstName,
+    //   lastname: lastName,
+    //   phone: tel,
+    // } as {
+    //   username: string;
+    //   email?: string;
+    //   firstname?: string;
+    //   lastname?: string;
+    //   phone?: string;
+    //   farmerstorename?: string;
+    //   province?: string;
+    //   amphure?: string;
+    //   tambon?: string;
+    //   role?: string;
+    //   lat?: number;
+    //   lng?: number;
+    //   facebooklink?: string;
+    //   lineid?: string;
+    //   address?: string;
+    //   zipcode?: number;
+    //   shippingcost?: { weight: number; price: number }[];
+    //   qrCode?: File;
+    // };
+    // console.log(data);
+    // if (prop.admin) {
+    //   data = { ...data, role: prop.admin.role };
+    // }
+
+    // if (
+    //   jwtDecode<{
+    //     role: string;
+    //   }>(prop.jwt_token).role == "farmers" ||
+    //   prop.admin?.role == "farmers"
+    // ) {
+    //   console.log(position);
+
+    //   data = {
+    //     ...data,
+    //     address: address,
+    //     farmerstorename: storeName,
+    //     province: selected.province_name_th,
+    //     amphure: selected.amphure_name_th,
+    //     tambon: selected.tambon_name_th,
+    //     lat: position?.lat,
+    //     lng: position?.lng,
+    //     facebooklink: facebookLink,
+    //     lineid: lineId,
+    //     zipcode: zipCode,
+    //     shippingcost: shippingcost,
+    //     qrCode: qrCode,
+    //   };
+    // }
+
+    // if (role === "members" || prop.admin?.role === "members") {
+    //   data = { ...data, address: address };
+    // }
+    // if (role === "tambons" || prop.admin?.role === "tambons") {
+    //   data = {
+    //     ...data,
+    //     amphure: selected.amphure_name_th,
+    //   };
+    // }
+
+    // axios
+    //   .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
+    //     headers: {
+    //       Authorization: `Bearer ${prop.jwt_token}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then((res) => {
+    //     console.log(res.data);
+    //     EdituserSuccess();
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     EdituserFail();
+    //   });
   };
   const changePassword = () => {
     console.log("passwordNew: ", passwordNew);
@@ -611,13 +687,7 @@ const EditProfile = (prop: {
                 name="email"
                 autoComplete="email"
                 error={!emailReg}
-                helperText={
-                  email == "" && emailCheck == false
-                    ? "กรุณากรอก Email"
-                    : "" || !emailReg
-                    ? "กรุณากรอก Email ให้ถูกต้อง"
-                    : ""
-                }
+                helperText={!emailReg ? "กรุณากรอก Email ให้ถูกต้อง" : ""}
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   onBlurEmail(event)
@@ -715,13 +785,34 @@ const EditProfile = (prop: {
                     onChange={(event) => setStoreName(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <TextField
                     label="ช่องทางการชำระเงิน"
                     fullWidth
                     value={payment}
                     onChange={(event) => setPayment(event.target.value)}
                   />
+                </Grid> */}
+                <Grid item xs={12}>
+                  <Button
+                    component="label"
+                    variant="contained"
+                    tabIndex={-1}
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    QR Code การชำระเงิน
+                    <VisuallyHiddenInput
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files?.length > 0) {
+                          setQrCode(e.target.files[0]);
+                        } else {
+                          setQrCode(null);
+                        }
+                      }}
+                    />
+                  </Button>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
