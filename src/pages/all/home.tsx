@@ -133,7 +133,9 @@ const Home = (prop: { jwt_token: string }) => {
       });
   }, [selectedCategory, searchContent]);
 
-  useEffect(() => {}, [page, data]);
+  useEffect(() => {
+    setProductPage(data.slice((page - 1) * 2, page * 2));
+  }, [page, data]);
 
   useEffect(() => {
     axios
@@ -282,7 +284,7 @@ const Home = (prop: { jwt_token: string }) => {
           boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px",
         }}
       >
-        {data.map((item, index) => {
+        {productPage.map((item, index) => {
           return (
             <Typography
               key={index}
@@ -310,7 +312,9 @@ const Home = (prop: { jwt_token: string }) => {
         <Pagination
           count={Math.ceil(data.length / 2)}
           page={parseInt(value)}
-          onChange={handleChange}
+          onChange={(e, value) => {
+            setPage(value);
+          }}
         />
       </Box>
       <MapContainer
