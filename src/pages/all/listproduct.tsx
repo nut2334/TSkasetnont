@@ -32,6 +32,7 @@ import Pagination from "@mui/material/Pagination";
 import { MessengerChat } from "react-messenger-chat-plugin";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { jwtDecode } from "jwt-decode";
 
 interface sortInterface {
   title: string;
@@ -72,7 +73,7 @@ interface ProductInterface {
   farmerstorename: string;
 }
 
-const ListProduct = () => {
+const ListProduct = (prop: { jwt_token: string }) => {
   const apiCategories = config.getApiEndpoint("categories", "GET");
   const apiProducts = config.getApiEndpoint("getproducts", "GET");
   const [search, setSearch] = React.useState("");
@@ -405,15 +406,17 @@ const ListProduct = () => {
                         />
                         <CardContent sx={{ flexGrow: 1, padding: "20px" }}>
                           <Stack direction="row" spacing={1}>
-                            <Stack>
-                              <Button
-                                sx={{
-                                  alignRight: "right",
-                                }}
-                              >
-                                <ShoppingCartIcon />
-                              </Button>
-                            </Stack>
+                            {product.selectedType !== "ประชาสัมพันธ์" && (
+                              <Stack>
+                                <Button
+                                  sx={{
+                                    alignRight: "right",
+                                  }}
+                                >
+                                  <ShoppingCartIcon />
+                                </Button>
+                              </Stack>
+                            )}
                             <Stack>
                               <Typography gutterBottom variant="h5">
                                 {product.product_name}
