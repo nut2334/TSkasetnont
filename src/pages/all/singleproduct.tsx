@@ -743,7 +743,8 @@ const SigleProduct = (prop: {
                       }}
                     >
                       จองสินค้า
-                      {(jwtDecode(prop.jwt_token) as { activate: boolean })
+                      {prop.jwt_token &&
+                      (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
                         : " (ต้องยืนยันตัวตนก่อน)"}
@@ -840,7 +841,8 @@ const SigleProduct = (prop: {
                       }}
                     >
                       หยิบใส่ตะกร้า
-                      {(jwtDecode(prop.jwt_token) as { activate: boolean })
+                      {prop.jwt_token &&
+                      (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
                         : " (ต้องยืนยันตัวตนก่อน)"}
@@ -920,7 +922,8 @@ const SigleProduct = (prop: {
                       }}
                     >
                       ซื้อสินค้า
-                      {(jwtDecode(prop.jwt_token) as { activate: boolean })
+                      {prop.jwt_token &&
+                      (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
                         : " (ต้องยืนยันตัวตนก่อน)"}
