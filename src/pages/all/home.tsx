@@ -302,8 +302,8 @@ const Home = (prop: {
         </Box>
       </Box>
       <MapContainer
-        center={[13.812688652414751, 100.51108360290529]}
-        zoom={1}
+        center={[13.810300182207499, 100.47597885131837]}
+        zoom={15}
         scrollWheelZoom={true}
         style={{
           width: "100%",
