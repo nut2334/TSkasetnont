@@ -459,36 +459,38 @@ const ManageUser = (prop: {
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    select
-                    label="อำเภอ"
-                    fullWidth
-                    onChange={(event) => {
-                      setAmphure(
-                        event.target.value as
-                          | "จังหวัดอื่นๆ"
-                          | "เมืองนนทบุรี"
-                          | "บางบัวทอง"
-                          | "บางกรวย"
-                          | "บางใหญ่"
-                          | "ปากเกร็ด"
-                          | "ไทรน้อย"
-                          | "ทั้งหมด"
-                          | ""
-                      );
-                    }}
-                  >
-                    <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
-                    <MenuItem value="เมืองนนทบุรี">เมืองนนทบุรี</MenuItem>
-                    <MenuItem value="บางบัวทอง">บางบัวทอง</MenuItem>
-                    <MenuItem value="บางกรวย">บางกรวย</MenuItem>
-                    <MenuItem value="บางใหญ่">บางใหญ่</MenuItem>
-                    <MenuItem value="ปากเกร็ด">ปากเกร็ด</MenuItem>
-                    <MenuItem value="ไทรน้อย">ไทรน้อย</MenuItem>
-                    <MenuItem value="จังหวัดอื่นๆ">จังหวัดอื่นๆ</MenuItem>
-                  </TextField>
-                </Grid>
+                {currentRole == "admins" && (
+                  <Grid item xs={6}>
+                    <TextField
+                      select
+                      label="อำเภอ"
+                      fullWidth
+                      onChange={(event) => {
+                        setAmphure(
+                          event.target.value as
+                            | "จังหวัดอื่นๆ"
+                            | "เมืองนนทบุรี"
+                            | "บางบัวทอง"
+                            | "บางกรวย"
+                            | "บางใหญ่"
+                            | "ปากเกร็ด"
+                            | "ไทรน้อย"
+                            | "ทั้งหมด"
+                            | ""
+                        );
+                      }}
+                    >
+                      <MenuItem value="ทั้งหมด">ทั้งหมด</MenuItem>
+                      <MenuItem value="เมืองนนทบุรี">เมืองนนทบุรี</MenuItem>
+                      <MenuItem value="บางบัวทอง">บางบัวทอง</MenuItem>
+                      <MenuItem value="บางกรวย">บางกรวย</MenuItem>
+                      <MenuItem value="บางใหญ่">บางใหญ่</MenuItem>
+                      <MenuItem value="ปากเกร็ด">ปากเกร็ด</MenuItem>
+                      <MenuItem value="ไทรน้อย">ไทรน้อย</MenuItem>
+                      <MenuItem value="จังหวัดอื่นๆ">จังหวัดอื่นๆ</MenuItem>
+                    </TextField>
+                  </Grid>
+                )}
                 <Grid item xs={6}>
                   <TextField
                     select
