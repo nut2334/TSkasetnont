@@ -334,7 +334,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
           title: "บันทึกข้อมูลสำเร็จ",
           showCancelButton: true,
           confirmButtonText: "เสร็จสิ้น",
-          cancelButtonText: "เพิ่มสินค้า",
+          cancelButtonText: "เพิ่มสินค้าต่อ",
         })
           .then((result) => {
             if (result.isConfirmed) {
@@ -749,7 +749,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </List>
               </Grid>
             )}
-            {(jwtDecode(prop.jwt_token) as { role: string }).role ===
+
+            {/* {(jwtDecode(prop.jwt_token) as { role: string }).role ===
               "farmers" && (
               <Grid item xs={12}>
                 <Button
@@ -775,7 +776,8 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   -
                 </Button>
               </Grid>
-            )}
+            )} */}
+
             {add && (
               <>
                 <Grid item xs={6}>
@@ -887,6 +889,66 @@ const AddProduct = (prop: { jwt_token: string }) => {
               </>
             )}
             <Grid item xs={12}>
+              <List
+                subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    มาตรฐานสินค้า
+                  </ListSubheader>
+                }
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {allStandard.map((data, index) => {
+                  if (
+                    data.standard_name !== "ไม่มี" &&
+                    data.standard_name !== "อื่นๆ"
+                  ) {
+                    return (
+                      <ListItem key={data.standard_id} disablePadding>
+                        <ListItemButton dense>
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              tabIndex={-1}
+                              disableRipple
+                              defaultChecked={selectedStandard.includes(
+                                data.standard_id
+                              )}
+                              inputProps={{
+                                "aria-labelledby": data.standard_id,
+                              }}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedStandard([
+                                    ...selectedStandard,
+                                    data.standard_id,
+                                  ]);
+                                } else {
+                                  setSelectedStandard(
+                                    selectedStandard.filter(
+                                      (standard) =>
+                                        standard !== data.standard_id
+                                    )
+                                  );
+                                }
+                              }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            id={data.standard_id}
+                            primary={data.standard_name}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  }
+                })}
+              </List>
+            </Grid>
+            <Grid item xs={12}>
               <Divider />
             </Grid>
             <Grid item xs={12}>
@@ -979,41 +1041,29 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
               </Grid>
             </Grid>
-            {(jwtDecode(prop.jwt_token) as { role: string }).role ===
-            "farmers" ? (
-              <Grid item xs={12} md={6}>
-                <TextField
-                  value={selectedType}
-                  select
-                  fullWidth
-                  disabled={productid ? true : false}
-                  label="รูปแบบการขาย"
-                  required
-                  error={!checkType}
-                  helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
-                >
-                  {web_activity.map((activity) => (
-                    <MenuItem
-                      key={activity.activityID}
-                      value={activity.activityName}
-                      onClick={() => setSelectedType(activity.activityName)}
-                    >
-                      {activity.activityName}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-            ) : (
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="รูปแบบการขาย"
-                  value="ประชาสัมพันธ์"
-                  fullWidth
-                  disabled
-                  required
-                />
-              </Grid>
-            )}
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                value={selectedType}
+                select
+                fullWidth
+                disabled={productid ? true : false}
+                label="รูปแบบการขาย"
+                required
+                error={!checkType}
+                helperText={!checkType && "กรุณาเลือกรูปแบบการขาย"}
+              >
+                {web_activity.map((activity) => (
+                  <MenuItem
+                    key={activity.activityID}
+                    value={activity.activityName}
+                    onClick={() => setSelectedType(activity.activityName)}
+                  >
+                    {activity.activityName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
 
             {selectedType == "ประชาสัมพันธ์" && (
               <React.Fragment>

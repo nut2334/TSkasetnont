@@ -171,7 +171,16 @@ function App() {
         />
 
         <Routes>
-          <Route path="/" element={<Home jwt_token={jwt_token} />} />
+          <Route
+            path="/"
+            element={
+              <Home
+                jwt_token={jwt_token}
+                cartList={cartList}
+                setCartList={setCartList}
+              />
+            }
+          />
           <Route
             path="/login"
             element={

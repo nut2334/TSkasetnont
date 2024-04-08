@@ -499,7 +499,7 @@ const SigleProduct = (prop: {
       <Typography variant="h6">รายละเอียดสินค้า</Typography>
       <Typography>{product.product_description}</Typography>
 
-      {product.certificate.length > 0 && (
+      {/* {product.certificate.length > 0 && (
         <Box
           sx={{
             paddingTop: "10px",
@@ -539,7 +539,7 @@ const SigleProduct = (prop: {
             </TableContainer>
           </Box>
         </Box>
-      )}
+      )} */}
 
       {product.selectedType !== "ประชาสัมพันธ์" && (
         <>

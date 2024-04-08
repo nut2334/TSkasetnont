@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import TabPanel from "@mui/lab/TabPanel";
 import SearchBar from "../../components/searchbar";
 import { styled, alpha } from "@mui/material/styles";
-import { Typography, TextField, MenuItem, Chip } from "@mui/material";
+import { Typography, TextField, MenuItem, Chip, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Container,
@@ -30,6 +30,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { RGBColor } from "react-color";
 import Pagination from "@mui/material/Pagination";
 import { MessengerChat } from "react-messenger-chat-plugin";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 interface sortInterface {
   title: string;
@@ -402,9 +404,22 @@ const ListProduct = () => {
                           }
                         />
                         <CardContent sx={{ flexGrow: 1, padding: "20px" }}>
-                          <Typography gutterBottom variant="h5">
-                            {product.product_name}
-                          </Typography>
+                          <Stack direction="row" spacing={1}>
+                            <Stack>
+                              <Button
+                                sx={{
+                                  alignRight: "right",
+                                }}
+                              >
+                                <ShoppingCartIcon />
+                              </Button>
+                            </Stack>
+                            <Stack>
+                              <Typography gutterBottom variant="h5">
+                                {product.product_name}
+                              </Typography>
+                            </Stack>
+                          </Stack>
                           <Chip
                             label={product.selectedType}
                             sx={{
