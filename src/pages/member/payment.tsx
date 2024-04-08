@@ -257,7 +257,7 @@ const Payment = (prop: {
                   "get"
                 )}`}
                 alt="qrcode"
-                width="100"
+                width="200px"
               />
             ) : (
               <Typography>ไม่พบช่องทางการชำระเงิน</Typography>
