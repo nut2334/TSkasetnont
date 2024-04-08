@@ -289,9 +289,6 @@ const AddUser = (prop: { jwt_token: string }) => {
     } else {
       setCheckAmphure(true);
     }
-    if (emailReg == false || usernameReg == false || telValidate == false) {
-      return;
-    }
 
     const data = {
       username: username,
