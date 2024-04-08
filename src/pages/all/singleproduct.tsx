@@ -764,9 +764,8 @@ const SigleProduct = (prop: {
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
                           : product.stock === 0 ||
-                            !(
-                              jwtDecode(prop.jwt_token) as { activate: boolean }
-                            ).activate
+                            (jwtDecode(prop.jwt_token) as { activate: boolean })
+                              .activate
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
@@ -854,9 +853,8 @@ const SigleProduct = (prop: {
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
                           : product.stock === 0 ||
-                            !(
-                              jwtDecode(prop.jwt_token) as { activate: boolean }
-                            ).activate
+                            (jwtDecode(prop.jwt_token) as { activate: boolean })
+                              .activate
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
