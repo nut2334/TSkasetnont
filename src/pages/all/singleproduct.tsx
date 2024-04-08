@@ -763,7 +763,8 @@ const SigleProduct = (prop: {
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
-                          : !(
+                          : product.stock === 0 ||
+                            !(
                               jwtDecode(prop.jwt_token) as { activate: boolean }
                             ).activate
                       }
