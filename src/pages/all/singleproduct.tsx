@@ -638,8 +638,9 @@ const SigleProduct = (prop: {
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
-                          : (jwtDecode(prop.jwt_token) as { activate: boolean })
-                              .activate
+                          : !(
+                              jwtDecode(prop.jwt_token) as { activate: boolean }
+                            ).activate
                       }
                       variant="contained"
                       color="secondary"
@@ -739,11 +740,11 @@ const SigleProduct = (prop: {
                         });
                       }}
                     >
-                      จองสินค้า{" "}
+                      จองสินค้า
                       {(jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
-                        : "(ต้องยืนยันตัวตนก่อน)"}
+                        : " (ต้องยืนยันตัวตนก่อน)"}
                     </Button>
                   </NavLink>
                 </Stack>
@@ -762,8 +763,9 @@ const SigleProduct = (prop: {
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
-                          : (jwtDecode(prop.jwt_token) as { activate: boolean })
-                              .activate
+                          : !(
+                              jwtDecode(prop.jwt_token) as { activate: boolean }
+                            ).activate
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
@@ -833,11 +835,11 @@ const SigleProduct = (prop: {
                         }
                       }}
                     >
-                      หยิบใส่ตะกร้า{" "}
+                      หยิบใส่ตะกร้า
                       {(jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
-                        : "(ต้องยืนยันตัวตนก่อน)"}
+                        : " (ต้องยืนยันตัวตนก่อน)"}
                     </Button>
                   </Stack>
 
@@ -850,7 +852,10 @@ const SigleProduct = (prop: {
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members"
-                          : product.stock === 0
+                          : product.stock === 0 ||
+                            !(
+                              jwtDecode(prop.jwt_token) as { activate: boolean }
+                            ).activate
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
