@@ -12,7 +12,7 @@ import { Container, Grid, Stack } from "@mui/material";
 import axios from "axios";
 import * as config from "../config/config";
 import StoreIcon from "@mui/icons-material/Store";
-import { NavLink } from "react-router-dom";
+import { NavLink, Navigate } from "react-router-dom";
 import ShareIcon from "@mui/icons-material/Share";
 import { RWebShare } from "react-web-share";
 import StarIcon from "@mui/icons-material/Star";
@@ -80,6 +80,7 @@ export default function SwipeableEdgeDrawer(
   }
 ) {
   const [average, setAverage] = React.useState<number>(0);
+  const [goCart, setGoCart] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (props.selectedProduct.product_id === "") return;
@@ -108,6 +109,10 @@ export default function SwipeableEdgeDrawer(
     props.setOpen(newOpen);
     console.log(props.selectedProduct);
   };
+
+  if (goCart) {
+    return <Navigate to="/listcart" />;
+  }
 
   return (
     <Root>
@@ -224,114 +229,112 @@ export default function SwipeableEdgeDrawer(
                         "สินค้าจัดส่งพัสดุ" && (
                         <Stack>
                           <Grid item xs={12}>
-                            <Link to="/listcart">
-                              <Button
-                                variant="contained"
-                                color="secondary"
-                                startIcon={<PointOfSaleIcon />}
-                                disabled={
-                                  props.jwt_token
-                                    ? (
-                                        jwtDecode(props.jwt_token) as {
-                                          role: string;
-                                        }
-                                      ).role !== "members"
-                                    : props.selectedProduct.stock === "0"
-                                }
-                                onClick={() => {
-                                  if (props.cartList.length === 0) {
-                                    props.setCartList([
-                                      {
-                                        product_id:
-                                          props.selectedProduct.product_id,
-                                        product_name:
-                                          props.selectedProduct.product_name,
-                                        price: parseFloat(
-                                          props.selectedProduct.price
-                                        ),
-                                        quantity: 1,
-                                        farmer_id:
-                                          props.selectedProduct.farmer_id,
-                                        weight: parseFloat(
-                                          props.selectedProduct.weight
-                                        ),
-                                        shippingcost:
-                                          props.selectedProduct.shippingcost,
-                                        stock: parseInt(
-                                          props.selectedProduct.stock
-                                        ),
-                                      },
-                                    ]);
-                                    return;
-                                  }
-
-                                  if (
-                                    props.cartList.find(
-                                      (cart) =>
-                                        cart.product_id ===
-                                        props.selectedProduct.product_id
-                                    )
-                                  ) {
-                                    props.setCartList((prev) =>
-                                      prev.map((cart) =>
-                                        cart.product_id ===
-                                        props.selectedProduct.product_id
-                                          ? {
-                                              ...cart,
-                                              quantity: cart.quantity + 1,
-                                            }
-                                          : cart
-                                      )
-                                    );
-                                    return;
-                                  }
-                                  if (
-                                    props.selectedProduct.farmer_id !==
-                                    props.cartList[0].farmer_id
-                                  ) {
-                                    Swal.fire({
-                                      icon: "question",
-                                      title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
-                                      text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
-                                      showCancelButton: true,
-                                      confirmButtonText: "ใช่",
-                                      cancelButtonText: "ไม่",
-                                      focusConfirm: false,
-                                    }).then((result) => {
-                                      if (result.isConfirmed) {
-                                        props.setCartList([
-                                          {
-                                            product_id:
-                                              props.selectedProduct.product_id,
-                                            product_name:
-                                              props.selectedProduct
-                                                .product_name,
-                                            price: parseFloat(
-                                              props.selectedProduct.price
-                                            ),
-                                            quantity: 1,
-                                            farmer_id:
-                                              props.selectedProduct.farmer_id,
-                                            weight: parseFloat(
-                                              props.selectedProduct.weight
-                                            ),
-                                            shippingcost:
-                                              props.selectedProduct
-                                                .shippingcost,
-                                            stock: parseInt(
-                                              props.selectedProduct.stock
-                                            ),
-                                          },
-                                        ]);
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              startIcon={<PointOfSaleIcon />}
+                              disabled={
+                                props.jwt_token
+                                  ? (
+                                      jwtDecode(props.jwt_token) as {
+                                        role: string;
                                       }
-                                    });
-                                    return;
-                                  }
-                                }}
-                              >
-                                ซื้อสินค้า
-                              </Button>
-                            </Link>
+                                    ).role !== "members"
+                                  : props.selectedProduct.stock === "0"
+                              }
+                              onClick={() => {
+                                if (props.cartList.length === 0) {
+                                  props.setCartList([
+                                    {
+                                      product_id:
+                                        props.selectedProduct.product_id,
+                                      product_name:
+                                        props.selectedProduct.product_name,
+                                      price: parseFloat(
+                                        props.selectedProduct.price
+                                      ),
+                                      quantity: 1,
+                                      farmer_id:
+                                        props.selectedProduct.farmer_id,
+                                      weight: parseFloat(
+                                        props.selectedProduct.weight
+                                      ),
+                                      shippingcost:
+                                        props.selectedProduct.shippingcost,
+                                      stock: parseInt(
+                                        props.selectedProduct.stock
+                                      ),
+                                    },
+                                  ]);
+                                  setGoCart(true);
+                                  return;
+                                }
+
+                                if (
+                                  props.cartList.find(
+                                    (cart) =>
+                                      cart.product_id ===
+                                      props.selectedProduct.product_id
+                                  )
+                                ) {
+                                  props.setCartList((prev) =>
+                                    prev.map((cart) =>
+                                      cart.product_id ===
+                                      props.selectedProduct.product_id
+                                        ? {
+                                            ...cart,
+                                            quantity: cart.quantity + 1,
+                                          }
+                                        : cart
+                                    )
+                                  );
+                                  return;
+                                }
+                                if (
+                                  props.selectedProduct.farmer_id !==
+                                  props.cartList[0].farmer_id
+                                ) {
+                                  Swal.fire({
+                                    icon: "question",
+                                    title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
+                                    text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
+                                    showCancelButton: true,
+                                    confirmButtonText: "ใช่",
+                                    cancelButtonText: "ไม่",
+                                    focusConfirm: false,
+                                  }).then((result) => {
+                                    if (result.isConfirmed) {
+                                      props.setCartList([
+                                        {
+                                          product_id:
+                                            props.selectedProduct.product_id,
+                                          product_name:
+                                            props.selectedProduct.product_name,
+                                          price: parseFloat(
+                                            props.selectedProduct.price
+                                          ),
+                                          quantity: 1,
+                                          farmer_id:
+                                            props.selectedProduct.farmer_id,
+                                          weight: parseFloat(
+                                            props.selectedProduct.weight
+                                          ),
+                                          shippingcost:
+                                            props.selectedProduct.shippingcost,
+                                          stock: parseInt(
+                                            props.selectedProduct.stock
+                                          ),
+                                        },
+                                      ]);
+                                      setGoCart(true);
+                                    }
+                                  });
+                                  return;
+                                }
+                              }}
+                            >
+                              ซื้อสินค้า
+                            </Button>
                           </Grid>
                         </Stack>
                       )}
