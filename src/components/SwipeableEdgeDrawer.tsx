@@ -234,13 +234,19 @@ export default function SwipeableEdgeDrawer(
                               color="secondary"
                               startIcon={<PointOfSaleIcon />}
                               disabled={
-                                props.jwt_token
-                                  ? (
+                                props.jwt_token == ""
+                                  ? true
+                                  : (
                                       jwtDecode(props.jwt_token) as {
                                         role: string;
                                       }
-                                    ).role !== "members"
-                                  : props.selectedProduct.stock === "0"
+                                    ).role !== "members" ||
+                                    props.selectedProduct.stock === "0" ||
+                                    !(
+                                      jwtDecode(props.jwt_token) as {
+                                        activate: boolean;
+                                      }
+                                    ).activate
                               }
                               onClick={() => {
                                 if (props.cartList.length === 0) {
@@ -347,9 +353,18 @@ export default function SwipeableEdgeDrawer(
                               color="primary"
                               startIcon={<PointOfSaleIcon />}
                               disabled={
-                                props.jwt_token === "" ||
-                                (jwtDecode(props.jwt_token) as { role: string })
-                                  .role !== "members"
+                                props.jwt_token == ""
+                                  ? true
+                                  : (
+                                      jwtDecode(props.jwt_token) as {
+                                        role: string;
+                                      }
+                                    ).role !== "members" ||
+                                    !(
+                                      jwtDecode(props.jwt_token) as {
+                                        activate: boolean;
+                                      }
+                                    ).activate
                               }
                               sx={{
                                 marginBottom: "10px",

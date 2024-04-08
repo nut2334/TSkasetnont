@@ -635,10 +635,12 @@ const SigleProduct = (prop: {
                   <NavLink to={prop.jwt_token == "" ? "/login" : ""}>
                     <Button
                       disabled={
-                        prop.jwt_token
-                          ? (jwtDecode(prop.jwt_token) as { role: string })
-                              .role !== "members"
-                          : !(
+                        prop.jwt_token == ""
+                          ? true
+                          : (jwtDecode(prop.jwt_token) as { role: string })
+                              .role !== "members" ||
+                            product.stock === 0 ||
+                            !(
                               jwtDecode(prop.jwt_token) as { activate: boolean }
                             ).activate
                       }
@@ -760,14 +762,14 @@ const SigleProduct = (prop: {
                       color="secondary"
                       startIcon={<AddShoppingCartIcon />}
                       disabled={
-                        prop.jwt_token
-                          ? (jwtDecode(prop.jwt_token) as { role: string })
+                        prop.jwt_token == ""
+                          ? true
+                          : (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members" ||
                             product.stock === 0 ||
                             !(
                               jwtDecode(prop.jwt_token) as { activate: boolean }
                             ).activate
-                          : false
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
@@ -851,14 +853,14 @@ const SigleProduct = (prop: {
                       color="secondary"
                       startIcon={<PointOfSaleIcon />}
                       disabled={
-                        prop.jwt_token
-                          ? (jwtDecode(prop.jwt_token) as { role: string })
+                        prop.jwt_token == ""
+                          ? true
+                          : (jwtDecode(prop.jwt_token) as { role: string })
                               .role !== "members" ||
                             product.stock === 0 ||
                             !(
                               jwtDecode(prop.jwt_token) as { activate: boolean }
                             ).activate
-                          : false
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
