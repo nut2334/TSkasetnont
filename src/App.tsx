@@ -189,8 +189,14 @@ function App() {
           />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/confirm/:email/:hashed" element={<Confirm />} />
-          <Route path="/listproduct" element={<ListProduct />} />
-          <Route path="/shop/:shopname" element={<ListProduct />} />
+          <Route
+            path="/listproduct"
+            element={<ListProduct jwt_token={jwt_token} />}
+          />
+          <Route
+            path="/shop/:shopname"
+            element={<ListProduct jwt_token={jwt_token} />}
+          />
           <Route
             path="/shop/:shopname/:productid"
             element={
