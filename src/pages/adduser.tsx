@@ -91,6 +91,7 @@ const AddUser = (prop: { jwt_token: string }) => {
   const [exist, setExist] = useState<boolean>(false);
   const [addProduct, setAddProduct] = useState<boolean>(false);
   const [position, setPosition] = useState<LatLngLiteral>();
+  const [checkPosition, setCheckPosition] = useState<boolean>(true);
   const [current, setCurrent] = useState<boolean>(false);
   const [amphures, setAmphures] = useState<amphure[]>([]);
   const [tambons, setTambons] = useState<tambon[]>([]);
@@ -805,6 +806,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                     value={changelat}
                     onChange={(e) => setChangelat(parseFloat(e.target.value))}
                     inputProps={{ min: 0 }}
+                    error={checkPosition ? false : true}
                   />
                 </Grid>
                 <Grid item xs={2}>
@@ -814,6 +816,8 @@ const AddUser = (prop: { jwt_token: string }) => {
                     value={changelng}
                     onChange={(e) => setChangelng(parseFloat(e.target.value))}
                     inputProps={{ min: 0 }}
+                    error={checkPosition ? false : true}
+                    helperText={checkPosition ? "" : "กรุณากรอกตำแหน่ง"}
                   />
                 </Grid>
                 <Grid item xs={6}>

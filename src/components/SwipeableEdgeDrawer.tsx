@@ -8,7 +8,7 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import { Container, Grid } from "@mui/material";
+import { Container, Grid, Stack } from "@mui/material";
 import axios from "axios";
 import * as config from "../config/config";
 import StoreIcon from "@mui/icons-material/Store";
@@ -19,6 +19,11 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import { Rating } from "@mui/material";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
+import { Cart } from "../App";
+import { Link } from "react-router-dom";
 
 const drawerBleeding = 56;
 
@@ -63,7 +68,15 @@ export default function SwipeableEdgeDrawer(
       lng: string;
       farmerstorename: string;
       unit: string;
+      selectedType: string;
+      stock: string;
+      farmer_id: string;
+      weight: string;
+      shippingcost: string;
     };
+    jwt_token: string;
+    cartList: Cart[];
+    setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
   }
 ) {
   const [average, setAverage] = React.useState<number>(0);
@@ -171,50 +184,293 @@ export default function SwipeableEdgeDrawer(
                         {props.selectedProduct.product_name}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
-                      {
-                        <div>
-                          {!isNaN(average) && (
-                            <Typography variant="h6" gutterBottom>
-                              คะแนนเฉลี่ย {average.toFixed(1)}
-                            </Typography>
-                          )}
-                          <Rating
-                            value={average}
-                            readOnly
-                            precision={0.5}
-                            size="large"
-                          />
-                        </div>
-                      }
-                    </Grid>
+                    {props.selectedProduct.selectedType ===
+                      "สินค้าจัดส่งพัสดุ" && (
+                      <Grid item xs={12}>
+                        {
+                          <div>
+                            {!isNaN(average) && (
+                              <Typography variant="h6" gutterBottom>
+                                คะแนนเฉลี่ย {average.toFixed(1)}
+                              </Typography>
+                            )}
+                            <Rating
+                              value={average}
+                              readOnly
+                              precision={0.5}
+                              size="large"
+                            />
+                          </div>
+                        }
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <Typography variant="body1" gutterBottom>
                         {props.selectedProduct.product_description}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="h6" gutterBottom>
-                        ราคา {props.selectedProduct.price} บาท /{" "}
-                        {props.selectedProduct.unit}
-                      </Typography>
-                    </Grid>
-                    <Grid item md={12} sm={12}>
-                      <NavLink
-                        to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
-                      >
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<StoreIcon />}
-                          sx={{
-                            marginBottom: "10px",
-                          }}
-                        >
-                          เยี่ยมชมสินค้า
-                        </Button>
-                      </NavLink>
-                    </Grid>
+                    {props.selectedProduct.selectedType ===
+                      "สินค้าจัดส่งพัสดุ" && (
+                      <Grid item xs={12}>
+                        <Typography variant="h6" gutterBottom>
+                          ราคา {props.selectedProduct.price} บาท /{" "}
+                          {props.selectedProduct.unit}
+                        </Typography>
+                      </Grid>
+                    )}
+
+                    <Stack spacing={2} direction="row">
+                      {props.selectedProduct.selectedType ===
+                        "สินค้าจัดส่งพัสดุ" && (
+                        <Stack>
+                          <Grid item xs={12}>
+                            <Link to="/listcart">
+                              <Button
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<PointOfSaleIcon />}
+                                disabled={
+                                  props.jwt_token
+                                    ? (
+                                        jwtDecode(props.jwt_token) as {
+                                          role: string;
+                                        }
+                                      ).role !== "members"
+                                    : props.selectedProduct.stock === "0"
+                                }
+                                onClick={() => {
+                                  if (props.cartList.length === 0) {
+                                    props.setCartList([
+                                      {
+                                        product_id:
+                                          props.selectedProduct.product_id,
+                                        product_name:
+                                          props.selectedProduct.product_name,
+                                        price: parseFloat(
+                                          props.selectedProduct.price
+                                        ),
+                                        quantity: 1,
+                                        farmer_id:
+                                          props.selectedProduct.farmer_id,
+                                        weight: parseFloat(
+                                          props.selectedProduct.weight
+                                        ),
+                                        shippingcost:
+                                          props.selectedProduct.shippingcost,
+                                        stock: parseInt(
+                                          props.selectedProduct.stock
+                                        ),
+                                      },
+                                    ]);
+                                    return;
+                                  }
+
+                                  if (
+                                    props.cartList.find(
+                                      (cart) =>
+                                        cart.product_id ===
+                                        props.selectedProduct.product_id
+                                    )
+                                  ) {
+                                    props.setCartList((prev) =>
+                                      prev.map((cart) =>
+                                        cart.product_id ===
+                                        props.selectedProduct.product_id
+                                          ? {
+                                              ...cart,
+                                              quantity: cart.quantity + 1,
+                                            }
+                                          : cart
+                                      )
+                                    );
+                                    return;
+                                  }
+                                  if (
+                                    props.selectedProduct.farmer_id !==
+                                    props.cartList[0].farmer_id
+                                  ) {
+                                    Swal.fire({
+                                      icon: "question",
+                                      title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
+                                      text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
+                                      showCancelButton: true,
+                                      confirmButtonText: "ใช่",
+                                      cancelButtonText: "ไม่",
+                                      focusConfirm: false,
+                                    }).then((result) => {
+                                      if (result.isConfirmed) {
+                                        props.setCartList([
+                                          {
+                                            product_id:
+                                              props.selectedProduct.product_id,
+                                            product_name:
+                                              props.selectedProduct
+                                                .product_name,
+                                            price: parseFloat(
+                                              props.selectedProduct.price
+                                            ),
+                                            quantity: 1,
+                                            farmer_id:
+                                              props.selectedProduct.farmer_id,
+                                            weight: parseFloat(
+                                              props.selectedProduct.weight
+                                            ),
+                                            shippingcost:
+                                              props.selectedProduct
+                                                .shippingcost,
+                                            stock: parseInt(
+                                              props.selectedProduct.stock
+                                            ),
+                                          },
+                                        ]);
+                                      }
+                                    });
+                                    return;
+                                  }
+                                }}
+                              >
+                                ซื้อสินค้า
+                              </Button>
+                            </Link>
+                          </Grid>
+                        </Stack>
+                      )}
+                      {props.selectedProduct.selectedType ===
+                        "จองสินค้าผ่านเว็บไซต์" && (
+                        <Stack>
+                          <Grid item xs={12}>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              startIcon={<PointOfSaleIcon />}
+                              disabled={
+                                props.jwt_token === "" ||
+                                (jwtDecode(props.jwt_token) as { role: string })
+                                  .role !== "members"
+                              }
+                              sx={{
+                                marginBottom: "10px",
+                              }}
+                              onClick={() => {
+                                if (props.jwt_token == "") {
+                                  Swal.fire({
+                                    icon: "info",
+                                    title: "กรุณาเข้าสู่ระบบ",
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                  });
+                                  return;
+                                }
+                                Swal.fire({
+                                  title: "จองสินค้า",
+                                  html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${props.selectedProduct.unit}
+                                          <br/>Line ID <input type="text" id="lineid">`,
+                                  showCancelButton: true,
+                                  confirmButtonText: "จอง",
+                                  cancelButtonText: "ยกเลิก",
+                                  focusConfirm: false,
+                                  preConfirm: () => {
+                                    const quantity = document.getElementById(
+                                      "quantity"
+                                    ) as HTMLInputElement;
+                                    const lineId = document.getElementById(
+                                      "lineid"
+                                    ) as HTMLInputElement;
+
+                                    // ตรวจสอบว่ามีข้อมูลใน input ทั้งหมดหรือไม่
+                                    if (!quantity.value || !lineId.value) {
+                                      Swal.showValidationMessage(
+                                        "กรุณากรอกข้อมูลให้ครบทุกช่อง"
+                                      );
+                                    }
+
+                                    // ตรวจสอบว่าเลขจำนวนไม่ติดลบ
+                                    if (Number(quantity.value) < 0) {
+                                      Swal.showValidationMessage(
+                                        "กรุณากรอกจำนวนที่มากกว่าหรือเท่ากับ 1"
+                                      );
+                                    }
+
+                                    // ตรวจสอบว่า Line ID ไม่เป็นภาษาไทย
+                                    const thaiRegex = /[ก-๙]/;
+                                    if (thaiRegex.test(lineId.value)) {
+                                      Swal.showValidationMessage(
+                                        "Line ID ต้องเป็นภาษาอังกฤษเท่านั้น"
+                                      );
+                                    }
+                                  },
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    let quantity = document.getElementById(
+                                      "quantity"
+                                    ) as HTMLInputElement;
+                                    let lineid = document.getElementById(
+                                      "lineid"
+                                    ) as HTMLInputElement;
+                                    const apiReserve = config.getApiEndpoint(
+                                      `reserve`,
+                                      "post"
+                                    );
+                                    axios
+                                      .post(
+                                        apiReserve,
+                                        {
+                                          quantity: quantity.value,
+                                          lineid: lineid.value,
+                                          product_id:
+                                            props.selectedProduct.product_id,
+                                        },
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${props.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then(() => {
+                                        Swal.fire({
+                                          icon: "success",
+                                          title: "จองสินค้าสำเร็จ",
+                                          showConfirmButton: false,
+                                          timer: 1500,
+                                        });
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                        Swal.fire({
+                                          icon: "error",
+                                          title: error.response.data.message,
+                                          showConfirmButton: false,
+                                          showCloseButton: true,
+                                        });
+                                      });
+                                  }
+                                });
+                              }}
+                            >
+                              จองสินค้า
+                            </Button>
+                          </Grid>
+                        </Stack>
+                      )}
+                      <Stack>
+                        <Grid item md={12} sm={12}>
+                          <NavLink
+                            to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
+                          >
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              startIcon={<StoreIcon />}
+                              sx={{
+                                marginBottom: "10px",
+                              }}
+                            >
+                              เยี่ยมชมสินค้า
+                            </Button>
+                          </NavLink>
+                        </Grid>
+                      </Stack>
+                    </Stack>
                     <Grid item md={12} sm={12}>
                       <RWebShare
                         data={{

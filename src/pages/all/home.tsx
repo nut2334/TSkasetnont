@@ -8,12 +8,6 @@ import {
   Container,
   Chip,
   Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Divider,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -27,6 +21,7 @@ import { RGBColor } from "react-color";
 import SwipeableEdgeDrawer from "../../components/SwipeableEdgeDrawer";
 import { useMap } from "react-leaflet";
 import { Pagination } from "@mui/material";
+import { Cart } from "../../App";
 
 interface CateagoryInterface {
   category_id: string;
@@ -45,28 +40,24 @@ interface ProductInterface {
   lng: string;
   farmerstorename: string;
   unit: string;
+  selectedType: string;
+  stock: string;
+  farmer_id: string;
+  weight: string;
+  shippingcost: string;
 }
 
-const Home = (prop: { jwt_token: string }) => {
+const Home = (prop: {
+  jwt_token: string;
+  cartList: Cart[];
+  setCartList: React.Dispatch<React.SetStateAction<Cart[]>>;
+}) => {
   const apiProducts = config.getApiEndpoint("getproducts", "GET");
   const apiCategories = config.getApiEndpoint("categories", "GET");
 
   const [searchContent, setSearchContent] = React.useState("");
   const [search, setSearch] = React.useState("");
-  const [data, setData] = React.useState<
-    {
-      product_id: string;
-      product_name: string;
-      product_description: string;
-      price: string;
-      product_image: string;
-      category_id: string;
-      lat: string;
-      lng: string;
-      farmerstorename: string;
-      unit: string;
-    }[]
-  >([]);
+  const [data, setData] = React.useState<ProductInterface[]>([]);
   const [allCategory, setAllCategory] = React.useState<
     {
       category_id: string;
@@ -81,32 +72,25 @@ const Home = (prop: { jwt_token: string }) => {
     });
   const [value, setValue] = React.useState("1");
   const [open, setOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<{
-    product_id: string;
-    product_name: string;
-    product_description: string;
-    price: string;
-    product_image: string;
-    category_id: string;
-    lat: string;
-    lng: string;
-    farmerstorename: string;
-    unit: string;
-  }>({
-    product_id: "",
-    product_name: "",
-    product_description: "",
-    price: "",
-    product_image: "",
-    category_id: "",
-    lat: "",
-    lng: "",
-    farmerstorename: "",
-    unit: "",
-  });
+  const [selectedProduct, setSelectedProduct] =
+    React.useState<ProductInterface>({
+      product_id: "",
+      product_name: "",
+      product_description: "",
+      price: "",
+      product_image: "",
+      category_id: "",
+      lat: "",
+      lng: "",
+      farmerstorename: "",
+      unit: "",
+      selectedType: "",
+      stock: "",
+      farmer_id: "",
+    } as ProductInterface);
   const [position, setPosition] = useState<LatLngLiteral>({
-    lat: 13.849861759515747,
-    lng: 100.52318572998047,
+    lat: 13.810300182207499,
+    lng: 100.47597885131837,
   });
   const [productPage, setProductPage] = useState<ProductInterface[]>([]);
   const [page, setPage] = useState(1);
@@ -186,23 +170,10 @@ const Home = (prop: { jwt_token: string }) => {
     }
   };
 
-  const CreateMarker = (props: {
-    item: {
-      product_id: string;
-      product_name: string;
-      product_description: string;
-      price: string;
-      product_image: string;
-      category_id: string;
-      lat: string;
-      lng: string;
-      farmerstorename: string;
-      unit: string;
-    };
-  }) => {
+  const CreateMarker = (props: { item: ProductInterface }) => {
     const map = useMap();
     useEffect(() => {
-      map.flyTo([position.lat, position.lng], 17);
+      map.flyTo([position.lat, position.lng], 14);
     }, [position]);
     const { item } = props;
     const iconMarker = divIcon({
@@ -272,6 +243,9 @@ const Home = (prop: { jwt_token: string }) => {
         open={open}
         setOpen={setOpen}
         selectedProduct={selectedProduct}
+        jwt_token={prop.jwt_token}
+        cartList={prop.cartList}
+        setCartList={prop.setCartList}
       />
       <Box
         sx={{
@@ -328,8 +302,8 @@ const Home = (prop: { jwt_token: string }) => {
         </Box>
       </Box>
       <MapContainer
-        center={[13.849861759515747, 100.52318572998047]}
-        zoom={13}
+        center={[13.812688652414751, 100.51108360290529]}
+        zoom={1}
         scrollWheelZoom={true}
         style={{
           width: "100%",
