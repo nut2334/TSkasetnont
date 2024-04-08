@@ -743,7 +743,7 @@ const SigleProduct = (prop: {
                       }}
                     >
                       จองสินค้า
-                      {prop.jwt_token &&
+                      {prop.jwt_token !== "" &&
                       (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
@@ -754,8 +754,9 @@ const SigleProduct = (prop: {
               )}
             {product.selectedType == "สินค้าจัดส่งพัสดุ" &&
               (prop.jwt_token == "" ||
-                (jwtDecode(prop.jwt_token) as { role: string }).role ==
-                  "members") && (
+                (prop.jwt_token &&
+                  (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                    "members")) && (
                 <>
                   <Stack>
                     <Button
@@ -841,7 +842,7 @@ const SigleProduct = (prop: {
                       }}
                     >
                       หยิบใส่ตะกร้า
-                      {prop.jwt_token &&
+                      {prop.jwt_token !== "" &&
                       (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
@@ -922,7 +923,7 @@ const SigleProduct = (prop: {
                       }}
                     >
                       ซื้อสินค้า
-                      {prop.jwt_token &&
+                      {prop.jwt_token !== "" &&
                       (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate
                         ? ""
