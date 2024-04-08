@@ -762,10 +762,12 @@ const SigleProduct = (prop: {
                       disabled={
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
-                              .role !== "members"
-                          : product.stock === 0 ||
-                            (jwtDecode(prop.jwt_token) as { activate: boolean })
-                              .activate
+                              .role !== "members" ||
+                            product.stock === 0 ||
+                            !(
+                              jwtDecode(prop.jwt_token) as { activate: boolean }
+                            ).activate
+                          : false
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
@@ -851,10 +853,12 @@ const SigleProduct = (prop: {
                       disabled={
                         prop.jwt_token
                           ? (jwtDecode(prop.jwt_token) as { role: string })
-                              .role !== "members"
-                          : product.stock === 0 ||
-                            (jwtDecode(prop.jwt_token) as { activate: boolean })
-                              .activate
+                              .role !== "members" ||
+                            product.stock === 0 ||
+                            !(
+                              jwtDecode(prop.jwt_token) as { activate: boolean }
+                            ).activate
+                          : false
                       }
                       onClick={() => {
                         if (prop.jwt_token == "") {
