@@ -59,10 +59,7 @@ const Navbar = (prop: {
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
 
-  const defaultPages = [
-    { name: "สินค้าทั้งหมด", path: "/listproduct" },
-    { name: "เทศกาล", path: "/festival" },
-  ];
+  const defaultPages = [{ name: "สินค้าทั้งหมด", path: "/listproduct" }];
 
   const settings = [
     { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },
@@ -113,23 +110,26 @@ const Navbar = (prop: {
 
   useEffect(() => {
     if (!prop.role) {
-      setVisiblePages(defaultPages);
+      setVisiblePages([...defaultPages, { name: "เทศกาล", path: "/festival" }]);
     } else if (prop.role == "admins") {
       setVisiblePages([
         ...defaultPages,
         { name: "จัดการผู้ใช้งาน", path: "" },
         { name: "การตั้งค่า", path: "/setting" },
         { name: "จัดการมาตรฐาน", path: "/certification" },
+        { name: "แก้ไขเทศกาล", path: "/editfestival" },
       ]);
     } else if (prop.role == "farmers") {
       setVisiblePages([
         ...defaultPages,
         { name: "ข้อมูลสินค้าของฉัน", path: "/myproducts" },
+        { name: "เทศกาล", path: "/festival" },
       ]);
     } else if (prop.role == "providers") {
       setVisiblePages([
         ...defaultPages,
         { name: "ข้อมูลเกษตรกร", path: "/manageuser/farmers" },
+        { name: "เทศกาล", path: "/festival" },
       ]);
     } else if (prop.role == "tambons") {
       setVisiblePages([
@@ -139,11 +139,13 @@ const Navbar = (prop: {
           path: `/manageuser/farmers`,
         },
         { name: "จัดการมาตรฐาน", path: "/certification" },
+        { name: "เทศกาล", path: "/festival" },
       ]);
     } else if (prop.role == "members") {
       setVisiblePages([
         ...defaultPages,
         { name: "ประวัติการซื้อขาย", path: "/orderlist" },
+        { name: "เทศกาล", path: "/festival" },
       ]);
     } else if (prop.role == "") {
       setVisiblePages([...defaultPages]);

@@ -26,6 +26,7 @@ import Myproducts from "./pages/farmer/myproducts";
 import ExcelDownload from "./pages/provider/exceldownload";
 import Certification from "./pages/admin/certification";
 import Confirm from "./pages/all/confirm";
+import Editfestival from "./pages/admin/editfestival";
 import Festival from "./pages/all/festival";
 
 export interface Cart {
@@ -60,7 +61,6 @@ function App() {
       type: string;
     }[]
   >([]);
-
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
@@ -288,6 +288,10 @@ function App() {
                     setFollowList={setFollowList}
                   />
                 }
+              />
+              <Route
+                path="/editfestival"
+                element={<Editfestival jwt_token={jwt_token} />}
               />
               <Route
                 path="/manageuser/farmers/:username"
