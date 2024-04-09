@@ -229,7 +229,7 @@ const Analyze = (prop: { jwt_token: string }) => {
               }}
               textAlign="left"
             >
-              ซื้อขายแบบจัดส่งพัสดุ
+              สินค้าที่จัดส่งพัสดุ
             </Divider>
           </Grid>
         )}
