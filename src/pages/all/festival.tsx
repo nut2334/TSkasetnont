@@ -295,7 +295,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
             </Grid>
           );
         })}
-        {showProduct.length === 0 && (
+        {showProduct.length === 0 && selectedEvent && (
           <Grid item xs={12}>
             <Typography
               variant="h6"
