@@ -406,7 +406,6 @@ const EditProfile = (prop: {
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
     formData.append("phone", tel);
-    console.log(1);
     if (prop.admin) {
       formData.append("role", prop.admin.role);
     }
@@ -424,7 +423,6 @@ const EditProfile = (prop: {
       formData.append("farmerstorename", storeName);
 
       formData.append("province", "นนทบุรี");
-      console.log(3);
       formData.append("amphure", selected.amphure_name_th);
       formData.append("tambon", selected.tambon_name_th);
       formData.append("facebooklink", facebookLink);
@@ -432,7 +430,6 @@ const EditProfile = (prop: {
       if (zipCode) {
         formData.append("zipcode", zipCode.toString());
       }
-      console.log(4);
       formData.append("shippingcost", JSON.stringify(shippingcost));
       console.log(qrCode);
       if (qrCode) {

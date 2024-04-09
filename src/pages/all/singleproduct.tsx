@@ -69,7 +69,10 @@ interface FullProductInterface {
   campaign_id: string;
   last_modified: Date;
   selectedType: string;
+  selectedStatus?: string;
   shippingcost: string;
+  date_reserve_start?: string;
+  date_reserve_end?: string;
   firstname: string;
   lastname: string;
   farmer_id: string;
@@ -80,6 +83,7 @@ interface FullProductInterface {
   lineid: string;
   lat: number | undefined;
   lng: number | undefined;
+  lastLogin: string;
 }
 
 const style = {
@@ -135,6 +139,7 @@ const SigleProduct = (prop: {
     lineid: "",
     lat: undefined,
     lng: undefined,
+    lastLogin: "",
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -374,6 +379,38 @@ const SigleProduct = (prop: {
     return <Navigate to="/listcart" />;
   }
 
+  let LastLogin = () => {
+    let lastLogin = new Date(product.lastLogin);
+    let daySinceLastLogin = Math.floor(
+      (new Date().getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return daySinceLastLogin > 0
+      ? `(เข้าสู่ระบบล่าสุดเมื่อ ${daySinceLastLogin} วันที่ผ่านมา)`
+      : "(เข้าสู่ระบบล่าสุดวันนี้)";
+  };
+
+  let CheckReserveValid = () => {
+    if (product.selectedStatus == "ปิดรับจอง") {
+      return false;
+    }
+    if (product.selectedStatus == "เปิดรับจองตลอด") {
+      return true;
+    }
+    if (
+      product.date_reserve_end == null ||
+      product.date_reserve_start == null
+    ) {
+      return false;
+    }
+    let today = new Date();
+    let start = new Date(product.date_reserve_start);
+    let end = new Date(product.date_reserve_end);
+    if (today >= start && today <= end) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <Container component="main" maxWidth="lg">
       <Box sx={{ position: "relative" }}>
@@ -426,15 +463,48 @@ const SigleProduct = (prop: {
       </Box>
       <Typography variant="h4">
         {product.product_name}{" "}
-        <div
-          style={{
-            color: "red",
-          }}
-        >
-          {product.stock === 0 && product.selectedType == "สินค้าจัดส่งพัสดุ"
-            ? `สินค้าหมด`
-            : ""}
-        </div>
+        {product.stock === 0 && product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+          <div
+            style={{
+              color: "red",
+            }}
+          >
+            สินค้าหมด
+          </div>
+        )}
+        {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
+          <>
+            <Typography>ประเภทการจอง: {product.selectedStatus}</Typography>
+            {product.date_reserve_start && product.date_reserve_end && (
+              <Typography>
+                <span>
+                  ระยะเวลาจองสินค้า :{" "}
+                  {new Date(product.date_reserve_start).toLocaleDateString()}{" "}
+                  ถึง {new Date(product.date_reserve_end).toLocaleDateString()}
+                </span>
+              </Typography>
+            )}
+            {CheckReserveValid() ? (
+              <Typography
+                style={{
+                  color: "green",
+                }}
+              >
+                {" "}
+                (สามารถจองสินค้าได้)
+              </Typography>
+            ) : (
+              <Typography
+                style={{
+                  color: "red",
+                }}
+              >
+                {" "}
+                (ไม่สามารถจองสินค้าได้)
+              </Typography>
+            )}
+          </>
+        )}
       </Typography>
       {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
         <Typography
@@ -641,7 +711,8 @@ const SigleProduct = (prop: {
                               .role !== "members" ||
                             !(
                               jwtDecode(prop.jwt_token) as { activate: boolean }
-                            ).activate
+                            ).activate ||
+                            !CheckReserveValid()
                       }
                       variant="contained"
                       color="secondary"
@@ -1068,7 +1139,17 @@ const SigleProduct = (prop: {
           </Stack>
         </Stack>
         <Typography>
-          โดย {product.firstname + " " + product.lastname}
+          โดย {product.firstname + " " + product.lastname + " "}
+        </Typography>
+        <Typography
+          color={
+            new Date().getTime() - new Date(product.lastLogin).getTime() >
+            10 * 1000 * 60 * 60 * 24
+              ? "red"
+              : "green"
+          }
+        >
+          {LastLogin()}
         </Typography>
 
         {product.facebooklink || product.lineid ? (
