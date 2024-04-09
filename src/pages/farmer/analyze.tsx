@@ -280,7 +280,49 @@ const Analyze = (prop: { jwt_token: string }) => {
             รายเดือน
           </Button>
         </Grid>
-
+        {saleData && (
+          <Grid xs={12}>
+            {chartType === "date" ? (
+              <Typography>
+                ข้อมูลช่วงวันที่{" "}
+                {new Date(saleData[0].date).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                ถึง{" "}
+                {new Date(
+                  saleData[saleData.length - 1].date
+                ).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Typography>
+            ) : (
+              <Typography>
+                ข้อมูลเดือน{" "}
+                {new Date(
+                  saleData[0].date.split("/")[0] +
+                    "/1/" +
+                    saleData[0].date.split("/")[1]
+                ).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                })}{" "}
+                ถึง{" "}
+                {new Date(
+                  saleData[saleData.length - 1].date.split("/")[0] +
+                    "/1/" +
+                    saleData[saleData.length - 1].date.split("/")[1]
+                ).toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                })}
+              </Typography>
+            )}
+          </Grid>
+        )}
         <Grid xs={12}>{saleData && <BarChart data={saleData} />}</Grid>
         <Grid xs={12}>
           <Divider
