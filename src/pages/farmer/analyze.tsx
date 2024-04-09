@@ -15,6 +15,8 @@ import axios from "axios";
 import FollowChart from "../../components/followchart";
 import RankingproductChart from "../../components/rankingproduct";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { status_buy } from "../../config/dataDropdown";
+import { status_reserve } from "../../config/dataDropdown";
 
 interface Saletoday {
   category_name: string;
@@ -140,6 +142,9 @@ const Analyze = (prop: { jwt_token: string }) => {
             return {
               ...order,
               id: index,
+              status: status_buy.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
             };
           })
         );
@@ -157,6 +162,9 @@ const Analyze = (prop: { jwt_token: string }) => {
             return {
               ...order,
               id: index,
+              status: status_reserve.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
             };
           })
         );
@@ -229,12 +237,12 @@ const Analyze = (prop: { jwt_token: string }) => {
               }}
               textAlign="left"
             >
-              สินค้าที่จัดส่งพัสดุ
+              <Typography>สินค้าที่จัดส่งพัสดุ</Typography>
             </Divider>
           </Grid>
         )}
         <Grid xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5">
             สินค้าที่ขายไปวันนี้ {today} รายการ
           </Typography>
         </Grid>
@@ -261,14 +269,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             ]}
           />
         </Grid>
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-          />
-        </Grid>
+
         <Grid
           xs={12}
           sx={{
@@ -325,10 +326,13 @@ const Analyze = (prop: { jwt_token: string }) => {
         <Grid xs={12}>
           <Divider
             sx={{
-              width: "100%",
-              margin: 2,
+              marginTop: 2,
+              marginBottom: 2,
             }}
-          />
+            textAlign="left"
+          >
+            <Typography>จองสินค้า</Typography>
+          </Divider>
         </Grid>
 
         {/* <Box>
@@ -373,15 +377,9 @@ const Analyze = (prop: { jwt_token: string }) => {
         )} */}
 
         <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-          />
-        </Grid>
-        <Grid xs={12}>
-          <Typography variant="h5">การจองสินค้าวันนี้</Typography>
+          <Typography variant="h5">
+            การจองสินค้าวันนี้ {reserveToday ? reserveToday.length : "0"} รายการ
+          </Typography>
         </Grid>
         <Grid xs={12}>
           <Typography>
@@ -412,7 +410,10 @@ const Analyze = (prop: { jwt_token: string }) => {
               width: "100%",
               margin: 2,
             }}
-          />
+            textAlign="left"
+          >
+            <Typography>ผู้ติดตาม</Typography>
+          </Divider>
         </Grid>
 
         <Grid xs={12}>
