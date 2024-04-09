@@ -118,6 +118,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [isExist, setIsExist] = useState<boolean>(false);
   const [checked, setChecked] = React.useState([0]);
   const [add, setAdd] = useState<boolean>(false);
+  const [monthreceived, setMonthreceived] = useState<Date | null>(null);
 
   function closeModal() {
     setIsOpen(null);
@@ -171,22 +172,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
           setSelectedType("ประชาสัมพันธ์");
         }
       });
-    // axios.get(apiAllStandard).then((res) => {
-    //   console.log(res.data);
-    //   setAllStandard(
-    //     res.data.filter(
-    //       (data: { standard_id: string; standard_name: string }) => {
-    //         console.log(data.standard_id);
-    //         if (data.standard_name !== "ไม่มี") {
-    //           return {
-    //             standard_id: data.standard_id,
-    //             standard_name: data.standard_name,
-    //           };
-    //         }
-    //       }
-    //     )
-    //   );
-    // });
     axios.get(apiAllStandard).then((res) => {
       console.log(res.data);
       setAllStandard(res.data);
@@ -293,6 +278,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
       product_video: productVideo[0],
       additional_images: JSON.stringify(selectImage),
       certificate: JSON.stringify(selectedStandard),
+      period:
+        selectedStatus == "เปิดรับจองตามช่วงเวลา" ? endDate : monthreceived,
+      forecastDate: monthreceived,
     } as any;
 
     if (selectedType == "สินค้าจัดส่งพัสดุ") {
@@ -1184,6 +1172,23 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   </React.Fragment>
                 )}
               </React.Fragment>
+            )}
+            {(selectedStatus == "เปิดรับจองตามช่วงเวลา" ||
+              selectedStatus == "เปิดรับจองตลอด") && (
+              <Grid item xs={6}>
+                <Typography variant="subtitle1">
+                  คาดการณ์เดือนที่ได้รับสินค้า
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    sx={{ width: "100%" }}
+                    defaultValue={monthreceived ? monthreceived : null}
+                    onChange={(e: any) =>
+                      setMonthreceived(e.format("YYYY-MM-DD"))
+                    }
+                  />
+                </LocalizationProvider>
+              </Grid>
             )}
             {selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>

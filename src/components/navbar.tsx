@@ -184,7 +184,7 @@ const Navbar = (prop: {
                 <img
                   src={require("../assets/karsetnont.png")}
                   alt="Italian Trulli"
-                  height="10px"
+                  height="40px"
                 ></img>
               </IconButton>
 
