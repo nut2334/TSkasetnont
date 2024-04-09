@@ -26,6 +26,7 @@ import Myproducts from "./pages/farmer/myproducts";
 import ExcelDownload from "./pages/provider/exceldownload";
 import Certification from "./pages/admin/certification";
 import Confirm from "./pages/all/confirm";
+import Festival from "./pages/all/festival";
 
 export interface Cart {
   product_id: string;
@@ -208,6 +209,10 @@ function App() {
                 setFollowList={setFollowList}
               />
             }
+          />
+          <Route
+            path="/festival"
+            element={<Festival jwt_token={jwt_token} />}
           />
           {decodeJWT.role && (
             <Route

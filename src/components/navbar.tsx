@@ -59,7 +59,10 @@ const Navbar = (prop: {
 }) => {
   const [visiblePages, setVisiblePages] = React.useState<Page[]>([]);
 
-  const defaultPages = [{ name: "สินค้าทั้งหมด", path: "/listproduct" }];
+  const defaultPages = [
+    { name: "สินค้าทั้งหมด", path: "/listproduct" },
+    { name: "เทศกาล", path: "/festival" },
+  ];
 
   const settings = [
     { name: "แก้ไขข้อมูลส่วนตัว", path: "/editprofile" },

@@ -406,7 +406,7 @@ const ManageUser = (prop: {
                     ? "สมาชิก"
                     : role === "providers"
                     ? "เกษตรจังหวัด"
-                    : "เกษตรกร"}
+                    : "เกษตรตำบล"}
                 </Typography>
               )}
               {currentRole == "tambons" && (
@@ -547,7 +547,7 @@ const ManageUser = (prop: {
                         ? "สมาชิก"
                         : role === "providers"
                         ? "เกษตรจังหวัด"
-                        : "เกษตรกร"}
+                        : "เกษตรตำบล"}
                     </Button>
                   </NavLink>
                 )}

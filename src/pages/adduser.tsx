@@ -36,6 +36,7 @@ import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import SearchIcon from "@mui/icons-material/Search";
 import Myproducts from "./farmer/myproducts";
 import { jwtDecode } from "jwt-decode";
+import { nonthaburi_amphure } from "../config/dataDropdown";
 
 interface amphure {
   id: string;
@@ -106,8 +107,8 @@ const AddUser = (prop: { jwt_token: string }) => {
     amphure_name_th: "",
     tambon_name_th: "",
   });
-  const [changelat, setChangelat] = useState<number>(0);
-  const [changelng, setChangelng] = useState<number>(0);
+  const [changelat, setChangelat] = useState<number | null>(null);
+  const [changelng, setChangelng] = useState<number | null>(null);
 
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members";
@@ -632,7 +633,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
               />
             </Grid>
-            {role == "tambons" ? (
+            {role == "tambons" || role == "admins" ? (
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -654,9 +655,9 @@ const AddUser = (prop: { jwt_token: string }) => {
                   }}
                 >
                   {/* เฉพาะจังหวัดนนทบุรี */}
-                  {amphure.map((amphure: amphure) => (
-                    <MenuItem value={amphure.name_th}>
-                      {amphure.name_th}
+                  {nonthaburi_amphure.map((amphure) => (
+                    <MenuItem value={amphure.amphureName}>
+                      {amphure.amphureName}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -677,7 +678,23 @@ const AddUser = (prop: { jwt_token: string }) => {
                     value="นนทบุรี"
                   ></TextField>
                 </Grid>
-                {amphures.length > 0 && (
+
+                {(jwtDecode(prop.jwt_token) as { amphure: string }).amphure ? (
+                  <Grid item xs={12}>
+                    <TextField
+                      label="เขต/อำเภอ"
+                      fullWidth
+                      disabled
+                      value={
+                        (jwtDecode(prop.jwt_token) as { amphure: string })
+                          .amphure
+                      }
+                    ></TextField>
+                  </Grid>
+                ) : null}
+
+                {(jwtDecode(prop.jwt_token) as { role: string }).role !==
+                  "tambons" && amphures.length > 0 ? (
                   <Grid item xs={12}>
                     <TextField
                       select
@@ -714,7 +731,8 @@ const AddUser = (prop: { jwt_token: string }) => {
                       ))}
                     </TextField>
                   </Grid>
-                )}
+                ) : null}
+
                 {tambons.length > 0 && (
                   <>
                     <Grid item xs={12}>
@@ -800,6 +818,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                   <TextField
                     size="small"
                     label="ละติจูด"
+                    required
                     value={changelat}
                     onChange={(e) => setChangelat(parseFloat(e.target.value))}
                     inputProps={{ min: 0 }}
@@ -815,6 +834,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                     inputProps={{ min: 0 }}
                     error={checkPosition ? false : true}
                     helperText={checkPosition ? "" : "กรุณากรอกตำแหน่ง"}
+                    required
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -822,6 +842,10 @@ const AddUser = (prop: { jwt_token: string }) => {
                     variant="contained"
                     startIcon={<SearchIcon />}
                     onClick={() => {
+                      if (changelat == null || changelng == null) {
+                        setCheckPosition(false);
+                        return;
+                      }
                       setPosition({ lat: changelat, lng: changelng });
                     }}
                   >
