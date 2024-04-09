@@ -26,8 +26,19 @@ interface Saletoday {
   username: string;
   id: string;
   price: string;
+  status: string;
 }
-
+interface Reservetoday {
+  category_name: string;
+  contact: string;
+  member_id: string;
+  product_id: string;
+  product_name: string;
+  total_quantity: number;
+  id: string;
+  username: string;
+  status: string;
+}
 const Analyze = (prop: { jwt_token: string }) => {
   const [farmerDetail, setFarmerDetail] = React.useState<{
     firstname: string;
@@ -66,6 +77,7 @@ const Analyze = (prop: { jwt_token: string }) => {
     "quantity"
   );
   const [buyToday, setBuyToday] = React.useState<Saletoday[]>();
+  const [reserveToday, setReserveToday] = React.useState<Reservetoday[]>();
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
@@ -123,9 +135,25 @@ const Analyze = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setBuyToday(
           res.data.map((order: Saletoday, index: number) => {
+            return {
+              ...order,
+              id: index,
+            };
+          })
+        );
+      });
+    axios
+      .get(config.getApiEndpoint("todayreserve", "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setReserveToday(
+          res.data.map((order: Reservetoday, index: number) => {
             return {
               ...order,
               id: index,
@@ -199,7 +227,10 @@ const Analyze = (prop: { jwt_token: string }) => {
                 marginTop: 2,
                 marginBottom: 2,
               }}
-            />
+              textAlign="left"
+            >
+              ซื้อขายแบบจัดส่งพัสดุ
+            </Divider>
           </Grid>
         )}
         <Grid xs={12}>
@@ -226,6 +257,7 @@ const Analyze = (prop: { jwt_token: string }) => {
               { field: "price", headerName: "ราคา", flex: 1 },
               { field: "total_quantity", headerName: "จำนวน", flex: 1 },
               { field: "total_price", headerName: "ราคาทั้งหมด", flex: 1 },
+              { field: "status", headerName: "สถานะ", flex: 1 },
             ]}
           />
         </Grid>
@@ -298,6 +330,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             }}
           />
         </Grid>
+
         {/* <Box>
           <Typography variant="h5">ยอดขายทั้งหมด</Typography>
           <Button
@@ -338,6 +371,49 @@ const Analyze = (prop: { jwt_token: string }) => {
             rankingLimit={rankingLimit}
           />
         )} */}
+
+        <Grid xs={12}>
+          <Divider
+            sx={{
+              width: "100%",
+              margin: 2,
+            }}
+          />
+        </Grid>
+        <Grid xs={12}>
+          <Typography variant="h5">การจองสินค้าวันนี้</Typography>
+        </Grid>
+        <Grid xs={12}>
+          <Typography>
+            ณ วันที่{" "}
+            {new Date().toLocaleDateString("th-TH", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </Typography>
+        </Grid>
+
+        <DataGrid
+          rows={reserveToday ? reserveToday : []}
+          columns={[
+            { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+            { field: "contact", headerName: "ติดต่อ", flex: 1 },
+            { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+            { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+
+            { field: "status", headerName: "สถานะ", flex: 1 },
+          ]}
+        />
+
+        <Grid xs={12}>
+          <Divider
+            sx={{
+              width: "100%",
+              margin: 2,
+            }}
+          />
+        </Grid>
 
         <Grid xs={12}>
           <Typography variant="h5">
