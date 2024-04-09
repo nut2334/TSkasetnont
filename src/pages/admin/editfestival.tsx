@@ -13,7 +13,7 @@ import axios from "axios";
 import * as config from "../../config/config";
 import { scheduler } from "timers/promises";
 import { ProcessedEvent, EventActions } from "@aldabil/react-scheduler/types";
-
+import { SketchPicker, RGBColor } from "react-color";
 interface CustomEditorProps {
   scheduler: SchedulerHelpers;
 }
@@ -133,7 +133,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
             title: e.name,
             start: new Date(e.start_date),
             end: new Date(e.end_date),
-            color: "#50b500",
+            color: e.color,
             admin_id: 1,
             editable: true,
           },
@@ -159,16 +159,16 @@ const Editfestival = (prop: { jwt_token: string }) => {
 
   const CustomEditor = ({ scheduler }: CustomEditorProps) => {
     const event = scheduler.edited;
-
     // Make your own form/state
     const [state, setState] = useState({
       title: event?.title || "",
       description: event?.description || "",
       start: event?.start || scheduler.state.start.value,
       end: event?.end || null,
+      color: event?.color || "#50b500",
     });
-    const [error, setError] = useState("");
 
+    const [error, setError] = useState("");
     const handleChange = (value: string, name: string) => {
       setState((prev) => {
         return {
@@ -180,46 +180,20 @@ const Editfestival = (prop: { jwt_token: string }) => {
     const handleSubmit = async () => {
       // Your own validation
       if (state.title.length < 3) {
-        return setError("Min 3 letters");
+        return setError("ชื่อเทศกาลอย่างน้อย 3 ตัวอักษร");
       }
 
       try {
         scheduler.loading(true);
-
         /**Simulate remote data saving */
-        const added_updated_event = (await new Promise((res) => {
-          /**
-           * Make sure the event have 4 mandatory fields
-           * event_id: string|number
-           * title: string
-           * start: Date|string
-           * end: Date|string
-           */
-
-          setTimeout(() => {
-            if (state.end == null || state.start == null) {
-              return;
-            }
-            res({
-              event_id: event?.event_id || Math.random(),
-              title: state.title,
-              description: state.description,
-              start: state.start,
-              end: state.end,
-            });
-          }, 3000);
-        })) as ProcessedEvent;
-
-        scheduler.onConfirm(added_updated_event, event ? "edit" : "create");
-        scheduler.close();
-      } finally {
-        console.log(event);
         const data = {
           name: state.title,
           keyword: state.description.split(",").map((e: string) => e.trim()),
           start_date: state.start,
           end_date: state.end,
+          color: state.color,
         };
+        let event_id = "";
         if (event) {
           /** PUT event to remote DB */
           await axios.patch(
@@ -233,29 +207,45 @@ const Editfestival = (prop: { jwt_token: string }) => {
           );
         } else if (event === undefined) {
           /**POST event to remote DB */
-          console.log(event);
-
-          await axios.post(config.getApiEndpoint("festival", "POST"), data, {
-            headers: {
-              Authorization: `Bearer ${prop.jwt_token}`,
-            },
-          });
+          let response = await axios.post(
+            config.getApiEndpoint("festival", "POST"),
+            data,
+            {
+              headers: {
+                Authorization: `Bearer ${prop.jwt_token}`,
+              },
+            }
+          );
+          event_id = response.data.id;
         }
-        // const data = {
-        //   name: state.title,
-        //   keyword: state.description.split(",").map((e: string) => e.trim()),
-        //   start_date: state.start,
-        //   end_date: state.end,
-        // };
-        // axios
-        //   .post(config.getApiEndpoint("festival", "POST"), data, {
-        //     headers: {
-        //       Authorization: `Bearer ${prop.jwt_token}`,
-        //     },
-        //   })
-        //   .then((res) => {
-        //     console.log(res);
-        //   });
+        const added_updated_event = (await new Promise((res) => {
+          /**
+           * Make sure the event have 4 mandatory fields
+           * event_id: string|number
+           * title: string
+           * start: Date|string
+           * end: Date|string
+           */
+
+          setTimeout(() => {
+            console.log(event_id, event?.event_id);
+            if (state.end == null || state.start == null) {
+              return;
+            }
+            res({
+              event_id: event?.event_id || event_id,
+              title: state.title,
+              description: state.description,
+              start: state.start,
+              end: state.end,
+              color: state.color,
+            });
+          }, 3000);
+        })) as ProcessedEvent;
+
+        scheduler.onConfirm(added_updated_event, event ? "edit" : "create");
+        scheduler.close();
+      } finally {
         scheduler.loading(false);
       }
     };
@@ -263,7 +253,11 @@ const Editfestival = (prop: { jwt_token: string }) => {
     return (
       <div>
         <div style={{ padding: "1rem" }}>
-          <Grid container spacing={2}>
+          <Grid
+            container
+            spacing={2}
+            //center
+          >
             <Grid item xs={12}>
               <TextField
                 label="ชื่อเทศกาล"
@@ -320,6 +314,20 @@ const Editfestival = (prop: { jwt_token: string }) => {
                 />
               </LocalizationProvider>
             </Grid>
+            <Grid item xs={12}>
+              <SketchPicker
+                color={state.color}
+                disableAlpha
+                onChange={(color) => {
+                  setState((prev) => {
+                    return {
+                      ...prev,
+                      color: color.hex,
+                    };
+                  });
+                }}
+              />
+            </Grid>
           </Grid>
         </div>
         <DialogActions>
@@ -343,6 +351,9 @@ const Editfestival = (prop: { jwt_token: string }) => {
     >
       <Scheduler
         events={events}
+        onCellClick={(e) => {
+          console.log(e);
+        }}
         view="month"
         locale={th}
         week={null}
