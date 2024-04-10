@@ -63,8 +63,7 @@ const Yearlybar = (prop: {
                 ? parseInt(data[0].year) + 543
                 : `${parseInt(data[0].year) + 543}` +
                   " - " +
-                  `${parseInt(data[data.length - 1].year)}` +
-                  543}
+                  `${parseInt(data[data.length - 1].year) + 543}`}
             </span>
           </Typography>
           <Bar
