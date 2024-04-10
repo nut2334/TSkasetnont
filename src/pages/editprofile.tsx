@@ -344,6 +344,11 @@ const EditProfile = (prop: {
             if (res.data.lat && res.data.lng) {
               setPosition({ lat: res.data.lat, lng: res.data.lng });
             }
+            setSelected({
+              province_name_th: res.data.province,
+              amphure_name_th: res.data.amphure,
+              tambon_name_th: res.data.tambon,
+            });
           })
           .catch((err) => {
             console.log(err);

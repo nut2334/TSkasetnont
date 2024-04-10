@@ -309,6 +309,10 @@ const AddUser = (prop: { jwt_token: string }) => {
     };
     if (role == "farmers" || role == "tambons") {
       data["province"] = "นนทบุรี";
+      console.log((jwtDecode(prop.jwt_token) as { amphure: string }).amphure);
+      data["amphure"] = (
+        jwtDecode(prop.jwt_token) as { amphure: string }
+      ).amphure;
     }
     const apiAddUser = config.getApiEndpoint("adduser", "POST");
 
@@ -519,9 +523,7 @@ const AddUser = (prop: { jwt_token: string }) => {
               <TextField
                 value={comfirmPassword}
                 onChange={(event) => {
-                  if (event.target.value != "") {
-                    setComfirmPassword(event.target.value);
-                  }
+                  setComfirmPassword(event.target.value);
                   if (event.target.value != password) {
                     setComfirmPasswordCheck(false);
                   } else {

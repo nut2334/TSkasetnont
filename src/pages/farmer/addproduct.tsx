@@ -135,24 +135,30 @@ const AddProduct = (prop: { jwt_token: string }) => {
         "GET"
       );
       axios.get(apiGetProduct).then((res) => {
-        console.log(res.data);
-        setProductName(res.data.product_name);
-        setSelectedCategory(res.data.category_id);
-        setDescription(res.data.product_description);
-        setSelectedType(res.data.selectedType);
-        setWeight(res.data.weight);
-        setPrice(res.data.price);
-        setUnit(res.data.unit);
-        setStock(res.data.stock);
-        setSelectedStatus(res.data.selectedStatus);
-        setStartDate(res.data.date_reserve_start);
-        setEndDate(res.data.date_reserve_end);
-        setCoverImage([res.data.product_image]);
-        setProductVideo(res.data.product_video ? [res.data.product_video] : []);
-        setSelectImage(
-          res.data.additional_image ? JSON.parse(res.data.additional_image) : []
-        );
-        setSelectedStandard(JSON.parse(res.data.certificate));
+        if (res.data) {
+          console.log(res.data);
+          setProductName(res.data.product_name);
+          setSelectedCategory(res.data.category_id);
+          setDescription(res.data.product_description);
+          setSelectedType(res.data.selectedType);
+          setWeight(res.data.weight);
+          setPrice(res.data.price);
+          setUnit(res.data.unit);
+          setStock(res.data.stock);
+          setSelectedStatus(res.data.selectedStatus);
+          setStartDate(res.data.date_reserve_start);
+          setEndDate(res.data.date_reserve_end);
+          setCoverImage([res.data.product_image]);
+          setProductVideo(
+            res.data.product_video ? [res.data.product_video] : []
+          );
+          setSelectImage(
+            res.data.additional_image
+              ? JSON.parse(res.data.additional_image)
+              : []
+          );
+          setSelectedStandard(JSON.parse(res.data.certificate));
+        }
       });
     }
     console.log(apiCertificate);
@@ -164,17 +170,21 @@ const AddProduct = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        console.log(res.data.data);
-        setStandard(res.data.data);
-        if (
-          (jwtDecode(prop.jwt_token) as { role: string }).role !== "farmers"
-        ) {
-          setSelectedType("ประชาสัมพันธ์");
+        if (res.data) {
+          console.log(res.data.data);
+          setStandard(res.data.data);
+          if (
+            (jwtDecode(prop.jwt_token) as { role: string }).role !== "farmers"
+          ) {
+            setSelectedType("ประชาสัมพันธ์");
+          }
         }
       });
     axios.get(apiAllStandard).then((res) => {
-      console.log(res.data);
-      setAllStandard(res.data);
+      if (res.data) {
+        console.log(res.data);
+        setAllStandard(res.data);
+      }
     });
   }, []);
 
@@ -620,24 +630,20 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Stack>
               </Container>
             </Grid>
-            {((jwtDecode(prop.jwt_token) as { role: string }).role ===
-              "tambons" ||
-              (jwtDecode(prop.jwt_token) as { role: string }).role ===
-                "admins") && (
-              <Grid item xs={12}>
-                <List
-                  subheader={
-                    <ListSubheader component="div" id="nested-list-subheader">
-                      มาตรฐานสินค้า
-                    </ListSubheader>
-                  }
-                  sx={{
-                    width: "100%",
-                    maxWidth: 360,
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  {/* {standard.map((data, index) => (
+            <Grid item xs={12}>
+              <List
+                subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    มาตรฐานสินค้า
+                  </ListSubheader>
+                }
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {/* {standard.map((data, index) => (
                     <ListItem key={data.id} disablePadding>
                       <ListItemButton dense>
                         <ListItemIcon>
@@ -689,54 +695,53 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       </ListItemButton>
                     </ListItem>
                   ))} */}
-                  {allStandard.map((data, index) => {
-                    if (
-                      data.standard_name !== "ไม่มี" &&
-                      data.standard_name !== "อื่นๆ"
-                    ) {
-                      return (
-                        <ListItem key={data.standard_id} disablePadding>
-                          <ListItemButton dense>
-                            <ListItemIcon>
-                              <Checkbox
-                                edge="start"
-                                tabIndex={-1}
-                                disableRipple
-                                defaultChecked={selectedStandard.includes(
-                                  data.standard_id
-                                )}
-                                inputProps={{
-                                  "aria-labelledby": data.standard_id,
-                                }}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setSelectedStandard([
-                                      ...selectedStandard,
-                                      data.standard_id,
-                                    ]);
-                                  } else {
-                                    setSelectedStandard(
-                                      selectedStandard.filter(
-                                        (standard) =>
-                                          standard !== data.standard_id
-                                      )
-                                    );
-                                  }
-                                }}
-                              />
-                            </ListItemIcon>
-                            <ListItemText
-                              id={data.standard_id}
-                              primary={data.standard_name}
+                {allStandard.map((data, index) => {
+                  if (
+                    data.standard_name !== "ไม่มี" &&
+                    data.standard_name !== "อื่นๆ"
+                  ) {
+                    return (
+                      <ListItem key={data.standard_id} disablePadding>
+                        <ListItemButton dense>
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              tabIndex={-1}
+                              disableRipple
+                              defaultChecked={selectedStandard.includes(
+                                data.standard_id
+                              )}
+                              inputProps={{
+                                "aria-labelledby": data.standard_id,
+                              }}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedStandard([
+                                    ...selectedStandard,
+                                    data.standard_id,
+                                  ]);
+                                } else {
+                                  setSelectedStandard(
+                                    selectedStandard.filter(
+                                      (standard) =>
+                                        standard !== data.standard_id
+                                    )
+                                  );
+                                }
+                              }}
                             />
-                          </ListItemButton>
-                        </ListItem>
-                      );
-                    }
-                  })}
-                </List>
-              </Grid>
-            )}
+                          </ListItemIcon>
+                          <ListItemText
+                            id={data.standard_id}
+                            primary={data.standard_name}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  }
+                })}
+              </List>
+            </Grid>
 
             {/* {(jwtDecode(prop.jwt_token) as { role: string }).role ===
               "farmers" && (
@@ -876,66 +881,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Grid>
               </>
             )}
-            <Grid item xs={12}>
-              <List
-                subheader={
-                  <ListSubheader component="div" id="nested-list-subheader">
-                    มาตรฐานสินค้า
-                  </ListSubheader>
-                }
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "background.paper",
-                }}
-              >
-                {allStandard.map((data, index) => {
-                  if (
-                    data.standard_name !== "ไม่มี" &&
-                    data.standard_name !== "อื่นๆ"
-                  ) {
-                    return (
-                      <ListItem key={data.standard_id} disablePadding>
-                        <ListItemButton dense>
-                          <ListItemIcon>
-                            <Checkbox
-                              edge="start"
-                              tabIndex={-1}
-                              disableRipple
-                              defaultChecked={selectedStandard.includes(
-                                data.standard_id
-                              )}
-                              inputProps={{
-                                "aria-labelledby": data.standard_id,
-                              }}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedStandard([
-                                    ...selectedStandard,
-                                    data.standard_id,
-                                  ]);
-                                } else {
-                                  setSelectedStandard(
-                                    selectedStandard.filter(
-                                      (standard) =>
-                                        standard !== data.standard_id
-                                    )
-                                  );
-                                }
-                              }}
-                            />
-                          </ListItemIcon>
-                          <ListItemText
-                            id={data.standard_id}
-                            primary={data.standard_name}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  }
-                })}
-              </List>
-            </Grid>
+
             <Grid item xs={12}>
               <Divider />
             </Grid>
