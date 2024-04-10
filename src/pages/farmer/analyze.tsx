@@ -15,6 +15,7 @@ import axios from "axios";
 import FollowChart from "../../components/followchart";
 import RankingproductChart from "../../components/rankingproduct";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import Yearlybar from "../../components/yearlybar";
 
 interface Saletoday {
   category_name: string;
@@ -78,11 +79,22 @@ const Analyze = (prop: { jwt_token: string }) => {
   );
   const [buyToday, setBuyToday] = React.useState<Saletoday[]>();
   const [reserveToday, setReserveToday] = React.useState<Reservetoday[]>();
+  const [yearlyReserve, setYearlyReserve] = React.useState<
+    {
+      product_name: string;
+      product_id: string;
+    }[]
+  >([]);
+  const [selectedYearlyReserve, setSelectedYearlyReserve] = React.useState<{
+    product_name: string;
+    product_id: string;
+  }>();
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
     const apiSelfInfo = config.getApiEndpoint("farmerselfinfo", "GET");
     const apiAllsum = config.getApiEndpoint("allsum", "GET");
+    const apiReserveProduct = config.getApiEndpoint("reserveproduct", "GET");
     axios
       .get(apiFollowMember, {
         headers: {
@@ -160,6 +172,16 @@ const Analyze = (prop: { jwt_token: string }) => {
             };
           })
         );
+      });
+    axios
+      .get(apiReserveProduct + "/เปิดรับจองตลอด", {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setYearlyReserve(res.data);
       });
   }, []);
 
@@ -436,18 +458,40 @@ const Analyze = (prop: { jwt_token: string }) => {
           </Typography>
         </Grid>
 
-        <DataGrid
-          rows={reserveToday ? reserveToday : []}
-          columns={[
-            { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
-            { field: "contact", headerName: "ติดต่อ", flex: 1 },
-            { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-            { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+        <Grid xs={12}>
+          <DataGrid
+            rows={reserveToday ? reserveToday : []}
+            columns={[
+              { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+              { field: "contact", headerName: "ติดต่อ", flex: 1 },
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "total_quantity", headerName: "จำนวน", flex: 1 },
 
-            { field: "status", headerName: "สถานะ", flex: 1 },
-          ]}
-        />
-
+              { field: "status", headerName: "สถานะ", flex: 1 },
+            ]}
+          />
+        </Grid>
+        <Grid xs={6} sx={{ marginTop: 2 }}>
+          <TextField select label="เลือกสินค้าการจอง" fullWidth>
+            {yearlyReserve.map((product) => (
+              <MenuItem
+                value={product.product_id}
+                onClick={() => setSelectedYearlyReserve(product)}
+              >
+                {product.product_name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid xs={12} sx={{ marginTop: 2 }}>
+          {selectedYearlyReserve && (
+            <Yearlybar
+              jwt_token={prop.jwt_token}
+              product_name={selectedYearlyReserve.product_name}
+              product_id={selectedYearlyReserve.product_id}
+            />
+          )}
+        </Grid>
         <Grid xs={12}>
           <Divider
             sx={{
