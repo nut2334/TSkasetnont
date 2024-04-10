@@ -84,6 +84,7 @@ interface FullProductInterface {
   lat: number | undefined;
   lng: number | undefined;
   lastLogin: string;
+  forecastDate: string;
 }
 
 const style = {
@@ -140,6 +141,7 @@ const SigleProduct = (prop: {
     lat: undefined,
     lng: undefined,
     lastLogin: "",
+    forecastDate: "",
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -472,39 +474,6 @@ const SigleProduct = (prop: {
             สินค้าหมด
           </div>
         )}
-        {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
-          <>
-            <Typography>ประเภทการจอง: {product.selectedStatus}</Typography>
-            {product.date_reserve_start && product.date_reserve_end && (
-              <Typography>
-                <span>
-                  ระยะเวลาจองสินค้า :{" "}
-                  {new Date(product.date_reserve_start).toLocaleDateString()}{" "}
-                  ถึง {new Date(product.date_reserve_end).toLocaleDateString()}
-                </span>
-              </Typography>
-            )}
-            {CheckReserveValid() ? (
-              <Typography
-                style={{
-                  color: "green",
-                }}
-              >
-                {" "}
-                (สามารถจองสินค้าได้)
-              </Typography>
-            ) : (
-              <Typography
-                style={{
-                  color: "red",
-                }}
-              >
-                {" "}
-                (ไม่สามารถจองสินค้าได้)
-              </Typography>
-            )}
-          </>
-        )}
       </Typography>
       {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
         <Typography
@@ -567,7 +536,53 @@ const SigleProduct = (prop: {
         }}
       />
       <Typography variant="h6">รายละเอียดสินค้า</Typography>
-      <Typography>{product.product_description}</Typography>
+      {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
+        <>
+          <Typography>ประเภทการจอง: {product.selectedStatus}</Typography>
+          {product.date_reserve_start && product.date_reserve_end && (
+            <Typography>
+              <span>
+                ระยะเวลาจองสินค้า :{" "}
+                {new Date(product.date_reserve_start).toLocaleDateString()} ถึง{" "}
+                {new Date(product.date_reserve_end).toLocaleDateString()}
+              </span>
+            </Typography>
+          )}
+          {CheckReserveValid() ? (
+            <Typography
+              style={{
+                color: "green",
+              }}
+            >
+              {" "}
+              (สามารถจองสินค้าได้)
+            </Typography>
+          ) : (
+            <Typography
+              style={{
+                color: "red",
+              }}
+            >
+              {" "}
+              (ไม่สามารถจองสินค้าได้)
+            </Typography>
+          )}
+          <Typography>
+            คาดว่าจะได้รับสินค้าในเดือน{" "}
+            {new Date(product.forecastDate).toLocaleDateString("th-TH", {
+              year: "numeric",
+              month: "long",
+            })}
+          </Typography>
+        </>
+      )}
+      <Typography
+        sx={{
+          marginTop: 1,
+        }}
+      >
+        {product.product_description}
+      </Typography>
 
       {/* {product.certificate.length > 0 && (
         <Box
