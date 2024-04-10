@@ -41,6 +41,7 @@ interface Reservetoday {
   username: string;
   status: string;
 }
+
 const Analyze = (prop: { jwt_token: string }) => {
   const [farmerDetail, setFarmerDetail] = React.useState<{
     firstname: string;
@@ -80,6 +81,13 @@ const Analyze = (prop: { jwt_token: string }) => {
   );
   const [buyToday, setBuyToday] = React.useState<Saletoday[]>();
   const [reserveToday, setReserveToday] = React.useState<Reservetoday[]>();
+  const [allReserve, setAllReserve] = React.useState<
+    {
+      product_id: string;
+      product_name: string;
+    }[]
+  >([]);
+  const [productId, setProductId] = React.useState<string>("");
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
@@ -169,6 +177,16 @@ const Analyze = (prop: { jwt_token: string }) => {
           })
         );
       });
+    axios
+      .get(config.getApiEndpoint("reserveproduct/all", "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setAllReserve(res.data);
+      });
   }, []);
 
   useEffect(() => {
@@ -184,6 +202,19 @@ const Analyze = (prop: { jwt_token: string }) => {
         setToday(response.data.today);
       });
   }, [chartType]);
+
+  useEffect(() => {
+    if (productId === "") return;
+    axios
+      .get(config.getApiEndpoint(`reserveproduct/${productId}`, "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
+  }, [productId]);
 
   return (
     <Container
@@ -279,30 +310,9 @@ const Analyze = (prop: { jwt_token: string }) => {
         >
           <Typography variant="h5">
             ยอดขาย{chartType === "date" ? "วันนี้ " : "เดือนนี้ "}
-            {today} รายการ
           </Typography>
         </Grid>
         <Grid>
-          <Grid xs={12}>
-            {chartType == "date" ? (
-              <Typography>
-                ณ วันที่{" "}
-                {new Date().toLocaleDateString("th-TH", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Typography>
-            ) : (
-              <Typography>
-                ณ เดือน{" "}
-                {new Date().toLocaleDateString("th-TH", {
-                  year: "numeric",
-                  month: "long",
-                })}
-              </Typography>
-            )}
-          </Grid>
           <Button
             variant="contained"
             color="info"
@@ -434,17 +444,34 @@ const Analyze = (prop: { jwt_token: string }) => {
           </Typography>
         </Grid>
 
-        <DataGrid
-          rows={reserveToday ? reserveToday : []}
-          columns={[
-            { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
-            { field: "contact", headerName: "ติดต่อ", flex: 1 },
-            { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-            { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+        <Grid item xs={12}>
+          <DataGrid
+            rows={reserveToday ? reserveToday : []}
+            columns={[
+              { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+              { field: "contact", headerName: "ติดต่อ", flex: 1 },
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+              { field: "status", headerName: "สถานะ", flex: 1 },
+            ]}
+          />
+        </Grid>
 
-            { field: "status", headerName: "สถานะ", flex: 1 },
-          ]}
-        />
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            select
+            label="รายการสินค้าจอง"
+            onChange={(e) => setProductId(e.target.value)}
+          >
+            {allReserve.map((product) => (
+              <MenuItem value={product.product_id}>
+                {product.product_name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12}></Grid>
 
         <Grid xs={12}>
           <Divider
