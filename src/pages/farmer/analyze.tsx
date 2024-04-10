@@ -15,6 +15,7 @@ import axios from "axios";
 import FollowChart from "../../components/followchart";
 import RankingproductChart from "../../components/rankingproduct";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import Yearlybar from "../../components/yearlybar";
 import { status_buy } from "../../config/dataDropdown";
 import { status_reserve } from "../../config/dataDropdown";
 
@@ -81,6 +82,16 @@ const Analyze = (prop: { jwt_token: string }) => {
   );
   const [buyToday, setBuyToday] = React.useState<Saletoday[]>();
   const [reserveToday, setReserveToday] = React.useState<Reservetoday[]>();
+  const [yearlyReserve, setYearlyReserve] = React.useState<
+    {
+      product_name: string;
+      product_id: string;
+    }[]
+  >([]);
+  const [selectedYearlyReserve, setSelectedYearlyReserve] = React.useState<{
+    product_name: string;
+    product_id: string;
+  }>();
   const [allReserve, setAllReserve] = React.useState<
     {
       product_id: string;
@@ -93,6 +104,7 @@ const Analyze = (prop: { jwt_token: string }) => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
     const apiSelfInfo = config.getApiEndpoint("farmerselfinfo", "GET");
     const apiAllsum = config.getApiEndpoint("allsum", "GET");
+    const apiReserveProduct = config.getApiEndpoint("reserveproduct", "GET");
     axios
       .get(apiFollowMember, {
         headers: {
@@ -176,6 +188,15 @@ const Analyze = (prop: { jwt_token: string }) => {
             };
           })
         );
+      });
+    axios
+      .get(config.getApiEndpoint("reserveproduct/เปิดรับจองตลอด", "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        setYearlyReserve(res.data);
       });
     axios
       .get(config.getApiEndpoint("reserveproduct/all", "GET"), {
@@ -472,35 +493,55 @@ const Analyze = (prop: { jwt_token: string }) => {
           </TextField>
         </Grid>
         <Grid item xs={12}></Grid>
-
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-            textAlign="left"
-          >
-            <Typography>ผู้ติดตาม</Typography>
-          </Divider>
-        </Grid>
-
-        <Grid xs={12}>
-          <Typography variant="h5">
-            ยอดผู้ติดตามทั้งหมด {allfollowers} คน
-          </Typography>
-        </Grid>
-        <Grid xs={12}>
-          <FollowChart follower={follower} />
-        </Grid>
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
+      </Grid>
+      <Grid xs={6} sx={{ marginTop: 2 }}>
+        <TextField select label="เลือกสินค้าการจอง" fullWidth>
+          {yearlyReserve.map((product) => (
+            <MenuItem
+              value={product.product_id}
+              onClick={() => setSelectedYearlyReserve(product)}
+            >
+              {product.product_name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid xs={12} sx={{ marginTop: 2 }}>
+        {selectedYearlyReserve && (
+          <Yearlybar
+            jwt_token={prop.jwt_token}
+            product_name={selectedYearlyReserve.product_name}
+            product_id={selectedYearlyReserve.product_id}
           />
-        </Grid>
+        )}
+      </Grid>
+      <Grid xs={12}>
+        <Divider
+          sx={{
+            width: "100%",
+            margin: 2,
+          }}
+          textAlign="left"
+        >
+          <Typography>ผู้ติดตาม</Typography>
+        </Divider>
+      </Grid>
+
+      <Grid xs={12}>
+        <Typography variant="h5">
+          ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+        </Typography>
+      </Grid>
+      <Grid xs={12}>
+        <FollowChart follower={follower} />
+      </Grid>
+      <Grid xs={12}>
+        <Divider
+          sx={{
+            width: "100%",
+            margin: 2,
+          }}
+        />
       </Grid>
     </Container>
   );
