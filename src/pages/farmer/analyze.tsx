@@ -96,9 +96,15 @@ const Analyze = (prop: { jwt_token: string }) => {
     {
       product_id: string;
       product_name: string;
+      period: string;
     }[]
   >([]);
-  const [productId, setProductId] = React.useState<string>("");
+  const [productId, setProductId] = React.useState<{
+    product_id: string;
+    product_name: string;
+    period: string;
+  }>();
+  const [reserveTable, setReserveTable] = React.useState<Reservetoday[]>([]);
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
@@ -225,15 +231,28 @@ const Analyze = (prop: { jwt_token: string }) => {
   }, [chartType]);
 
   useEffect(() => {
-    if (productId === "") return;
+    if (productId?.product_id === "") return;
     axios
-      .get(config.getApiEndpoint(`reserveproduct/${productId}`, "GET"), {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      })
+      .get(
+        config.getApiEndpoint(`reservetable/${productId?.product_id}`, "GET"),
+        {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        }
+      )
       .then((res) => {
-        console.log(res.data);
+        setReserveTable(
+          res.data.map((order: Reservetoday, index: number) => {
+            return {
+              ...order,
+              id: index,
+              status: status_reserve.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
+            };
+          })
+        );
       });
   }, [productId]);
 
@@ -477,23 +496,68 @@ const Analyze = (prop: { jwt_token: string }) => {
             ]}
           />
         </Grid>
-
+        {productId?.period && (
+          <Grid xs={12} sx={{ marginTop: 2 }}>
+            <Typography variant="h5">
+              การจองสินค้า{"(" + productId.product_name + ") "}ตัดรอบทุก{" "}
+              {new Date(productId.period).toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "long",
+              })}{" "}
+              ทั้งหมด {reserveTable ? reserveTable.length : "0"} รายการ
+            </Typography>
+          </Grid>
+        )}
         <Grid item xs={6}>
-          <TextField
-            fullWidth
-            select
-            label="รายการสินค้าจอง"
-            onChange={(e) => setProductId(e.target.value)}
-          >
+          <TextField fullWidth select label="รายการสินค้าจอง">
             {allReserve.map((product) => (
-              <MenuItem value={product.product_id}>
+              <MenuItem
+                value={product.product_id}
+                onClick={() => setProductId(product)}
+              >
                 {product.product_name}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12}></Grid>
+
+        <Grid item xs={12}>
+          <DataGrid
+            rows={reserveTable ? reserveTable : []}
+            columns={[
+              { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+              { field: "contact", headerName: "ติดต่อ", flex: 1 },
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+              { field: "status", headerName: "สถานะ", flex: 1 },
+            ]}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            ยอดรวมสินค้าทั้งหมด{" "}
+            {reserveTable.reduce((acc, order) => acc + order.total_quantity, 0)}{" "}
+            ชิ้น
+          </Typography>
+          <Typography>
+            ยอดรวมสินค้าที่อนุมัติแล้ว{" "}
+            {reserveTable.reduce((acc, order) => {
+              if (order.status === "สำเร็จ") {
+                return acc + order.total_quantity;
+              }
+              return acc;
+            }, 0)}{" "}
+            ชิ้น
+          </Typography>
+        </Grid>
       </Grid>
+      {selectedYearlyReserve && (
+        <Grid xs={12}>
+          <Typography variant="h5">
+            ยอดการจอง{selectedYearlyReserve.product_name}ประจำปี{" "}
+          </Typography>
+        </Grid>
+      )}
       <Grid xs={6} sx={{ marginTop: 2 }}>
         <TextField select label="เลือกสินค้าการจอง" fullWidth>
           {yearlyReserve.map((product) => (

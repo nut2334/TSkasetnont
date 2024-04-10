@@ -60,8 +60,11 @@ const Yearlybar = (prop: {
             <span>
               ยอดการจอง{prop.product_name}ประจำปี{" "}
               {data.length == 1
-                ? data[0].year + 543
-                : data[0].year + 543 + " - " + data[data.length - 1].year + 543}
+                ? parseInt(data[0].year) + 543
+                : `${parseInt(data[0].year) + 543}` +
+                  " - " +
+                  `${parseInt(data[data.length - 1].year)}` +
+                  543}
             </span>
           </Typography>
           <Bar
