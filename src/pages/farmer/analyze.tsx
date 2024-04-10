@@ -198,11 +198,13 @@ const Analyze = (prop: { jwt_token: string }) => {
       .then((res) => {
         setYearlyReserve(res.data);
       });
-      axios.get(config.getApiEndpoint("reserveproduct/all", "GET"), {
+    axios
+      .get(config.getApiEndpoint("reserveproduct/all", "GET"), {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
-      }).then((res) => {
+      })
+      .then((res) => {
         console.log(res.data);
         setAllReserve(res.data);
       });
@@ -491,60 +493,55 @@ const Analyze = (prop: { jwt_token: string }) => {
           </TextField>
         </Grid>
         <Grid item xs={12}></Grid>
-
-              { field: "status", headerName: "สถานะ", flex: 1 },
-            ]}
+      </Grid>
+      <Grid xs={6} sx={{ marginTop: 2 }}>
+        <TextField select label="เลือกสินค้าการจอง" fullWidth>
+          {yearlyReserve.map((product) => (
+            <MenuItem
+              value={product.product_id}
+              onClick={() => setSelectedYearlyReserve(product)}
+            >
+              {product.product_name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid xs={12} sx={{ marginTop: 2 }}>
+        {selectedYearlyReserve && (
+          <Yearlybar
+            jwt_token={prop.jwt_token}
+            product_name={selectedYearlyReserve.product_name}
+            product_id={selectedYearlyReserve.product_id}
           />
-        </Grid>
-        <Grid xs={6} sx={{ marginTop: 2 }}>
-          <TextField select label="เลือกสินค้าการจอง" fullWidth>
-            {yearlyReserve.map((product) => (
-              <MenuItem
-                value={product.product_id}
-                onClick={() => setSelectedYearlyReserve(product)}
-              >
-                {product.product_name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid xs={12} sx={{ marginTop: 2 }}>
-          {selectedYearlyReserve && (
-            <Yearlybar
-              jwt_token={prop.jwt_token}
-              product_name={selectedYearlyReserve.product_name}
-              product_id={selectedYearlyReserve.product_id}
-            />
-          )}
-        </Grid>
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-            textAlign="left"
-          >
-            <Typography>ผู้ติดตาม</Typography>
-          </Divider>
-        </Grid>
+        )}
+      </Grid>
+      <Grid xs={12}>
+        <Divider
+          sx={{
+            width: "100%",
+            margin: 2,
+          }}
+          textAlign="left"
+        >
+          <Typography>ผู้ติดตาม</Typography>
+        </Divider>
+      </Grid>
 
-        <Grid xs={12}>
-          <Typography variant="h5">
-            ยอดผู้ติดตามทั้งหมด {allfollowers} คน
-          </Typography>
-        </Grid>
-        <Grid xs={12}>
-          <FollowChart follower={follower} />
-        </Grid>
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-          />
-        </Grid>
+      <Grid xs={12}>
+        <Typography variant="h5">
+          ยอดผู้ติดตามทั้งหมด {allfollowers} คน
+        </Typography>
+      </Grid>
+      <Grid xs={12}>
+        <FollowChart follower={follower} />
+      </Grid>
+      <Grid xs={12}>
+        <Divider
+          sx={{
+            width: "100%",
+            margin: 2,
+          }}
+        />
       </Grid>
     </Container>
   );
