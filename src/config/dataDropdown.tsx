@@ -56,3 +56,37 @@ export const nonthaburi_amphure = [
     amphureName: "ปากเกร็ด",
   },
 ];
+
+export const status_buy = [
+  {
+    statusID: "waiting",
+    statusName: "รอจัดส่ง",
+  },
+  {
+    statusID: "complete",
+    statusName: "สำเร็จ",
+  },
+  {
+    statusID: "reject",
+    statusName: "ยกเลิก",
+  },
+  {
+    statusID: "pending",
+    statusName: "รอการตรวจสอบ",
+  },
+];
+
+export const status_reserve = [
+  {
+    statusID: "complete",
+    statusName: "สำเร็จ",
+  },
+  {
+    statusID: "reject",
+    statusName: "ยกเลิก",
+  },
+  {
+    statusID: "pending",
+    statusName: "รอการตรวจสอบ",
+  },
+];

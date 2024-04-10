@@ -16,6 +16,8 @@ import FollowChart from "../../components/followchart";
 import RankingproductChart from "../../components/rankingproduct";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Yearlybar from "../../components/yearlybar";
+import { status_buy } from "../../config/dataDropdown";
+import { status_reserve } from "../../config/dataDropdown";
 
 interface Saletoday {
   category_name: string;
@@ -40,6 +42,7 @@ interface Reservetoday {
   username: string;
   status: string;
 }
+
 const Analyze = (prop: { jwt_token: string }) => {
   const [farmerDetail, setFarmerDetail] = React.useState<{
     firstname: string;
@@ -89,6 +92,13 @@ const Analyze = (prop: { jwt_token: string }) => {
     product_name: string;
     product_id: string;
   }>();
+  const [allReserve, setAllReserve] = React.useState<
+    {
+      product_id: string;
+      product_name: string;
+    }[]
+  >([]);
+  const [productId, setProductId] = React.useState<string>("");
 
   useEffect(() => {
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
@@ -152,6 +162,9 @@ const Analyze = (prop: { jwt_token: string }) => {
             return {
               ...order,
               id: index,
+              status: status_buy.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
             };
           })
         );
@@ -169,19 +182,29 @@ const Analyze = (prop: { jwt_token: string }) => {
             return {
               ...order,
               id: index,
+              status: status_reserve.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
             };
           })
         );
       });
     axios
-      .get(apiReserveProduct + "/เปิดรับจองตลอด", {
+      .get(config.getApiEndpoint("reserveproduct/เปิดรับจองตลอด", "GET"), {
         headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
       })
       .then((res) => {
-        console.log(res.data);
         setYearlyReserve(res.data);
+      });
+      axios.get(config.getApiEndpoint("reserveproduct/all", "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      }).then((res) => {
+        console.log(res.data);
+        setAllReserve(res.data);
       });
   }, []);
 
@@ -198,6 +221,19 @@ const Analyze = (prop: { jwt_token: string }) => {
         setToday(response.data.today);
       });
   }, [chartType]);
+
+  useEffect(() => {
+    if (productId === "") return;
+    axios
+      .get(config.getApiEndpoint(`reserveproduct/${productId}`, "GET"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
+  }, [productId]);
 
   return (
     <Container
@@ -251,12 +287,12 @@ const Analyze = (prop: { jwt_token: string }) => {
               }}
               textAlign="left"
             >
-              สินค้าที่จัดส่งพัสดุ
+              <Typography>สินค้าที่จัดส่งพัสดุ</Typography>
             </Divider>
           </Grid>
         )}
         <Grid xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5">
             สินค้าที่ขายไปวันนี้ {today} รายการ
           </Typography>
         </Grid>
@@ -283,14 +319,7 @@ const Analyze = (prop: { jwt_token: string }) => {
             ]}
           />
         </Grid>
-        <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-          />
-        </Grid>
+
         <Grid
           xs={12}
           sx={{
@@ -300,30 +329,9 @@ const Analyze = (prop: { jwt_token: string }) => {
         >
           <Typography variant="h5">
             ยอดขาย{chartType === "date" ? "วันนี้ " : "เดือนนี้ "}
-            {today} รายการ
           </Typography>
         </Grid>
         <Grid>
-          <Grid xs={12}>
-            {chartType == "date" ? (
-              <Typography>
-                ณ วันที่{" "}
-                {new Date().toLocaleDateString("th-TH", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Typography>
-            ) : (
-              <Typography>
-                ณ เดือน{" "}
-                {new Date().toLocaleDateString("th-TH", {
-                  year: "numeric",
-                  month: "long",
-                })}
-              </Typography>
-            )}
-          </Grid>
           <Button
             variant="contained"
             color="info"
@@ -389,10 +397,13 @@ const Analyze = (prop: { jwt_token: string }) => {
         <Grid xs={12}>
           <Divider
             sx={{
-              width: "100%",
-              margin: 2,
+              marginTop: 2,
+              marginBottom: 2,
             }}
-          />
+            textAlign="left"
+          >
+            <Typography>จองสินค้า</Typography>
+          </Divider>
         </Grid>
 
         {/* <Box>
@@ -437,15 +448,9 @@ const Analyze = (prop: { jwt_token: string }) => {
         )} */}
 
         <Grid xs={12}>
-          <Divider
-            sx={{
-              width: "100%",
-              margin: 2,
-            }}
-          />
-        </Grid>
-        <Grid xs={12}>
-          <Typography variant="h5">การจองสินค้าวันนี้</Typography>
+          <Typography variant="h5">
+            การจองสินค้าวันนี้ {reserveToday ? reserveToday.length : "0"} รายการ
+          </Typography>
         </Grid>
         <Grid xs={12}>
           <Typography>
@@ -458,7 +463,7 @@ const Analyze = (prop: { jwt_token: string }) => {
           </Typography>
         </Grid>
 
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <DataGrid
             rows={reserveToday ? reserveToday : []}
             columns={[
@@ -466,6 +471,26 @@ const Analyze = (prop: { jwt_token: string }) => {
               { field: "contact", headerName: "ติดต่อ", flex: 1 },
               { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
               { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+              { field: "status", headerName: "สถานะ", flex: 1 },
+            ]}
+          />
+        </Grid>
+
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            select
+            label="รายการสินค้าจอง"
+            onChange={(e) => setProductId(e.target.value)}
+          >
+            {allReserve.map((product) => (
+              <MenuItem value={product.product_id}>
+                {product.product_name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12}></Grid>
 
               { field: "status", headerName: "สถานะ", flex: 1 },
             ]}
@@ -498,7 +523,10 @@ const Analyze = (prop: { jwt_token: string }) => {
               width: "100%",
               margin: 2,
             }}
-          />
+            textAlign="left"
+          >
+            <Typography>ผู้ติดตาม</Typography>
+          </Divider>
         </Grid>
 
         <Grid xs={12}>
