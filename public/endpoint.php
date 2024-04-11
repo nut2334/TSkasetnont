@@ -116,9 +116,9 @@ if (isset($endpoint) && isset($method)) {
     }
 
     $json_data = file_get_contents($rest_api_url, false, stream_context_create($options));
-
+    
     header('Content-Type: application/json; charset=utf-8');
-    // Reads the JSON file.
+    header($http_response_header[0]);
     header('Access-Control-Allow-Origin: *');
     header("Access-Control-Allow-Methods: *");
     header("Access-Control-Allow-Headers: *");

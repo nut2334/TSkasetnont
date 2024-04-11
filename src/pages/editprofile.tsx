@@ -415,12 +415,7 @@ const EditProfile = (prop: {
       formData.append("role", prop.admin.role);
     }
 
-    if (
-      jwtDecode<{
-        role: string;
-      }>(prop.jwt_token).role == "farmers" ||
-      prop.admin?.role == "farmers"
-    ) {
+    if (role == "farmers" || prop.admin?.role == "farmers") {
       console.log(2);
       formData.append("lat", position?.lat.toString() as string);
       formData.append("lng", position?.lng.toString() as string);
@@ -781,10 +776,7 @@ const EditProfile = (prop: {
                 }
               />
             </Grid>
-            {(jwtDecode<{
-              role: string;
-            }>(prop.jwt_token).role == "farmers" ||
-              prop.admin?.role == "farmers") && (
+            {(role == "farmers" || prop.admin?.role == "farmers") && (
               <>
                 <Grid item xs={12}>
                   <Divider textAlign="left">
@@ -989,7 +981,7 @@ const EditProfile = (prop: {
                   required
                   select
                   fullWidth
-                  label="อำเภอ"
+                  label="เขต/อำเภอ"
                   error={!checkAmphure}
                   helperText={
                     selected.amphure_name_th == undefined &&
