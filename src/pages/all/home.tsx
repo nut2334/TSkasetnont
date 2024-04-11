@@ -9,6 +9,7 @@ import {
   Chip,
   Box,
   Typography,
+  Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
@@ -237,191 +238,219 @@ const Home = (prop: {
     ) : null;
   };
 
-  return (
-    <div>
-      <SwipeableEdgeDrawer
-        open={open}
-        setOpen={setOpen}
-        selectedProduct={selectedProduct}
-        jwt_token={prop.jwt_token}
-        cartList={prop.cartList}
-        setCartList={prop.setCartList}
-      />
-      <Box
-        sx={{
-          height: "100%",
-          width: "250px",
-          position: "absolute",
-          zIndex: 2,
-          backgroundColor: "#ffffff",
-          padding: "10px",
-          boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px",
-        }}
-      >
-        {productPage.map((item, index) => {
-          return (
-            <Typography
-              key={index}
-              sx={{
-                cursor: "pointer",
-                "&:hover": {
-                  color: "green",
-                },
-              }}
-              onClick={() => {
-                setOpen(true);
-                setSelectedProduct(item);
-                if (item.lat && item.lng) {
-                  setPosition({
-                    lat: parseFloat(item.lat),
-                    lng: parseFloat(item.lng),
-                  });
-                }
-              }}
-            >
-              {item.product_name}
-            </Typography>
-          );
-        })}
-
+  try {
+    return (
+      <div>
+        <SwipeableEdgeDrawer
+          open={open}
+          setOpen={setOpen}
+          selectedProduct={selectedProduct}
+          jwt_token={prop.jwt_token}
+          cartList={prop.cartList}
+          setCartList={prop.setCartList}
+        />
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px",
-            marginBottom: "10px",
+            height: "100%",
+            width: "250px",
+            position: "absolute",
+            zIndex: 2,
+            backgroundColor: "#ffffff",
+            padding: "10px",
+            boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px",
           }}
         >
-          <Pagination
-            count={Math.ceil(data.length / 10)}
-            page={page}
-            onChange={(e, value) => {
-              setPage(value);
-            }}
-          />
-        </Box>
-      </Box>
-      <MapContainer
-        center={[13.810300182207499, 100.47597885131837]}
-        zoom={15}
-        scrollWheelZoom={true}
-        style={{
-          width: "100%",
-          height: "100vh",
-          zIndex: 1,
-          maxHeight: "calc(100vh - 80px)",
-        }}
-        zoomControl={false}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {data.map((item, index) => {
-          return <CreateMarker key={index} item={item} />;
-        })}
-      </MapContainer>
-      <Container
-        maxWidth="lg"
-        sx={{
-          position: "absolute",
-          zIndex: 2,
-          top: "10%",
-          width: "100%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          "@media (max-width: 600px)": {
-            left: "initial",
-            transform: "initial",
-            marginLeft: "auto",
-            marginRight: "auto",
-          },
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            borderRadius: "100px",
-            flexDirection: "row",
-            justifyContent: "center",
-            backgroundColor: "white",
-            paddingLeft: "30px",
-            boxShadow:
-              "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
-          }}
-        >
-          <InputBase
-            sx={{
-              width: "100%",
-            }}
-            placeholder="ค้นหาสินค้า"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                setSearchContent(search);
-              }
-            }}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-          <IconButton
-            type="button"
-            sx={{ p: "10px", background: "#F5F5F5" }}
-            aria-label="search"
-            onClick={() => {
-              setSearchContent(search);
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-        </div>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="icon label tabs example"
-          sx={{
-            marginTop: "20px",
-          }}
-          variant="scrollable"
-          scrollButtons="auto"
-        >
-          {allCategory.map((item, index) => {
-            let bgcolor = item.bgcolor
-              ? JSON.parse(item.bgcolor)
-              : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                  r: number;
-                  g: number;
-                  b: number;
-                  a: number;
-                });
+          {productPage.map((item, index) => {
             return (
-              <Chip
+              <Typography
                 key={index}
-                label={item.category_name}
-                icon={
-                  <LocationOnIcon
-                    sx={{
-                      fill: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                    }}
-                  />
-                }
                 sx={{
-                  // backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                  backgroundColor: "white",
-                  color: "black",
-                  // color: `${isDark(bgcolor) ? "white" : "black"}`,
-                  marginRight: "5px",
-                  boxShadow:
-                    "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
+                  cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                    color: "green",
                   },
                 }}
-                onClick={() => setSelectedCategory(item)}
-              />
+                onClick={() => {
+                  setOpen(true);
+                  setSelectedProduct(item);
+                  if (item.lat && item.lng) {
+                    setPosition({
+                      lat: parseFloat(item.lat),
+                      lng: parseFloat(item.lng),
+                    });
+                  }
+                }}
+              >
+                {item.product_name}
+              </Typography>
             );
           })}
-        </Tabs>
-      </Container>
-    </div>
-  );
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <Pagination
+              count={Math.ceil(data.length / 10)}
+              page={page}
+              onChange={(e, value) => {
+                setPage(value);
+              }}
+            />
+          </Box>
+        </Box>
+        <MapContainer
+          center={[13.810300182207499, 100.47597885131837]}
+          zoom={15}
+          scrollWheelZoom={true}
+          style={{
+            width: "100%",
+            height: "100vh",
+            zIndex: 1,
+            maxHeight: "calc(100vh - 80px)",
+          }}
+          zoomControl={false}
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {data.map((item, index) => {
+            return <CreateMarker key={index} item={item} />;
+          })}
+        </MapContainer>
+        <Container
+          maxWidth="lg"
+          sx={{
+            position: "absolute",
+            zIndex: 2,
+            top: "10%",
+            width: "100%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            "@media (max-width: 600px)": {
+              left: "initial",
+              transform: "initial",
+              marginLeft: "auto",
+              marginRight: "auto",
+            },
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              borderRadius: "100px",
+              flexDirection: "row",
+              justifyContent: "center",
+              backgroundColor: "white",
+              paddingLeft: "30px",
+              boxShadow:
+                "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
+            }}
+          >
+            <InputBase
+              sx={{
+                width: "100%",
+              }}
+              placeholder="ค้นหาสินค้า"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchContent(search);
+                }
+              }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+            />
+            <IconButton
+              type="button"
+              sx={{ p: "10px", background: "#F5F5F5" }}
+              aria-label="search"
+              onClick={() => {
+                setSearchContent(search);
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </div>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="icon label tabs example"
+            sx={{
+              marginTop: "20px",
+            }}
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            {allCategory.map((item, index) => {
+              let bgcolor = item.bgcolor
+                ? JSON.parse(item.bgcolor)
+                : ({ r: 68, g: 93, b: 72, a: 1 } as {
+                    r: number;
+                    g: number;
+                    b: number;
+                    a: number;
+                  });
+              return (
+                <Chip
+                  key={index}
+                  label={item.category_name}
+                  icon={
+                    <LocationOnIcon
+                      sx={{
+                        fill: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                      }}
+                    />
+                  }
+                  sx={{
+                    // backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                    backgroundColor: "white",
+                    color: "black",
+                    // color: `${isDark(bgcolor) ? "white" : "black"}`,
+                    marginRight: "5px",
+                    boxShadow:
+                      "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
+                    "&:hover": {
+                      backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
+                    },
+                  }}
+                  onClick={() => setSelectedCategory(item)}
+                />
+              );
+            })}
+          </Tabs>
+        </Container>
+      </div>
+    );
+  } catch (error) {
+    console.error(error);
+    return (
+      <Stack direction="column" spacing={2} alignItems="center">
+        <Stack>
+          <img
+            src={require("../../assets/sad.png")}
+            alt="sad"
+            width="200"
+            height="200"
+          />
+        </Stack>
+        <Stack>
+          <Typography
+            variant="h4"
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              color: "gray",
+            }}
+          >
+            เกิดข้อผิดพลาดกรุณา น้องนนท์กำลังเร่งแก้ไขน้าา
+          </Typography>
+        </Stack>
+      </Stack>
+    );
+  }
 };
 
 export default Home;
