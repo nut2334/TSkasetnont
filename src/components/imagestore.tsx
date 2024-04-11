@@ -44,16 +44,18 @@ const Imagestore = (prop: {
     >
       <Box
         sx={{
-          position: "absolute" as "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          position: "absolute",
+          width: 400,
+          maxHeight: "90%",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          outline: "none",
         }}
       >
-        {}
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -75,10 +77,61 @@ const Imagestore = (prop: {
           <Divider />
         </Grid>
         {productImage.length > 0 && (
-          <Grid item xs={12} marginTop={2}>
-            <Typography>กดเพื่อเลือก หากไม่ต้องการให้กดอีกครั้ง</Typography>
-          </Grid>
+          <>
+            <Grid item xs={12} marginTop={2}>
+              {prop.imgType == "video" && (
+                <>
+                  <Typography variant="h6">คำอธิบาย</Typography>
+                  <Typography>
+                    กดเพื่อเลือก หากไม่ต้องการให้กดอีกครั้ง
+                    แล้วเลือกวิดีโอที่ต้องการ
+                  </Typography>
+                  <Typography>
+                    {selectedImage.length}/{prop.imageSelect} วิดีโอที่เลือก
+                  </Typography>
+                </>
+              )}
+              {prop.imgType == "image" && (
+                <>
+                  <Typography variant="h6">คำอธิบาย</Typography>
+                  <Typography>
+                    กดเพื่อเลือก หากไม่ต้องการให้กดอีกครั้ง
+                    แล้วเลือกรูปภาพที่ต้องการ
+                  </Typography>
+                  <Typography>
+                    {selectedImage.length}/{prop.imageSelect} รูปภาพที่เลือก
+                  </Typography>
+                </>
+              )}
+            </Grid>
+          </>
         )}
+        <Grid item xs={12} marginTop={2}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              prop.setSelectImage(selectedImage);
+              prop.closeModal();
+            }}
+            sx={{
+              marginRight: "5px",
+            }}
+          >
+            ยืนยัน
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              prop.closeModal();
+            }}
+            color="error"
+          >
+            ยกเลิก
+          </Button>
+        </Grid>
+        <Grid item xs={12} marginTop={2}>
+          <Divider />
+        </Grid>
         <Grid item xs={12} marginTop={2}>
           <ImageList
             sx={{ width: "100%", height: 450 }}
@@ -219,32 +272,6 @@ const Imagestore = (prop: {
               });
           }}
         />
-        <Grid item xs={12} marginTop={2}>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} marginTop={2}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              prop.setSelectImage(selectedImage);
-              prop.closeModal();
-            }}
-            sx={{
-              marginRight: "5px",
-            }}
-          >
-            ยืนยัน
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              prop.closeModal();
-            }}
-            color="error"
-          >
-            ยกเลิก
-          </Button>
-        </Grid>
       </Box>
     </Modal>
   );

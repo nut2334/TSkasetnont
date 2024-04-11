@@ -34,6 +34,8 @@ import Follow from "./member/follow";
 import { nonthaburi_amphure } from "../config/dataDropdown";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
+import SearchIcon from "@mui/icons-material/Search";
+import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -78,6 +80,8 @@ const EditProfile = (prop: {
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
 
+  const [role, setRole] = useState<string>();
+
   const [username, setUsername] = useState<string>("");
   const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
   const [usernameReg, setUsernameReg] = useState<boolean>(true);
@@ -104,7 +108,6 @@ const EditProfile = (prop: {
   const [allrole, setAllrole] = useState<
     [{ role_id: string; role_name: string }]
   >([{ role_id: "", role_name: "" }]);
-  const [role, setRole] = useState<string>();
   const [storeName, setStoreName] = useState<string>("");
   const [provinces, setProvinces] = useState<province[]>([]);
   const [amphures, setAmphures] = useState<amphure[]>([]);
@@ -133,6 +136,11 @@ const EditProfile = (prop: {
     }[]
   >([{ weight: 0, price: 0 }]);
   const [qrCode, setQrCode] = useState<File | null>(null);
+  const [changelat, setChangelat] = useState<string>();
+  const [changelng, setChangelng] = useState<number>();
+  const [checkPosition, setCheckPosition] = useState<boolean>(true);
+  // const inputlat = changelat === 0 || changelat ? changelat : ""; //ดักค่าNaN
+  const inputlng = changelng === 0 || changelng ? changelng : "";
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -299,8 +307,18 @@ const EditProfile = (prop: {
             setFacebookLink(res.data.facebooklink);
             setLineId(res.data.lineid);
             if (res.data.lat && res.data.lng) {
-              setPosition({ lat: res.data.lat, lng: res.data.lng });
+              setChangelat(res.data.lat);
+              setChangelng(parseFloat(res.data.lng));
+              setPosition({
+                lat: parseFloat(res.data.lat),
+                lng: parseFloat(res.data.lng),
+              });
             }
+            setSelected({
+              province_name_th: res.data.province,
+              amphure_name_th: res.data.amphure,
+              tambon_name_th: res.data.tambon,
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -342,7 +360,12 @@ const EditProfile = (prop: {
             setFacebookLink(res.data.facebooklink);
             setLineId(res.data.lineid);
             if (res.data.lat && res.data.lng) {
-              setPosition({ lat: res.data.lat, lng: res.data.lng });
+              setChangelat(res.data.lat);
+              setChangelng(parseFloat(res.data.lng));
+              setPosition({
+                lat: parseFloat(res.data.lat),
+                lng: parseFloat(res.data.lng),
+              });
             }
             setSelected({
               province_name_th: res.data.province,
@@ -404,7 +427,6 @@ const EditProfile = (prop: {
         setCheckAmphure(true);
       }
     }
-
     const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
@@ -417,8 +439,13 @@ const EditProfile = (prop: {
 
     if (role == "farmers" || prop.admin?.role == "farmers") {
       console.log(2);
-      formData.append("lat", position?.lat.toString() as string);
-      formData.append("lng", position?.lng.toString() as string);
+      if (changelat && changelng) {
+        formData.append("lat", changelat);
+        formData.append("lng", changelng.toString());
+      } else {
+        setCheckPosition(false);
+        return;
+      }
       formData.append("address", address);
       formData.append("farmerstorename", storeName);
 
@@ -462,88 +489,6 @@ const EditProfile = (prop: {
         console.log(err);
         EdituserFail();
       });
-
-    // var data = {
-    //   username: username,
-    //   email: email,
-    //   firstname: firstName,
-    //   lastname: lastName,
-    //   phone: tel,
-    // } as {
-    //   username: string;
-    //   email?: string;
-    //   firstname?: string;
-    //   lastname?: string;
-    //   phone?: string;
-    //   farmerstorename?: string;
-    //   province?: string;
-    //   amphure?: string;
-    //   tambon?: string;
-    //   role?: string;
-    //   lat?: number;
-    //   lng?: number;
-    //   facebooklink?: string;
-    //   lineid?: string;
-    //   address?: string;
-    //   zipcode?: number;
-    //   shippingcost?: { weight: number; price: number }[];
-    //   qrCode?: File;
-    // };
-    // console.log(data);
-    // if (prop.admin) {
-    //   data = { ...data, role: prop.admin.role };
-    // }
-
-    // if (
-    //   jwtDecode<{
-    //     role: string;
-    //   }>(prop.jwt_token).role == "farmers" ||
-    //   prop.admin?.role == "farmers"
-    // ) {
-    //   console.log(position);
-
-    //   data = {
-    //     ...data,
-    //     address: address,
-    //     farmerstorename: storeName,
-    //     province: selected.province_name_th,
-    //     amphure: selected.amphure_name_th,
-    //     tambon: selected.tambon_name_th,
-    //     lat: position?.lat,
-    //     lng: position?.lng,
-    //     facebooklink: facebookLink,
-    //     lineid: lineId,
-    //     zipcode: zipCode,
-    //     shippingcost: shippingcost,
-    //     qrCode: qrCode,
-    //   };
-    // }
-
-    // if (role === "members" || prop.admin?.role === "members") {
-    //   data = { ...data, address: address };
-    // }
-    // if (role === "tambons" || prop.admin?.role === "tambons") {
-    //   data = {
-    //     ...data,
-    //     amphure: selected.amphure_name_th,
-    //   };
-    // }
-
-    // axios
-    //   .post(prop.admin ? apiUpdateInfoadmin : apiUpdateInfo, data, {
-    //     headers: {
-    //       Authorization: `Bearer ${prop.jwt_token}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     EdituserSuccess();
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     EdituserFail();
-    //   });
   };
   const changePassword = () => {
     console.log("passwordNew: ", passwordNew);
@@ -603,6 +548,8 @@ const EditProfile = (prop: {
     useMapEvents({
       click(e) {
         setPosition(e.latlng);
+        setChangelat(e.latlng.lat.toString());
+        setChangelng(e.latlng.lng);
         map.flyTo(e.latlng, map.getZoom());
         if (prop.current) {
           setCurrent(false);
@@ -619,6 +566,8 @@ const EditProfile = (prop: {
       if (prop.current && position == undefined) {
         map.locate().on("locationfound", function (e) {
           setPosition(e.latlng);
+          setChangelat(e.latlng.lat.toString());
+          setChangelng(e.latlng.lng);
           map.flyTo(e.latlng, map.getZoom());
         });
       }
@@ -701,6 +650,7 @@ const EditProfile = (prop: {
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   onBlurEmail(event)
                 }
+                required={role == "members"}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -723,6 +673,7 @@ const EditProfile = (prop: {
                     ? "ชื่อต้องเป็นภาษาไทย หรือ ภาษาอังกฤษ"
                     : ""
                 }
+                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -747,6 +698,7 @@ const EditProfile = (prop: {
                     ? "ชื่อและนามสกุลต้องเป็นภาษาเดียวกัน"
                     : ""
                 }
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -774,6 +726,7 @@ const EditProfile = (prop: {
                     ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
                     : ""
                 }
+                required
               />
             </Grid>
             {(role == "farmers" || prop.admin?.role == "farmers") && (
@@ -791,14 +744,14 @@ const EditProfile = (prop: {
                     onChange={(event) => setStoreName(event.target.value)}
                   />
                 </Grid>
-                {/* <Grid item xs={12}>
+                <Grid item xs={12}>
                   <TextField
                     label="ช่องทางการชำระเงิน"
                     fullWidth
                     value={payment}
                     onChange={(event) => setPayment(event.target.value)}
                   />
-                </Grid> */}
+                </Grid>
                 {role == "farmers" && (
                   <Grid item xs={12}>
                     <Button
@@ -877,18 +830,18 @@ const EditProfile = (prop: {
                             (amphures) => amphures.name_th == event.target.value
                           )[0].tambon
                         );
-
-                        setSelected({
-                          ...selected,
-                          amphure_name_th: event.target.value
-                            ? event.target.value
-                            : selected.amphure_name_th,
-                          tambon_name_th: "",
-                        });
                       }}
                     >
                       {amphures.map((amphure: amphure) => (
-                        <MenuItem value={amphure.name_th}>
+                        <MenuItem
+                          value={amphure.name_th}
+                          onClick={() => {
+                            setSelected({
+                              ...selected,
+                              amphure_name_th: amphure.name_th,
+                            });
+                          }}
+                        >
                           {amphure.name_th}
                         </MenuItem>
                       ))}
@@ -939,12 +892,21 @@ const EditProfile = (prop: {
                     scrollWheelZoom={true}
                     style={{ height: "250px", width: "100%" }}
                   >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    {/* 
+                    <TileLayer url="https://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png" />
+                 */}
+
+                    <TileLayer
+                      attribution="Google Maps Satellite"
+                      url="https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
+                    />
+                    <TileLayer url="https://www.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}" />
                     <CreateMarker current={current} />
                   </MapContainer>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={2}>
                   <Button
+                    startIcon={<LocationSearchingIcon />}
                     variant="contained"
                     color={`${current ? "warning" : "success"}`}
                     onClick={() => {
@@ -953,6 +915,53 @@ const EditProfile = (prop: {
                     }}
                   >
                     ตำแหน่งปัจจุบัน
+                  </Button>
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    size="small"
+                    label="ละติจูด"
+                    required
+                    onChange={(e) => setChangelat(e.target.value)}
+                    value={changelat}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    error={checkPosition ? false : true}
+                    type="number"
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    label="ลองจิจูด"
+                    size="small"
+                    onChange={(e) => setChangelng(parseFloat(e.target.value))}
+                    value={inputlng}
+                    error={checkPosition ? false : true}
+                    helperText={checkPosition ? "" : "กรุณากรอกตำแหน่ง"}
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SearchIcon />}
+                    onClick={() => {
+                      if (changelat && changelng) {
+                        setPosition({
+                          lat: parseFloat(changelat),
+                          lng: changelng,
+                        });
+                        setCheckPosition(true);
+                      } else {
+                        setCheckPosition(false);
+                      }
+                    }}
+                  >
+                    ค้นหา
                   </Button>
                 </Grid>
               </>
@@ -975,37 +984,7 @@ const EditProfile = (prop: {
                 />
               </Grid>
             )}
-            {role == "tambons" || prop.admin?.role == "tambons" ? (
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  select
-                  fullWidth
-                  label="เขต/อำเภอ"
-                  error={!checkAmphure}
-                  helperText={
-                    selected.amphure_name_th == undefined &&
-                    checkAmphure == false
-                      ? "กรุณาเลือกอำเภอ"
-                      : ""
-                  }
-                  value={selected.amphure_name_th}
-                  onChange={(event) => {
-                    setSelected({
-                      province_name_th: "นนทบุรี",
-                      amphure_name_th: event.target.value,
-                      tambon_name_th: "",
-                    });
-                  }}
-                >
-                  {nonthaburi_amphure.map((amphure) => (
-                    <MenuItem value={amphure.amphureName}>
-                      {amphure.amphureName}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-            ) : null}
+
             <Grid item xs={12}>
               <Button
                 type="submit"

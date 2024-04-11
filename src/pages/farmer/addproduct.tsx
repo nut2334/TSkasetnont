@@ -516,6 +516,17 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </div>
               )}
             </Grid>
+            {modalIsOpen && (
+              <Imagestore
+                modalIsOpen={modalIsOpen.isOpen}
+                closeModal={closeModal}
+                imgType={modalIsOpen.imageType}
+                imageSelect={modalIsOpen.imageSelect}
+                selectImage={modalIsOpen.selectImage}
+                setSelectImage={modalIsOpen.setStateImage}
+                jwt_token={prop.jwt_token}
+              />
+            )}
             <Grid item xs={12} lg={6}>
               <Typography>วิดีโอ</Typography>
               <Button
@@ -1235,17 +1246,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
           </Grid>
         </form>
       </Container>
-      {modalIsOpen && (
-        <Imagestore
-          modalIsOpen={modalIsOpen.isOpen}
-          closeModal={closeModal}
-          imgType={modalIsOpen.imageType}
-          imageSelect={modalIsOpen.imageSelect}
-          selectImage={modalIsOpen.selectImage}
-          setSelectImage={modalIsOpen.setStateImage}
-          jwt_token={prop.jwt_token}
-        />
-      )}
     </React.Fragment>
   );
 };
