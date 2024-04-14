@@ -10,6 +10,7 @@ import {
   Box,
   Typography,
   Stack,
+  Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
@@ -251,7 +252,7 @@ const Home = (prop: {
         />
         <Box
           sx={{
-            height: "100%",
+            height: "90%",
             width: "250px",
             position: "absolute",
             zIndex: 2,
@@ -259,30 +260,45 @@ const Home = (prop: {
             padding: "10px",
             boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px",
           }}
+          display={{ xs: "none", sm: "block" }}
         >
+          <Typography variant="h6">รายการสินค้า</Typography>
           {productPage.map((item, index) => {
             return (
-              <Typography
-                key={index}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    color: "green",
-                  },
-                }}
-                onClick={() => {
-                  setOpen(true);
-                  setSelectedProduct(item);
-                  if (item.lat && item.lng) {
-                    setPosition({
-                      lat: parseFloat(item.lat),
-                      lng: parseFloat(item.lng),
-                    });
-                  }
-                }}
-              >
-                {item.product_name}
-              </Typography>
+              <>
+                <Box
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      color: "green",
+                    },
+                  }}
+                >
+                  <Typography
+                    key={index}
+                    onClick={() => {
+                      setOpen(true);
+                      setSelectedProduct(item);
+                      if (item.lat && item.lng) {
+                        setPosition({
+                          lat: parseFloat(item.lat),
+                          lng: parseFloat(item.lng),
+                        });
+                      }
+                    }}
+                  >
+                    {item.product_name}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "gray",
+                    }}
+                  >
+                    โดย {item.farmerstorename}
+                  </Typography>
+                </Box>
+                <Divider />
+              </>
             );
           })}
 
@@ -295,12 +311,15 @@ const Home = (prop: {
             }}
           >
             <Pagination
-              count={Math.ceil(data.length / 10)}
+              count={Math.ceil(data.length / 20)}
               page={page}
               onChange={(e, value) => {
                 setPage(value);
               }}
             />
+          </Box>
+          <Box>
+            <Typography variant="h6">เทศกาลที่กำลังจะมาถึง</Typography>
           </Box>
         </Box>
         <MapContainer
@@ -347,6 +366,7 @@ const Home = (prop: {
               paddingLeft: "30px",
               boxShadow:
                 "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;",
+              width: "90%",
             }}
           >
             <InputBase
@@ -380,6 +400,7 @@ const Home = (prop: {
             aria-label="icon label tabs example"
             sx={{
               marginTop: "20px",
+              width: "90%",
             }}
             variant="scrollable"
             scrollButtons="auto"

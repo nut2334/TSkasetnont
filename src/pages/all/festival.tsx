@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Divider, Grid, Typography } from "@mui/material";
+import { Container, Divider, Grid, Menu, Typography } from "@mui/material";
 import { Scheduler } from "@aldabil/react-scheduler";
 import { th } from "date-fns/locale";
 import type { SchedulerHelpers } from "@aldabil/react-scheduler/types";
@@ -12,6 +12,10 @@ import { CardActions } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { RGBColor } from "react-color";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import TextField from "@mui/material/TextField";
+import { month } from "../../config/dataDropdown";
+import MenuItem from "@mui/material/MenuItem";
 
 interface Product {
   additional_image: string[];
@@ -37,6 +41,7 @@ interface Product {
   unit: string;
   view_count: number;
   weight: number;
+  id: string;
 }
 
 interface Event {
@@ -57,6 +62,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
       editable?: boolean;
       admin_id: number | number[];
       color?: string;
+      id: number;
     }[]
   >([]);
   const [showProduct, setShowProduct] = React.useState<Product[]>([]);
@@ -68,6 +74,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
     }[]
   >([]);
   const [selectedEvent, setSelectedEvent] = React.useState<Event>();
+  const [filteredEvent, setFilteredEvent] = React.useState<Event[]>([]);
 
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
@@ -90,9 +97,30 @@ const Editfestival = (prop: { jwt_token: string }) => {
             end: new Date(e.end_date),
             color: e.color ? e.color : "#50b500",
             admin_id: 1,
+            id: e.id,
           },
         ]);
       });
+      setFilteredEvent(
+        res.data.map((e: any) => {
+          return {
+            title: e.name,
+            start: new Date(e.start_date).toLocaleDateString("th-TH", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            end: new Date(e.end_date).toLocaleDateString("th-TH", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            id: e.id,
+          };
+        })
+      );
     });
     axios.get(apiCategories).then((res) => {
       setAllCategory([
@@ -127,7 +155,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
         marginTop: 2,
       }}
     >
-      <Grid container>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
           <Scheduler
             events={events}
@@ -137,6 +165,35 @@ const Editfestival = (prop: { jwt_token: string }) => {
             editable={false}
             deletable={false}
             onEventClick={handleClick}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            select
+            label="เดือน"
+            value={month[new Date().getMonth()]}
+            fullWidth
+          >
+            {month.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={6}>
+          <TextField select label="ปี" fullWidth>
+            <MenuItem></MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <DataGrid
+            rows={filteredEvent}
+            columns={[
+              { field: "title", headerName: "ชื่อเทศกาล", flex: 1 },
+              { field: "start", headerName: "วันเริ่มต้น", flex: 1 },
+              { field: "end", headerName: "วันสิ้นสุด", flex: 1 },
+            ]}
           />
         </Grid>
         {selectedEvent && (
@@ -163,7 +220,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
             </Grid>
           </>
         )}
-        {showProduct.map((product, index) => {
+        {/* {showProduct.map((product, index) => {
           let date = new Date(product.last_modified).toLocaleDateString();
           let bgcolor = allCategory.find(
             (item) => item.category_id === product.category_id
@@ -294,7 +351,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
               </NavLink>
             </Grid>
           );
-        })}
+        })} 
         {showProduct.length === 0 && selectedEvent && (
           <Grid item xs={12}>
             <Typography
@@ -309,7 +366,199 @@ const Editfestival = (prop: { jwt_token: string }) => {
               ไม่มีข้อมูลสินค้าในเทศกาลนี้
             </Typography>
           </Grid>
-        )}
+        )}*/}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            marginTop: 2,
+          }}
+        >
+          <Typography variant="h4">สินค้าจัดส่งพัสดุ</Typography>
+          <DataGrid
+            rows={showProduct.filter(
+              (item) => item.selectedType === "สินค้าจัดส่งพัสดุ"
+            )}
+            columns={[
+              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+              { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+              { field: "unit", headerName: "หน่วย", flex: 1 },
+              {
+                field: "action",
+                headerName: "สถานะ",
+                flex: 1,
+
+                renderCell: (params) => (
+                  <>
+                    <Chip
+                      label="เข้าร่วม"
+                      color="primary"
+                      onClick={() => {
+                        axios.post(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "POST"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                    <Chip
+                      label="ไม่เข้าร่วม"
+                      color="error"
+                      onClick={() => {
+                        axios.delete(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "DELETE"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                  </>
+                ),
+              },
+            ]}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            marginTop: 6,
+          }}
+        >
+          <Typography variant="h4">สินค้าจองสินค้าผ่านเว็บไซต์</Typography>
+          <DataGrid
+            rows={showProduct.filter(
+              (item) => item.selectedType === "จองสินค้าผ่านเว็บไซต์"
+            )}
+            columns={[
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "selectedType", headerName: "ประเภท", flex: 1 },
+              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
+              {
+                field: "action",
+                headerName: "สถานะ",
+                flex: 1,
+
+                renderCell: (params) => (
+                  <>
+                    <Chip
+                      label="เข้าร่วม"
+                      color="primary"
+                      onClick={() => {
+                        axios.post(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "POST"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                    <Chip
+                      label="ไม่เข้าร่วม"
+                      color="error"
+                      onClick={() => {
+                        axios.delete(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "DELETE"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                  </>
+                ),
+              },
+            ]}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            marginTop: 6,
+          }}
+        >
+          <Typography variant="h4">สินค้าประชาสัมพันธ์</Typography>
+          <DataGrid
+            rows={showProduct.filter(
+              (item) => item.selectedType === "ประชาสัมพันธ์"
+            )}
+            columns={[
+              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+              { field: "selectedType", headerName: "ประเภท", flex: 1 },
+              { field: "price", headerName: "ราคา", flex: 1 },
+              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
+              {
+                field: "action",
+                headerName: "สถานะ",
+                flex: 1,
+
+                renderCell: (params) => (
+                  <>
+                    <Chip
+                      label="เข้าร่วม"
+                      color="primary"
+                      onClick={() => {
+                        axios.post(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "POST"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                    <Chip
+                      label="ไม่เข้าร่วม"
+                      color="error"
+                      onClick={() => {
+                        axios.patch(
+                          config.getApiEndpoint(
+                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
+                            "PATCH"
+                          ),
+                          {
+                            headers: {
+                              Authorization: `Bearer ${prop.jwt_token}`,
+                            },
+                          }
+                        );
+                      }}
+                    />
+                  </>
+                ),
+              },
+            ]}
+          />
+        </Grid>
       </Grid>
     </Container>
   );
