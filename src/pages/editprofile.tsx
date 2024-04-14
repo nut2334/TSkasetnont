@@ -428,7 +428,18 @@ const EditProfile = (prop: {
       }
     }
     const formData = new FormData();
-    formData.append("username", username);
+    const regUsername = /^[a-zA-Z0-9]{6,}$/;
+    if (!regUsername.test(username)) {
+      setUsernameReg(false);
+    } else {
+      setUsernameReg(true);
+    }
+    if (username == "") {
+      setUsernameCheck(false);
+      formData.append("username", username);
+    } else {
+      setUsernameCheck(true);
+    }
     formData.append("email", email);
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
@@ -558,6 +569,7 @@ const EditProfile = (prop: {
     });
     useEffect(() => {
       if (position && initialFly) {
+        console.log(position);
         map.flyTo(position, map.getZoom());
         setInitialFly(false);
       }
@@ -943,6 +955,7 @@ const EditProfile = (prop: {
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    type="number"
                   />
                 </Grid>
                 <Grid item xs={6}>

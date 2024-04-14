@@ -269,8 +269,17 @@ const ManageUser = (prop: {
             (1000 * 3600 * 24)
         );
         return (
-          <span style={{ color: daysAgo === 30 ? "red" : "inherit" }}>
-            {daysAgo === 30 ? "30" : daysAgo} วันที่แล้ว
+          <span
+            style={{
+              color:
+                daysAgo === 0 ? "green" : daysAgo === 30 ? "red" : "inherit",
+            }}
+          >
+            {daysAgo === 0
+              ? "วันนี้"
+              : daysAgo === 30
+              ? "30" + " วันที่แล้ว"
+              : daysAgo + " วันที่แล้ว"}
           </span>
         );
       },

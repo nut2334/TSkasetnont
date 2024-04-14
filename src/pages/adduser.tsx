@@ -290,6 +290,12 @@ const AddUser = (prop: { jwt_token: string }) => {
     } else {
       setCheckAmphure(true);
     }
+    if (!position) {
+      setCheckPosition(false);
+      return;
+    } else {
+      setCheckPosition(true);
+    }
 
     const data = {
       username: username,
@@ -825,6 +831,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                     onChange={(e) => setChangelat(parseFloat(e.target.value))}
                     inputProps={{ min: 0 }}
                     error={checkPosition ? false : true}
+                    type="number"
                   />
                 </Grid>
                 <Grid item xs={2}>
@@ -837,6 +844,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                     error={checkPosition ? false : true}
                     helperText={checkPosition ? "" : "กรุณากรอกตำแหน่ง"}
                     required
+                    type="number"
                   />
                 </Grid>
                 <Grid item xs={6}>
