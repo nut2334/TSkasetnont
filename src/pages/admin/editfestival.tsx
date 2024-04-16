@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Grid, Typography } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Typography,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 import { Scheduler } from "@aldabil/react-scheduler";
-import { th } from "date-fns/locale";
 import { jwtDecode } from "jwt-decode";
 import type { SchedulerHelpers } from "@aldabil/react-scheduler/types";
 import { Button, DialogActions, TextField } from "@mui/material";
@@ -11,9 +17,15 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import axios from "axios";
 import * as config from "../../config/config";
-import { scheduler } from "timers/promises";
-import { ProcessedEvent, EventActions } from "@aldabil/react-scheduler/types";
-import { SketchPicker, RGBColor } from "react-color";
+import { ProcessedEvent } from "@aldabil/react-scheduler/types";
+import { SketchPicker } from "react-color";
+import "dayjs/locale/th";
+import buddhistEra from "dayjs/plugin/buddhistEra";
+import { th } from "date-fns/locale";
+import { Form } from "react-router-dom";
+
+dayjs.extend(buddhistEra);
+
 interface CustomEditorProps {
   scheduler: SchedulerHelpers;
 }
@@ -29,8 +41,14 @@ const Editfestival = (prop: { jwt_token: string }) => {
       editable?: boolean;
       admin_id: number | number[];
       color?: string;
+      everyYear?: boolean;
     }[]
   >([]);
+  const [nameError, setNameError] = useState<boolean>(false);
+  const [keywordError, setKeywordError] = useState<boolean>(false);
+  const [startError, setStartError] = useState<boolean>(false);
+  const [endError, setEndError] = useState<boolean>(false);
+  const [everyYear, setEveryYear] = useState<boolean>(false);
 
   // const EVENTS = [
   //   {
@@ -136,6 +154,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
             color: e.color,
             admin_id: 1,
             editable: true,
+            everyYear: true,
           },
         ]);
       });
@@ -166,6 +185,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
       start: event?.start || scheduler.state.start.value,
       end: event?.end || null,
       color: event?.color || "#50b500",
+      everyYear: event?.everyYear || false,
     });
 
     const [error, setError] = useState("");
@@ -182,16 +202,26 @@ const Editfestival = (prop: { jwt_token: string }) => {
       if (state.title.length < 3) {
         return setError("ชื่อเทศกาลอย่างน้อย 3 ตัวอักษร");
       }
+      if (state.description == "") {
+        return setKeywordError(true);
+      }
+      if (state.start == null) {
+        return setStartError(true);
+      }
+      if (state.end == null) {
+        return setEndError(true);
+      }
 
       try {
         scheduler.loading(true);
         /**Simulate remote data saving */
         const data = {
-          name: state.title,
+          festname: state.title,
           keyword: state.description.split(",").map((e: string) => e.trim()),
           start_date: state.start,
           end_date: state.end,
           color: state.color,
+          everyYear: state.everyYear,
         };
         let event_id = "";
         if (event) {
@@ -219,14 +249,6 @@ const Editfestival = (prop: { jwt_token: string }) => {
           event_id = response.data.id;
         }
         const added_updated_event = (await new Promise((res) => {
-          /**
-           * Make sure the event have 4 mandatory fields
-           * event_id: string|number
-           * title: string
-           * start: Date|string
-           * end: Date|string
-           */
-
           setTimeout(() => {
             console.log(event_id, event?.event_id);
             if (state.end == null || state.start == null) {
@@ -279,12 +301,33 @@ const Editfestival = (prop: { jwt_token: string }) => {
                 placeholder="ทุเรียน,มังคุด,ส้มโอ,มะม่วง,ลำไย,สตอเบอรี่,แอปเปิ้ล,กล้วย"
                 multiline
                 rows={2}
+                error={keywordError}
+                helperText={keywordError ? "กรุณากรอกคำค้นหา" : ""}
               />
             </Grid>
             {/* เวลาวันที่ */}
+            <Grid item xs={12}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={state.everyYear}
+                      value={state.everyYear}
+                      onChange={(e) => {
+                        handleChange(e.target.value, "everyYear");
+                      }}
+                    />
+                  }
+                  label="เทศกาลประจำปี"
+                />
+              </FormGroup>
+            </Grid>
             <Grid item xs={6}>
-              <Typography>เวลาเริ่มต้น</Typography>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Typography>วันที่เริ่มเทศกาล*</Typography>
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="th"
+              >
                 <DatePicker
                   sx={{ width: "100%" }}
                   defaultValue={state.start ? dayjs(state.start) : null}
@@ -295,10 +338,16 @@ const Editfestival = (prop: { jwt_token: string }) => {
                   }}
                 />
               </LocalizationProvider>
+              <Typography color="error">
+                {startError ? "กรุณาเลือกวันที่เริ่มเทศกาล" : ""}
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography>วันสิ้นสุดการจอง</Typography>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Typography>วันสิ้นสุดเทศกาล*</Typography>
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="th"
+              >
                 <DatePicker
                   sx={{ width: "100%" }}
                   minDate={
@@ -313,6 +362,9 @@ const Editfestival = (prop: { jwt_token: string }) => {
                   }}
                 />
               </LocalizationProvider>
+              <Typography color="error">
+                {endError ? "กรุณาเลือกวันที่สิ้นสุดเทศกาล" : ""}
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               <SketchPicker
@@ -355,10 +407,10 @@ const Editfestival = (prop: { jwt_token: string }) => {
           console.log(e);
         }}
         view="month"
-        locale={th}
         week={null}
         customEditor={(scheduler) => <CustomEditor scheduler={scheduler} />}
         onDelete={handleDelete}
+        locale={th}
       />
     </Container>
   );

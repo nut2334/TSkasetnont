@@ -2,20 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Container, Divider, Grid, Menu, Typography } from "@mui/material";
 import { Scheduler } from "@aldabil/react-scheduler";
 import { th } from "date-fns/locale";
-import type { SchedulerHelpers } from "@aldabil/react-scheduler/types";
 import axios from "axios";
 import * as config from "../../config/config";
 import { ProcessedEvent } from "@aldabil/react-scheduler/types";
-import { Card, CardContent, CardMedia, Stack, Button } from "@mui/material";
 import { Chip } from "@mui/material";
-import { CardActions } from "@mui/material";
-import { NavLink } from "react-router-dom";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { RGBColor } from "react-color";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import TextField from "@mui/material/TextField";
 import { month } from "../../config/dataDropdown";
 import MenuItem from "@mui/material/MenuItem";
+import { Event } from "@mui/icons-material";
+import { jwtDecode } from "jwt-decode";
+import { event_status } from "../../config/dataDropdown";
+import { NavLink, Navigate } from "react-router-dom";
 
 interface Product {
   additional_image: string[];
@@ -42,16 +41,28 @@ interface Product {
   view_count: number;
   weight: number;
   id: string;
+  is_accept: string;
+  name: string;
+  festivalId: string;
+}
+
+interface FestivalDetail {
+  id: string;
+  title: string;
+  is_accept: string;
+  date_start: Date;
+  date_end: Date;
+  products: Product[];
 }
 
 interface Event {
-  color: string;
+  color?: string;
   end: Date;
   start: Date;
   title: string;
 }
 
-const Editfestival = (prop: { jwt_token: string }) => {
+const Festival = (prop: { jwt_token: string }) => {
   const apiCategories = config.getApiEndpoint("categories", "GET");
   const [events, setEvents] = React.useState<
     {
@@ -75,6 +86,10 @@ const Editfestival = (prop: { jwt_token: string }) => {
   >([]);
   const [selectedEvent, setSelectedEvent] = React.useState<Event>();
   const [filteredEvent, setFilteredEvent] = React.useState<Event[]>([]);
+  const [allEvent, setAllEvent] = React.useState<Event[]>([]);
+  const [searchMonth, setSearchMonth] = React.useState<string>("");
+  const [searchYear, setSearchYear] = React.useState<string>("");
+  const [myEvent, setMyEvent] = React.useState<FestivalDetail[]>([]);
 
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
@@ -87,10 +102,9 @@ const Editfestival = (prop: { jwt_token: string }) => {
 
   useEffect(() => {
     axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
-      res.data.map((e: any) => {
-        setEvents((prev) => [
-          ...prev,
-          {
+      setEvents(
+        res.data.map((e: any) => {
+          return {
             event_id: e.id,
             title: e.name,
             start: new Date(e.start_date),
@@ -98,21 +112,37 @@ const Editfestival = (prop: { jwt_token: string }) => {
             color: e.color ? e.color : "#50b500",
             admin_id: 1,
             id: e.id,
-          },
-        ]);
-      });
+          };
+        })
+      );
       setFilteredEvent(
         res.data.map((e: any) => {
           return {
             title: e.name,
             start: new Date(e.start_date).toLocaleDateString("th-TH", {
-              weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
             }),
             end: new Date(e.end_date).toLocaleDateString("th-TH", {
-              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            id: e.id,
+          };
+        })
+      );
+      setAllEvent(
+        res.data.map((e: any) => {
+          return {
+            title: e.name,
+            start: new Date(e.start_date).toLocaleDateString("th-TH", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            end: new Date(e.end_date).toLocaleDateString("th-TH", {
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -122,6 +152,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
         })
       );
     });
+
     axios.get(apiCategories).then((res) => {
       setAllCategory([
         {
@@ -134,6 +165,42 @@ const Editfestival = (prop: { jwt_token: string }) => {
     });
   }, []);
 
+  useEffect(() => {
+    prop.jwt_token &&
+      axios
+        .get(config.getApiEndpoint("festivaldetail", "GET"), {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setMyEvent(res.data.festivals);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+  }, [prop.jwt_token]);
+
+  useEffect(() => {
+    let filtered = allEvent;
+    if (searchYear !== "" && searchYear !== "all") {
+      filtered = filtered.filter((event) => {
+        let yearStart = `${event.start}`.split(" ")[2];
+        let yearEnd = `${event.end}`.split(" ")[2];
+        return yearStart == searchYear + 543 || yearEnd == searchYear + 543;
+      });
+    }
+    if (searchMonth !== "" && searchMonth !== "all") {
+      filtered = filtered.filter((event) => {
+        let monthStart = `${event.start}`.split(" ")[1];
+        let monthEnd = `${event.end}`.split(" ")[1];
+        return monthStart === searchMonth || monthEnd === searchMonth;
+      });
+    }
+    setFilteredEvent(filtered);
+  }, [searchMonth, searchYear]);
+
   const handleClick = (event: ProcessedEvent) => {
     setSelectedEvent({
       color: event.color ? event.color : "#50b500",
@@ -141,11 +208,29 @@ const Editfestival = (prop: { jwt_token: string }) => {
       start: event.start,
       title: event.title,
     });
+
     axios
       .get(config.getApiEndpoint(`festival/${event.event_id}`, "GET"))
       .then((res) => {
-        setShowProduct(res.data);
+        setShowProduct(
+          res.data.map((product: any) => {
+            return {
+              ...product,
+              is_accept: event_status.find(
+                (item) => item.statusID === product.is_accept
+              )?.statusName,
+            };
+          })
+        );
+        console.log(res.data);
       });
+  };
+
+  const handleChangeMonth = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchMonth(event.target.value);
+  };
+  const handleChangeYear = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchYear(event.target.value);
   };
 
   return (
@@ -156,6 +241,175 @@ const Editfestival = (prop: { jwt_token: string }) => {
       }}
     >
       <Grid container spacing={1}>
+        {prop.jwt_token &&
+          (jwtDecode(prop.jwt_token) as { role: string }).role ===
+            "farmers" && (
+            <>
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  marginTop: 2,
+                }}
+              >
+                <Divider textAlign="left">
+                  <Typography variant="h6">คำเชิญเข้าร่วม</Typography>
+                </Divider>
+              </Grid>
+              <>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    marginTop: 2,
+                  }}
+                >
+                  <DataGrid
+                    rows={myEvent.reduce((acc, cur) => {
+                      return [
+                        ...acc,
+                        ...cur.products.filter((product) => {
+                          // if (product.selectedType === "สินค้าจัดส่งพัสดุ")
+                          return {
+                            ...product,
+                            farmerstorename: cur.title,
+                            campaign_id: cur.id,
+                          };
+                        }),
+                      ];
+                    }, [] as Product[])}
+                    columns={[
+                      {
+                        field: "farmerstorename",
+                        headerName: "ร้านค้า",
+                        flex: 1,
+                      },
+                      {
+                        field: "name",
+                        headerName: "ชื่อสินค้า",
+                        flex: 1,
+                      },
+                      { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+                      { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+                      { field: "unit", headerName: "หน่วย", flex: 1 },
+                      {
+                        field: "action",
+                        headerName: "สถานะ",
+                        flex: 1,
+
+                        renderCell: (params) => {
+                          console.log(params);
+                          return (
+                            <>
+                              <Chip
+                                label="เข้าร่วม"
+                                color="primary"
+                                onClick={() => {
+                                  console.log(params);
+                                  const data = {
+                                    is_accept: "accept",
+                                  };
+                                  axios
+                                    .put(
+                                      config.getApiEndpoint(
+                                        `campaign/${params.row.festivalId}/${params.row.id}`,
+                                        "PUT"
+                                      ),
+                                      data,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${prop.jwt_token}`,
+                                        },
+                                      }
+                                    )
+                                    .then((res) => {
+                                      axios
+                                        .get(
+                                          config.getApiEndpoint(
+                                            "festivaldetail",
+                                            "GET"
+                                          ),
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${prop.jwt_token}`,
+                                            },
+                                          }
+                                        )
+                                        .then((res) => {
+                                          console.log(res.data);
+                                          setMyEvent(res.data.festivals);
+                                        })
+                                        .catch((err) => {
+                                          console.error(err);
+                                        });
+                                    });
+                                }}
+                              />
+                              <Chip
+                                label="ไม่เข้าร่วม"
+                                color="error"
+                                onClick={() => {
+                                  const data = {
+                                    is_accept: "reject",
+                                  };
+                                  axios
+                                    .put(
+                                      config.getApiEndpoint(
+                                        `campaign/${params.row.festivalId}/${params.row.id}`,
+                                        "PUT"
+                                      ),
+                                      data,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${prop.jwt_token}`,
+                                        },
+                                      }
+                                    )
+                                    .then((res) => {
+                                      axios
+                                        .get(
+                                          config.getApiEndpoint(
+                                            "festivaldetail",
+                                            "GET"
+                                          ),
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${prop.jwt_token}`,
+                                            },
+                                          }
+                                        )
+                                        .then((res) => {
+                                          console.log(res.data);
+                                          setMyEvent(res.data.festivals);
+                                        })
+                                        .catch((err) => {
+                                          console.error(err);
+                                        });
+                                    });
+                                }}
+                              />
+                            </>
+                          );
+                        },
+                      },
+                    ]}
+                  />
+                </Grid>
+              </>
+            </>
+          )}
+
+        <Grid
+          item
+          xs={12}
+          sx={{
+            marginTop: 2,
+          }}
+        >
+          <Divider textAlign="left">
+            <Typography variant="h6">ปฏิทินเทศกาล</Typography>
+          </Divider>
+        </Grid>
         <Grid item xs={12}>
           <Scheduler
             events={events}
@@ -167,13 +421,26 @@ const Editfestival = (prop: { jwt_token: string }) => {
             onEventClick={handleClick}
           />
         </Grid>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            marginTop: 2,
+          }}
+        >
+          <Divider textAlign="left">
+            <Typography variant="h6">รายละเอียดเทศกาล</Typography>
+          </Divider>
+        </Grid>
         <Grid item xs={6}>
           <TextField
             select
             label="เดือน"
-            value={month[new Date().getMonth()]}
             fullWidth
+            value={searchMonth}
+            onChange={handleChangeMonth}
           >
+            <MenuItem value="all">ทั้งหมด</MenuItem>
             {month.map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
@@ -182,8 +449,24 @@ const Editfestival = (prop: { jwt_token: string }) => {
           </TextField>
         </Grid>
         <Grid item xs={6}>
-          <TextField select label="ปี" fullWidth>
-            <MenuItem></MenuItem>
+          <TextField
+            select
+            label="ปี"
+            fullWidth
+            value={searchYear}
+            onChange={handleChangeYear}
+          >
+            <MenuItem value="all">ทั้งหมด</MenuItem>
+            {Array.from(
+              new Set([
+                ...events.map((event) => event.start.getFullYear()),
+                ...events.map((event) => event.end.getFullYear()),
+              ])
+            ).map((year: number) => (
+              <MenuItem key={year} value={year}>
+                {year + 543}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
         <Grid item xs={12}>
@@ -198,11 +481,23 @@ const Editfestival = (prop: { jwt_token: string }) => {
         </Grid>
         {selectedEvent && (
           <>
-            <Grid item xs={12}>
-              <Typography variant="h2">{selectedEvent?.title}</Typography>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="h6">{selectedEvent?.title}</Typography>
             </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6">
+            <Grid
+              item
+              xs={12}
+              sx={{
+                textAlign: "center",
+              }}
+            >
+              <Typography>
                 {selectedEvent?.start.toLocaleDateString("th-TH", {
                   weekday: "long",
                   year: "numeric",
@@ -367,201 +662,152 @@ const Editfestival = (prop: { jwt_token: string }) => {
             </Typography>
           </Grid>
         )}*/}
-        <Grid
-          item
-          xs={12}
-          sx={{
-            marginTop: 2,
-          }}
-        >
-          <Typography variant="h4">สินค้าจัดส่งพัสดุ</Typography>
-          <DataGrid
-            rows={showProduct.filter(
+        {selectedEvent ? (
+          <>
+            {showProduct.filter(
               (item) => item.selectedType === "สินค้าจัดส่งพัสดุ"
+            ) && (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  marginTop: 2,
+                }}
+              >
+                <Divider textAlign="left">
+                  <Typography>สินค้าจัดส่งพัสดุ</Typography>
+                </Divider>
+                <DataGrid
+                  onRowClick={(params) => {
+                    return (
+                      <Navigate
+                        to={`/shop/${params.row.farmerstorename}/${params.row.id}`}
+                      />
+                    );
+                  }}
+                  rows={showProduct.filter(
+                    (item) => item.selectedType === "สินค้าจัดส่งพัสดุ"
+                  )}
+                  columns={[
+                    {
+                      field: "farmerstorename",
+                      headerName: "ร้านค้า",
+                      flex: 1,
+                    },
+                    {
+                      field: "product_name",
+                      headerName: "ชื่อสินค้า",
+                      flex: 1,
+                    },
+                    { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+                    { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+                    { field: "unit", headerName: "หน่วย", flex: 1 },
+                    {
+                      field: "is_accept",
+                      headerName: "สถานะ",
+                      flex: 1,
+                    },
+                  ]}
+                />
+              </Grid>
             )}
-            columns={[
-              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
-              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-              { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
-              { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
-              { field: "unit", headerName: "หน่วย", flex: 1 },
-              {
-                field: "action",
-                headerName: "สถานะ",
-                flex: 1,
-
-                renderCell: (params) => (
-                  <>
-                    <Chip
-                      label="เข้าร่วม"
-                      color="primary"
-                      onClick={() => {
-                        axios.post(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "POST"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                    <Chip
-                      label="ไม่เข้าร่วม"
-                      color="error"
-                      onClick={() => {
-                        axios.delete(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "DELETE"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sx={{
-            marginTop: 6,
-          }}
-        >
-          <Typography variant="h4">สินค้าจองสินค้าผ่านเว็บไซต์</Typography>
-          <DataGrid
-            rows={showProduct.filter(
+            {showProduct.filter(
               (item) => item.selectedType === "จองสินค้าผ่านเว็บไซต์"
+            ).length > 0 && (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  marginTop: 6,
+                }}
+              >
+                <Divider textAlign="left">
+                  <Typography>สินค้าจองสินค้าผ่านเว็บไซต์</Typography>
+                </Divider>
+                <DataGrid
+                  rows={showProduct.filter(
+                    (item) => item.selectedType === "จองสินค้าผ่านเว็บไซต์"
+                  )}
+                  columns={[
+                    {
+                      field: "farmerstorename",
+                      headerName: "ร้านค้า",
+                      flex: 1,
+                    },
+                    {
+                      field: "product_name",
+                      headerName: "ชื่อสินค้า",
+                      flex: 1,
+                    },
+                    {
+                      field: "is_accept",
+                      headerName: "สถานะ",
+                      flex: 1,
+                    },
+                    {
+                      field: "action",
+                      headerName: "ไปยังสินค้า",
+                      flex: 1,
+                      renderCell: (params) => {
+                        return (
+                          <NavLink
+                            to={`/shop/${params.row.farmerstorename}/${params.row.id}`}
+                          >
+                            <Chip label="ไปเลย" color="primary" />
+                          </NavLink>
+                        );
+                      },
+                    },
+                  ]}
+                />
+              </Grid>
             )}
-            columns={[
-              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-              { field: "selectedType", headerName: "ประเภท", flex: 1 },
-              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
-              {
-                field: "action",
-                headerName: "สถานะ",
-                flex: 1,
-
-                renderCell: (params) => (
-                  <>
-                    <Chip
-                      label="เข้าร่วม"
-                      color="primary"
-                      onClick={() => {
-                        axios.post(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "POST"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                    <Chip
-                      label="ไม่เข้าร่วม"
-                      color="error"
-                      onClick={() => {
-                        axios.delete(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "DELETE"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sx={{
-            marginTop: 6,
-          }}
-        >
-          <Typography variant="h4">สินค้าประชาสัมพันธ์</Typography>
-          <DataGrid
-            rows={showProduct.filter(
-              (item) => item.selectedType === "ประชาสัมพันธ์"
+            {showProduct.filter((item) => item.selectedType === "ประชาสัมพันธ์")
+              .length > 0 && (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  marginTop: 6,
+                }}
+              >
+                <Divider textAlign="left">
+                  <Typography>สินค้าประชาสัมพันธ์</Typography>
+                </Divider>
+                <DataGrid
+                  rows={showProduct.filter(
+                    (item) => item.selectedType === "ประชาสัมพันธ์"
+                  )}
+                  columns={[
+                    {
+                      field: "farmerstorename",
+                      headerName: "ร้านค้า",
+                      flex: 1,
+                    },
+                    {
+                      field: "product_name",
+                      headerName: "ชื่อสินค้า",
+                      flex: 1,
+                    },
+                    { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+                    { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+                    { field: "unit", headerName: "หน่วย", flex: 1 },
+                    {
+                      field: "is_accept",
+                      headerName: "สถานะ",
+                      flex: 1,
+                    },
+                  ]}
+                />
+              </Grid>
             )}
-            columns={[
-              { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-              { field: "selectedType", headerName: "ประเภท", flex: 1 },
-              { field: "price", headerName: "ราคา", flex: 1 },
-              { field: "farmerstorename", headerName: "ร้านค้า", flex: 1 },
-              {
-                field: "action",
-                headerName: "สถานะ",
-                flex: 1,
-
-                renderCell: (params) => (
-                  <>
-                    <Chip
-                      label="เข้าร่วม"
-                      color="primary"
-                      onClick={() => {
-                        axios.post(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "POST"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                    <Chip
-                      label="ไม่เข้าร่วม"
-                      color="error"
-                      onClick={() => {
-                        axios.patch(
-                          config.getApiEndpoint(
-                            `campaign/${params.row.campaign_id}/${params.row.product_id}`,
-                            "PATCH"
-                          ),
-                          {
-                            headers: {
-                              Authorization: `Bearer ${prop.jwt_token}`,
-                            },
-                          }
-                        );
-                      }}
-                    />
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Grid>
+          </>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Container>
   );
 };
 
-export default Editfestival;
+export default Festival;

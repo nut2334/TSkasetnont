@@ -32,6 +32,7 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
 import { NumberInput } from "../../components/addamount";
 import StarIcon from "@mui/icons-material/Star";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import {
   FacebookShareButton,
   LineShareButton,
@@ -413,6 +414,24 @@ const SigleProduct = (prop: {
     return false;
   };
 
+  const handleActivate = () => {
+    axios
+      .get(config.getApiEndpoint(`repeatactivate`, "get"), {
+        headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        },
+      })
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "ส่งอีเมลยืนยันตัวตนสำเร็จ",
+          text: "กรุณายืนยันตัวตนจากอีเมลของคุณ เมื่อยืนยันตัวตนแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+  };
+
   return (
     <Container component="main" maxWidth="lg">
       <Box sx={{ position: "relative" }}>
@@ -712,6 +731,20 @@ const SigleProduct = (prop: {
           )}
 
           <Stack direction="row" spacing={2} justifyContent="end">
+            <Stack>
+              {prop.jwt_token &&
+              (jwtDecode(prop.jwt_token) as { activate: boolean }).activate ? (
+                ""
+              ) : (
+                <Button
+                  startIcon={<AdminPanelSettingsIcon />}
+                  variant="contained"
+                  onClick={handleActivate}
+                >
+                  ยืนยันตัวตน
+                </Button>
+              )}
+            </Stack>
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
               (prop.jwt_token == "" ||
                 (jwtDecode(prop.jwt_token) as { role: string }).role ==

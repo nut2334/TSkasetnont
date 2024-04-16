@@ -631,21 +631,6 @@ const EditProfile = (prop: {
                 fullWidth
                 id="username"
                 label="Username"
-                error={!usernameCheck || !usernameReg}
-                helperText={
-                  username == "" && usernameCheck == false
-                    ? "กรุณากรอก Username"
-                    : "" || !usernameCheck
-                    ? "Username นี้มีผู้ใช้งานแล้ว"
-                    : "" || !usernameReg
-                    ? "ต้องมีอักษร 6 ตัวขึ้นไป"
-                    : ""
-                }
-                onChange={(event) => setUsername(event.target.value)}
-                onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                  onBlurUsername(event)
-                }
-                placeholder="ห้ามเป็นภาษาไทย และอักขระพิเศษ"
               />
             </Grid>
             <Grid item xs={12}>
@@ -1006,7 +991,11 @@ const EditProfile = (prop: {
                 color="primary"
                 sx={{ mt: 3, mb: 2 }}
                 style={{ color: "#fff" }}
-                disabled={!selected.amphure_name_th}
+                disabled={
+                  role == "members" || prop.admin?.role == "members"
+                    ? false
+                    : !selected.amphure_name_th
+                }
               >
                 ยืนยัน
               </Button>

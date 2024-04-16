@@ -91,6 +91,21 @@ export const status_reserve = [
   },
 ];
 
+export const event_status = [
+  {
+    statusID: "accept",
+    statusName: "สินค้าพร้อมจำหน่าย",
+  },
+  {
+    statusID: "waiting",
+    statusName: "รอการตรวจสอบ",
+  },
+  {
+    statusID: "reject",
+    statusName: "ไม่พร้อมจำหน่าย",
+  },
+];
+
 export const month = [
   "มกราคม",
   "กุมภาพันธ์",

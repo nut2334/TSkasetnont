@@ -73,6 +73,7 @@ const Home = (prop: {
       category_name: "ทั้งหมด",
     });
   const [value, setValue] = React.useState("1");
+  const [valueEvent, setValueEvent] = React.useState("1");
   const [open, setOpen] = React.useState(false);
   const [selectedProduct, setSelectedProduct] =
     React.useState<ProductInterface>({
@@ -95,7 +96,32 @@ const Home = (prop: {
     lng: 100.47597885131837,
   });
   const [productPage, setProductPage] = useState<ProductInterface[]>([]);
+  const [eventPage, setEventPage] = useState<
+    {
+      event_id: number;
+      title: string;
+      start: Date;
+      end: Date;
+      editable?: boolean;
+      admin_id: number | number[];
+      color?: string;
+      id: number;
+    }[]
+  >([]);
   const [page, setPage] = useState(1);
+  const [pageEvent, setPageEvent] = useState(1);
+  const [events, setEvents] = React.useState<
+    {
+      event_id: number;
+      title: string;
+      start: Date;
+      end: Date;
+      editable?: boolean;
+      admin_id: number | number[];
+      color?: string;
+      id: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     axios
@@ -120,8 +146,12 @@ const Home = (prop: {
   }, [selectedCategory, searchContent]);
 
   useEffect(() => {
-    setProductPage(data.slice((page - 1) * 10, page * 10));
+    setProductPage(data.slice((page - 1) * 5, page * 5));
   }, [page, data]);
+
+  useEffect(() => {
+    setEventPage(events.slice((pageEvent - 1) * 5, pageEvent * 5));
+  }, [pageEvent, events]);
 
   useEffect(() => {
     axios
@@ -139,6 +169,21 @@ const Home = (prop: {
       .catch((err) => {
         console.log(err);
       });
+    axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
+      setEvents(
+        res.data.map((e: any) => {
+          return {
+            event_id: e.id,
+            title: e.name,
+            start: new Date(e.start_date),
+            end: new Date(e.end_date),
+            color: e.color ? e.color : "#50b500",
+            admin_id: 1,
+            id: e.id,
+          };
+        })
+      );
+    });
   }, []);
 
   const myCustomColour = (id: string) => {
@@ -161,6 +206,13 @@ const Home = (prop: {
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setValue(value.toString());
+  };
+
+  const handlePageEvent = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setValueEvent(value.toString());
   };
 
   const isDark = (color: RGBColor) => {
@@ -311,17 +363,59 @@ const Home = (prop: {
             }}
           >
             <Pagination
-              count={Math.ceil(data.length / 20)}
+              count={Math.ceil(data.length / 5)}
               page={page}
               onChange={(e, value) => {
                 setPage(value);
               }}
             />
           </Box>
-          <Box>
+          <Box
+            sx={{
+              marginTop: "20px",
+            }}
+          >
             <Typography variant="h6">เทศกาลที่กำลังจะมาถึง</Typography>
+            {eventPage.map((event, index) => {
+              return (
+                <Box key={index}>
+                  <Typography>{event.title}</Typography>
+                  <Typography>
+                    {event.start.toLocaleDateString("th", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {event.end.toLocaleDateString("th", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Typography>
+                  <Divider />
+                </Box>
+              );
+            })}
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <Pagination
+              count={Math.ceil(events.length / 5)}
+              page={pageEvent}
+              onChange={(e, value) => {
+                setPageEvent(value);
+              }}
+            />
           </Box>
         </Box>
+
         <MapContainer
           center={[13.810300182207499, 100.47597885131837]}
           zoom={15}
