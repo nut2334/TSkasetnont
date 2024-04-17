@@ -61,9 +61,19 @@ function App() {
       type: string;
     }[]
   >([]);
+  //overwrite cartList to update cookie before setCartList
+  useEffect(() => {
+    const cookies = new Cookies();
+    cookies.set("cart", cartList, { path: "/" });
+    if (cartList.length === 0) {
+      cookies.remove("cart");
+    }
+  }, [cartList]);
+
   useEffect(() => {
     const cookies = new Cookies();
     const cookie_jwt_token = cookies.get("jwt_token");
+    const cookie_cart = cookies.get("cart");
     if (typeof cookie_jwt_token !== "undefined") {
       setJwt_token(cookie_jwt_token);
       axios
@@ -88,6 +98,10 @@ function App() {
           cookies.remove("jwt_token");
           setJwt_token("");
         });
+    }
+
+    if (typeof cookie_cart !== "undefined") {
+      setCartList(cookie_cart);
     }
   }, []);
 
