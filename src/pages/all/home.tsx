@@ -49,6 +49,7 @@ interface ProductInterface {
   farmer_id: string;
   weight: string;
   shippingcost: string;
+  forecastDate: Date;
 }
 
 const Home = (prop: {
@@ -92,6 +93,9 @@ const Home = (prop: {
       selectedType: "",
       stock: "",
       farmer_id: "",
+      weight: "",
+      shippingcost: "",
+      forecastDate: new Date(),
     } as ProductInterface);
   const [position, setPosition] = useState<LatLngLiteral>({
     lat: 13.810300182207499,
@@ -443,6 +447,7 @@ const Home = (prop: {
             />
             สินค้าที่กำลังมาแรง
           </Typography>
+
           {productPage.map((item, index) => {
             return (
               <>
@@ -470,7 +475,7 @@ const Home = (prop: {
                           color: "white",
                         }}
                       >
-                        {index + 1}
+                        {index + 1 + page * 5 - 5}
                       </Typography>
                     </Stack>
                     <Stack>
@@ -498,6 +503,39 @@ const Home = (prop: {
                         โดย {item.farmerstorename}
                       </Typography>
                     </Stack>
+                    {item.selectedType === "สินค้าจัดส่งพัสดุ" && (
+                      <Stack>
+                        <Typography
+                          sx={{
+                            color: "red",
+                          }}
+                        >
+                          {item.price} บาท / {item.unit}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: "gray",
+                          }}
+                        >
+                          จำนวนคลัง {item.stock} {item.unit}
+                        </Typography>
+                      </Stack>
+                    )}
+                    {item.selectedType === "สินค้าจอง" && (
+                      <Stack>
+                        <Typography
+                          sx={{
+                            color: "red",
+                          }}
+                        >
+                          {item.forecastDate.toLocaleDateString("th", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </Typography>
+                      </Stack>
+                    )}
                   </Stack>
                 </Box>
                 <Divider />

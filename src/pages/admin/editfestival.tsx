@@ -317,6 +317,12 @@ const Editfestival = (prop: { jwt_token: string }) => {
                       value={state.everyYear}
                       onChange={(e) => {
                         handleChange(e.target.value, "everyYear");
+                        setState((prev) => {
+                          return {
+                            ...prev,
+                            everyYear: e.target.checked,
+                          };
+                        });
                       }}
                     />
                   }

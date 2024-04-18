@@ -250,7 +250,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       setCheckWeight(false);
       check = false;
     }
-    if (weight > 0) {
+    if (selectedType == "สินค้าจัดส่งพัสดุ" && weight > 0) {
       setCheckWeight(true);
     }
     if (!unit) {
@@ -359,7 +359,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
         Swal.fire({
           icon: "error",
           title: "บันทึกข้อมูลไม่สำเร็จ",
-          text: "กรุณากรอกข้อมูลให้ครบถ้วน",
+          text: err.response.data.message,
         });
       });
   };

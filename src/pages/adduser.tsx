@@ -313,9 +313,12 @@ const AddUser = (prop: { jwt_token: string }) => {
       lat: position?.lat,
       lng: position?.lng,
     };
+    console.log(data);
     if (role == "farmers" || role == "tambons") {
       data["province"] = "นนทบุรี";
       console.log((jwtDecode(prop.jwt_token) as { amphure: string }).amphure);
+    }
+    if ((jwtDecode(prop.jwt_token) as { role: string }).role == "tambons") {
       data["amphure"] = (
         jwtDecode(prop.jwt_token) as { amphure: string }
       ).amphure;

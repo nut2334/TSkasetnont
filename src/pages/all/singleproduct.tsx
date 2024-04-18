@@ -9,7 +9,6 @@ import {
   Stack,
   Box,
   Divider,
-  Chip,
   TableContainer,
   Table,
   TableHead,
@@ -18,6 +17,7 @@ import {
   TableBody,
   Paper,
   Tooltip,
+  Chip,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -54,6 +54,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
 import Path from "../../components/path";
 import { Facebook as Fbicon } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface FullProductInterface {
   product_id: string;
@@ -86,6 +87,8 @@ interface FullProductInterface {
   lng: number | undefined;
   lastLogin: string;
   forecastDate: string;
+  phone: string;
+  username: string;
 }
 
 const style = {
@@ -143,6 +146,8 @@ const SigleProduct = (prop: {
     lng: undefined,
     lastLogin: "",
     forecastDate: "",
+    phone: "",
+    username: "",
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -178,13 +183,25 @@ const SigleProduct = (prop: {
       `getproduct/${encodeURI(shopname ? shopname : "")}/${productid}`,
       "get"
     );
-    console.log(apiSingleProduct);
-
     axios.get(apiSingleProduct).then((response) => {
       setProduct({
         ...response.data,
         certificate: JSON.parse(response.data.certificate),
       });
+      if (response.data.certificate) {
+        setAllStandardShow(
+          JSON.parse(response.data.certificate).filter(
+            (item: {
+              standard_id: string;
+              standard_name: string;
+              status: string;
+            }) => {
+              console.log(item);
+              if (item.status == "complete") return item.standard_name;
+            }
+          )
+        );
+      }
       console.log(response.data);
     });
 
@@ -196,12 +213,6 @@ const SigleProduct = (prop: {
       console.log(error);
     });
     console.log(prop.followList);
-    axios
-      .get(config.getApiEndpoint(`certiconver/${productid}`, "get"))
-      .then((response) => {
-        console.log(response.data);
-        setAllStandardShow(response.data.standardNames);
-      });
     console.log(product);
   }, [productid, shopname]);
 
@@ -211,10 +222,15 @@ const SigleProduct = (prop: {
       setComment(response.data.reviews);
     });
     const apiAllStandard = config.getApiEndpoint(`standardproducts`, "get");
-    axios.get(apiAllStandard).then((response) => {
-      console.log(response.data);
-      setAllStandard(response.data);
-    });
+    axios
+      .get(apiAllStandard)
+      .then((response) => {
+        console.log(response.data);
+        setAllStandard(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   const handleCopy = (text: string) => () => {
@@ -483,18 +499,30 @@ const SigleProduct = (prop: {
           </AliceCarousel>
         </Box>
       </Box>
-      <Typography variant="h4">
-        {product.product_name}{" "}
-        {product.stock === 0 && product.selectedType == "สินค้าจัดส่งพัสดุ" && (
-          <div
-            style={{
-              color: "red",
-            }}
+      <Stack direction="row" spacing={2}>
+        <Stack>
+          <Typography variant="h4">
+            {product.product_name}{" "}
+            {product.stock === 0 &&
+              product.selectedType == "สินค้าจัดส่งพัสดุ" && (
+                <div
+                  style={{
+                    color: "red",
+                  }}
+                >
+                  สินค้าหมด
+                </div>
+              )}
+          </Typography>
+        </Stack>
+        <Stack>
+          <NavLink
+            to={`/editproduct/${shopname}/${product.username}/${product.product_id}`}
           >
-            สินค้าหมด
-          </div>
-        )}
-      </Typography>
+            <Chip icon={<EditIcon />} label="แก้ไขสินค้า" />
+          </NavLink>
+        </Stack>
+      </Stack>
       {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
         <Typography
           variant="h6"
@@ -590,7 +618,6 @@ const SigleProduct = (prop: {
           <Typography>
             คาดว่าจะได้รับสินค้าในเดือน{" "}
             {new Date(product.forecastDate).toLocaleDateString("th-TH", {
-              year: "numeric",
               month: "long",
             })}
           </Typography>
@@ -604,7 +631,7 @@ const SigleProduct = (prop: {
         {product.product_description}
       </Typography>
 
-      {/* {product.certificate.length > 0 && (
+      {allStandardShow.length > 0 && (
         <Box
           sx={{
             paddingTop: "10px",
@@ -626,7 +653,7 @@ const SigleProduct = (prop: {
               <Table aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>ชื่อมาตรฐาน</TableCell>
+                    <TableCell>มาตรฐานที่ได้รับ</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -644,7 +671,7 @@ const SigleProduct = (prop: {
             </TableContainer>
           </Box>
         </Box>
-      )} */}
+      )}
 
       {product.selectedType !== "ประชาสัมพันธ์" && (
         <>
@@ -1100,6 +1127,11 @@ const SigleProduct = (prop: {
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
           <Stack>
+            <NavLink to={`/editprofile`}>
+              <Chip icon={<EditIcon />} label="แก้ไขข้อมูล" />
+            </NavLink>
+          </Stack>
+          <Stack>
             {prop.jwt_token &&
               (jwtDecode(prop.jwt_token) as { role: string }).role ==
                 "members" && (
@@ -1193,9 +1225,11 @@ const SigleProduct = (prop: {
               )}
           </Stack>
         </Stack>
+
         <Typography>
           โดย {product.firstname + " " + product.lastname + " "}
         </Typography>
+
         <Typography
           color={
             new Date().getTime() - new Date(product.lastLogin).getTime() >
@@ -1221,6 +1255,9 @@ const SigleProduct = (prop: {
         {product.facebooklink && (
           <Tooltip title={product.facebooklink}>
             <Button
+              sx={{
+                backgroundColor: "#4267B2",
+              }}
               startIcon={<Fbicon />}
               variant="contained"
               onClick={() => {
