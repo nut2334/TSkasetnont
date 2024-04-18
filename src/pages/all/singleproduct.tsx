@@ -54,6 +54,7 @@ import { Icon } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
 import { Margin } from "@mui/icons-material";
+import Path from "../../components/path";
 
 interface FullProductInterface {
   product_id: string;
@@ -434,6 +435,7 @@ const SigleProduct = (prop: {
 
   return (
     <Container component="main" maxWidth="lg">
+      <Path />
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <ArrowBackIosNewIcon
@@ -1266,7 +1268,7 @@ const SigleProduct = (prop: {
             marginTop: 2,
           }}
         >
-          <NavLink to={`/shop/${shopname}`}>
+          <NavLink to={`/listproduct/${shopname}`}>
             <Button variant="contained">ดูสินค้าอื่นๆภายในร้าน</Button>
           </NavLink>
         </div>

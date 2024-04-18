@@ -473,7 +473,7 @@ export default function SwipeableEdgeDrawer(
                       <Stack>
                         <Grid item md={12} sm={12}>
                           <NavLink
-                            to={`/shop/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
+                            to={`/listproduct/${props.selectedProduct.farmerstorename}/${props.selectedProduct.product_id}`}
                           >
                             <Button
                               variant="contained"

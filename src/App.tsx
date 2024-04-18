@@ -212,11 +212,11 @@ function App() {
             element={<ListProduct jwt_token={jwt_token} />}
           />
           <Route
-            path="/shop/:shopname"
+            path="/listproduct/:shopname"
             element={<ListProduct jwt_token={jwt_token} />}
           />
           <Route
-            path="/shop/:shopname/:productid"
+            path="/listproduct/:shopname/:productid"
             element={
               <SigleProduct
                 setCartList={setCartList}

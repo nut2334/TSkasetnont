@@ -541,7 +541,7 @@ const Festival = (prop: { jwt_token: string }) => {
           return (
             <Grid item key={index} lg={4} xs={12} sm={6} padding={1}>
               <NavLink
-                to={`/shop/${product.farmerstorename}/${product.product_id}`}
+                to={`/listproduct/${product.farmerstorename}/${product.product_id}`}
                 style={{
                   textDecoration: "none",
                 }}
@@ -681,7 +681,7 @@ const Festival = (prop: { jwt_token: string }) => {
                   onRowClick={(params) => {
                     return (
                       <Navigate
-                        to={`/shop/${params.row.farmerstorename}/${params.row.id}`}
+                        to={`/listproduct/${params.row.farmerstorename}/${params.row.id}`}
                       />
                     );
                   }}
@@ -751,7 +751,7 @@ const Festival = (prop: { jwt_token: string }) => {
                       renderCell: (params) => {
                         return (
                           <NavLink
-                            to={`/shop/${params.row.farmerstorename}/${params.row.id}`}
+                            to={`/listproduct/${params.row.farmerstorename}/${params.row.id}`}
                           >
                             <Chip label="ไปเลย" color="primary" />
                           </NavLink>

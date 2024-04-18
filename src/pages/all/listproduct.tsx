@@ -372,7 +372,7 @@ const ListProduct = (prop: { jwt_token: string }) => {
                 return (
                   <Grid item key={index} lg={4} xs={12} sm={6} padding={1}>
                     <NavLink
-                      to={`/shop/${product.farmerstorename}/${product.product_id}`}
+                      to={`/listproduct/${product.farmerstorename}/${product.product_id}`}
                       style={{
                         textDecoration: "none",
                       }}

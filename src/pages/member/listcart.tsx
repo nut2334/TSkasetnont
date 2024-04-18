@@ -9,7 +9,6 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { NumberInput } from "../../components/addamount";
 import Payment from "./payment";
 import Swal from "sweetalert2";
-import { json } from "stream/consumers";
 
 const EachItem = (prop: {
   cart: Cart;
