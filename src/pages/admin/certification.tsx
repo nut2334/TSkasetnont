@@ -10,9 +10,10 @@ import { styled } from "@mui/material/styles";
 import Swal from "sweetalert2";
 import axios from "axios";
 import * as config from "../../config/config";
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, TablePagination, Typography } from "@mui/material";
 import { RemoveRedEye } from "@mui/icons-material";
 import { Container } from "@mui/system";
+import { NavLink } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -39,16 +40,15 @@ interface requestInterface {
   standard_name: string;
   firstname: string;
   lastname: string;
-  image_path: string;
-  certificate_number: string;
-  name?: string;
+  product_name: string;
+  farmerstorename: string;
+  product_id: string;
 }
 const EachRow = (prop: {
   row: requestInterface;
   jwt_token: string;
   setAllRequest: React.Dispatch<React.SetStateAction<requestInterface[]>>;
 }) => {
-  const [open, setOpen] = useState(false);
   const handleClick = (isAccept: boolean, id: string) => {
     let apiCert = config.getApiEndpoint("certificate", "patch");
     if (isAccept) {
@@ -148,16 +148,18 @@ const EachRow = (prop: {
     <>
       <StyledTableRow key={prop.row.id}>
         <StyledTableCell component="th" scope="row">
-          {`${
-            prop.row.standard_name == "อื่นๆ"
-              ? `(${prop.row.standard_name}) ${prop.row.name}`
-              : prop.row.standard_name
-          }`}
+          {prop.row.standard_name}
         </StyledTableCell>
         <StyledTableCell>
           {prop.row.firstname} {prop.row.lastname}
         </StyledTableCell>
-
+        <StyledTableCell align="right">
+          <NavLink
+            to={`/listproduct/${prop.row.farmerstorename}/${prop.row.product_id}`}
+          >
+            {prop.row.product_name}
+          </NavLink>
+        </StyledTableCell>
         <StyledTableCell align="right">
           <Chip
             label="ยอมรับ"
@@ -167,6 +169,7 @@ const EachRow = (prop: {
             }}
           />
           <Chip
+            sx={{ marginLeft: 1 }}
             label="ปฏิเสธ"
             color="error"
             onClick={() => {
@@ -175,33 +178,15 @@ const EachRow = (prop: {
           />
         </StyledTableCell>
       </StyledTableRow>
-      {open && (
-        <StyledTableRow>
-          <StyledTableCell colSpan={5}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src={`${config.getApiEndpoint(
-                  `getimage/${prop.row.image_path.split("/").pop()}`,
-                  "get"
-                )}`}
-                style={{ width: "50%", height: "50%" }}
-              />
-            </Box>
-          </StyledTableCell>
-        </StyledTableRow>
-      )}
     </>
   );
 };
 
 const Certification = (prop: { jwt_token: string }) => {
   const [allRequest, setAllRequest] = useState<requestInterface[]>([]);
+  const [pageRequest, setPageRequest] = useState<requestInterface[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   useEffect(() => {
     axios
       .get(config.getApiEndpoint("getadmincertificate", "GET"), {
@@ -220,6 +205,23 @@ const Certification = (prop: { jwt_token: string }) => {
       });
   }, []);
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  useEffect(() => {
+    setPageRequest(
+      allRequest.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    );
+  }, [page, rowsPerPage, allRequest]);
+
   return (
     <Container maxWidth="lg">
       <Typography
@@ -237,6 +239,7 @@ const Certification = (prop: { jwt_token: string }) => {
             <StyledTableRow>
               <StyledTableCell>ประเภทมาตรฐาน</StyledTableCell>
               <StyledTableCell>ผู้ขอ</StyledTableCell>
+              <StyledTableCell align="right">ชื่อสินค้า</StyledTableCell>
               <StyledTableCell align="right">การกระทำ</StyledTableCell>
             </StyledTableRow>
           </TableHead>
@@ -250,7 +253,7 @@ const Certification = (prop: { jwt_token: string }) => {
             </TableBody>
           )}
           <TableBody>
-            {allRequest.map((row) => (
+            {pageRequest.map((row) => (
               <EachRow
                 row={row}
                 jwt_token={prop.jwt_token}
@@ -260,6 +263,15 @@ const Certification = (prop: { jwt_token: string }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={allRequest.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Container>
   );
 };

@@ -375,6 +375,7 @@ const ListProduct = (prop: { jwt_token: string }) => {
                       to={`/listproduct/${product.farmerstorename}/${product.product_id}`}
                       style={{
                         textDecoration: "none",
+                        color: "black",
                       }}
                     >
                       <Card
