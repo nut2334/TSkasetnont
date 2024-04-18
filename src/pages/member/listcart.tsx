@@ -119,7 +119,6 @@ const EachItem = (prop: {
         <Grid item xs={1}>
           <Button
             onClick={() => {
-              console.log(prop.cart);
               prop.setCartList((prev) =>
                 prev.filter((cart) => cart.product_id !== prop.cart.product_id)
               );
@@ -152,7 +151,6 @@ const ListCart = (prop: {
   const [skipped, setSkipped] = React.useState(new Set<number>());
 
   useEffect(() => {
-    console.log(shippingcost);
     if (shippingcost.length === 0) {
       return;
     }
@@ -173,6 +171,10 @@ const ListCart = (prop: {
     });
     setSummaryShippingCost(totalCost);
   }, [shippingcost]);
+
+  useEffect(() => {
+    console.log(cartList);
+  }, [cartList]);
 
   const handleSubmit = () => {
     if (cartList.length === 0) {
@@ -230,27 +232,29 @@ const ListCart = (prop: {
 
   return (
     <Container component="main" maxWidth="lg" sx={{ marginTop: 3 }}>
-      <Stepper
-        activeStep={activeStep}
-        sx={{
-          marginBottom: 3,
-        }}
-      >
-        {steps.map((label, index) => {
-          const stepProps: { completed?: boolean } = {};
-          const labelProps: {
-            optional?: React.ReactNode;
-          } = {};
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
+      {cartList.length > 0 && (
+        <Stepper
+          activeStep={activeStep}
+          sx={{
+            marginBottom: 3,
+          }}
+        >
+          {steps.map((label, index) => {
+            const stepProps: { completed?: boolean } = {};
+            const labelProps: {
+              optional?: React.ReactNode;
+            } = {};
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+      )}
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>

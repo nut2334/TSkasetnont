@@ -42,8 +42,6 @@ import {
 } from "react-share";
 import { Cart } from "../../App";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import StarHalfIcon from "@mui/icons-material/StarHalf";
 import Swal from "sweetalert2";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -54,7 +52,6 @@ import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
-import { Margin } from "@mui/icons-material";
 import Path from "../../components/path";
 import { Facebook as Fbicon } from "@mui/icons-material";
 
@@ -1074,7 +1071,8 @@ const SigleProduct = (prop: {
             <img
               style={{
                 width: "100%",
-                height: "70%",
+                maxHeight: "600px",
+                objectFit: "contain",
               }}
               src={`${config.getApiEndpoint(
                 `getimage/${showFullImage.split("/").pop()}`,

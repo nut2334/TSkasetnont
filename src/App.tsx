@@ -102,7 +102,6 @@ function App() {
   useEffect(() => {
     const cookies = new Cookies();
     cookies.set("cart", cartList, { path: "/" });
-
     if (cartList.length === 0) {
       cookies.remove("cart");
     }
