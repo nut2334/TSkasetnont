@@ -128,6 +128,7 @@ const Home = (prop: {
       id: number;
     }[]
   >([]);
+  const [havePosition, setHavePosition] = useState(false);
 
   useEffect(() => {
     axios
@@ -233,8 +234,8 @@ const Home = (prop: {
   const CreateMarker = (props: { item: ProductInterface }) => {
     const map = useMap();
     useEffect(() => {
-      map.flyTo([position.lat, position.lng], 14);
-    }, [position]);
+      havePosition && map.flyTo([position.lat, position.lng], 14);
+    }, [position, havePosition]);
     const { item } = props;
     const iconMarker = divIcon({
       className: "my-custom-pin",
@@ -291,6 +292,7 @@ const Home = (prop: {
           click: () => {
             setOpen(true);
             setSelectedProduct(item);
+            setHavePosition(false);
           },
         }}
       ></Marker>
@@ -428,25 +430,34 @@ const Home = (prop: {
               })}
             </Tabs>
           </Container>
-          <Typography
-            variant="h6"
+          <Box
             sx={{
-              backgroundImage:
-                "linear-gradient(319deg, #ffcb43 0%, #ff6425 37%, #ff0016 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+              marginBottom: "10px",
             }}
           >
-            {" "}
             <LocalFireDepartmentIcon
               sx={{
                 fill: "red",
               }}
             />
-            สินค้าที่กำลังมาแรง
-          </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                backgroundImage:
+                  "linear-gradient(319deg, #ffcb43 0%, #ff6425 37%, #ff0016 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                marginLeft: "10px",
+              }}
+            >
+              สินค้าที่กำลังมาแรง
+            </Typography>
+          </Box>
 
           {productPage.map((item, index) => {
             return (
@@ -460,7 +471,20 @@ const Home = (prop: {
                     "&:hover": {
                       color: "green",
                     },
-                    padding: "2px 0",
+                    padding: "2px 10px",
+                  }}
+                  onClick={() => {
+                    setOpen(true);
+                    setSelectedProduct(item);
+                    if (item.lat && item.lng) {
+                      setHavePosition(true);
+                      setPosition({
+                        lat: parseFloat(item.lat),
+                        lng: parseFloat(item.lng),
+                      });
+                    } else {
+                      setHavePosition(false);
+                    }
                   }}
                 >
                   <Box>
@@ -483,21 +507,7 @@ const Home = (prop: {
                         {index + 1 + page * 5 - 5}
                       </Typography>
 
-                      <Typography
-                        key={index}
-                        onClick={() => {
-                          setOpen(true);
-                          setSelectedProduct(item);
-                          if (item.lat && item.lng) {
-                            setPosition({
-                              lat: parseFloat(item.lat),
-                              lng: parseFloat(item.lng),
-                            });
-                          }
-                        }}
-                      >
-                        {item.product_name}
-                      </Typography>
+                      <Typography key={index}>{item.product_name}</Typography>
                     </Box>
 
                     <Box>
@@ -571,14 +581,25 @@ const Home = (prop: {
               marginTop: "20px",
             }}
           >
-            <Typography
-              variant="h6"
+            <Box
               sx={{
-                textAlign: "center",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: "10px",
               }}
             >
-              <AccessTimeIcon /> เทศกาลที่กำลังจะมาถึง
-            </Typography>
+              <AccessTimeIcon />
+              <Typography
+                variant="h6"
+                sx={{
+                  marginLeft: "10px",
+                }}
+              >
+                เทศกาลที่กำลังจะมาถึง
+              </Typography>
+            </Box>
+
             {eventPage.map((event, index) => {
               return (
                 <Box
