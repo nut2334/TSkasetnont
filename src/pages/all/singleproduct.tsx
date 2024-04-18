@@ -17,6 +17,7 @@ import {
   TableCell,
   TableBody,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -55,7 +56,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 import Path from "../../components/path";
-import Cookies from "universal-cookie";
+import { Facebook as Fbicon } from "@mui/icons-material";
 
 interface FullProductInterface {
   product_id: string;
@@ -1220,29 +1221,17 @@ const SigleProduct = (prop: {
         ) : null}
 
         {product.facebooklink && (
-          <Stack
-            direction="row"
-            spacing={2}
-            onClick={() => {
-              window.open(product.facebooklink, "_blank");
-            }}
-            sx={{
-              cursor: "pointer",
-            }}
-          >
-            <Stack>
-              <FacebookIcon
-                style={{
-                  borderRadius: "100%",
-                  width: 30,
-                  height: "auto",
-                }}
-              />
-            </Stack>
-            <Stack>
-              <Typography>{product.facebooklink}</Typography>
-            </Stack>
-          </Stack>
+          <Tooltip title={product.facebooklink}>
+            <Button
+              startIcon={<Fbicon />}
+              variant="contained"
+              onClick={() => {
+                window.open(product.facebooklink, "_blank");
+              }}
+            >
+              Facebook
+            </Button>
+          </Tooltip>
         )}
         {product.lineid && (
           <>

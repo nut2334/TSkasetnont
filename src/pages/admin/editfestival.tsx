@@ -23,6 +23,7 @@ import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { th } from "date-fns/locale";
 import { Form } from "react-router-dom";
+import { json } from "stream/consumers";
 
 dayjs.extend(buddhistEra);
 
@@ -148,6 +149,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
           ...prev,
           {
             event_id: e.id,
+            description: JSON.parse(e.keywords).join(", "),
             title: e.name,
             start: new Date(e.start_date),
             end: new Date(e.end_date),

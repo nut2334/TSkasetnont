@@ -228,6 +228,7 @@ const Register = (prop: {
         .then((response) => {
           Swal.fire({
             title: "สมัครสมาชิกสำเร็จ",
+            text: "ส่งลิงค์ยืนยันตัวตนไปที่อีเมลของคุณแล้ว",
             icon: "success",
             confirmButtonText: "OK",
           });

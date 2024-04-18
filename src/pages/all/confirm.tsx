@@ -47,7 +47,7 @@ const Confirm = (prop: {
         });
       });
   }, []);
-  return redirect ? <Navigate to="/login" /> : <></>;
+  return redirect ? <Navigate to="/" /> : <></>;
 };
 
 export default Confirm;
