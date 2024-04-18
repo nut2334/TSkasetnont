@@ -163,9 +163,9 @@ const AddProduct = (prop: { jwt_token: string }) => {
               ? JSON.parse(res.data.additional_image)
               : []
           );
-          setMonthreceived(res.data.forecastDate);
-
+          console.log(res.data.certificate);
           setSelectedStandard(JSON.parse(res.data.certificate));
+          setMonthreceived(res.data.forecastDate);
         }
       });
     }
@@ -1052,6 +1052,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     onChange={(e: any) =>
                       setMonthreceived(e.format("YYYY-MM-DD"))
                     }
+                    value={monthreceived}
                   />
                 </LocalizationProvider>
               </Grid>
