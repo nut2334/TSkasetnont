@@ -19,6 +19,8 @@ import {
   Tooltip,
   Chip,
   Grid,
+  IconButton,
+  Snackbar,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -58,7 +60,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Yearlybar from "../../components/yearlybar";
 import { status_reserve } from "../../config/dataDropdown";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-
+import CloseIcon from "@mui/icons-material/Close";
 interface FullProductInterface {
   product_id: string;
   product_name: string;
@@ -196,6 +198,22 @@ const SigleProduct = (prop: {
   >([]);
   const [allStandardShow, setAllStandardShow] = useState<string[]>([]);
   const [reserveTable, setReserveTable] = React.useState<Reservetoday[]>([]);
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -208,18 +226,23 @@ const SigleProduct = (prop: {
         certificate: JSON.parse(response.data.certificate),
       });
       if (response.data.certificate) {
-        setAllStandardShow(
-          JSON.parse(response.data.certificate).filter(
+        let allStandard = JSON.parse(response.data.certificate) as {
+          standard_id: string;
+          standard_name: string;
+          status: string;
+        }[];
+
+        let standardComplete = allStandard
+          .filter(
             (item: {
               standard_id: string;
               standard_name: string;
               status: string;
-            }) => {
-              console.log(item);
-              if (item.status == "complete") return item.standard_name;
-            }
+            }) => item.status === "complete"
           )
-        );
+          .map((item) => item.standard_name);
+
+        setAllStandardShow(standardComplete);
       }
       console.log(response.data);
     });
@@ -277,7 +300,18 @@ const SigleProduct = (prop: {
         );
       });
   }, [product]);
-
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
   const handleCopy = (text: string) => () => {
     copy(text)
       .then(() => {
@@ -776,7 +810,20 @@ const SigleProduct = (prop: {
                     return (
                       <TableRow key={item}>
                         <TableCell component="th" scope="row">
-                          {item}
+                          {item}{" "}
+                          {item === "นนทบุรีการันตี" ? (
+                            <IconButton>
+                              <img
+                                style={{
+                                  width: "20px",
+                                  height: "100%",
+                                }}
+                                src={require("../../assets/GUARANTEE.png")}
+                              />
+                            </IconButton>
+                          ) : (
+                            "hi"
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -1396,7 +1443,10 @@ const SigleProduct = (prop: {
                 cursor: "pointer",
                 marginTop: 2,
               }}
-              onClick={handleCopy(product.lineid)}
+              onClick={() => {
+                handleClick();
+                handleCopy(product.lineid);
+              }}
             >
               <Stack>
                 <LineIcon
@@ -1494,6 +1544,13 @@ const SigleProduct = (prop: {
           </Marker>
         </MapContainer>
       )}
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message="คัดลอกไอดีไลน์สำเร็จ"
+        action={action}
+      />
     </Container>
   );
 };
