@@ -152,11 +152,11 @@ const Home = (prop: {
   }, [selectedCategory, searchContent]);
 
   useEffect(() => {
-    setProductPage(data.slice((page - 1) * 5, page * 5));
+    setProductPage(data.slice((page - 1) * 4, page * 4));
   }, [page, data]);
 
   useEffect(() => {
-    setEventPage(events.slice((pageEvent - 1) * 5, pageEvent * 5));
+    setEventPage(events.slice((pageEvent - 1) * 4, pageEvent * 4));
   }, [pageEvent, events]);
 
   useEffect(() => {
@@ -453,14 +453,18 @@ const Home = (prop: {
               <>
                 <Box
                   sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     cursor: "pointer",
                     "&:hover": {
                       color: "green",
                     },
+                    padding: "2px 0",
                   }}
                 >
-                  <Stack direction="row" spacing={2}>
-                    <Stack>
+                  <Box>
+                    <Box sx={{ display: "flex" }}>
                       <Typography
                         sx={{
                           width: "24px",
@@ -473,12 +477,12 @@ const Home = (prop: {
                           justifyContent: "center",
                           alignItems: "center",
                           color: "white",
+                          marginRight: "10px",
                         }}
                       >
                         {index + 1 + page * 5 - 5}
                       </Typography>
-                    </Stack>
-                    <Stack>
+
                       <Typography
                         key={index}
                         onClick={() => {
@@ -494,17 +498,23 @@ const Home = (prop: {
                       >
                         {item.product_name}
                       </Typography>
+                    </Box>
 
+                    <Box>
                       <Typography
                         sx={{
                           color: "gray",
+                          marginLeft: "34px",
                         }}
                       >
                         โดย {item.farmerstorename}
                       </Typography>
-                    </Stack>
+                    </Box>
+                  </Box>
+
+                  <Box>
                     {item.selectedType === "สินค้าจัดส่งพัสดุ" && (
-                      <Stack>
+                      <>
                         <Typography
                           sx={{
                             color: "red",
@@ -519,24 +529,22 @@ const Home = (prop: {
                         >
                           จำนวนคลัง {item.stock} {item.unit}
                         </Typography>
-                      </Stack>
+                      </>
                     )}
                     {item.selectedType === "สินค้าจอง" && (
-                      <Stack>
-                        <Typography
-                          sx={{
-                            color: "red",
-                          }}
-                        >
-                          {item.forecastDate.toLocaleDateString("th", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </Typography>
-                      </Stack>
+                      <Typography
+                        sx={{
+                          color: "red",
+                        }}
+                      >
+                        {item.forecastDate.toLocaleDateString("th", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </Typography>
                     )}
-                  </Stack>
+                  </Box>
                 </Box>
                 <Divider />
               </>
