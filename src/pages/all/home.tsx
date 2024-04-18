@@ -24,6 +24,8 @@ import SwipeableEdgeDrawer from "../../components/SwipeableEdgeDrawer";
 import { useMap } from "react-leaflet";
 import { Pagination } from "@mui/material";
 import { Cart } from "../../App";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 interface CateagoryInterface {
   category_id: string;
@@ -305,7 +307,7 @@ const Home = (prop: {
         <Box
           sx={{
             height: "90%",
-            width: "250px",
+            width: "20%",
             position: "absolute",
             zIndex: 2,
             backgroundColor: "#ffffff",
@@ -314,7 +316,25 @@ const Home = (prop: {
           }}
           display={{ xs: "none", sm: "block" }}
         >
-          <Typography variant="h6">รายการสินค้า</Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              backgroundImage:
+                "linear-gradient(319deg, #ffcb43 0%, #ff6425 37%, #ff0016 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              textAlign: "center",
+            }}
+          >
+            {" "}
+            <LocalFireDepartmentIcon
+              sx={{
+                fill: "red",
+              }}
+            />
+            สินค้าที่กำลังมาแรง
+          </Typography>
           {productPage.map((item, index) => {
             return (
               <>
@@ -326,34 +346,56 @@ const Home = (prop: {
                     },
                   }}
                 >
-                  <Typography
-                    key={index}
-                    onClick={() => {
-                      setOpen(true);
-                      setSelectedProduct(item);
-                      if (item.lat && item.lng) {
-                        setPosition({
-                          lat: parseFloat(item.lat),
-                          lng: parseFloat(item.lng),
-                        });
-                      }
-                    }}
-                  >
-                    {item.product_name}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: "gray",
-                    }}
-                  >
-                    โดย {item.farmerstorename}
-                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Stack>
+                      <Typography
+                        sx={{
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "50%",
+                          backgroundImage:
+                            "linear-gradient(319deg, #ffcb43 0%, #ff6425 37%, #ff0016 100%)",
+                          boxShadow: "rgba(0, 0, 0, 0.3) 0px 3px 7px -3px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "white",
+                        }}
+                      >
+                        {index + 1}
+                      </Typography>
+                    </Stack>
+                    <Stack>
+                      <Typography
+                        key={index}
+                        onClick={() => {
+                          setOpen(true);
+                          setSelectedProduct(item);
+                          if (item.lat && item.lng) {
+                            setPosition({
+                              lat: parseFloat(item.lat),
+                              lng: parseFloat(item.lng),
+                            });
+                          }
+                        }}
+                      >
+                        {item.product_name}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          color: "gray",
+                        }}
+                      >
+                        โดย {item.farmerstorename}
+                      </Typography>
+                    </Stack>
+                  </Stack>
                 </Box>
                 <Divider />
               </>
             );
           })}
-
           <Box
             sx={{
               display: "flex",
@@ -375,10 +417,25 @@ const Home = (prop: {
               marginTop: "20px",
             }}
           >
-            <Typography variant="h6">เทศกาลที่กำลังจะมาถึง</Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                textAlign: "center",
+              }}
+            >
+              <AccessTimeIcon /> เทศกาลที่กำลังจะมาถึง
+            </Typography>
             {eventPage.map((event, index) => {
               return (
-                <Box key={index}>
+                <Box
+                  key={index}
+                  sx={{
+                    backgroundColor:
+                      new Date() < event.end && new Date() > event.start
+                        ? "rgba(255,0,0,0.1)"
+                        : "rgba(0,255,0,0.1)",
+                  }}
+                >
                   <Typography>{event.title}</Typography>
                   <Typography>
                     {event.start.toLocaleDateString("th", {
