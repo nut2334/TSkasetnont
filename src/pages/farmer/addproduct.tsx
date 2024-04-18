@@ -1048,7 +1048,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     sx={{ width: "100%" }}
-                    defaultValue={monthreceived ? monthreceived : null}
+                    defaultValue={monthreceived ? dayjs(monthreceived) : null}
                     onChange={(e: any) =>
                       setMonthreceived(e.format("YYYY-MM-DD"))
                     }
