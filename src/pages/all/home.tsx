@@ -576,26 +576,53 @@ const Home = (prop: {
                 <Box
                   key={index}
                   sx={{
-                    backgroundColor:
-                      new Date() >= event.start && new Date() <= event.end
-                        ? "rgba(255,0,0,0.1)"
-                        : "rgba(0,255,0,0.1)",
+                    padding: "2px 10px",
                   }}
                 >
-                  <Typography>{event.title}</Typography>
-                  <Typography>
-                    {event.start.toLocaleDateString("th", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}{" "}
-                    -{" "}
-                    {event.end.toLocaleDateString("th", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box>
+                      <Typography>{event.title}</Typography>
+                      <Typography>
+                        {event.start.toLocaleDateString("th", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        -{" "}
+                        {event.end.toLocaleDateString("th", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </Typography>
+                    </Box>
+
+                    {new Date().getTime() <= new Date(event.end).getTime() &&
+                    new Date().getTime() >= new Date(event.start).getTime() ? (
+                      <Chip
+                        label="กำลังจัดขึ้น"
+                        sx={{
+                          backgroundColor: "rgba(0,255,0,0.1)",
+                          color: "black",
+                        }}
+                      />
+                    ) : (
+                      <Chip
+                        label="ยังไม่เริ่ม"
+                        sx={{
+                          backgroundColor: "rgba(255,0,0,0.1)",
+                          color: "black",
+                        }}
+                      />
+                    )}
+                  </Box>
+
                   <Divider />
                 </Box>
               );
