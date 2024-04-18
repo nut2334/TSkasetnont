@@ -154,10 +154,10 @@ const AddProduct = (prop: { jwt_token: string }) => {
           );
           setSelectImage(
             res.data.additional_image
-              ? JSON.parse(res.data.additional_image)
+              ? JSON.parse(JSON.stringify(res.data.additional_image))
               : []
           );
-          setSelectedStandard(JSON.parse(res.data.certificate));
+          setSelectedStandard(JSON.parse(JSON.stringify(res.data.certificate)));
         }
       });
     }
