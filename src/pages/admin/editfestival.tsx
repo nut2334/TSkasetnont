@@ -170,6 +170,33 @@ const Editfestival = (prop: { jwt_token: string }) => {
         Authorization: `Bearer ${prop.jwt_token}`,
       },
     });
+    if (prop.jwt_token) {
+      let role = (jwtDecode(prop.jwt_token) as { role: string }).role;
+      if (role == "admins") {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    }
+    axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
+      console.log(res.data);
+      res.data.map((e: any) => {
+        setEvents((prev) => [
+          ...prev,
+          {
+            event_id: e.id,
+            description: JSON.parse(e.keywords).join(", "),
+            title: e.name,
+            start: new Date(e.start_date),
+            end: new Date(e.end_date),
+            color: e.color,
+            admin_id: 1,
+            editable: true,
+            everyYear: true,
+          },
+        ]);
+      });
+    });
     // Simulate http request: return the deleted id
     return new Promise((res, rej) => {
       setTimeout(() => {
@@ -238,6 +265,33 @@ const Editfestival = (prop: { jwt_token: string }) => {
               },
             }
           );
+          if (prop.jwt_token) {
+            let role = (jwtDecode(prop.jwt_token) as { role: string }).role;
+            if (role == "admins") {
+              setIsAdmin(true);
+            } else {
+              setIsAdmin(false);
+            }
+          }
+          axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
+            console.log(res.data);
+            res.data.map((e: any) => {
+              setEvents((prev) => [
+                ...prev,
+                {
+                  event_id: e.id,
+                  description: JSON.parse(e.keywords).join(", "),
+                  title: e.name,
+                  start: new Date(e.start_date),
+                  end: new Date(e.end_date),
+                  color: e.color,
+                  admin_id: 1,
+                  editable: true,
+                  everyYear: true,
+                },
+              ]);
+            });
+          });
         } else if (event === undefined) {
           /**POST event to remote DB */
           let response = await axios.post(
@@ -249,6 +303,33 @@ const Editfestival = (prop: { jwt_token: string }) => {
               },
             }
           );
+          if (prop.jwt_token) {
+            let role = (jwtDecode(prop.jwt_token) as { role: string }).role;
+            if (role == "admins") {
+              setIsAdmin(true);
+            } else {
+              setIsAdmin(false);
+            }
+          }
+          axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
+            console.log(res.data);
+            res.data.map((e: any) => {
+              setEvents((prev) => [
+                ...prev,
+                {
+                  event_id: e.id,
+                  description: JSON.parse(e.keywords).join(", "),
+                  title: e.name,
+                  start: new Date(e.start_date),
+                  end: new Date(e.end_date),
+                  color: e.color,
+                  admin_id: 1,
+                  editable: true,
+                  everyYear: e.everyYear,
+                },
+              ]);
+            });
+          });
           event_id = response.data.id;
         }
         const added_updated_event = (await new Promise((res) => {
@@ -264,6 +345,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
               start: state.start,
               end: state.end,
               color: state.color,
+              everyYear: state.everyYear,
             });
           }, 3000);
         })) as ProcessedEvent;

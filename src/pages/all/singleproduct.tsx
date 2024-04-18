@@ -451,6 +451,34 @@ const SigleProduct = (prop: {
   return (
     <Container component="main" maxWidth="lg">
       <Path />
+      {/* {selectedYearlyReserve && (
+        <Grid xs={12}>
+          <Typography variant="h5">
+            ยอดการจอง{selectedYearlyReserve.product_name}ประจำปี{" "}
+          </Typography>
+        </Grid>
+      )}
+      <Grid xs={6} sx={{ marginTop: 2 }}>
+        <TextField select label="เลือกสินค้าการจอง" fullWidth>
+          {yearlyReserve.map((product) => (
+            <MenuItem
+              value={product.product_id}
+              onClick={() => setSelectedYearlyReserve(product)}
+            >
+              {product.product_name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid xs={12} sx={{ marginTop: 2 }}>
+        {selectedYearlyReserve && (
+          <Yearlybar
+            jwt_token={prop.jwt_token}
+            product_name={selectedYearlyReserve.product_name}
+            product_id={selectedYearlyReserve.product_id}
+          />
+        )}
+      </Grid> */}
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <ArrowBackIosNewIcon
