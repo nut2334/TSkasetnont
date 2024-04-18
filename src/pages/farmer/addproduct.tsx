@@ -163,7 +163,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
               ? JSON.parse(res.data.additional_image)
               : []
           );
-          console.log(res.data.certificate);
+          setMonthreceived(res.data.forecastDate);
 
           setSelectedStandard(JSON.parse(res.data.certificate));
         }
@@ -1048,7 +1048,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     sx={{ width: "100%" }}
-                    defaultValue={monthreceived ? monthreceived : null}
+                    defaultValue={monthreceived ? dayjs(monthreceived) : null}
                     onChange={(e: any) =>
                       setMonthreceived(e.format("YYYY-MM-DD"))
                     }
