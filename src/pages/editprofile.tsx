@@ -36,6 +36,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
+import Cookies from "universal-cookie";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -62,6 +63,7 @@ interface tambon {
 
 const EditProfile = (prop: {
   jwt_token: string;
+  setJwt_token: React.Dispatch<React.SetStateAction<string>>;
   admin?: { username: string; role: string };
   followList: { id: string; farmerstorename: string }[];
   setFollowList: React.Dispatch<
@@ -494,6 +496,17 @@ const EditProfile = (prop: {
       })
       .then((res) => {
         console.log(res.data);
+
+        if (res.data.newToken) {
+          const cookies = new Cookies();
+          cookies.set("jwt_token", res.data.newToken, {
+            path: "/",
+            sameSite: "strict",
+            secure: true,
+          });
+
+          prop.setJwt_token(res.data.newToken);
+        }
         EdituserSuccess();
       })
       .catch((err) => {

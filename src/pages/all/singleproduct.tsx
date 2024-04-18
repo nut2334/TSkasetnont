@@ -55,6 +55,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
 import { Margin } from "@mui/icons-material";
 import Path from "../../components/path";
+import Cookies from "universal-cookie";
 
 interface FullProductInterface {
   product_id: string;
@@ -422,7 +423,7 @@ const SigleProduct = (prop: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
       })
-      .then(() => {
+      .then((res) => {
         Swal.fire({
           icon: "success",
           title: "ส่งอีเมลยืนยันตัวตนสำเร็จ",
@@ -733,20 +734,25 @@ const SigleProduct = (prop: {
           )}
 
           <Stack direction="row" spacing={2} justifyContent="end">
-            <Stack>
-              {prop.jwt_token &&
-              (jwtDecode(prop.jwt_token) as { activate: boolean }).activate ? (
-                ""
-              ) : (
-                <Button
-                  startIcon={<AdminPanelSettingsIcon />}
-                  variant="contained"
-                  onClick={handleActivate}
-                >
-                  ยืนยันตัวตน
-                </Button>
+            {prop.jwt_token &&
+              (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                "members" && (
+                <Stack>
+                  {prop.jwt_token &&
+                  (jwtDecode(prop.jwt_token) as { activate: boolean })
+                    .activate ? (
+                    ""
+                  ) : (
+                    <Button
+                      startIcon={<AdminPanelSettingsIcon />}
+                      variant="contained"
+                      onClick={handleActivate}
+                    >
+                      ยืนยันตัวตน
+                    </Button>
+                  )}
+                </Stack>
               )}
-            </Stack>
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
               (prop.jwt_token == "" ||
                 (jwtDecode(prop.jwt_token) as { role: string }).role ==

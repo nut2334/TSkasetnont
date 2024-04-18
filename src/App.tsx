@@ -206,7 +206,10 @@ function App() {
             }
           />
           <Route path="/forgot" element={<Forgot />} />
-          <Route path="/confirm/:email/:hashed" element={<Confirm />} />
+          <Route
+            path="/confirm/:email/:hashed"
+            element={<Confirm setJwt_token={setJwt_token} />}
+          />
           <Route
             path="/listproduct"
             element={<ListProduct jwt_token={jwt_token} />}
@@ -239,6 +242,7 @@ function App() {
                   jwt_token={jwt_token}
                   followList={followList}
                   setFollowList={setFollowList}
+                  setJwt_token={setJwt_token}
                 />
               }
             />
@@ -275,6 +279,7 @@ function App() {
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
+                    setJwt_token={setJwt_token}
                     followList={followList}
                     setFollowList={setFollowList}
                   />
@@ -301,6 +306,7 @@ function App() {
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
+                    setJwt_token={setJwt_token}
                     followList={followList}
                     setFollowList={setFollowList}
                   />
