@@ -98,22 +98,20 @@ const EachDataCarriage = (prop: {
               -
             </Button>
           )}
-          {prop.index == prop.dataCarriage.length - 1 &&
-            weight > 0 &&
-            price > 0 && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  prop.setDataCarriage([
-                    ...prop.dataCarriage,
-                    { weight: 0, price: 0 },
-                  ]);
-                }}
-              >
-                +
-              </Button>
-            )}
+          {prop.index == prop.dataCarriage.length - 1 && price > 0 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                prop.setDataCarriage([
+                  ...prop.dataCarriage,
+                  { weight: 0, price: 0 },
+                ]);
+              }}
+            >
+              +
+            </Button>
+          )}
         </Grid>{" "}
       </Grid>
     </>

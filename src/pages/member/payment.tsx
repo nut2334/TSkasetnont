@@ -257,7 +257,7 @@ const Payment = (prop: {
                   "get"
                 )}`}
                 alt="qrcode"
-                width="200px"
+                width="500px"
               />
             ) : (
               <Typography>ไม่พบช่องทางการชำระเงิน</Typography>
@@ -293,14 +293,24 @@ const Payment = (prop: {
                   marginTop: "10px",
                 }}
               >
-                <img src={URL.createObjectURL(slip)} alt="slip" width="100" />
+                <img
+                  src={URL.createObjectURL(slip)}
+                  alt="slip"
+                  width="500px"
+                  style={{
+                    display: "block",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "50%",
+                  }}
+                />
               </Typography>
             )}
           </Grid>
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} textAlign={"right"}>
             <Button
               variant="contained"
               onClick={handleSubmit}

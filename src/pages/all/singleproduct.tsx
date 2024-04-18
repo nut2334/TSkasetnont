@@ -17,6 +17,7 @@ import {
   TableCell,
   TableBody,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -41,8 +42,6 @@ import {
 } from "react-share";
 import { Cart } from "../../App";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import StarHalfIcon from "@mui/icons-material/StarHalf";
 import Swal from "sweetalert2";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -53,7 +52,8 @@ import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
-import { Margin } from "@mui/icons-material";
+import Path from "../../components/path";
+import { Facebook as Fbicon } from "@mui/icons-material";
 
 interface FullProductInterface {
   product_id: string;
@@ -421,7 +421,7 @@ const SigleProduct = (prop: {
           Authorization: `Bearer ${prop.jwt_token}`,
         },
       })
-      .then(() => {
+      .then((res) => {
         Swal.fire({
           icon: "success",
           title: "ส่งอีเมลยืนยันตัวตนสำเร็จ",
@@ -434,6 +434,7 @@ const SigleProduct = (prop: {
 
   return (
     <Container component="main" maxWidth="lg">
+      <Path />
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <ArrowBackIosNewIcon
@@ -731,20 +732,25 @@ const SigleProduct = (prop: {
           )}
 
           <Stack direction="row" spacing={2} justifyContent="end">
-            <Stack>
-              {prop.jwt_token &&
-              (jwtDecode(prop.jwt_token) as { activate: boolean }).activate ? (
-                ""
-              ) : (
-                <Button
-                  startIcon={<AdminPanelSettingsIcon />}
-                  variant="contained"
-                  onClick={handleActivate}
-                >
-                  ยืนยันตัวตน
-                </Button>
+            {prop.jwt_token &&
+              (jwtDecode(prop.jwt_token) as { role: string }).role ==
+                "members" && (
+                <Stack>
+                  {prop.jwt_token &&
+                  (jwtDecode(prop.jwt_token) as { activate: boolean })
+                    .activate ? (
+                    ""
+                  ) : (
+                    <Button
+                      startIcon={<AdminPanelSettingsIcon />}
+                      variant="contained"
+                      onClick={handleActivate}
+                    >
+                      ยืนยันตัวตน
+                    </Button>
+                  )}
+                </Stack>
               )}
-            </Stack>
             {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
               (prop.jwt_token == "" ||
                 (jwtDecode(prop.jwt_token) as { role: string }).role ==
@@ -1065,7 +1071,8 @@ const SigleProduct = (prop: {
             <img
               style={{
                 width: "100%",
-                height: "70%",
+                maxHeight: "600px",
+                objectFit: "contain",
               }}
               src={`${config.getApiEndpoint(
                 `getimage/${showFullImage.split("/").pop()}`,
@@ -1212,29 +1219,17 @@ const SigleProduct = (prop: {
         ) : null}
 
         {product.facebooklink && (
-          <Stack
-            direction="row"
-            spacing={2}
-            onClick={() => {
-              window.open(product.facebooklink, "_blank");
-            }}
-            sx={{
-              cursor: "pointer",
-            }}
-          >
-            <Stack>
-              <FacebookIcon
-                style={{
-                  borderRadius: "100%",
-                  width: 30,
-                  height: "auto",
-                }}
-              />
-            </Stack>
-            <Stack>
-              <Typography>{product.facebooklink}</Typography>
-            </Stack>
-          </Stack>
+          <Tooltip title={product.facebooklink}>
+            <Button
+              startIcon={<Fbicon />}
+              variant="contained"
+              onClick={() => {
+                window.open(product.facebooklink, "_blank");
+              }}
+            >
+              Facebook
+            </Button>
+          </Tooltip>
         )}
         {product.lineid && (
           <>
@@ -1266,7 +1261,7 @@ const SigleProduct = (prop: {
             marginTop: 2,
           }}
         >
-          <NavLink to={`/shop/${shopname}`}>
+          <NavLink to={`/listproduct/${shopname}`}>
             <Button variant="contained">ดูสินค้าอื่นๆภายในร้าน</Button>
           </NavLink>
         </div>

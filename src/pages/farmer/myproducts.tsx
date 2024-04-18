@@ -507,7 +507,7 @@ const Myproducts = (prop: {
                     </CardContent>
                     <CardActions>
                       <NavLink
-                        to={`/shop/${product.farmerstorename}/${product.product_id}`}
+                        to={`/listproduct/${product.farmerstorename}/${product.product_id}`}
                       >
                         <Button size="small">
                           <VisibilityIcon

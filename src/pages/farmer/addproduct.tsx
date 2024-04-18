@@ -24,7 +24,7 @@ import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import axios, { all } from "axios";
+import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
 import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
@@ -119,6 +119,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checked, setChecked] = React.useState([0]);
   const [add, setAdd] = useState<boolean>(false);
   const [monthreceived, setMonthreceived] = useState<Date | null>(null);
+  const [checkWeight, setCheckWeight] = useState<boolean>(true);
 
   function closeModal() {
     setIsOpen(null);
@@ -255,6 +256,13 @@ const AddProduct = (prop: { jwt_token: string }) => {
         setCheckEndDate(false);
         check = false;
       }
+    }
+    if (selectedType == "สินค้าจัดส่งพัสดุ" && weight == 0) {
+      setCheckWeight(false);
+      check = false;
+    }
+    if (weight > 0) {
+      setCheckWeight(true);
     }
     if (!unit) {
       setCheckUnit(false);
@@ -1171,13 +1179,15 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     value={weight}
                     placeholder="หน่วยกรัม (นำไปใช้ในการคำนวณค่าส่ง)"
                     type="number"
-                    inputProps={{ min: 0 }}
+                    inputProps={{ min: weight > 0 }}
                     variant="outlined"
                     fullWidth
-                    onChange={(e) => setWeight(parseInt(e.target.value))}
+                    onChange={(e) => setWeight(parseFloat(e.target.value))}
                     InputProps={{
                       endAdornment: <Typography>กรัม</Typography>,
                     }}
+                    error={!checkWeight}
+                    helperText={!checkWeight && "น้ำหนักต้องมากกว่า 0 กรัม"}
                   />
                 </Grid>
                 <Grid item xs={4} lg={6}>

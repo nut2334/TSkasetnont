@@ -36,6 +36,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
+import Cookies from "universal-cookie";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -62,6 +63,7 @@ interface tambon {
 
 const EditProfile = (prop: {
   jwt_token: string;
+  setJwt_token: React.Dispatch<React.SetStateAction<string>>;
   admin?: { username: string; role: string };
   followList: { id: string; farmerstorename: string }[];
   setFollowList: React.Dispatch<
@@ -494,6 +496,17 @@ const EditProfile = (prop: {
       })
       .then((res) => {
         console.log(res.data);
+
+        if (res.data.newToken) {
+          const cookies = new Cookies();
+          cookies.set("jwt_token", res.data.newToken, {
+            path: "/",
+            sameSite: "strict",
+            secure: true,
+          });
+
+          prop.setJwt_token(res.data.newToken);
+        }
         EdituserSuccess();
       })
       .catch((err) => {
@@ -798,7 +811,10 @@ const EditProfile = (prop: {
                   dataCarriage={shippingcost}
                   setDataCarriage={setShippingCost}
                 />
-
+              </>
+            )}
+            {role !== "admins" && (
+              <>
                 <Grid item xs={12}>
                   <TextField
                     label="จังหวัด"
@@ -845,43 +861,47 @@ const EditProfile = (prop: {
                     </TextField>
                   </Grid>
                 )}
-                {tambons.length > 0 && (
-                  <>
-                    <Grid item xs={12}>
-                      <TextField
-                        select
-                        label="แขวง/ตำบล"
-                        fullWidth
-                        value={selected.tambon_name_th}
-                        onChange={(event) => {
-                          setSelected({
-                            ...selected,
-                            tambon_name_th: event.target.value
-                              ? event.target.value
-                              : selected.tambon_name_th,
-                          });
-                          setZipCode(tambons[0].zip_code);
-                        }}
-                      >
-                        {tambons.map((tambon: tambon) => (
-                          <MenuItem value={tambon.name_th}>
-                            {tambon.name_th}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={12}>
-                      {zipCode && (
-                        <TextField
-                          label="รหัสไปรษณีย์"
-                          fullWidth
-                          disabled
-                          value={zipCode}
-                        />
-                      )}
-                    </Grid>
-                  </>
-                )}
+              </>
+            )}
+            {tambons.length > 0 && (
+              <>
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    label="แขวง/ตำบล"
+                    fullWidth
+                    value={selected.tambon_name_th}
+                    onChange={(event) => {
+                      setSelected({
+                        ...selected,
+                        tambon_name_th: event.target.value
+                          ? event.target.value
+                          : selected.tambon_name_th,
+                      });
+                      setZipCode(tambons[0].zip_code);
+                    }}
+                  >
+                    {tambons.map((tambon: tambon) => (
+                      <MenuItem value={tambon.name_th}>
+                        {tambon.name_th}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={12}>
+                  {zipCode && (
+                    <TextField
+                      label="รหัสไปรษณีย์"
+                      fullWidth
+                      disabled
+                      value={zipCode}
+                    />
+                  )}
+                </Grid>
+              </>
+            )}
+            {role == "farmers" || prop.admin?.role == "farmers" ? (
+              <>
                 <Grid item xs={12}>
                   <MapContainer
                     center={[13.736717, 100.523186]}
@@ -963,6 +983,8 @@ const EditProfile = (prop: {
                   </Button>
                 </Grid>
               </>
+            ) : (
+              ""
             )}
 
             {(role == "farmers" ||

@@ -102,7 +102,6 @@ function App() {
   useEffect(() => {
     const cookies = new Cookies();
     cookies.set("cart", cartList, { path: "/" });
-
     if (cartList.length === 0) {
       cookies.remove("cart");
     }
@@ -206,17 +205,20 @@ function App() {
             }
           />
           <Route path="/forgot" element={<Forgot />} />
-          <Route path="/confirm/:email/:hashed" element={<Confirm />} />
+          <Route
+            path="/confirm/:email/:hashed"
+            element={<Confirm setJwt_token={setJwt_token} />}
+          />
           <Route
             path="/listproduct"
             element={<ListProduct jwt_token={jwt_token} />}
           />
           <Route
-            path="/shop/:shopname"
+            path="/listproduct/:shopname"
             element={<ListProduct jwt_token={jwt_token} />}
           />
           <Route
-            path="/shop/:shopname/:productid"
+            path="/listproduct/:shopname/:productid"
             element={
               <SigleProduct
                 setCartList={setCartList}
@@ -239,6 +241,7 @@ function App() {
                   jwt_token={jwt_token}
                   followList={followList}
                   setFollowList={setFollowList}
+                  setJwt_token={setJwt_token}
                 />
               }
             />
@@ -275,6 +278,7 @@ function App() {
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
+                    setJwt_token={setJwt_token}
                     followList={followList}
                     setFollowList={setFollowList}
                   />
@@ -301,6 +305,7 @@ function App() {
                 element={
                   <ManageUser
                     jwt_token={jwt_token}
+                    setJwt_token={setJwt_token}
                     followList={followList}
                     setFollowList={setFollowList}
                   />

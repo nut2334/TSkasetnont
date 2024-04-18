@@ -77,6 +77,7 @@ const EachRow = (prop: {
               },
             })
             .then((response) => {
+              console.log(response.data);
               let temp: requestInterface[] = response.data.certificate;
               prop.setAllRequest(temp);
             });
@@ -157,22 +158,6 @@ const EachRow = (prop: {
           {prop.row.firstname} {prop.row.lastname}
         </StyledTableCell>
 
-        <StyledTableCell>{prop.row.certificate_number}</StyledTableCell>
-        <StyledTableCell>
-          {prop.row.image_path ? (
-            <RemoveRedEye
-              sx={{
-                cursor: "pointer",
-                fill: `${open ? "black" : "rgba(0, 0, 0, 0.54)"}`,
-              }}
-              onClick={() => {
-                setOpen(!open);
-              }}
-            />
-          ) : (
-            "ไม่มีรูปภาพ"
-          )}
-        </StyledTableCell>
         <StyledTableCell align="right">
           <Chip
             label="ยอมรับ"
@@ -252,8 +237,6 @@ const Certification = (prop: { jwt_token: string }) => {
             <StyledTableRow>
               <StyledTableCell>ประเภทมาตรฐาน</StyledTableCell>
               <StyledTableCell>ผู้ขอ</StyledTableCell>
-              <StyledTableCell>หมายเลขมาตรฐาน</StyledTableCell>
-              <StyledTableCell>รูปภาพ</StyledTableCell>
               <StyledTableCell align="right">การกระทำ</StyledTableCell>
             </StyledTableRow>
           </TableHead>

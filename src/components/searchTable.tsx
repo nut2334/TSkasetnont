@@ -34,6 +34,7 @@ interface userInterface {
 
 const Searchtable = (prop: {
   jwt_token: string;
+  setJwt_token: React.Dispatch<React.SetStateAction<string>>;
   followList: { id: string; farmerstorename: string }[];
   setFollowList: React.Dispatch<
     React.SetStateAction<
@@ -363,6 +364,7 @@ const Searchtable = (prop: {
         <EditProfile
           followList={prop.followList}
           jwt_token={prop.jwt_token}
+          setJwt_token={prop.setJwt_token}
           admin={{ username: editingUser.username, role: editingUser.role }}
           setFollowList={prop.setFollowList}
         />
