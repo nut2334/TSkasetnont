@@ -90,7 +90,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkendDate, setCheckEndDate] = useState<boolean>(true);
   const [standard, setStandard] = useState<certificateInterface[]>([]);
   const [allStandard, setAllStandard] = useState<allStandardInterface[]>([]);
-  const [selectedStandard, setSelectedStandard] = React.useState<string[]>([]);
+  const [selectedStandard, setSelectedStandard] = React.useState<
+    {
+      standard_id: string;
+      status: string;
+    }[]
+  >([]);
   const [dropdownStandard, setDropdownStandard] = useState<string>("");
   const [nameStandard, setNameStandard] = useState<string>("");
   const [imageStandard, setImageStandard] = useState<File | null>(null);
@@ -158,29 +163,13 @@ const AddProduct = (prop: { jwt_token: string }) => {
               ? JSON.parse(res.data.additional_image)
               : []
           );
+          console.log(res.data.certificate);
+
           setSelectedStandard(JSON.parse(res.data.certificate));
         }
       });
     }
-    console.log(apiCertificate);
 
-    axios
-      .get(apiCertificate, {
-        headers: {
-          Authorization: `Bearer ${prop.jwt_token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data) {
-          console.log(res.data.data);
-          setStandard(res.data.data);
-          if (
-            (jwtDecode(prop.jwt_token) as { role: string }).role !== "farmers"
-          ) {
-            setSelectedType("ประชาสัมพันธ์");
-          }
-        }
-      });
     axios.get(apiAllStandard).then((res) => {
       if (res.data) {
         console.log(res.data);
@@ -727,9 +716,12 @@ const AddProduct = (prop: { jwt_token: string }) => {
                               edge="start"
                               tabIndex={-1}
                               disableRipple
-                              defaultChecked={selectedStandard.includes(
-                                data.standard_id
-                              )}
+                              defaultChecked={
+                                selectedStandard.filter(
+                                  (standard) =>
+                                    standard.standard_id === data.standard_id
+                                ).length > 0
+                              }
                               inputProps={{
                                 "aria-labelledby": data.standard_id,
                               }}
@@ -737,23 +729,43 @@ const AddProduct = (prop: { jwt_token: string }) => {
                                 if (e.target.checked) {
                                   setSelectedStandard([
                                     ...selectedStandard,
-                                    data.standard_id,
+                                    {
+                                      standard_id: data.standard_id,
+                                      status: "pending",
+                                    },
                                   ]);
                                 } else {
                                   setSelectedStandard(
                                     selectedStandard.filter(
                                       (standard) =>
-                                        standard !== data.standard_id
+                                        standard.standard_id !==
+                                        data.standard_id
                                     )
                                   );
                                 }
                               }}
                             />
                           </ListItemIcon>
-                          <ListItemText
-                            id={data.standard_id}
-                            primary={data.standard_name}
-                          />
+                          <ListItemText id={data.standard_id}>
+                            {selectedStandard.filter(
+                              (standard) =>
+                                standard.standard_id === data.standard_id &&
+                                standard.status === "complete"
+                            ).length > 0 ? (
+                              <Typography>
+                                {data.standard_name}
+                                <span
+                                  style={{
+                                    color: "green",
+                                  }}
+                                >
+                                  {` (อนุมัติแล้ว)`}
+                                </span>
+                              </Typography>
+                            ) : (
+                              <Typography>{data.standard_name}</Typography>
+                            )}
+                          </ListItemText>
                         </ListItemButton>
                       </ListItem>
                     );
@@ -789,117 +801,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Button>
               </Grid>
             )} */}
-
-            {add && (
-              <>
-                <Grid item xs={6}>
-                  <TextField
-                    select
-                    fullWidth
-                    onChange={(e) => {
-                      setDropdownStandard(e.target.value);
-                    }}
-                    label="เลือกมาตรฐาน"
-                  >
-                    {allStandard.map((option) => (
-                      <MenuItem
-                        key={option.standard_id}
-                        value={option.standard_id}
-                      >
-                        {option.standard_name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                {allStandard.filter(
-                  (standard) => standard.standard_id === dropdownStandard
-                )[0]?.standard_name === "อื่นๆ" && (
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="ชื่อมาตรฐาน"
-                      value={nameStandard}
-                      onChange={(e) => setNameStandard(e.target.value)}
-                    />
-                  </Grid>
-                )}
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="หมายเลขใบรับรอง"
-                    onChange={(e) => {
-                      setCertificateNumber(e.target.value);
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    component="label"
-                    variant="contained"
-                    color="info"
-                    tabIndex={-1}
-                    startIcon={<CloudUploadIcon />}
-                    sx={{
-                      marginTop: "10px",
-                    }}
-                  >
-                    อัพโหลดรูปใบรับรอง
-                    <VisuallyHiddenInput
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        if (e.target.files !== null) {
-                          setImageStandard(e.target.files[0]);
-                        }
-                      }}
-                    />
-                  </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      const add = new FormData();
-                      add.append("standard_id", dropdownStandard);
-                      add.append("name", nameStandard);
-                      add.append("certificate_number", certificateNumber);
-                      if (username) {
-                        add.append("username", username);
-                      }
-                      if (imageStandard !== null) {
-                        add.append("image", imageStandard);
-                      }
-                      axios
-                        .post(apiAddCertificate, add, {
-                          headers: {
-                            Authorization: `Bearer ${prop.jwt_token}`,
-                          },
-                        })
-                        .then((res) => {
-                          console.log(res.data);
-                          Swal.fire({
-                            icon: "success",
-                            title: "บันทึกข้อมูลสำเร็จ",
-                            text: "รอการอนุมัติจากผู้ดูแลระบบ",
-                          });
-                          axios
-                            .get(apiCertificate, {
-                              headers: {
-                                Authorization: `Bearer ${prop.jwt_token}`,
-                              },
-                            })
-                            .then((res) => {
-                              setStandard(res.data.data);
-                            });
-                          setAdd(false);
-                        });
-                    }}
-                  >
-                    ยืนยัน
-                  </Button>
-                </Grid>
-              </>
-            )}
 
             <Grid item xs={12}>
               <Divider />
