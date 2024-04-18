@@ -41,20 +41,53 @@ const FollowChart = (prop: {
         beginAtZero: true,
         ticks: {
           stepSize: 1,
+          font: {
+            size: 20,
+            family: "Kanit",
+          },
         },
         max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
       },
+      x: {
+        ticks: {
+          font: {
+            size: 20,
+            family: "Kanit",
+          },
+        },
+      },
     },
+    responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top" as const,
         align: "end" as const,
+        labels: {
+          font: {
+            size: 20,
+            family: "Kanit",
+          },
+        },
       },
       title: {
         display: true,
         text: "จำนวนยอดผู้ติดตาม",
         align: "end" as const,
+        font: {
+          size: 20,
+          family: "Kanit",
+        },
+      },
+      tooltip: {
+        bodyFont: {
+          size: 20,
+          family: "Kanit",
+        },
+        titleFont: {
+          size: 20,
+          family: "Kanit",
+        },
       },
     },
   };

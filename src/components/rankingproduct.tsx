@@ -81,10 +81,30 @@ const RankingproductChart = (prop: {
             plugins: {
               legend: {
                 position: "right" as const,
+                labels: {
+                  font: {
+                    size: 20,
+                    family: "Kanit",
+                  },
+                },
               },
               title: {
                 display: true,
                 text: "ยอดการขายสินค้าทั้งหมดของร้านค้าคุณ",
+                font: {
+                  size: 25,
+                  family: "Kanit",
+                },
+              },
+              tooltip: {
+                bodyFont: {
+                  size: 20,
+                  family: "Kanit",
+                },
+                titleFont: {
+                  size: 20,
+                  family: "Kanit",
+                },
               },
             },
           }}

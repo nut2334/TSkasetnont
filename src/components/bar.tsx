@@ -61,11 +61,22 @@ const BarChart = (prop: {
     scales: {
       x: {
         stacked: true,
+        ticks: {
+          stepSize: 1,
+          font: {
+            size: 20,
+            family: "Kanit",
+          },
+        },
       },
       y: {
         stacked: true,
         ticks: {
           stepSize: 1,
+        },
+        font: {
+          size: 20,
+          family: "Kanit",
         },
         max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
       },
@@ -75,11 +86,31 @@ const BarChart = (prop: {
       legend: {
         position: "top" as const,
         align: "start" as const,
+        labels: {
+          font: {
+            size: 20,
+            family: "Kanit",
+          },
+        },
       },
       title: {
         display: true,
         text: "จำนวนยอดขายตามหมวดหมู่",
         align: "start" as const,
+        font: {
+          size: 20,
+          family: "Kanit",
+        },
+      },
+      tooltip: {
+        bodyFont: {
+          size: 20,
+          family: "Kanit",
+        },
+        titleFont: {
+          size: 20,
+          family: "Kanit",
+        },
       },
     },
   };

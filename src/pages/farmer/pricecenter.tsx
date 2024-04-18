@@ -184,9 +184,16 @@ const Pricecenter = () => {
             plugins: {
               legend: {
                 position: "top" as const,
+                labels: {
+                  font: {
+                    size: 20,
+                    family: "Kanit",
+                  },
+                },
               },
               title: {
                 display: true,
+
                 text: `ราคากลางสินค้า ณ ช่วงวันที่ ${new Date(
                   graph[0].date
                 ).toLocaleDateString("th-TH", {
@@ -201,7 +208,18 @@ const Pricecenter = () => {
                   day: "numeric",
                 })} (${unit}) `,
                 font: {
-                  size: 15,
+                  size: 20,
+                  family: "Kanit",
+                },
+              },
+              tooltip: {
+                bodyFont: {
+                  size: 20,
+                  family: "Kanit",
+                },
+                titleFont: {
+                  size: 20,
+                  family: "Kanit",
                 },
               },
             },

@@ -12,6 +12,7 @@ import { Bar } from "react-chartjs-2";
 import axios from "axios";
 import * as config from "../config/config";
 import { Typography } from "@mui/material";
+import { title } from "process";
 
 ChartJS.register(
   CategoryScale,
@@ -23,6 +24,32 @@ ChartJS.register(
 );
 export const options = {
   responsive: true,
+  plugins: {
+    legend: {
+      labels: {
+        font: {
+          size: 20,
+          family: "Kanit",
+        },
+      },
+    },
+    title: {
+      font: {
+        size: 20,
+        family: "Kanit",
+      },
+    },
+    tooltip: {
+      bodyFont: {
+        size: 20,
+        family: "Kanit",
+      },
+      titleFont: {
+        size: 20,
+        family: "Kanit",
+      },
+    },
+  },
 };
 
 const Yearlybar = (prop: {

@@ -822,7 +822,7 @@ const SigleProduct = (prop: {
                               />
                             </IconButton>
                           ) : (
-                            "hi"
+                            ""
                           )}
                         </TableCell>
                       </TableRow>

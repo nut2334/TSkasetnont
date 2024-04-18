@@ -174,11 +174,22 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 scales: {
                   x: {
                     stacked: true,
+                    ticks: {
+                      stepSize: 1,
+                      font: {
+                        size: 20,
+                        family: "Kanit",
+                      },
+                    },
                   },
                   y: {
                     stacked: true,
                     ticks: {
                       stepSize: 1,
+                      font: {
+                        size: 20,
+                        family: "Kanit",
+                      },
                     },
                     max: max > 0 ? max + Math.ceil(max * 0.2) : 5,
                   },
@@ -187,8 +198,23 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 plugins: {
                   legend: {
                     position: "top" as const,
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Kanit",
+                      },
+                    },
                   },
-
+                  tooltip: {
+                    bodyFont: {
+                      size: 20,
+                      family: "Kanit",
+                    },
+                    titleFont: {
+                      size: 20,
+                      family: "Kanit",
+                    },
+                  },
                   title: {
                     display: true,
                     text: `จำนวนเกษตกรที่ลงทะเบียนในแต่ละวัน ในช่วง ${
@@ -209,7 +235,8 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                         : ""
                     }`,
                     font: {
-                      size: 15,
+                      size: 20,
+                      family: "Kanit",
                     },
                   },
                 },
@@ -264,11 +291,31 @@ const ExcelDownload = (prop: { jwt_token: string }) => {
                 plugins: {
                   legend: {
                     position: "top" as const,
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Kanit",
+                      },
+                    },
                   },
 
                   title: {
                     display: true,
                     text: "จำนวนสินค้าในระบบ",
+                    font: {
+                      size: 25,
+                      family: "Kanit",
+                    },
+                  },
+                  tooltip: {
+                    bodyFont: {
+                      size: 20,
+                      family: "Kanit",
+                    },
+                    titleFont: {
+                      size: 20,
+                      family: "Kanit",
+                    },
                   },
                 },
               }}
