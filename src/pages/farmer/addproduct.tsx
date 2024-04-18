@@ -1052,7 +1052,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     onChange={(e: any) =>
                       setMonthreceived(e.format("YYYY-MM-DD"))
                     }
-                    value={monthreceived}
                   />
                 </LocalizationProvider>
               </Grid>
