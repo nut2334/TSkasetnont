@@ -140,6 +140,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
         `getproduct/${shopname}/${productid}`,
         "GET"
       );
+
       axios.get(apiGetProduct).then((res) => {
         if (res.data) {
           console.log(res.data);
@@ -299,6 +300,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
       }
     }
 
+    //จะเป็นการแก้ไขเมื่อมี productid
     if (productid) {
       body = {
         ...body,
