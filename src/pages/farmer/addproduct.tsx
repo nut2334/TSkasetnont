@@ -158,7 +158,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
               ? JSON.parse(res.data.additional_image)
               : []
           );
-          setSelectedStandard(JSON.parse(JSON.stringify(res.data.certificate)));
+          setSelectedStandard(JSON.parse(res.data.certificate));
         }
       });
     }
