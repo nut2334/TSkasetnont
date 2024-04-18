@@ -37,6 +37,7 @@ const Yearlybar = (prop: {
     }[]
   >([]);
   useEffect(() => {
+    console.log(prop.product_id);
     let apiReserveyearly = config.getApiEndpoint(
       `reserveyearly/${prop.product_id}`,
       "GET"
@@ -48,6 +49,7 @@ const Yearlybar = (prop: {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setData(res.data);
       });
   }, [prop.product_id]);
@@ -56,7 +58,7 @@ const Yearlybar = (prop: {
     <>
       {data.length > 0 ? (
         <>
-          <Typography>
+          <Typography variant="h6">
             <span>
               ยอดการจอง{prop.product_name}ประจำปี{" "}
               {data.length == 1

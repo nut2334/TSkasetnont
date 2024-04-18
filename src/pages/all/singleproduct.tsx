@@ -18,6 +18,7 @@ import {
   Paper,
   Tooltip,
   Chip,
+  Grid,
 } from "@mui/material";
 import axios from "axios";
 import * as config from "../../config/config";
@@ -32,7 +33,6 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { RWebShare } from "react-web-share";
 import { NumberInput } from "../../components/addamount";
-import StarIcon from "@mui/icons-material/Star";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import {
   FacebookShareButton,
@@ -55,6 +55,9 @@ import { Rating } from "@mui/material";
 import Path from "../../components/path";
 import { Facebook as Fbicon } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
+import Yearlybar from "../../components/yearlybar";
+import { status_reserve } from "../../config/dataDropdown";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface FullProductInterface {
   product_id: string;
@@ -89,6 +92,20 @@ interface FullProductInterface {
   forecastDate: string;
   phone: string;
   username: string;
+  period: string;
+}
+
+interface Reservetoday {
+  category_name: string;
+  contact: string;
+  member_id: string;
+  product_id: string;
+  product_name: string;
+  total_quantity: number;
+  id: string;
+  username: string;
+  status: string;
+  period: string;
 }
 
 const style = {
@@ -148,6 +165,7 @@ const SigleProduct = (prop: {
     forecastDate: "",
     phone: "",
     username: "",
+    period: "",
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -177,6 +195,7 @@ const SigleProduct = (prop: {
     }[]
   >([]);
   const [allStandardShow, setAllStandardShow] = useState<string[]>([]);
+  const [reserveTable, setReserveTable] = React.useState<Reservetoday[]>([]);
 
   useEffect(() => {
     const apiSingleProduct = config.getApiEndpoint(
@@ -232,6 +251,32 @@ const SigleProduct = (prop: {
         console.log(error);
       });
   }, []);
+
+  useEffect(() => {
+    if (product?.product_id === "") return;
+    axios
+      .get(
+        config.getApiEndpoint(`reservetable/${product?.product_id}`, "GET"),
+        {
+          headers: {
+            Authorization: `Bearer ${prop.jwt_token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setReserveTable(
+          res.data.map((order: Reservetoday, index: number) => {
+            return {
+              ...order,
+              id: index,
+              status: status_reserve.find(
+                (status) => status.statusID === order.status
+              )?.statusName,
+            };
+          })
+        );
+      });
+  }, [product]);
 
   const handleCopy = (text: string) => () => {
     copy(text)
@@ -451,34 +496,7 @@ const SigleProduct = (prop: {
   return (
     <Container component="main" maxWidth="lg">
       <Path />
-      {/* {selectedYearlyReserve && (
-        <Grid xs={12}>
-          <Typography variant="h5">
-            ยอดการจอง{selectedYearlyReserve.product_name}ประจำปี{" "}
-          </Typography>
-        </Grid>
-      )}
-      <Grid xs={6} sx={{ marginTop: 2 }}>
-        <TextField select label="เลือกสินค้าการจอง" fullWidth>
-          {yearlyReserve.map((product) => (
-            <MenuItem
-              value={product.product_id}
-              onClick={() => setSelectedYearlyReserve(product)}
-            >
-              {product.product_name}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
-      <Grid xs={12} sx={{ marginTop: 2 }}>
-        {selectedYearlyReserve && (
-          <Yearlybar
-            jwt_token={prop.jwt_token}
-            product_name={selectedYearlyReserve.product_name}
-            product_id={selectedYearlyReserve.product_id}
-          />
-        )}
-      </Grid> */}
+
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <ArrowBackIosNewIcon
@@ -543,13 +561,17 @@ const SigleProduct = (prop: {
               )}
           </Typography>
         </Stack>
-        <Stack>
-          <NavLink
-            to={`/editproduct/${shopname}/${product.username}/${product.product_id}`}
-          >
-            <Chip icon={<EditIcon />} label="แก้ไขสินค้า" />
-          </NavLink>
-        </Stack>
+        {prop.jwt_token &&
+          (jwtDecode(prop.jwt_token) as { ID: string }).ID ==
+            product.farmer_id && (
+            <Stack>
+              <NavLink
+                to={`/editproduct/${shopname}/${product.username}/${product.product_id}`}
+              >
+                <Chip icon={<EditIcon />} label="แก้ไขสินค้า" />
+              </NavLink>
+            </Stack>
+          )}
       </Stack>
       {product.selectedType !== "จองสินค้าผ่านเว็บไซต์" && (
         <Typography
@@ -658,6 +680,71 @@ const SigleProduct = (prop: {
       >
         {product.product_description}
       </Typography>
+      <Divider
+        sx={{
+          marginBottom: 2,
+          marginTop: 1,
+        }}
+      />
+      {prop.jwt_token &&
+        (jwtDecode(prop.jwt_token) as { ID: string }).ID == product.farmer_id &&
+        product.product_id && (
+          <>
+            {product?.period && (
+              <Grid xs={12} sx={{ marginTop: 2 }}>
+                <Typography variant="h6">
+                  การจองสินค้า{"(" + product.product_name + ") "}ตัดรอบทุก{" "}
+                  {new Date(product.period).toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                  })}{" "}
+                  ทั้งหมด {reserveTable ? reserveTable.length : "0"} รายการ
+                </Typography>
+              </Grid>
+            )}
+
+            <Grid item xs={12}>
+              <DataGrid
+                rows={reserveTable ? reserveTable : []}
+                columns={[
+                  { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+                  { field: "contact", headerName: "ติดต่อ", flex: 1 },
+                  { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
+                  { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+                  { field: "status", headerName: "สถานะ", flex: 1 },
+                ]}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>
+                ยอดรวมสินค้าทั้งหมด{" "}
+                {reserveTable.reduce(
+                  (acc, order) => acc + order.total_quantity,
+                  0
+                )}{" "}
+                ชิ้น
+              </Typography>
+              <Typography>
+                ยอดรวมสินค้าที่อนุมัติแล้ว{" "}
+                {reserveTable.reduce((acc, order) => {
+                  if (order.status === "สำเร็จ") {
+                    return acc + order.total_quantity;
+                  }
+                  return acc;
+                }, 0)}{" "}
+                ชิ้น
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Yearlybar
+              jwt_token={prop.jwt_token}
+              product_name={product.product_name}
+              product_id={product.product_id}
+            />
+          </>
+        )}
 
       {allStandardShow.length > 0 && (
         <Box
@@ -1154,14 +1241,15 @@ const SigleProduct = (prop: {
           >
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
-          {(jwtDecode(prop.jwt_token) as { role: string }).role ==
-            "farmers" && (
-            <Stack>
-              <NavLink to={`/editprofile`}>
-                <Chip icon={<EditIcon />} label="แก้ไขข้อมูล" />
-              </NavLink>
-            </Stack>
-          )}
+          {prop.jwt_token &&
+            (jwtDecode(prop.jwt_token) as { ID: string }).ID ==
+              product.farmer_id && (
+              <Stack>
+                <NavLink to={`/editprofile`}>
+                  <Chip icon={<EditIcon />} label="แก้ไขข้อมูล" />
+                </NavLink>
+              </Stack>
+            )}
           <Stack>
             {prop.jwt_token &&
               (jwtDecode(prop.jwt_token) as { role: string }).role ==

@@ -577,7 +577,7 @@ const Home = (prop: {
                   key={index}
                   sx={{
                     backgroundColor:
-                      new Date() < event.end && new Date() > event.start
+                      new Date() >= event.start && new Date() <= event.end
                         ? "rgba(255,0,0,0.1)"
                         : "rgba(0,255,0,0.1)",
                   }}
