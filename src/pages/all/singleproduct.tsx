@@ -1126,11 +1126,14 @@ const SigleProduct = (prop: {
           >
             <Typography variant="h5">{shopname}</Typography>
           </Stack>
-          <Stack>
-            <NavLink to={`/editprofile`}>
-              <Chip icon={<EditIcon />} label="แก้ไขข้อมูล" />
-            </NavLink>
-          </Stack>
+          {(jwtDecode(prop.jwt_token) as { role: string }).role ==
+            "farmers" && (
+            <Stack>
+              <NavLink to={`/editprofile`}>
+                <Chip icon={<EditIcon />} label="แก้ไขข้อมูล" />
+              </NavLink>
+            </Stack>
+          )}
           <Stack>
             {prop.jwt_token &&
               (jwtDecode(prop.jwt_token) as { role: string }).role ==

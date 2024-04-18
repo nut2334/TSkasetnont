@@ -225,6 +225,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
           color: state.color,
           everyYear: state.everyYear,
         };
+        console.log(data);
         let event_id = "";
         if (event) {
           /** PUT event to remote DB */
