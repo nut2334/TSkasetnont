@@ -230,9 +230,11 @@ const AddProduct = (prop: { jwt_token: string }) => {
       setCheckCoverImage(true);
     }
 
-    if (selectedType == "จองสินค้าผ่านเว็บไซต์" && selectedStatus == "") {
+    if (selectedType == "จองสินค้าผ่านเว็บไซต์" && !selectedStatus) {
       setCheckStatus(false);
       check = false;
+    } else {
+      setCheckStatus(true);
     }
 
     if (selectedStatus == "เปิดรับจองตามช่วงเวลา" && !startDate && !endDate) {
@@ -652,58 +654,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                   bgcolor: "background.paper",
                 }}
               >
-                {/* {standard.map((data, index) => (
-                    <ListItem key={data.id} disablePadding>
-                      <ListItemButton dense>
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            tabIndex={-1}
-                            disableRipple
-                            defaultChecked={selectedStandard.includes(data.id)}
-                            inputProps={{ "aria-labelledby": data.id }}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedStandard([
-                                  ...selectedStandard,
-                                  data.id,
-                                ]);
-                              } else {
-                                setSelectedStandard(
-                                  selectedStandard.filter(
-                                    (standard) => standard !== data.id
-                                  )
-                                );
-                              }
-                            }}
-                          />
-                        </ListItemIcon>
-                        <ListItemText
-                          id={data.standard_id}
-                          primary={
-                            allStandard.find(
-                              (standard) =>
-                                standard.standard_id === data.standard_id
-                            )?.standard_name
-                          }
-                          secondary={`${
-                            data.certificate_number
-                              ? "หมายเลขมาตรฐาน : " + data.certificate_number
-                              : ""
-                          } ${
-                            data.status === "pending"
-                              ? "รออนุมัติ"
-                              : "อนุมัติแล้ว"
-                          }`}
-                          sx={{
-                            color: `${
-                              data.status === "pending" ? "red" : "green"
-                            }`,
-                          }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))} */}
                 {allStandard.map((data, index) => {
                   if (
                     data.standard_name !== "ไม่มี" &&
@@ -774,34 +724,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 })}
               </List>
             </Grid>
-
-            {/* {(jwtDecode(prop.jwt_token) as { role: string }).role ===
-              "farmers" && (
-              <Grid item xs={12}>
-                <Button
-                  startIcon={<AddIcon />}
-                  variant="contained"
-                  onClick={() => {
-                    setAdd(true);
-                  }}
-                  sx={{
-                    marginRight: "10px",
-                  }}
-                >
-                  เพิ่มมาตรฐาน
-                </Button>
-
-                <Button
-                  color="error"
-                  variant="contained"
-                  onClick={() => {
-                    setAdd(false);
-                  }}
-                >
-                  -
-                </Button>
-              </Grid>
-            )} */}
 
             <Grid item xs={12}>
               <Divider />
@@ -999,8 +921,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           sx={{ width: "100%" }}
-                          defaultValue={startDate ? dayjs(startDate) : dayjs()}
-                          minDate={dayjs()}
+                          defaultValue={startDate ? dayjs(startDate) : null}
                           onChange={(e: any) =>
                             setStartDate(e.format("YYYY-MM-DD"))
                           }

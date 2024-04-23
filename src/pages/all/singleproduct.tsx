@@ -505,6 +505,7 @@ const SigleProduct = (prop: {
     let today = new Date();
     let start = new Date(product.date_reserve_start);
     let end = new Date(product.date_reserve_end);
+    console.log(today, start, end);
     if (today >= start && today <= end) {
       return true;
     }
@@ -534,37 +535,6 @@ const SigleProduct = (prop: {
       <Path />
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
-          {/* <ArrowBackIosNewIcon
-            sx={{
-              position: "absolute",
-              top: "40%",
-              zIndex: 1,
-              backgroundColor: "gray",
-              color: "white",
-              left: 20,
-              padding: 1,
-            }}
-            onClick={(e) => {
-              if (carousel.current) carousel.current.slidePrev();
-              //carousel.current?.slidePrev(e);
-            }}
-          />
-          <ArrowForwardIosIcon
-            sx={{
-              position: "absolute",
-              zIndex: 1,
-              top: "40%",
-              backgroundColor: "gray",
-              color: "white",
-              right: 20,
-              padding: 1,
-            }}
-            onClick={(e) => {
-              console.log(carousel.current);
-              if (carousel.current) carousel.current.slideNext();
-              // carousel.current?.slideNext(e)
-            }}
-          /> */}
           <AliceCarousel
             key="carousel"
             disableButtonsControls
@@ -643,14 +613,18 @@ const SigleProduct = (prop: {
           <Typography variant="body1"> | แชร์ : </Typography>
         </Stack>
         <Stack>
-          <FacebookShareButton url={window.location.href}>
+          <FacebookShareButton
+            url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
+          >
             <FacebookIcon
               style={{ borderRadius: "100%", width: 30, height: "auto" }}
             />
           </FacebookShareButton>
         </Stack>
         <Stack>
-          <LineShareButton url={window.location.href}>
+          <LineShareButton
+            url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
+          >
             <LineIcon
               style={{ borderRadius: "100%", width: 30, height: "auto" }}
             />
@@ -660,7 +634,7 @@ const SigleProduct = (prop: {
           <RWebShare
             data={{
               text: product.product_description,
-              url: window.location.href,
+              url: `https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`,
               title: "ของเด็ดเกษตรนนท์",
             }}
             onClick={() => console.log("shared successfully!")}
@@ -733,53 +707,61 @@ const SigleProduct = (prop: {
         (jwtDecode(prop.jwt_token) as { ID: string }).ID == product.farmer_id &&
         product.product_id && (
           <>
-            {product?.period && (
-              <Grid xs={12} sx={{ marginTop: 2 }}>
-                <Typography variant="h6">
-                  การจองสินค้า{"(" + product.product_name + ") "}ตัดรอบทุก{" "}
-                  {new Date(product.period).toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                  })}{" "}
-                  ทั้งหมด {reserveTable ? reserveTable.length : "0"} รายการ
-                </Typography>
-              </Grid>
+            {reserveTable.length > 0 && (
+              <>
+                {product?.period && (
+                  <Grid xs={12} sx={{ marginTop: 2 }}>
+                    <Typography variant="h6">
+                      การจองสินค้า{"(" + product.product_name + ") "}ตัดรอบทุก{" "}
+                      {new Date(product.period).toLocaleDateString("th-TH", {
+                        year: "numeric",
+                        month: "long",
+                      })}{" "}
+                      ทั้งหมด {reserveTable ? reserveTable.length : "0"} รายการ
+                    </Typography>
+                  </Grid>
+                )}
+                <Grid item xs={12}>
+                  <DataGrid
+                    rows={reserveTable ? reserveTable : []}
+                    columns={[
+                      { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
+                      { field: "contact", headerName: "ติดต่อ", flex: 1 },
+                      {
+                        field: "product_name",
+                        headerName: "ชื่อสินค้า",
+                        flex: 1,
+                      },
+                      { field: "total_quantity", headerName: "จำนวน", flex: 1 },
+                      { field: "status", headerName: "สถานะ", flex: 1 },
+                    ]}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>
+                    ยอดรวมสินค้าทั้งหมด{" "}
+                    {reserveTable.reduce(
+                      (acc, order) => acc + order.total_quantity,
+                      0
+                    )}{" "}
+                    ชิ้น
+                  </Typography>
+                  <Typography>
+                    ยอดรวมสินค้าที่อนุมัติแล้ว{" "}
+                    {reserveTable.reduce((acc, order) => {
+                      if (order.status === "สำเร็จ") {
+                        return acc + order.total_quantity;
+                      }
+                      return acc;
+                    }, 0)}{" "}
+                    ชิ้น
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+              </>
             )}
-            <Grid item xs={12}>
-              <DataGrid
-                rows={reserveTable ? reserveTable : []}
-                columns={[
-                  { field: "username", headerName: "ชื่อผู้ใช้", flex: 1 },
-                  { field: "contact", headerName: "ติดต่อ", flex: 1 },
-                  { field: "product_name", headerName: "ชื่อสินค้า", flex: 1 },
-                  { field: "total_quantity", headerName: "จำนวน", flex: 1 },
-                  { field: "status", headerName: "สถานะ", flex: 1 },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography>
-                ยอดรวมสินค้าทั้งหมด{" "}
-                {reserveTable.reduce(
-                  (acc, order) => acc + order.total_quantity,
-                  0
-                )}{" "}
-                ชิ้น
-              </Typography>
-              <Typography>
-                ยอดรวมสินค้าที่อนุมัติแล้ว{" "}
-                {reserveTable.reduce((acc, order) => {
-                  if (order.status === "สำเร็จ") {
-                    return acc + order.total_quantity;
-                  }
-                  return acc;
-                }, 0)}{" "}
-                ชิ้น
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
             <Yearlybar
               jwt_token={prop.jwt_token}
               product_name={product.product_name}
