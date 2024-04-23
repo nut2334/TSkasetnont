@@ -350,7 +350,7 @@ const Festival = (prop: { jwt_token: string }) => {
                     item
                     xs={12}
                     sx={{
-                      marginTop: 2,
+                      marginTop: 10,
                     }}
                   >
                     <Divider textAlign="left">
@@ -502,7 +502,7 @@ const Festival = (prop: { jwt_token: string }) => {
                     item
                     xs={12}
                     sx={{
-                      marginTop: 2,
+                      marginTop: 10,
                     }}
                   >
                     <Divider textAlign="left">
