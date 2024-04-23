@@ -199,30 +199,13 @@ const Festival = (prop: { jwt_token: string }) => {
                   .map((product) => {
                     return {
                       ...product,
-                      festivalId: cur.id,
+                      id: cur.id + product.id,
                       title: cur.title,
                     };
                   }),
               ];
             }, [] as Product[])
           );
-          let dataa = data.reduce((acc, cur) => {
-            return [
-              ...acc,
-              ...cur.products
-                .filter(
-                  (product) => product.selectedType === "จองสินค้าผ่านเว็บไซต์"
-                )
-                .map((product) => {
-                  return {
-                    ...product,
-                    festivalId: cur.id,
-                    title: cur.title + cur.id + product.id,
-                  };
-                }),
-            ];
-          }, [] as Product[]);
-          console.log(dataa);
           setProductReserve(
             data.reduce((acc, cur) => {
               return [
@@ -235,8 +218,8 @@ const Festival = (prop: { jwt_token: string }) => {
                   .map((product) => {
                     return {
                       ...product,
-                      festivalId: cur.id,
-                      title: cur.title + cur.id + product.id,
+                      id: cur.id + product.id,
+                      title: cur.title,
                     };
                   }),
               ];
@@ -252,7 +235,7 @@ const Festival = (prop: { jwt_token: string }) => {
                   .map((product) => {
                     return {
                       ...product,
-                      festivalId: cur.id,
+                      id: cur.id + product.id,
                       title: cur.title,
                     };
                   }),
@@ -357,28 +340,7 @@ const Festival = (prop: { jwt_token: string }) => {
                       <Typography>สินค้าจัดส่งพัสดุ</Typography>
                     </Divider>
                     <DataGrid
-                      rows={myEvent.reduce((acc, cur) => {
-                        return [
-                          ...acc,
-                          ...cur.products
-                            .filter(
-                              (product) =>
-                                product.selectedType === "สินค้าจัดส่งพัสดุ"
-                            )
-                            .map((product) => {
-                              console.log({
-                                ...product,
-                                festivalId: cur.id,
-                                title: cur.title,
-                              });
-                              return {
-                                ...product,
-                                festivalId: cur.id,
-                                title: cur.title,
-                              };
-                            }),
-                        ];
-                      }, [] as Product[])}
+                      rows={productDelivery}
                       columns={[
                         {
                           field: "title",
