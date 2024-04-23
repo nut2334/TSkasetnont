@@ -37,6 +37,7 @@ import { styled } from "@mui/system";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import Cookies from "universal-cookie";
+import Path from "../components/path";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -438,10 +439,10 @@ const EditProfile = (prop: {
     }
     if (username == "") {
       setUsernameCheck(false);
-      formData.append("username", username);
     } else {
       setUsernameCheck(true);
     }
+    formData.append("username", username);
     formData.append("email", email);
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
@@ -613,6 +614,7 @@ const EditProfile = (prop: {
       maxWidth="lg"
       sx={{ marginTop: 3, position: "relative", marginBottom: 10 }}
     >
+      <Path />
       <Box
         sx={{
           marginTop: 0,

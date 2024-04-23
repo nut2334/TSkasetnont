@@ -223,7 +223,9 @@ const SigleProduct = (prop: {
     axios.get(apiSingleProduct).then((response) => {
       setProduct({
         ...response.data,
-        certificate: JSON.parse(response.data.certificate),
+        certificate: response.data.certificate
+          ? JSON.parse(response.data.certificate)
+          : [],
       });
       if (response.data.certificate) {
         let allStandard = JSON.parse(response.data.certificate) as {
@@ -530,10 +532,9 @@ const SigleProduct = (prop: {
   return (
     <Container component="main" maxWidth="lg">
       <Path />
-
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
-          <ArrowBackIosNewIcon
+          {/* <ArrowBackIosNewIcon
             sx={{
               position: "absolute",
               top: "40%",
@@ -543,7 +544,10 @@ const SigleProduct = (prop: {
               left: 20,
               padding: 1,
             }}
-            onClick={(e) => carousel?.current?.slidePrev(e)}
+            onClick={(e) => {
+              if (carousel.current) carousel.current.slidePrev();
+              //carousel.current?.slidePrev(e);
+            }}
           />
           <ArrowForwardIosIcon
             sx={{
@@ -555,8 +559,12 @@ const SigleProduct = (prop: {
               right: 20,
               padding: 1,
             }}
-            onClick={(e) => carousel?.current?.slideNext(e)}
-          />
+            onClick={(e) => {
+              console.log(carousel.current);
+              if (carousel.current) carousel.current.slideNext();
+              // carousel.current?.slideNext(e)
+            }}
+          /> */}
           <AliceCarousel
             key="carousel"
             disableButtonsControls
@@ -720,7 +728,8 @@ const SigleProduct = (prop: {
           marginTop: 1,
         }}
       />
-      {prop.jwt_token &&
+      {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
+        prop.jwt_token &&
         (jwtDecode(prop.jwt_token) as { ID: string }).ID == product.farmer_id &&
         product.product_id && (
           <>
@@ -736,7 +745,6 @@ const SigleProduct = (prop: {
                 </Typography>
               </Grid>
             )}
-
             <Grid item xs={12}>
               <DataGrid
                 rows={reserveTable ? reserveTable : []}

@@ -26,7 +26,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import DropdownCatagory from "../../components/dropdownCatagory";
-import AddStandard from "../../components/addstandard";
 import { reservation_status, web_activity } from "../../config/dataDropdown";
 import * as config from "../../config/config";
 import { useParams } from "react-router-dom";
@@ -37,10 +36,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/system";
 import Pricecenter from "./pricecenter";
+import Path from "../../components/path";
 
 interface certificateInterface {
   id: string;
@@ -387,6 +385,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
   return (
     <React.Fragment>
       <Container component="main" maxWidth="md">
+        <Path />
         <Box
           sx={{
             marginTop: 5,

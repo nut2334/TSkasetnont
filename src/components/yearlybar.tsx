@@ -12,7 +12,6 @@ import { Bar } from "react-chartjs-2";
 import axios from "axios";
 import * as config from "../config/config";
 import { Typography } from "@mui/material";
-import { title } from "process";
 
 ChartJS.register(
   CategoryScale,

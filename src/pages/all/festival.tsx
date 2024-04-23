@@ -44,6 +44,7 @@ interface Product {
   is_accept: string;
   name: string;
   festivalId: string;
+  title: string;
 }
 
 interface FestivalDetail {
@@ -90,6 +91,9 @@ const Festival = (prop: { jwt_token: string }) => {
   const [searchMonth, setSearchMonth] = React.useState<string>("");
   const [searchYear, setSearchYear] = React.useState<string>("");
   const [myEvent, setMyEvent] = React.useState<FestivalDetail[]>([]);
+  const [productDelivery, setProductDelivery] = React.useState<Product[]>([]);
+  const [productReserve, setProductReserve] = React.useState<Product[]>([]);
+  const [productPromote, setProductPromote] = React.useState<Product[]>([]);
 
   const isDark = (color: RGBColor) => {
     var luma = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b; // per ITU-R BT.709
@@ -99,6 +103,12 @@ const Festival = (prop: { jwt_token: string }) => {
       return false;
     }
   };
+
+  useEffect(() => {
+    console.log(productDelivery);
+    console.log(productReserve);
+    console.log(productPromote);
+  }, [productDelivery, productReserve, productPromote]);
 
   useEffect(() => {
     axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
@@ -166,6 +176,7 @@ const Festival = (prop: { jwt_token: string }) => {
   }, []);
 
   useEffect(() => {
+    // คำเชิญเกษตรกรเข้าร่วมเทศกาล
     prop.jwt_token &&
       axios
         .get(config.getApiEndpoint("festivaldetail", "GET"), {
@@ -176,6 +187,78 @@ const Festival = (prop: { jwt_token: string }) => {
         .then((res) => {
           console.log(res.data);
           setMyEvent(res.data.festivals);
+          let data = res.data.festivals as FestivalDetail[];
+          setProductDelivery(
+            data.reduce((acc, cur) => {
+              return [
+                ...acc,
+                ...cur.products
+                  .filter(
+                    (product) => product.selectedType === "สินค้าจัดส่งพัสดุ"
+                  )
+                  .map((product) => {
+                    return {
+                      ...product,
+                      festivalId: cur.id,
+                      title: cur.title,
+                    };
+                  }),
+              ];
+            }, [] as Product[])
+          );
+          let dataa = data.reduce((acc, cur) => {
+            return [
+              ...acc,
+              ...cur.products
+                .filter(
+                  (product) => product.selectedType === "จองสินค้าผ่านเว็บไซต์"
+                )
+                .map((product) => {
+                  return {
+                    ...product,
+                    festivalId: cur.id,
+                    title: cur.title + cur.id + product.id,
+                  };
+                }),
+            ];
+          }, [] as Product[]);
+          console.log(dataa);
+          setProductReserve(
+            data.reduce((acc, cur) => {
+              return [
+                ...acc,
+                ...cur.products
+                  .filter(
+                    (product) =>
+                      product.selectedType === "จองสินค้าผ่านเว็บไซต์"
+                  )
+                  .map((product) => {
+                    return {
+                      ...product,
+                      festivalId: cur.id,
+                      title: cur.title + cur.id + product.id,
+                    };
+                  }),
+              ];
+            }, [] as Product[])
+          );
+
+          setProductPromote(
+            data.reduce((acc, cur) => {
+              return [
+                ...acc,
+                ...cur.products
+                  .filter((product) => product.selectedType === "ประชาสัมพันธ์")
+                  .map((product) => {
+                    return {
+                      ...product,
+                      festivalId: cur.id,
+                      title: cur.title,
+                    };
+                  }),
+              ];
+            }, [] as Product[])
+          );
         })
         .catch((err) => {
           console.error(err);
@@ -208,7 +291,7 @@ const Festival = (prop: { jwt_token: string }) => {
       start: event.start,
       title: event.title,
     });
-
+    // ดึงข้อมูลสินค้าในเทศกาล
     axios
       .get(config.getApiEndpoint(`festival/${event.event_id}`, "GET"))
       .then((res) => {
@@ -222,6 +305,7 @@ const Festival = (prop: { jwt_token: string }) => {
             };
           })
         );
+
         console.log(res.data);
       });
   };
@@ -245,18 +329,9 @@ const Festival = (prop: { jwt_token: string }) => {
           (jwtDecode(prop.jwt_token) as { role: string }).role ===
             "farmers" && (
             <>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginTop: 2,
-                }}
-              >
-                <Divider textAlign="left">
-                  <Typography variant="h6">คำเชิญเข้าร่วม</Typography>
-                </Divider>
-              </Grid>
-              <>
+              {(productDelivery.length > 0 ||
+                productReserve.length > 0 ||
+                productPromote.length > 0) && (
                 <Grid
                   item
                   xs={12}
@@ -264,137 +339,419 @@ const Festival = (prop: { jwt_token: string }) => {
                     marginTop: 2,
                   }}
                 >
-                  <DataGrid
-                    rows={myEvent.reduce((acc, cur) => {
-                      return [
-                        ...acc,
-                        ...cur.products.filter((product) => {
-                          // if (product.selectedType === "สินค้าจัดส่งพัสดุ")
-                          return {
-                            ...product,
-                            farmerstorename: cur.title,
-                            campaign_id: cur.id,
-                          };
-                        }),
-                      ];
-                    }, [] as Product[])}
-                    columns={[
-                      {
-                        field: "farmerstorename",
-                        headerName: "ร้านค้า",
-                        flex: 1,
-                      },
-                      {
-                        field: "name",
-                        headerName: "ชื่อสินค้า",
-                        flex: 1,
-                      },
-                      { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
-                      { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
-                      { field: "unit", headerName: "หน่วย", flex: 1 },
-                      {
-                        field: "action",
-                        headerName: "สถานะ",
-                        flex: 1,
-
-                        renderCell: (params) => {
-                          console.log(params);
-                          return (
-                            <>
-                              <Chip
-                                label="เข้าร่วม"
-                                color="primary"
-                                onClick={() => {
-                                  console.log(params);
-                                  const data = {
-                                    is_accept: "accept",
-                                  };
-                                  axios
-                                    .put(
-                                      config.getApiEndpoint(
-                                        `campaign/${params.row.festivalId}/${params.row.id}`,
-                                        "PUT"
-                                      ),
-                                      data,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${prop.jwt_token}`,
-                                        },
-                                      }
-                                    )
-                                    .then((res) => {
-                                      axios
-                                        .get(
-                                          config.getApiEndpoint(
-                                            "festivaldetail",
-                                            "GET"
-                                          ),
-                                          {
-                                            headers: {
-                                              Authorization: `Bearer ${prop.jwt_token}`,
-                                            },
-                                          }
-                                        )
-                                        .then((res) => {
-                                          console.log(res.data);
-                                          setMyEvent(res.data.festivals);
-                                        })
-                                        .catch((err) => {
-                                          console.error(err);
-                                        });
-                                    });
-                                }}
-                              />
-                              <Chip
-                                label="ไม่เข้าร่วม"
-                                color="error"
-                                onClick={() => {
-                                  const data = {
-                                    is_accept: "reject",
-                                  };
-                                  axios
-                                    .put(
-                                      config.getApiEndpoint(
-                                        `campaign/${params.row.festivalId}/${params.row.id}`,
-                                        "PUT"
-                                      ),
-                                      data,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${prop.jwt_token}`,
-                                        },
-                                      }
-                                    )
-                                    .then((res) => {
-                                      axios
-                                        .get(
-                                          config.getApiEndpoint(
-                                            "festivaldetail",
-                                            "GET"
-                                          ),
-                                          {
-                                            headers: {
-                                              Authorization: `Bearer ${prop.jwt_token}`,
-                                            },
-                                          }
-                                        )
-                                        .then((res) => {
-                                          console.log(res.data);
-                                          setMyEvent(res.data.festivals);
-                                        })
-                                        .catch((err) => {
-                                          console.error(err);
-                                        });
-                                    });
-                                }}
-                              />
-                            </>
-                          );
-                        },
-                      },
-                    ]}
-                  />
+                  <Divider textAlign="left">
+                    <Typography variant="h6">คำเชิญเข้าร่วม</Typography>
+                  </Divider>
                 </Grid>
+              )}
+              <>
+                {productDelivery.length > 0 && (
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{
+                      marginTop: 2,
+                    }}
+                  >
+                    <Divider textAlign="left">
+                      <Typography>สินค้าจัดส่งพัสดุ</Typography>
+                    </Divider>
+                    <DataGrid
+                      rows={myEvent.reduce((acc, cur) => {
+                        return [
+                          ...acc,
+                          ...cur.products
+                            .filter(
+                              (product) =>
+                                product.selectedType === "สินค้าจัดส่งพัสดุ"
+                            )
+                            .map((product) => {
+                              console.log({
+                                ...product,
+                                festivalId: cur.id,
+                                title: cur.title,
+                              });
+                              return {
+                                ...product,
+                                festivalId: cur.id,
+                                title: cur.title,
+                              };
+                            }),
+                        ];
+                      }, [] as Product[])}
+                      columns={[
+                        {
+                          field: "title",
+                          headerName: "เทศกาล",
+                          flex: 1,
+                        },
+                        {
+                          field: "name",
+                          headerName: "ชื่อสินค้า",
+                          flex: 1,
+                        },
+                        { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+                        { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+                        { field: "unit", headerName: "หน่วย", flex: 1 },
+                        {
+                          field: "action",
+                          headerName: "สถานะ",
+                          flex: 1,
+
+                          renderCell: (params) => {
+                            console.log(params);
+                            return (
+                              <>
+                                <Chip
+                                  label="เข้าร่วม"
+                                  color="primary"
+                                  onClick={() => {
+                                    console.log(params);
+                                    const data = {
+                                      is_accept: "accept",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                                <Chip
+                                  label="ไม่เข้าร่วม"
+                                  color="error"
+                                  onClick={() => {
+                                    const data = {
+                                      is_accept: "reject",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                              </>
+                            );
+                          },
+                        },
+                      ]}
+                    />
+                  </Grid>
+                )}
+                {productReserve.length > 0 && (
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{
+                      marginTop: 2,
+                    }}
+                  >
+                    <Divider textAlign="left">
+                      <Typography>สินค้าจองสินค้าผ่านเว็บไซต์</Typography>
+                    </Divider>
+                    <DataGrid
+                      rows={productReserve}
+                      columns={[
+                        {
+                          field: "title",
+                          headerName: "เทศกาล",
+                          flex: 1,
+                        },
+
+                        {
+                          field: "name",
+                          headerName: "ชื่อสินค้า",
+                          flex: 1,
+                        },
+                        { field: "unit", headerName: "หน่วย", flex: 1 },
+                        {
+                          field: "action",
+                          headerName: "สถานะ",
+                          flex: 1,
+
+                          renderCell: (params) => {
+                            console.log(params);
+                            return (
+                              <>
+                                <Chip
+                                  label="เข้าร่วม"
+                                  color="primary"
+                                  onClick={() => {
+                                    console.log(params);
+                                    const data = {
+                                      is_accept: "accept",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                                <Chip
+                                  label="ไม่เข้าร่วม"
+                                  color="error"
+                                  onClick={() => {
+                                    const data = {
+                                      is_accept: "reject",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                              </>
+                            );
+                          },
+                        },
+                      ]}
+                    />
+                  </Grid>
+                )}
+                {productPromote.length > 0 && (
+                  <Grid item xs={12}>
+                    <Divider textAlign="left">
+                      <Typography>สินค้าประชาสัมพันธ์</Typography>
+                    </Divider>
+                    <DataGrid
+                      rows={productPromote}
+                      columns={[
+                        {
+                          field: "title",
+                          headerName: "เทศกาล",
+                          flex: 1,
+                        },
+                        {
+                          field: "name",
+                          headerName: "ชื่อสินค้า",
+                          flex: 1,
+                        },
+                        { field: "stock", headerName: "จำนวนคลัง", flex: 1 },
+                        { field: "price", headerName: "ราคา/หน่วย", flex: 1 },
+                        { field: "unit", headerName: "หน่วย", flex: 1 },
+                        {
+                          field: "action",
+                          headerName: "สถานะ",
+                          flex: 1,
+
+                          renderCell: (params) => {
+                            console.log(params);
+                            return (
+                              <>
+                                <Chip
+                                  label="เข้าร่วม"
+                                  color="primary"
+                                  onClick={() => {
+                                    console.log(params);
+                                    const data = {
+                                      is_accept: "accept",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                                <Chip
+                                  label="ไม่เข้าร่วม"
+                                  color="error"
+                                  onClick={() => {
+                                    const data = {
+                                      is_accept: "reject",
+                                    };
+                                    axios
+                                      .put(
+                                        config.getApiEndpoint(
+                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          "PUT"
+                                        ),
+                                        data,
+                                        {
+                                          headers: {
+                                            Authorization: `Bearer ${prop.jwt_token}`,
+                                          },
+                                        }
+                                      )
+                                      .then((res) => {
+                                        axios
+                                          .get(
+                                            config.getApiEndpoint(
+                                              "festivaldetail",
+                                              "GET"
+                                            ),
+                                            {
+                                              headers: {
+                                                Authorization: `Bearer ${prop.jwt_token}`,
+                                              },
+                                            }
+                                          )
+                                          .then((res) => {
+                                            console.log(res.data);
+                                            setMyEvent(res.data.festivals);
+                                          })
+                                          .catch((err) => {
+                                            console.error(err);
+                                          });
+                                      });
+                                  }}
+                                />
+                              </>
+                            );
+                          },
+                        },
+                      ]}
+                    />
+                  </Grid>
+                )}
               </>
             </>
           )}
@@ -515,153 +872,7 @@ const Festival = (prop: { jwt_token: string }) => {
             </Grid>
           </>
         )}
-        {/* {showProduct.map((product, index) => {
-          let date = new Date(product.last_modified).toLocaleDateString();
-          let bgcolor = allCategory.find(
-            (item) => item.category_id === product.category_id
-          )?.bgcolor
-            ? JSON.parse(
-                allCategory.find(
-                  (item) => item.category_id === product.category_id
-                )?.bgcolor as string
-              )
-            : ({ r: 68, g: 93, b: 72, a: 1 } as {
-                r: number;
-                g: number;
-                b: number;
-                a: number;
-              });
-          let nameCategory = allCategory.find(
-            (item) => item.category_id === product.category_id
-          )?.category_name
-            ? allCategory.find(
-                (item) => item.category_id === product.category_id
-              )?.category_name
-            : "OTHER";
-          return (
-            <Grid item key={index} lg={4} xs={12} sm={6} padding={1}>
-              <NavLink
-                to={`/listproduct/${product.farmerstorename}/${product.product_id}`}
-                style={{
-                  textDecoration: "none",
-                }}
-              >
-                <Card
-                  variant="outlined"
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    borderRadius: "10px",
-                    boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;",
-                  }}
-                >
-                  <CardMedia
-                    component="div"
-                    sx={{
-                      // 16:9
-                      pt: "56.25%",
-                    }}
-                    image={
-                      product.product_image
-                        ? `${config.getApiEndpoint(
-                            `getimage/${product.product_image
-                              .split("/")
-                              .pop()}`,
-                            "get"
-                          )}`
-                        : require("../../assets/noimage.jpg")
-                    }
-                  />
-                  <CardContent sx={{ flexGrow: 1, padding: "20px" }}>
-                    <Stack direction="row" spacing={1}>
-                      {product.selectedType !== "ประชาสัมพันธ์" && (
-                        <Stack>
-                          <Button
-                            sx={{
-                              alignRight: "right",
-                            }}
-                          >
-                            <ShoppingCartIcon />
-                          </Button>
-                        </Stack>
-                      )}
-                      <Stack>
-                        <Typography gutterBottom variant="h5">
-                          {product.product_name}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                    <Chip
-                      label={product.selectedType}
-                      sx={{
-                        marginRight: "5px",
-                        marginBottom: "10px",
-                      }}
-                    />
-                    <Chip
-                      label={nameCategory}
-                      sx={{
-                        backgroundColor: `rgba(${bgcolor.r},${bgcolor.g},${bgcolor.b},${bgcolor.a})`,
-                        color: isDark(bgcolor) ? "white" : "black",
-                        marginRight: "5px",
-                        marginBottom: "10px",
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        marginTop: "10px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitBoxOrient: "vertical",
-                        WebkitLineClamp: 4, // จำนวนบรรทัดที่ต้องการแสดง
-                      }}
-                    >
-                      {product.product_description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ padding: "20px" }}>
-                    {product.selectedType != "จองสินค้าผ่านเว็บไซต์" && (
-                      <Typography
-                        sx={{
-                          color: "green",
-                          fontWeight: "bold",
-                          fontSize: "20px",
-                        }}
-                      >
-                        {product.price} บาท
-                      </Typography>
-                    )}
 
-                    <Typography
-                      sx={{
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {product.farmerstorename}
-                    </Typography>
-                  </CardActions>
-                </Card>
-              </NavLink>
-            </Grid>
-          );
-        })} 
-        {showProduct.length === 0 && selectedEvent && (
-          <Grid item xs={12}>
-            <Typography
-              variant="h6"
-              sx={{
-                marginTop: 2,
-                marginBottom: 2,
-                color: "gray",
-              }}
-              align="center"
-            >
-              ไม่มีข้อมูลสินค้าในเทศกาลนี้
-            </Typography>
-          </Grid>
-        )}*/}
         {selectedEvent ? (
           <>
             {showProduct.filter(
@@ -706,6 +917,20 @@ const Festival = (prop: { jwt_token: string }) => {
                       field: "is_accept",
                       headerName: "สถานะ",
                       flex: 1,
+                    },
+                    {
+                      field: "action",
+                      headerName: "ไปยังสินค้า",
+                      flex: 1,
+                      renderCell: (params) => {
+                        return (
+                          <NavLink
+                            to={`/listproduct/${params.row.farmerstorename}/${params.row.id}`}
+                          >
+                            <Chip label="ไปเลย" color="primary" />
+                          </NavLink>
+                        );
+                      },
                     },
                   ]}
                 />
@@ -796,6 +1021,20 @@ const Festival = (prop: { jwt_token: string }) => {
                       field: "is_accept",
                       headerName: "สถานะ",
                       flex: 1,
+                    },
+                    {
+                      field: "action",
+                      headerName: "ไปยังสินค้า",
+                      flex: 1,
+                      renderCell: (params) => {
+                        return (
+                          <NavLink
+                            to={`/listproduct/${params.row.farmerstorename}/${params.row.id}`}
+                          >
+                            <Chip label="ไปเลย" color="primary" />
+                          </NavLink>
+                        );
+                      },
                     },
                   ]}
                 />

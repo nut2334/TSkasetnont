@@ -18,7 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
-import { Navigate, useParams } from "react-router-dom";
+import { NavLink, Navigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import * as L from "leaflet";
 import {
@@ -37,6 +37,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import Myproducts from "./farmer/myproducts";
 import { jwtDecode } from "jwt-decode";
 import { nonthaburi_amphure } from "../config/dataDropdown";
+import Path from "../components/path";
 
 interface amphure {
   id: string;
@@ -290,7 +291,7 @@ const AddUser = (prop: { jwt_token: string }) => {
     } else {
       setCheckAmphure(true);
     }
-    if (!position) {
+    if (!position && role == "farmers") {
       setCheckPosition(false);
       return;
     } else {
@@ -414,6 +415,7 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   return (
     <Container component="main" maxWidth="lg">
+      <Path />
       <Box
         sx={{
           marginTop: 8,
@@ -920,18 +922,26 @@ const AddUser = (prop: { jwt_token: string }) => {
             <Grid item xs={12}>
               <Divider />
             </Grid>
+            <Grid item xs={12}>
+              <NavLink to={`/manageuser/${role}`}>
+                <Button color="error" variant="contained">
+                  ยกเลิก
+                </Button>
+              </NavLink>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                style={{ color: "#fff" }}
+                disabled={!username || !password}
+                sx={{
+                  marginLeft: 2,
+                }}
+              >
+                ยืนยัน
+              </Button>
+            </Grid>
           </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2 }}
-            style={{ color: "#fff" }}
-            disabled={!username || !password}
-          >
-            ยืนยัน
-          </Button>
         </Box>
       </Box>
     </Container>

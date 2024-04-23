@@ -37,6 +37,7 @@ import { MenuItem } from "@mui/material";
 import { web_activity } from "../../config/dataDropdown";
 import { RGBColor } from "react-color";
 import { jwtDecode } from "jwt-decode";
+import Path from "../../components/path";
 
 interface ProductInterface {
   product_id: string;
@@ -245,20 +246,20 @@ const Myproducts = (prop: {
         padding: username ? "20px" : "",
       }}
     >
+      <Path />
       <Grid container spacing={2}>
         {((jwtDecode(prop.jwt_token) as { role: string }).role == "admins" ||
           (jwtDecode(prop.jwt_token) as { role: string }).role == "tambons" ||
           (jwtDecode(prop.jwt_token) as { role: string }).role ==
             "providers") && (
           <>
+            {/* ข้อมูลเกษตรกร */}
             <Grid item xs={12}>
               <Typography variant="h4">
                 จัดการสินค้าของ {dataFarmer.firstname} {dataFarmer.lastname}
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
+
             <Grid item xs={12}>
               <Typography variant="h6">ข้อมูลพื้นฐาน</Typography>
             </Grid>
@@ -272,11 +273,14 @@ const Myproducts = (prop: {
                 ชื่อ: {dataFarmer.firstname} {dataFarmer.lastname}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1">
-                อีเมล: {dataFarmer.email}
-              </Typography>
-            </Grid>
+            {dataFarmer.email && (
+              <Grid item xs={12} md={6}>
+                <Typography variant="subtitle1">
+                  อีเมล: {dataFarmer.email}
+                </Typography>
+              </Grid>
+            )}
+
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle1">
                 เบอร์โทร:{dataFarmer.phone}

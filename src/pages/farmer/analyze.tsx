@@ -13,7 +13,6 @@ import * as config from "../../config/config";
 import BarChart from "../../components/bar";
 import axios from "axios";
 import FollowChart from "../../components/followchart";
-import RankingproductChart from "../../components/rankingproduct";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Yearlybar from "../../components/yearlybar";
 import { status_buy } from "../../config/dataDropdown";
@@ -107,8 +106,11 @@ const Analyze = (prop: { jwt_token: string }) => {
   const [reserveTable, setReserveTable] = React.useState<Reservetoday[]>([]);
 
   useEffect(() => {
+    //ผู้ติดตาม
     const apiFollowMember = config.getApiEndpoint("allfollowers", "GET");
+    //ข้อมูลพื้นฐาน
     const apiSelfInfo = config.getApiEndpoint("farmerselfinfo", "GET");
+    //ยอดขาย
     const apiAllsum = config.getApiEndpoint("allsum", "GET");
     const apiReserveProduct = config.getApiEndpoint("reserveproduct", "GET");
     axios

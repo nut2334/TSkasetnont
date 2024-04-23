@@ -1,7 +1,9 @@
 <?php
+//ดึงข้อมูลจาก header ทั้งหมด
 $headers = getallheaders();
-
+// ตั้งค่าการแสดงผล error ไม่แสดง error ที่เป็น warning
 error_reporting(E_ERROR | E_PARSE);
+// method ที่ใช้ เช่น GET, POST, PUT, DELETE
 $method = $_SERVER['REQUEST_METHOD'];
 $port = 3006;
 $url = 'http://localhost:' . $port . '/';

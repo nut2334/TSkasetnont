@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TabPanel from "@mui/lab/TabPanel";
-import SearchBar from "../../components/searchbar";
-import { styled, alpha } from "@mui/material/styles";
-import { Typography, TextField, MenuItem, Chip, Stack } from "@mui/material";
+import { Typography, Chip, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Container,
@@ -33,6 +30,7 @@ import { MessengerChat } from "react-messenger-chat-plugin";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { jwtDecode } from "jwt-decode";
+import Path from "../../components/path";
 
 interface sortInterface {
   title: string;
@@ -74,7 +72,7 @@ interface ProductInterface {
 }
 
 const ListProduct = (prop: { jwt_token: string }) => {
-  const apiCategories = config.getApiEndpoint("categories", "GET");
+  const apiCategories = config.getApiEndpoint("categoriesort", "GET");
   const apiProducts = config.getApiEndpoint("getproducts", "GET");
   const [search, setSearch] = React.useState("");
   const [searchContent, setSearchContent] = React.useState("");

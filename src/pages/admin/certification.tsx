@@ -10,8 +10,7 @@ import { styled } from "@mui/material/styles";
 import Swal from "sweetalert2";
 import axios from "axios";
 import * as config from "../../config/config";
-import { Box, Chip, TablePagination, Typography } from "@mui/material";
-import { RemoveRedEye } from "@mui/icons-material";
+import { Chip, TablePagination, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { NavLink } from "react-router-dom";
 

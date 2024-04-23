@@ -234,7 +234,6 @@ const ManageUser = (prop: {
     setFilteredUsers(filteredUsers);
   };
   const columns: GridColDef[] = [
-    { field: "email", headerName: "Email", flex: 1 },
     { field: "username", headerName: "Username", flex: 1 },
     {
       field: "firstnamelastname",
@@ -562,23 +561,26 @@ const ManageUser = (prop: {
                     </Button>
                   </NavLink>
                 )}
-              {role == "farmers" && (
-                <Button
-                  sx={{
-                    marginRight: "10px",
-                    marginBottom: "10px",
-                  }}
-                  disabled={
-                    (jwtDecode(prop.jwt_token) as { role: string }).role ===
-                    "providers"
-                  }
-                  onClick={downloadExcel}
-                  variant="contained"
-                  startIcon={<DownloadIcon />}
-                >
-                  Excel Download
-                </Button>
-              )}
+              {prop.jwt_token &&
+                (jwtDecode(prop.jwt_token) as { role: string }).role !==
+                  "tambons" &&
+                role == "farmers" && (
+                  <Button
+                    sx={{
+                      marginRight: "10px",
+                      marginBottom: "10px",
+                    }}
+                    disabled={
+                      (jwtDecode(prop.jwt_token) as { role: string }).role ===
+                      "tambons"
+                    }
+                    onClick={downloadExcel}
+                    variant="contained"
+                    startIcon={<DownloadIcon />}
+                  >
+                    Excel Download
+                  </Button>
+                )}
             </Grid>
           </Grid>
 
@@ -623,7 +625,7 @@ const ManageUser = (prop: {
           />
         </>
       )}
-      {editingUser && role == "farmers" && (
+      {editingUser && (
         <>
           <div
             style={{
