@@ -505,7 +505,7 @@ const Festival = (prop: { jwt_token: string }) => {
                                     axios
                                       .put(
                                         config.getApiEndpoint(
-                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          `campaign/${params.row.festivalId}/${params.row.product_id}`,
                                           "PUT"
                                         ),
                                         data,
@@ -548,7 +548,7 @@ const Festival = (prop: { jwt_token: string }) => {
                                     axios
                                       .put(
                                         config.getApiEndpoint(
-                                          `campaign/${params.row.festivalId}/${params.row.id}`,
+                                          `campaign/${params.row.festivalId}/${params.row.product_id}`,
                                           "PUT"
                                         ),
                                         data,

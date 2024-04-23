@@ -218,6 +218,15 @@ const Imagestore = (prop: {
                         width: 164,
                         aspectRatio: 1 / 1,
                       }}
+                      onError={
+                        ((e: any) => {
+                          //delete dom image if error
+                          e.target.remove();
+                          // e.target.onload = null;
+                          // e.onerror = null;
+                          // e.target.src = null;
+                        }) as any
+                      }
                     />
                   </ImageListItem>
                 );

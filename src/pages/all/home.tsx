@@ -98,8 +98,8 @@ const Home = (prop: {
       forecastDate: new Date(),
     } as ProductInterface);
   const [position, setPosition] = useState<LatLngLiteral>({
-    lat: 13.810300182207499,
-    lng: 100.47597885131837,
+    lat: 13.878993833816393,
+    lng: 100.40054968931354,
   });
   const [productPage, setProductPage] = useState<ProductInterface[]>([]);
   const [eventPage, setEventPage] = useState<
@@ -766,7 +766,7 @@ const Home = (prop: {
           </Box>
         </Container>
         <MapContainer
-          center={[13.810300182207499, 100.47597885131837]}
+          center={[13.878993833816393, 100.40054968931354]}
           zoom={15}
           scrollWheelZoom={true}
           style={{
