@@ -103,7 +103,60 @@ const Festival = (prop: { jwt_token: string }) => {
       return false;
     }
   };
+  const setFestivalData = (data: FestivalDetail[]) => {
+    setProductDelivery(
+      data.reduce((acc, cur) => {
+        return [
+          ...acc,
+          ...cur.products
+            .filter((product) => product.selectedType === "สินค้าจัดส่งพัสดุ")
+            .map((product) => {
+              return {
+                ...product,
+                product_id: product.id,
+                id: cur.id + product.id,
+                title: cur.title,
+              };
+            }),
+        ];
+      }, [] as Product[])
+    );
+    setProductReserve(
+      data.reduce((acc, cur) => {
+        return [
+          ...acc,
+          ...cur.products
+            .filter(
+              (product) => product.selectedType === "จองสินค้าผ่านเว็บไซต์"
+            )
+            .map((product) => {
+              return {
+                ...product,
+                id: cur.id + product.id,
+                title: cur.title,
+              };
+            }),
+        ];
+      }, [] as Product[])
+    );
 
+    setProductPromote(
+      data.reduce((acc, cur) => {
+        return [
+          ...acc,
+          ...cur.products
+            .filter((product) => product.selectedType === "ประชาสัมพันธ์")
+            .map((product) => {
+              return {
+                ...product,
+                id: cur.id + product.id,
+                title: cur.title,
+              };
+            }),
+        ];
+      }, [] as Product[])
+    );
+  };
   useEffect(() => {
     console.log(productDelivery);
     console.log(productReserve);
@@ -188,61 +241,7 @@ const Festival = (prop: { jwt_token: string }) => {
           console.log(res.data);
           setMyEvent(res.data.festivals);
           let data = res.data.festivals as FestivalDetail[];
-          setProductDelivery(
-            data.reduce((acc, cur) => {
-              return [
-                ...acc,
-                ...cur.products
-                  .filter(
-                    (product) => product.selectedType === "สินค้าจัดส่งพัสดุ"
-                  )
-                  .map((product) => {
-                    return {
-                      ...product,
-                      product_id: product.id,
-                      id: cur.id + product.id,
-                      title: cur.title,
-                    };
-                  }),
-              ];
-            }, [] as Product[])
-          );
-          setProductReserve(
-            data.reduce((acc, cur) => {
-              return [
-                ...acc,
-                ...cur.products
-                  .filter(
-                    (product) =>
-                      product.selectedType === "จองสินค้าผ่านเว็บไซต์"
-                  )
-                  .map((product) => {
-                    return {
-                      ...product,
-                      id: cur.id + product.id,
-                      title: cur.title,
-                    };
-                  }),
-              ];
-            }, [] as Product[])
-          );
-
-          setProductPromote(
-            data.reduce((acc, cur) => {
-              return [
-                ...acc,
-                ...cur.products
-                  .filter((product) => product.selectedType === "ประชาสัมพันธ์")
-                  .map((product) => {
-                    return {
-                      ...product,
-                      id: cur.id + product.id,
-                      title: cur.title,
-                    };
-                  }),
-              ];
-            }, [] as Product[])
-          );
+          setFestivalData(data);
         })
         .catch((err) => {
           console.error(err);
@@ -402,6 +401,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
@@ -445,6 +447,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
@@ -532,6 +537,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
@@ -575,6 +583,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
@@ -657,6 +668,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
@@ -700,6 +714,9 @@ const Festival = (prop: { jwt_token: string }) => {
                                           .then((res) => {
                                             console.log(res.data);
                                             setMyEvent(res.data.festivals);
+                                            let data = res.data
+                                              .festivals as FestivalDetail[];
+                                            setFestivalData(data);
                                           })
                                           .catch((err) => {
                                             console.error(err);
