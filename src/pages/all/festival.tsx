@@ -199,6 +199,7 @@ const Festival = (prop: { jwt_token: string }) => {
                   .map((product) => {
                     return {
                       ...product,
+                      product_id: product.id,
                       id: cur.id + product.id,
                       title: cur.title,
                     };
