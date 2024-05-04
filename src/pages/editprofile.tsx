@@ -815,7 +815,7 @@ const EditProfile = (prop: {
                 />
               </>
             )}
-            {role !== "admins" && (
+            {(role !== "admins" || prop.admin?.role !== "admins") && (
               <>
                 <Grid item xs={12}>
                   <TextField
@@ -865,43 +865,44 @@ const EditProfile = (prop: {
                 )}
               </>
             )}
-            {tambons.length > 0 && (
-              <>
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    label="แขวง/ตำบล"
-                    fullWidth
-                    value={selected.tambon_name_th}
-                    onChange={(event) => {
-                      setSelected({
-                        ...selected,
-                        tambon_name_th: event.target.value
-                          ? event.target.value
-                          : selected.tambon_name_th,
-                      });
-                      setZipCode(tambons[0].zip_code);
-                    }}
-                  >
-                    {tambons.map((tambon: tambon) => (
-                      <MenuItem value={tambon.name_th}>
-                        {tambon.name_th}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  {zipCode && (
+            {(role == "farmers" || prop.admin?.role == "farmers") &&
+              tambons.length > 0 && (
+                <>
+                  <Grid item xs={12}>
                     <TextField
-                      label="รหัสไปรษณีย์"
+                      select
+                      label="แขวง/ตำบล"
                       fullWidth
-                      disabled
-                      value={zipCode}
-                    />
-                  )}
-                </Grid>
-              </>
-            )}
+                      value={selected.tambon_name_th}
+                      onChange={(event) => {
+                        setSelected({
+                          ...selected,
+                          tambon_name_th: event.target.value
+                            ? event.target.value
+                            : selected.tambon_name_th,
+                        });
+                        setZipCode(tambons[0].zip_code);
+                      }}
+                    >
+                      {tambons.map((tambon: tambon) => (
+                        <MenuItem value={tambon.name_th}>
+                          {tambon.name_th}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {zipCode && (
+                      <TextField
+                        label="รหัสไปรษณีย์"
+                        fullWidth
+                        disabled
+                        value={zipCode}
+                      />
+                    )}
+                  </Grid>
+                </>
+              )}
             {role == "farmers" || prop.admin?.role == "farmers" ? (
               <>
                 <Grid item xs={12}>

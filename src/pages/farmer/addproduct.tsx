@@ -53,10 +53,10 @@ interface allStandardInterface {
   standard_name: string;
   expire: boolean;
   available: boolean;
+  date_expired: Date;
 }
 
 const AddProduct = (prop: { jwt_token: string }) => {
-  const apiAddCertificate = config.getApiEndpoint("certifarmer", "POST");
   const apiAllStandard = config.getApiEndpoint("standardproducts", "GET");
   const apiAddProduct = config.getApiEndpoint("addproduct", "POST");
 
@@ -86,19 +86,15 @@ const AddProduct = (prop: { jwt_token: string }) => {
   const [checkstartDate, setCheckStartDate] = useState<boolean>(true);
   const [endDate, setEndDate] = useState(null);
   const [checkendDate, setCheckEndDate] = useState<boolean>(true);
-  const [standard, setStandard] = useState<certificateInterface[]>([]);
   const [allStandard, setAllStandard] = useState<allStandardInterface[]>([]);
   const [selectedStandard, setSelectedStandard] = React.useState<
     {
       standard_id: string;
       status: string;
+      date_expired: Date;
     }[]
   >([]);
-  const [dropdownStandard, setDropdownStandard] = useState<string>("");
-  const [nameStandard, setNameStandard] = useState<string>("");
-  const [imageStandard, setImageStandard] = useState<File | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>();
-  const [certificateNumber, setCertificateNumber] = useState<string>("");
   const [checkStatus, setCheckStatus] = useState<boolean>(true);
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
@@ -106,10 +102,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
     username: string;
     shopname: string;
   }>();
-  const apiCertificate = config.getApiEndpoint(
-    `certifarmer/${username}`,
-    "GET"
-  );
 
   const [modalIsOpen, setIsOpen] = useState<{
     isOpen: boolean;
@@ -119,8 +111,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
     setStateImage: React.Dispatch<React.SetStateAction<string[]>>;
   } | null>();
   const [isExist, setIsExist] = useState<boolean>(false);
-  const [checked, setChecked] = React.useState([0]);
-  const [add, setAdd] = useState<boolean>(false);
   const [monthreceived, setMonthreceived] = useState<Date | null>(null);
   const [checkWeight, setCheckWeight] = useState<boolean>(true);
 
@@ -162,7 +152,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
               ? JSON.parse(res.data.additional_image)
               : []
           );
-          console.log(res.data.certificate);
+          console.log(JSON.parse(res.data.certificate));
           setSelectedStandard(JSON.parse(res.data.certificate));
           setMonthreceived(res.data.forecastDate);
         }
@@ -351,6 +341,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
               setProductVideo([]);
               setSelectImage([]);
               setSelectedType("");
+              setSelectedStandard([]);
             }
           })
           .catch((err) => {
@@ -376,6 +367,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
     whiteSpace: "nowrap",
     width: 1,
   });
+
   if (isExist) {
     if ((jwtDecode(prop.jwt_token) as { role: string }).role === "farmers") {
       return <Navigate to="/myproducts" />;
@@ -660,65 +652,92 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     data.standard_name !== "อื่นๆ"
                   ) {
                     return (
-                      <ListItem key={data.standard_id} disablePadding>
-                        <ListItemButton dense>
-                          <ListItemIcon>
-                            <Checkbox
-                              edge="start"
-                              tabIndex={-1}
-                              disableRipple
-                              defaultChecked={
-                                selectedStandard.filter(
-                                  (standard) =>
-                                    standard.standard_id === data.standard_id
-                                ).length > 0
-                              }
-                              inputProps={{
-                                "aria-labelledby": data.standard_id,
-                              }}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedStandard([
-                                    ...selectedStandard,
-                                    {
-                                      standard_id: data.standard_id,
-                                      status: "pending",
-                                    },
-                                  ]);
-                                } else {
-                                  setSelectedStandard(
-                                    selectedStandard.filter(
-                                      (standard) =>
-                                        standard.standard_id !==
-                                        data.standard_id
-                                    )
+                      <>
+                        <ListItem key={data.standard_id} disablePadding>
+                          <ListItemButton dense>
+                            <ListItemIcon>
+                              <Checkbox
+                                edge="start"
+                                tabIndex={-1}
+                                disableRipple
+                                defaultChecked={
+                                  selectedStandard.filter(
+                                    (standard) =>
+                                      standard.standard_id === data.standard_id
+                                  ).length > 0
+                                }
+                                inputProps={{
+                                  "aria-labelledby": data.standard_id,
+                                }}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedStandard([
+                                      ...selectedStandard,
+                                      {
+                                        standard_id: data.standard_id,
+                                        status: "pending",
+                                        date_expired: data.date_expired,
+                                      },
+                                    ]);
+                                  } else {
+                                    setSelectedStandard(
+                                      selectedStandard.filter(
+                                        (standard) =>
+                                          standard.standard_id !==
+                                          data.standard_id
+                                      )
+                                    );
+                                  }
+                                }}
+                              />
+                            </ListItemIcon>
+                            <ListItemText id={data.standard_id}>
+                              {selectedStandard.map((standard) => {
+                                if (standard.standard_id === data.standard_id) {
+                                  return (
+                                    <Typography key={standard.standard_id}>
+                                      {data.standard_name} {standard.status}
+                                    </Typography>
                                   );
                                 }
-                              }}
-                            />
-                          </ListItemIcon>
-                          <ListItemText id={data.standard_id}>
-                            {selectedStandard.filter(
-                              (standard) =>
-                                standard.standard_id === data.standard_id &&
-                                standard.status === "complete"
-                            ).length > 0 ? (
-                              <Typography>
-                                {data.standard_name}
-                                <span
-                                  style={{
-                                    color: "green",
-                                  }}
-                                >
-                                  {` (อนุมัติแล้ว)`}
-                                </span>
-                              </Typography>
-                            ) : (
-                              <Typography>{data.standard_name}</Typography>
-                            )}
-                          </ListItemText>
-                        </ListItemButton>
-                      </ListItem>
+                              })}
+                            </ListItemText>
+                          </ListItemButton>
+                        </ListItem>
+                        {selectedStandard.filter(
+                          (standard) =>
+                            standard.standard_id === data.standard_id
+                        ).length > 0 && (
+                          <>
+                            <Typography variant="subtitle1">
+                              วันหมดอายุใบรับรอง
+                            </Typography>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker
+                                sx={{ width: "100%" }}
+                                defaultValue={dayjs()}
+                                onChange={(e: any) => {
+                                  setSelectedStandard(
+                                    selectedStandard.map((standard) => {
+                                      if (
+                                        standard.standard_id ===
+                                        data.standard_id
+                                      ) {
+                                        return {
+                                          ...standard,
+                                          date_expired: e.format("YYYY-MM-DD"),
+                                        };
+                                      } else {
+                                        return standard;
+                                      }
+                                    })
+                                  );
+                                }}
+                              />
+                            </LocalizationProvider>
+                          </>
+                        )}
+                      </>
                     );
                   }
                 })}
