@@ -41,11 +41,8 @@ import Pricecenter from "./pricecenter";
 import Path from "../../components/path";
 
 interface certificateInterface {
-  id: string;
-  name: string;
   standard_id: string;
-  status: string;
-  certificate_number?: string;
+  date_recieve: Date;
 }
 
 interface allStandardInterface {
@@ -53,7 +50,6 @@ interface allStandardInterface {
   standard_name: string;
   expire: boolean;
   available: boolean;
-  date_expired: Date;
 }
 
 const AddProduct = (prop: { jwt_token: string }) => {
@@ -91,10 +87,13 @@ const AddProduct = (prop: { jwt_token: string }) => {
     {
       standard_id: string;
       status: string;
-      date_expired: Date;
+      date_expired?: Date;
+      date_recieve?: Date;
+      date_request?: Date;
     }[]
   >([]);
   const [selectedStatus, setSelectedStatus] = useState<string>();
+  const [certificate, setCertificate] = useState<certificateInterface[]>([]);
   const [checkStatus, setCheckStatus] = useState<boolean>(true);
   const [stock, setStock] = useState<number>(0);
   const { productid, username, shopname } = useParams<{
@@ -154,6 +153,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
           );
           console.log(JSON.parse(res.data.certificate));
           setSelectedStandard(JSON.parse(res.data.certificate));
+          setCertificate(JSON.parse(res.data.certificate));
           setMonthreceived(res.data.forecastDate);
         }
       });
@@ -676,7 +676,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                                       {
                                         standard_id: data.standard_id,
                                         status: "pending",
-                                        date_expired: data.date_expired,
+                                        date_expired: new Date(),
                                       },
                                     ]);
                                   } else {
@@ -692,15 +692,44 @@ const AddProduct = (prop: { jwt_token: string }) => {
                               />
                             </ListItemIcon>
                             <ListItemText id={data.standard_id}>
-                              {selectedStandard.map((standard) => {
-                                if (standard.standard_id === data.standard_id) {
-                                  return (
-                                    <Typography key={standard.standard_id}>
-                                      {data.standard_name} {standard.status}
-                                    </Typography>
-                                  );
-                                }
-                              })}
+                              <Typography>
+                                {data.standard_name}{" "}
+                                {selectedStandard.map((standard) => {
+                                  if (
+                                    standard.standard_id === data.standard_id
+                                  ) {
+                                    return (
+                                      <Typography
+                                        sx={{
+                                          color:
+                                            standard.status === "pending"
+                                              ? "#FFA500"
+                                              : "green",
+                                        }}
+                                      >
+                                        {(standard.status === "pending" &&
+                                          `(รอการอนุมัติ ${standard.date_recieve?.toLocaleDateString(
+                                            "th-TH",
+                                            {
+                                              year: "numeric",
+                                              month: "short",
+                                              day: "numeric",
+                                            }
+                                          )})`) ||
+                                          (standard.status === "complete" &&
+                                            `(อนุมัติแล้ว ${standard.date_request?.toLocaleDateString(
+                                              "th-TH",
+                                              {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                              }
+                                            )})`)}
+                                      </Typography>
+                                    );
+                                  }
+                                })}
+                              </Typography>
                             </ListItemText>
                           </ListItemButton>
                         </ListItem>
@@ -714,6 +743,14 @@ const AddProduct = (prop: { jwt_token: string }) => {
                             </Typography>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                               <DatePicker
+                                disabled={
+                                  selectedStandard.filter(
+                                    (standard) =>
+                                      standard.standard_id ===
+                                        data.standard_id &&
+                                      standard.status === "complete"
+                                  ).length > 0
+                                }
                                 sx={{ width: "100%" }}
                                 defaultValue={dayjs()}
                                 onChange={(e: any) => {

@@ -86,8 +86,6 @@ const EditProfile = (prop: {
   const [role, setRole] = useState<string>();
 
   const [username, setUsername] = useState<string>("");
-  const [usernameCheck, setUsernameCheck] = useState<boolean>(true);
-  const [usernameReg, setUsernameReg] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
   const [emailCheck, setEmailCheck] = useState<boolean>(true);
   const [emailReg, setEmailReg] = useState<boolean>(true);
@@ -183,29 +181,6 @@ const EditProfile = (prop: {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-  };
-
-  const onBlurUsername = (event: React.FocusEvent<HTMLInputElement>) => {
-    const usernameRegExp = /^[a-zA-Z0-9]{6,}$/;
-    if (usernameRegExp.test(event.target.value)) {
-      setUsernameReg(true);
-    } else {
-      setUsernameReg(false);
-    }
-    axios
-      .post(apiCheckinguser, {
-        username: event.target.value,
-      })
-      .then((res) => {
-        if (res.data) {
-          setUsernameCheck(false);
-        } else {
-          setUsernameCheck(true);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   const onBlurEmail = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -431,17 +406,6 @@ const EditProfile = (prop: {
       }
     }
     const formData = new FormData();
-    const regUsername = /^[a-zA-Z0-9]{6,}$/;
-    if (!regUsername.test(username)) {
-      setUsernameReg(false);
-    } else {
-      setUsernameReg(true);
-    }
-    if (username == "") {
-      setUsernameCheck(false);
-    } else {
-      setUsernameCheck(true);
-    }
     formData.append("username", username);
     formData.append("email", email);
     formData.append("firstname", firstName);
@@ -630,12 +594,24 @@ const EditProfile = (prop: {
           แก้ไขข้อมูล
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Grid item xs={12} textAlign="right">
+            <Typography color="textSecondary">
+              แก้ไขล่าสุดโดย {prop.admin ? prop.admin.username : username}{" "}
+              วันที่{" "}
+              {new Date().toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </Typography>
+          </Grid>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Divider textAlign="left">
                 <Typography>ข้อมูลส่วนตัว</Typography>
               </Divider>
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 variant="filled"
