@@ -677,6 +677,7 @@ const AddProduct = (prop: { jwt_token: string }) => {
                                         standard_id: data.standard_id,
                                         status: "pending",
                                         date_expired: new Date(),
+                                        date_request: new Date(),
                                       },
                                     ]);
                                   } else {
@@ -708,23 +709,27 @@ const AddProduct = (prop: { jwt_token: string }) => {
                                         }}
                                       >
                                         {(standard.status === "pending" &&
-                                          `(รอการอนุมัติ ${standard.date_recieve?.toLocaleDateString(
-                                            "th-TH",
-                                            {
+                                          `(รอการอนุมัติ ${
+                                            standard.date_request &&
+                                            new Date(
+                                              standard.date_request
+                                            ).toLocaleDateString("th-TH", {
                                               year: "numeric",
                                               month: "short",
                                               day: "numeric",
-                                            }
-                                          )})`) ||
+                                            })
+                                          })`) ||
                                           (standard.status === "complete" &&
-                                            `(อนุมัติแล้ว ${standard.date_request?.toLocaleDateString(
-                                              "th-TH",
-                                              {
+                                            `(อนุมัติแล้ว ${
+                                              standard.date_recieve &&
+                                              new Date(
+                                                standard.date_recieve
+                                              ).toLocaleDateString("th-TH", {
                                                 year: "numeric",
                                                 month: "short",
                                                 day: "numeric",
-                                              }
-                                            )})`)}
+                                              })
+                                            })`)}
                                       </Typography>
                                     );
                                   }
