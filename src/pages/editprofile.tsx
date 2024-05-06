@@ -450,6 +450,7 @@ const EditProfile = (prop: {
     }
     if (role == "members" || prop.admin?.role == "members") {
       formData.append("address", address);
+      formData.append("lineid", lineId);
     }
     if (role == "tambons" || prop.admin?.role == "tambons") {
       formData.append("amphure", selected.amphure_name_th);
@@ -789,23 +790,34 @@ const EditProfile = (prop: {
                     onChange={(event) => setFacebookLink(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Line ID"
-                    fullWidth
-                    placeholder="@HelloWorld หรือ 0912345678"
-                    value={lineId}
-                    onChange={(event) => setLineId(event.target.value)}
-                  />
-                </Grid>
-
+              </>
+            )}
+            {role == "farmers" ||
+              role == "members" ||
+              prop.admin?.role == "farmers" ||
+              (prop.admin?.role == "members" && (
+                <>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Line ID"
+                      fullWidth
+                      placeholder="@HelloWorld หรือ 0912345678"
+                      value={lineId}
+                      onChange={(event) => setLineId(event.target.value)}
+                    />
+                  </Grid>
+                </>
+              ))}
+            {(role == "farmers" || prop.admin?.role == "farmers") && (
+              <Grid item xs={6}>
                 <SetDataCarriage
                   unit="กรัม"
                   dataCarriage={shippingcost}
                   setDataCarriage={setShippingCost}
                 />
-              </>
+              </Grid>
             )}
+
             {(role == "tambons" ||
               prop.admin?.role == "tambons" ||
               role == "farmers" ||

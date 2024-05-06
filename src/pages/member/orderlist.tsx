@@ -153,7 +153,7 @@ const EachOrder = (prop: {
                           "POST"
                         );
                         const data = new FormData();
-                        data.append("productSlip", files);
+                        data.append("image", files);
                         data.append("order_id", order.id);
 
                         axios
