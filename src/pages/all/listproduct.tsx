@@ -290,6 +290,11 @@ const ListProduct = (prop: { jwt_token: string }) => {
               width: "100%",
             }}
             placeholder="ค้นหาสินค้า"
+            onKeyDownCapture={(e) => {
+              if (e.key === "Enter") {
+                setSearchContent(search);
+              }
+            }}
             onChange={(e) => {
               setSearch(e.target.value);
             }}

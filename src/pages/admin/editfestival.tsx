@@ -41,6 +41,10 @@ const Editfestival = (prop: { jwt_token: string }) => {
       admin_id: number | number[];
       color?: string;
       everyYear?: boolean;
+      editor_info?: {
+        editor_username: string;
+        lastmodified: string;
+      };
     }[]
   >([]);
   const [keywordError, setKeywordError] = useState<boolean>(false);
@@ -74,23 +78,24 @@ const Editfestival = (prop: { jwt_token: string }) => {
     }
     axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
       console.log(res.data);
-      res.data.map((e: any) => {
-        setEvents((prev) => [
-          ...prev,
-          {
-            event_id: e.id,
-            description: JSON.parse(e.keywords).join(", "),
-            title: e.name,
-            start: new Date(e.start_date),
-            end: new Date(e.end_date),
-            color: e.color,
-            admin_id: 1,
-            editable: true,
-            everyYear: true,
+      let data = res.data.map((e: any) => {
+        return {
+          event_id: e.id,
+          description: JSON.parse(e.keywords).join(", "),
+          title: e.name,
+          start: new Date(e.start_date),
+          end: new Date(e.end_date),
+          color: e.color,
+          admin_id: 1,
+          editable: true,
+          everyYear: e.everyYear,
+          editor_info: {
+            editor_username: e.editor_info?.editor_username,
+            lastmodified: e.editor_info?.lastmodified,
           },
-        ]);
+        };
       });
-     
+      setEvents(data);
     });
   }, []);
 
@@ -137,7 +142,6 @@ const Editfestival = (prop: { jwt_token: string }) => {
   };
 
   const CustomEditor = ({ scheduler }: CustomEditorProps) => {
-    
     const event = scheduler.edited;
     // Make your own form/state
     const [state, setState] = useState({
@@ -147,6 +151,10 @@ const Editfestival = (prop: { jwt_token: string }) => {
       end: event?.end || null,
       color: event?.color || "#50b500",
       everyYear: event?.everyYear || false,
+      editor_info: event?.editor_info || {
+        editor_username: "",
+        lastmodified: "",
+      },
     });
 
     const [error, setError] = useState("");
@@ -184,7 +192,6 @@ const Editfestival = (prop: { jwt_token: string }) => {
           color: state.color,
           everyYear: state.everyYear,
         };
-        console.log(data);
         let event_id = "";
         if (event) {
           /** PUT event to remote DB */
@@ -297,12 +304,12 @@ const Editfestival = (prop: { jwt_token: string }) => {
             spacing={2}
             //center
           >
-            <Grid item xs={12} textAlign="right">
-              <Typography color="textSecondary">
-                แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username}{" "}
-                วันที่{" "}
-                {editor_info &&
-                  new Date(editor_info?.lastmodified).toLocaleDateString(
+            {state.editor_info.editor_username ||
+            state.editor_info.lastmodified ? (
+              <Grid item xs={12} textAlign="right">
+                <Typography color="textSecondary">
+                  แก้ไขล่าสุดโดย {state.editor_info.editor_username} วันที่{" "}
+                  {new Date(state.editor_info.lastmodified).toLocaleDateString(
                     "th-TH",
                     {
                       year: "numeric",
@@ -312,8 +319,11 @@ const Editfestival = (prop: { jwt_token: string }) => {
                       hour: "numeric",
                     }
                   )}
-              </Typography>
-            </Grid>
+                </Typography>
+              </Grid>
+            ) : (
+              <></>
+            )}
             <Grid item xs={12}>
               <TextField
                 label="ชื่อเทศกาล"
