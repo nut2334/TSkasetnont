@@ -300,6 +300,7 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
+            setPayment(res.data.payment);
           })
           .catch((err) => {
             console.log(err);
