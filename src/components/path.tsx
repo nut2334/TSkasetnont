@@ -40,6 +40,14 @@ const Path = () => {
           const last = index === pathnames.length - 1;
           const to = `/${pathnames.slice(0, index + 1).join("/")}`;
 
+          if (value == "editprofile") {
+            value = "แก้ไขข้อมูลส่วนตัว";
+          }
+
+          if (value == "myproducts") {
+            value = "สินค้าของฉัน";
+          }
+
           if (value == "listproduct") {
             value = "สินค้าทั้งหมด";
           }
