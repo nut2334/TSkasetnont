@@ -51,7 +51,7 @@ import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Icon } from "leaflet";
+import { Icon, point } from "leaflet";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Rating } from "@mui/material";
 import Path from "../../components/path";
@@ -95,6 +95,10 @@ interface FullProductInterface {
   phone: string;
   username: string;
   period: string;
+  editor_info?: {
+    editor_username: string;
+    lastmodified: string;
+  };
 }
 
 interface Reservetoday {
@@ -168,6 +172,7 @@ const SigleProduct = (prop: {
     phone: "",
     username: "",
     period: "",
+    
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -533,6 +538,7 @@ const SigleProduct = (prop: {
   return (
     <Container component="main" maxWidth="lg">
       <Path />
+     
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <AliceCarousel
@@ -600,8 +606,36 @@ const SigleProduct = (prop: {
         direction="row"
         spacing={1}
         marginLeft={2}
-        justifyContent="flex-end"
+        justifyContent={product.editor_info && product.editor_info.editor_username !== null ? "space-between": "flex-end"}
       >
+        {product.editor_info && product.editor_info.editor_username !== null && (
+        <Stack>
+            <Typography color="textSecondary">
+              แก้ไขล่าสุดโดย {product.editor_info?.editor_username} วันที่{" "}
+              {product.editor_info?.lastmodified &&
+                new Date(product.editor_info?.lastmodified).toLocaleDateString(
+                  "th-TH",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    minute: "numeric",
+                    hour: "numeric",
+                  }
+                )}
+            </Typography>
+            </Stack>
+          )}
+            <Stack
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              "& > *": {
+                marginLeft: 1, // กำหนดระยะห่างด้านซ้ายของทุก child ใน Stack เป็น 1 unit
+              },
+            }}
+           
+            >
         <Stack>
           <RemoveRedEyeIcon />
         </Stack>
@@ -630,8 +664,10 @@ const SigleProduct = (prop: {
             />
           </LineShareButton>
         </Stack>
-        <Stack>
+        <Stack
+        sx={{ cursor: "pointer" }}>
           <RWebShare
+            
             data={{
               text: product.product_description,
               url: `https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`,
@@ -641,7 +677,7 @@ const SigleProduct = (prop: {
           >
             <ShareIcon />
           </RWebShare>
-        </Stack>
+        </Stack></Stack>
       </Stack>
       <Divider
         sx={{
@@ -649,6 +685,7 @@ const SigleProduct = (prop: {
           marginTop: 1,
         }}
       />
+       
       <Typography variant="h6">รายละเอียดสินค้า</Typography>
       {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
         <>

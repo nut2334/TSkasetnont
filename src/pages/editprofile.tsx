@@ -598,6 +598,7 @@ const EditProfile = (prop: {
           แก้ไขข้อมูล
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          {editor_info && editor_info.editor_username !== null && (
           <Grid item xs={12} textAlign="right">
             <Typography color="textSecondary">
               แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username} วันที่{" "}
@@ -614,6 +615,7 @@ const EditProfile = (prop: {
                 )}
             </Typography>
           </Grid>
+          )}
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Divider textAlign="left">

@@ -329,6 +329,7 @@ const AddUser = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
+        console.log(res);
         if (role == "farmers") {
           Swal.fire({
             icon: "success",
@@ -345,11 +346,13 @@ const AddUser = (prop: { jwt_token: string }) => {
             }
           });
         } else {
+          console.log("heart");
           AdduserSuccess();
           setExist(true);
         }
       })
       .catch((err) => {
+        console.log(err);
         AdduserFail();
       });
   };

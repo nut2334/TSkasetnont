@@ -44,6 +44,11 @@ interface userInterface {
     lastmodified: string;
   };
 }
+interface downloadInterface {
+  download_user: string;
+  lastmodified: Date;
+  id: string;
+}
 const ManageUser = (prop: {
   jwt_token: string;
   setJwt_token: React.Dispatch<React.SetStateAction<string>>;
@@ -98,6 +103,7 @@ const ManageUser = (prop: {
       standard_name: string;
     }[]
   >([]);
+  const [download, setDownload] = useState<downloadInterface[]>([]);
   const { role } = useParams() as {
     role: "admins" | "tambons" | "farmers" | "providers" | "members" | "all";
   };
@@ -154,8 +160,12 @@ const ManageUser = (prop: {
     }
     axios.get(config.getApiEndpoint("gethistorydownload", "GET")).then((res) => {
       console.log(res.data);
+      if (res.data){
+      setDownload(res.data);
+      }
     });
-  }, []);
+  }
+  , []);
 
   const deleteUser = (username: string, role: string) => {
     const apiDeleteUser = config.getApiEndpoint(
@@ -289,16 +299,29 @@ const ManageUser = (prop: {
           </span>
         );
       }},
-      {
+      ...role === "farmers" || role === "members" ?[{
         field: "editor_info.editor_username",
         headerName: "ผู้แก้ไขล่าสุด",
         flex: 1,
-      },
-      {
+        renderCell: (params:any) => {
+          if(params.row.editor_info.editor_username === null) return "ไม่มีข้อมูล";
+          return params.row.editor_info.editor_username;
+        }
+      },{
         field: "editor_info.lastmodified",
-        headerName: "วันที่แก้ไขล่าสุด",
+        headerName: "แก้ไขล่าสุด",
         flex: 1,
-      },
+        renderCell: (params:any) => {
+          if(params.row.editor_info.lastmodified === null) return "ไม่มีข้อมูล";
+          return new Date(params.row.editor_info.lastmodified).toLocaleDateString("th-TH", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          });
+        }
+      }]:[],
     {
       field: "action",
       headerName: "การกระทำ",
@@ -378,6 +401,15 @@ const ManageUser = (prop: {
         );
         document.body.appendChild(link);
         link.click();
+        axios.get(config.getApiEndpoint("gethistorydownload", "GET")).then((res) => {
+          if (res.data){
+          setDownload(res.data);
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+      }).catch((err) => { 
+        console.log(err);
       });
   };
 
@@ -630,6 +662,41 @@ const ManageUser = (prop: {
               pageSizeOptions={[10, 20, 50]}
             />
           </div>
+          <Grid container spacing={2}>
+            <Grid item xs={12} style={{ marginTop: "20px" }}
+            >
+              <Typography component="h1" variant="h5">
+                ประวัติการดาวน์โหลดไฟล์ Excel ของเกษตรกร
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+
+                <DataGrid
+                  rows={download}
+                  columns={[{
+                    field: "download_user",
+                    headerName: "Username",
+                    flex: 1
+                  }
+                  ,{
+                    field: "lastmodified",
+                    headerName: "วันที่ดาวน์โหลด",
+                    flex: 1,
+                    renderCell: (params) => {
+                      return new Date(params.row.lastmodified).toLocaleDateString("th-TH", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      });
+                    }
+                  }
+                  ]
+                  }                  
+                />
+            </Grid> 
+          </Grid>
         </>
       ) : (
         <>
