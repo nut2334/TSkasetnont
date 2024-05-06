@@ -152,6 +152,9 @@ const ManageUser = (prop: {
           console.log(err);
         });
     }
+    axios.get(config.getApiEndpoint("gethistorydownload", "GET")).then((res) => {
+      console.log(res.data);
+    });
   }, []);
 
   const deleteUser = (username: string, role: string) => {
