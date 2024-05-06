@@ -731,6 +731,22 @@ const EditProfile = (prop: {
                 required
               />
             </Grid>
+            {(role == "farmers" ||
+              role == "members" ||
+              prop.admin?.role == "farmers" ||
+              prop.admin?.role == "members") && (
+              <>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Line ID"
+                    fullWidth
+                    placeholder="@HelloWorld หรือ 0912345678"
+                    value={lineId}
+                    onChange={(event) => setLineId(event.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
             {(role == "farmers" || prop.admin?.role == "farmers") && (
               <>
                 <Grid item xs={12}>
@@ -792,30 +808,14 @@ const EditProfile = (prop: {
                 </Grid>
               </>
             )}
-            {(role == "farmers" ||
-              role == "members" ||
-              prop.admin?.role == "farmers" ||
-              prop.admin?.role == "members") && (
-              <>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Line ID"
-                    fullWidth
-                    placeholder="@HelloWorld หรือ 0912345678"
-                    value={lineId}
-                    onChange={(event) => setLineId(event.target.value)}
-                  />
-                </Grid>
-              </>
-            )}
+
+            <Grid item xs={12}></Grid>
             {(role == "farmers" || prop.admin?.role == "farmers") && (
-              <Grid item xs={6}>
-                <SetDataCarriage
-                  unit="กรัม"
-                  dataCarriage={shippingcost}
-                  setDataCarriage={setShippingCost}
-                />
-              </Grid>
+              <SetDataCarriage
+                unit="กรัม"
+                dataCarriage={shippingcost}
+                setDataCarriage={setShippingCost}
+              />
             )}
 
             {(role == "tambons" ||
@@ -918,10 +918,6 @@ const EditProfile = (prop: {
                     scrollWheelZoom={true}
                     style={{ height: "250px", width: "100%" }}
                   >
-                    {/* 
-                    <TileLayer url="https://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png" />
-                 */}
-
                     <TileLayer
                       attribution="Google Maps Satellite"
                       url="https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"

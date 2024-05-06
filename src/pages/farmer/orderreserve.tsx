@@ -499,6 +499,7 @@ const Orderreserve = (prop: { jwt_token: string }) => {
             display: "flex",
             justifyContent: "center",
             marginTop: "20px",
+            marginBottom: "20px",
           }}
         >
           <Pagination
