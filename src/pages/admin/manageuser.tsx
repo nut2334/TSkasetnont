@@ -359,7 +359,9 @@ const ManageUser = (prop: {
     const apiExcelDownload = config.getApiEndpoint("excel", "GET");
     axios
       .get(apiExcelDownload, {
-        responseType: "blob",
+        responseType: "blob",headers: {
+          Authorization: `Bearer ${prop.jwt_token}`,
+        }, 
       })
       .then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
