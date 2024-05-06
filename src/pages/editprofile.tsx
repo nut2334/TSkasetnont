@@ -79,7 +79,6 @@ const EditProfile = (prop: {
   const apiUpdateInfo = config.getApiEndpoint("updateinfo", "POST");
   const apiUpdateInfoadmin = config.getApiEndpoint("updateinfoadmin", "GET");
   const apiRole = config.getApiEndpoint("role", "GET");
-  const apiCheckinguser = config.getApiEndpoint("checkinguser", "POST");
   const apiCheckingemail = config.getApiEndpoint("checkingemail", "POST");
   const apiGetinfo = config.getApiEndpoint("getinfo", "GET");
 
@@ -140,7 +139,10 @@ const EditProfile = (prop: {
   const [changelat, setChangelat] = useState<string>();
   const [changelng, setChangelng] = useState<number>();
   const [checkPosition, setCheckPosition] = useState<boolean>(true);
-  // const inputlat = changelat === 0 || changelat ? changelat : ""; //ดักค่าNaN
+  const [editor_info, setEditor_info] = useState<{
+    editor_username: string;
+    lastmodified: string;
+  }>();
   const inputlng = changelng === 0 || changelng ? changelng : "";
 
   const VisuallyHiddenInput = styled("input")({
@@ -248,6 +250,7 @@ const EditProfile = (prop: {
           })
           .then((res) => {
             console.log(res.data);
+            setEditor_info(res.data.editor_info);
             setUsername(res.data.username);
             setEmail(res.data.email);
             setFirstName(res.data.firstname);
@@ -350,6 +353,7 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
+            setEditor_info(res.data.editor_info);
           })
           .catch((err) => {
             console.log(err);
@@ -596,13 +600,18 @@ const EditProfile = (prop: {
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid item xs={12} textAlign="right">
             <Typography color="textSecondary">
-              แก้ไขล่าสุดโดย {prop.admin ? prop.admin.username : username}{" "}
-              วันที่{" "}
-              {new Date().toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
+              แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username} วันที่{" "}
+              {editor_info &&
+                new Date(editor_info?.lastmodified).toLocaleDateString(
+                  "th-TH",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    minute: "numeric",
+                    hour: "numeric",
+                  }
+                )}
             </Typography>
           </Grid>
           <Grid container spacing={2}>

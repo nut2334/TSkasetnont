@@ -67,7 +67,7 @@ const EachRow = (prop: {
             title: "สำเร็จ",
             text: "ยอมรับการขอใบรับรอง",
             icon: "success",
-            confirmButtonText: "Cool",
+            confirmButtonText: "ตกลง",
           });
           axios
             .get(config.getApiEndpoint("getadmincertificate", "GET"), {
@@ -115,7 +115,7 @@ const EachRow = (prop: {
                   title: "สำเร็จ",
                   text: "ปฏิเสธการขอใบรับรอง",
                   icon: "success",
-                  confirmButtonText: "Cool",
+                  confirmButtonText: "ตกลง",
                 });
                 axios
                   .get(config.getApiEndpoint("getadmincertificate", "GET"), {
@@ -136,7 +136,7 @@ const EachRow = (prop: {
               title: "ผิดพลาด",
               text: "กรุณากรอกเหตุผล",
               icon: "error",
-              confirmButtonText: "Cool",
+              confirmButtonText: "ตกลง",
             });
           }
         }

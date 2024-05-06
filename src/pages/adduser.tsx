@@ -20,21 +20,17 @@ import * as config from "../config/config";
 import { AdduserSuccess, AdduserFail } from "../components/popup";
 import { NavLink, Navigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import * as L from "leaflet";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
   useMapEvents,
-  LayerGroup,
-  LayersControl,
 } from "react-leaflet";
 import { Icon, LatLngLiteral } from "leaflet";
 import { useMap } from "react-leaflet";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import SearchIcon from "@mui/icons-material/Search";
-import Myproducts from "./farmer/myproducts";
 import { jwtDecode } from "jwt-decode";
 import { nonthaburi_amphure } from "../config/dataDropdown";
 import Path from "../components/path";
@@ -333,20 +329,25 @@ const AddUser = (prop: { jwt_token: string }) => {
         },
       })
       .then((res) => {
-        Swal.fire({
-          icon: "success",
-          title: "เพิ่มผู้ใช้งานสำเร็จ",
-          text: "ต้องการเพิ่มสินค้าของเกษตรกรคนนี้หรือไม่?",
-          showCancelButton: true,
-          confirmButtonText: "ย้อนกลับ",
-          cancelButtonText: "เพิ่มสินค้า",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setExist(true);
-          } else {
-            setAddProduct(true);
-          }
-        });
+        if (role == "farmers") {
+          Swal.fire({
+            icon: "success",
+            title: "เพิ่มผู้ใช้งานสำเร็จ",
+            text: "ต้องการเพิ่มสินค้าของเกษตรกรคนนี้หรือไม่?",
+            showCancelButton: true,
+            confirmButtonText: "ย้อนกลับ",
+            cancelButtonText: "เพิ่มสินค้า",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              setExist(true);
+            } else {
+              setAddProduct(true);
+            }
+          });
+        } else {
+          AdduserSuccess();
+          setExist(true);
+        }
       })
       .catch((err) => {
         AdduserFail();
@@ -397,14 +398,6 @@ const AddUser = (prop: { jwt_token: string }) => {
     iconAnchor: [25, 50],
     popupAnchor: [0, -40],
   });
-  const SatelliteStyle = L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom: 19,
-      attribution:
-        'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    }
-  );
 
   if (exist) {
     return <Navigate to={`/manageuser/${role}`} />;
@@ -646,7 +639,7 @@ const AddUser = (prop: { jwt_token: string }) => {
                 }
               />
             </Grid>
-            {role == "tambons" || role == "admins" ? (
+            {role == "tambons" ? (
               <Grid item xs={12}>
                 <TextField
                   fullWidth

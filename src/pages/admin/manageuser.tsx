@@ -39,6 +39,10 @@ interface userInterface {
   productCount: number;
   lastLogin: Date;
   createAt: Date;
+  editor_info: {
+    editor_username: string;
+    lastmodified: string;
+  };
 }
 const ManageUser = (prop: {
   jwt_token: string;
@@ -246,7 +250,6 @@ const ManageUser = (prop: {
     },
 
     { field: "phone", headerName: "เบอร์โทรศัพท์", flex: 1 },
-
     {
       field: "createAt",
       headerName: "เป็นสมาชิกตั้งแต่",
@@ -282,8 +285,17 @@ const ManageUser = (prop: {
               : daysAgo + " วันที่แล้ว"}
           </span>
         );
+      }},
+      {
+        field: "editor_info.editor_username",
+        headerName: "ผู้แก้ไขล่าสุด",
+        flex: 1,
       },
-    },
+      {
+        field: "editor_info.lastmodified",
+        headerName: "วันที่แก้ไขล่าสุด",
+        flex: 1,
+      },
     {
       field: "action",
       headerName: "การกระทำ",
