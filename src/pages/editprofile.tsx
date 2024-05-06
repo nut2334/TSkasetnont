@@ -703,7 +703,7 @@ const EditProfile = (prop: {
                 required
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <TextField
                 value={tel}
                 onChange={(event) => setTel(event.target.value)}
@@ -792,22 +792,22 @@ const EditProfile = (prop: {
                 </Grid>
               </>
             )}
-            {role == "farmers" ||
+            {(role == "farmers" ||
               role == "members" ||
               prop.admin?.role == "farmers" ||
-              (prop.admin?.role == "members" && (
-                <>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Line ID"
-                      fullWidth
-                      placeholder="@HelloWorld หรือ 0912345678"
-                      value={lineId}
-                      onChange={(event) => setLineId(event.target.value)}
-                    />
-                  </Grid>
-                </>
-              ))}
+              prop.admin?.role == "members") && (
+              <>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Line ID"
+                    fullWidth
+                    placeholder="@HelloWorld หรือ 0912345678"
+                    value={lineId}
+                    onChange={(event) => setLineId(event.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
             {(role == "farmers" || prop.admin?.role == "farmers") && (
               <Grid item xs={6}>
                 <SetDataCarriage
