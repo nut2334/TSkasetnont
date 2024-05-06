@@ -253,21 +253,7 @@ const AddUser = (prop: { jwt_token: string }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axios
-      .post(apiCheckinguser, {
-        username: username,
-      })
-      .then((res) => {
-        if (res.data.exist == true) {
-          setUsernameCheck(false);
-        } else {
-          setUsernameCheck(true);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    if (!username) {
+    if (!username || usernameReg == false) {
       setUsernameCheck(false);
     } else {
       setUsernameCheck(true);

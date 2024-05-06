@@ -745,14 +745,16 @@ const EditProfile = (prop: {
                     onChange={(event) => setStoreName(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="ช่องทางการชำระเงิน"
-                    fullWidth
-                    value={payment}
-                    onChange={(event) => setPayment(event.target.value)}
-                  />
-                </Grid>
+                {role == "farmers" && (
+                  <Grid item xs={12}>
+                    <TextField
+                      label="ช่องทางการชำระเงิน"
+                      fullWidth
+                      value={payment}
+                      onChange={(event) => setPayment(event.target.value)}
+                    />
+                  </Grid>
+                )}
                 {role == "farmers" && (
                   <Grid item xs={12}>
                     <Button
