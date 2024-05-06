@@ -430,7 +430,6 @@ const EditProfile = (prop: {
       }
       formData.append("address", address);
       formData.append("farmerstorename", storeName);
-
       formData.append("province", "นนทบุรี");
       formData.append("amphure", selected.amphure_name_th);
       formData.append("tambon", selected.tambon_name_th);
@@ -446,6 +445,7 @@ const EditProfile = (prop: {
       } else {
         console.log("no qrCode");
       }
+      formData.append("payment", payment);
     }
     if (role == "members" || prop.admin?.role == "members") {
       formData.append("address", address);
