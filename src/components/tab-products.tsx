@@ -80,21 +80,25 @@ const TabProducts = (prop: { jwt_token: string; username: string }) => {
           <Analyze jwt_token={prop.jwt_token} />
         </TabPanel>
         <TabPanel value="3">
-          <Typography variant="h6">ประวัติสมาชิก</Typography>
-          <DataGrid
-            rows={historyMember}
-            columns={[
-              { field: "username", headerName: "username", flex: 1 },
-              { field: "firstname", headerName: "ชื่อ", flex: 1 },
-              { field: "lastname", headerName: "นามสกุล", flex: 1 },
-              { field: "phone", headerName: "เบอร์", flex: 1 },
-              {
-                field: "purchase_count",
-                headerName: "จำนวนครั้งที่ซื้อ",
-                flex: 1,
-              },
-            ]}
-          />
+          {historyMember.length > 0 && (
+            <>
+              <Typography variant="h6">ประวัติสมาชิก</Typography>
+              <DataGrid
+                rows={historyMember}
+                columns={[
+                  { field: "username", headerName: "username", flex: 1 },
+                  { field: "firstname", headerName: "ชื่อ", flex: 1 },
+                  { field: "lastname", headerName: "นามสกุล", flex: 1 },
+                  { field: "phone", headerName: "เบอร์", flex: 1 },
+                  {
+                    field: "purchase_count",
+                    headerName: "จำนวนครั้งที่ซื้อ",
+                    flex: 1,
+                  },
+                ]}
+              />
+            </>
+          )}
           <Divider
             sx={{
               marginTop: 2,

@@ -282,6 +282,8 @@ const EditProfile = (prop: {
                 JSON.parse(res.data.shippingcost.replace("'", ""))
               );
             }
+            console.log(res.data.shippingcost);
+            console.log(JSON.parse(res.data.shippingcost));
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
             setStoreName(res.data.farmerstorename);
