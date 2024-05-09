@@ -158,14 +158,15 @@ const ManageUser = (prop: {
           console.log(err);
         });
     }
-    axios.get(config.getApiEndpoint("gethistorydownload", "GET")).then((res) => {
-      console.log(res.data);
-      if (res.data){
-      setDownload(res.data);
-      }
-    });
-  }
-  , []);
+    axios
+      .get(config.getApiEndpoint("gethistorydownload", "GET"))
+      .then((res) => {
+        console.log(res.data);
+        if (res.data) {
+          setDownload(res.data);
+        }
+      });
+  }, []);
 
   const deleteUser = (username: string, role: string) => {
     const apiDeleteUser = config.getApiEndpoint(
@@ -298,30 +299,40 @@ const ManageUser = (prop: {
               : daysAgo + " วันที่แล้ว"}
           </span>
         );
-      }},
-      ...role === "farmers" || role === "members" ?[{
-        field: "editor_info.editor_username",
-        headerName: "ผู้แก้ไขล่าสุด",
-        flex: 1,
-        renderCell: (params:any) => {
-          if(params.row.editor_info.editor_username === null) return "ไม่มีข้อมูล";
-          return params.row.editor_info.editor_username;
-        }
-      },{
-        field: "editor_info.lastmodified",
-        headerName: "แก้ไขล่าสุด",
-        flex: 1,
-        renderCell: (params:any) => {
-          if(params.row.editor_info.lastmodified === null) return "ไม่มีข้อมูล";
-          return new Date(params.row.editor_info.lastmodified).toLocaleDateString("th-TH", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-          });
-        }
-      }]:[],
+      },
+    },
+    ...(role === "farmers" || role === "members"
+      ? [
+          {
+            field: "editor_info.editor_username",
+            headerName: "ผู้แก้ไขล่าสุด",
+            flex: 1,
+            renderCell: (params: any) => {
+              if (params.row.editor_info.editor_username === null)
+                return "ไม่มีข้อมูล";
+              return params.row.editor_info.editor_username;
+            },
+          },
+          {
+            field: "editor_info.lastmodified",
+            headerName: "แก้ไขล่าสุด",
+            flex: 1,
+            renderCell: (params: any) => {
+              if (params.row.editor_info.lastmodified === null)
+                return "ไม่มีข้อมูล";
+              return new Date(
+                params.row.editor_info.lastmodified
+              ).toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              });
+            },
+          },
+        ]
+      : []),
     {
       field: "action",
       headerName: "การกระทำ",
@@ -385,9 +396,10 @@ const ManageUser = (prop: {
     const apiExcelDownload = config.getApiEndpoint("excel", "GET");
     axios
       .get(apiExcelDownload, {
-        responseType: "blob",headers: {
+        responseType: "blob",
+        headers: {
           Authorization: `Bearer ${prop.jwt_token}`,
-        }, 
+        },
       })
       .then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -401,14 +413,18 @@ const ManageUser = (prop: {
         );
         document.body.appendChild(link);
         link.click();
-        axios.get(config.getApiEndpoint("gethistorydownload", "GET")).then((res) => {
-          if (res.data){
-          setDownload(res.data);
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
-      }).catch((err) => { 
+        axios
+          .get(config.getApiEndpoint("gethistorydownload", "GET"))
+          .then((res) => {
+            if (res.data) {
+              setDownload(res.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -663,39 +679,39 @@ const ManageUser = (prop: {
             />
           </div>
           <Grid container spacing={2}>
-            <Grid item xs={12} style={{ marginTop: "20px" }}
-            >
+            <Grid item xs={12} style={{ marginTop: "20px" }}>
               <Typography component="h1" variant="h5">
                 ประวัติการดาวน์โหลดไฟล์ Excel ของเกษตรกร
               </Typography>
             </Grid>
             <Grid item xs={12}>
-
-                <DataGrid
-                  rows={download}
-                  columns={[{
+              <DataGrid
+                rows={download}
+                columns={[
+                  {
                     field: "download_user",
                     headerName: "Username",
-                    flex: 1
-                  }
-                  ,{
+                    flex: 1,
+                  },
+                  {
                     field: "lastmodified",
                     headerName: "วันที่ดาวน์โหลด",
                     flex: 1,
                     renderCell: (params) => {
-                      return new Date(params.row.lastmodified).toLocaleDateString("th-TH", {
+                      return new Date(
+                        params.row.lastmodified
+                      ).toLocaleDateString("th-TH", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                         hour: "numeric",
                         minute: "numeric",
                       });
-                    }
-                  }
-                  ]
-                  }                  
-                />
-            </Grid> 
+                    },
+                  },
+                ]}
+              />
+            </Grid>
           </Grid>
         </>
       ) : (

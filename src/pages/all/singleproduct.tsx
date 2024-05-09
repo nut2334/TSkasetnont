@@ -172,7 +172,6 @@ const SigleProduct = (prop: {
     phone: "",
     username: "",
     period: "",
-    
   });
   const { productid, shopname } = useParams<{
     productid: string;
@@ -538,7 +537,7 @@ const SigleProduct = (prop: {
   return (
     <Container component="main" maxWidth="lg">
       <Path />
-     
+
       <Box sx={{ position: "relative" }}>
         <Box display={{ xs: "none", lg: "flex" }}>
           <AliceCarousel
@@ -606,78 +605,80 @@ const SigleProduct = (prop: {
         direction="row"
         spacing={1}
         marginLeft={2}
-        justifyContent={product.editor_info && product.editor_info.editor_username !== null ? "space-between": "flex-end"}
+        justifyContent={
+          product.editor_info && product.editor_info.editor_username !== null
+            ? "space-between"
+            : "flex-end"
+        }
       >
-        {product.editor_info && product.editor_info.editor_username !== null && (
-        <Stack>
-            <Typography color="textSecondary">
-              แก้ไขล่าสุดโดย {product.editor_info?.editor_username} วันที่{" "}
-              {product.editor_info?.lastmodified &&
-                new Date(product.editor_info?.lastmodified).toLocaleDateString(
-                  "th-TH",
-                  {
+        {product.editor_info &&
+          product.editor_info.editor_username !== null && (
+            <Stack>
+              <Typography color="textSecondary">
+                แก้ไขล่าสุดโดย {product.editor_info?.editor_username} วันที่{" "}
+                {product.editor_info?.lastmodified &&
+                  new Date(
+                    product.editor_info?.lastmodified
+                  ).toLocaleDateString("th-TH", {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
                     minute: "numeric",
                     hour: "numeric",
-                  }
-                )}
-            </Typography>
+                  })}
+              </Typography>
             </Stack>
           )}
-            <Stack
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              "& > *": {
-                marginLeft: 1, // กำหนดระยะห่างด้านซ้ายของทุก child ใน Stack เป็น 1 unit
-              },
-            }}
-           
-            >
-        <Stack>
-          <RemoveRedEyeIcon />
-        </Stack>
-
-        <Stack>
-          <Typography variant="body1">{product.view_count}</Typography>
-        </Stack>
-        <Stack>
-          <Typography variant="body1"> | แชร์ : </Typography>
-        </Stack>
-        <Stack>
-          <FacebookShareButton
-            url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
-          >
-            <FacebookIcon
-              style={{ borderRadius: "100%", width: 30, height: "auto" }}
-            />
-          </FacebookShareButton>
-        </Stack>
-        <Stack>
-          <LineShareButton
-            url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
-          >
-            <LineIcon
-              style={{ borderRadius: "100%", width: 30, height: "auto" }}
-            />
-          </LineShareButton>
-        </Stack>
         <Stack
-        sx={{ cursor: "pointer" }}>
-          <RWebShare
-            
-            data={{
-              text: product.product_description,
-              url: `https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`,
-              title: "ของเด็ดเกษตรนนท์",
-            }}
-            onClick={() => console.log("shared successfully!")}
-          >
-            <ShareIcon />
-          </RWebShare>
-        </Stack></Stack>
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            "& > *": {
+              marginLeft: 1, // กำหนดระยะห่างด้านซ้ายของทุก child ใน Stack เป็น 1 unit
+            },
+          }}
+        >
+          <Stack>
+            <RemoveRedEyeIcon />
+          </Stack>
+
+          <Stack>
+            <Typography variant="body1">{product.view_count}</Typography>
+          </Stack>
+          <Stack>
+            <Typography variant="body1"> | แชร์ : </Typography>
+          </Stack>
+          <Stack>
+            <FacebookShareButton
+              url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
+            >
+              <FacebookIcon
+                style={{ borderRadius: "100%", width: 30, height: "auto" }}
+              />
+            </FacebookShareButton>
+          </Stack>
+          <Stack>
+            <LineShareButton
+              url={`https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`}
+            >
+              <LineIcon
+                style={{ borderRadius: "100%", width: 30, height: "auto" }}
+              />
+            </LineShareButton>
+          </Stack>
+          <Stack sx={{ cursor: "pointer" }}>
+            <RWebShare
+              data={{
+                text: product.product_description,
+                url: `https://thebestkasetnont.doae.go.th/#/listproduct/${shopname}/${productid}`,
+                title: "ของเด็ดเกษตรนนท์",
+              }}
+              onClick={() => console.log("shared successfully!")}
+            >
+              <ShareIcon />
+            </RWebShare>
+          </Stack>
+        </Stack>
       </Stack>
       <Divider
         sx={{
@@ -685,60 +686,66 @@ const SigleProduct = (prop: {
           marginTop: 1,
         }}
       />
-       
-      <Typography variant="h6">รายละเอียดสินค้า</Typography>
-      {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
+
+      {(product.selectedType == "จองสินค้าผ่านเว็บไซต์" ||
+        product.product_description) && (
         <>
-          <Typography>ประเภทการจอง: {product.selectedStatus}</Typography>
-          {product.date_reserve_start && product.date_reserve_end && (
-            <Typography>
-              <span>
-                ระยะเวลาจองสินค้า :{" "}
-                {new Date(product.date_reserve_start).toLocaleDateString()} ถึง{" "}
-                {new Date(product.date_reserve_end).toLocaleDateString()}
-              </span>
-            </Typography>
+          <Typography variant="h6">รายละเอียดสินค้า</Typography>
+          {product.selectedType == "จองสินค้าผ่านเว็บไซต์" && (
+            <>
+              <Typography>ประเภทการจอง: {product.selectedStatus}</Typography>
+              {product.date_reserve_start && product.date_reserve_end && (
+                <Typography>
+                  <span>
+                    ระยะเวลาจองสินค้า :{" "}
+                    {new Date(product.date_reserve_start).toLocaleDateString()}{" "}
+                    ถึง{" "}
+                    {new Date(product.date_reserve_end).toLocaleDateString()}
+                  </span>
+                </Typography>
+              )}
+              {CheckReserveValid() ? (
+                <Typography
+                  style={{
+                    color: "green",
+                  }}
+                >
+                  {" "}
+                  (สามารถจองสินค้าได้)
+                </Typography>
+              ) : (
+                <Typography
+                  style={{
+                    color: "red",
+                  }}
+                >
+                  {" "}
+                  (ไม่สามารถจองสินค้าได้)
+                </Typography>
+              )}
+              <Typography>
+                คาดว่าจะได้รับสินค้าในเดือน{" "}
+                {new Date(product.forecastDate).toLocaleDateString("th-TH", {
+                  month: "long",
+                })}
+              </Typography>
+            </>
           )}
-          {CheckReserveValid() ? (
-            <Typography
-              style={{
-                color: "green",
-              }}
-            >
-              {" "}
-              (สามารถจองสินค้าได้)
-            </Typography>
-          ) : (
-            <Typography
-              style={{
-                color: "red",
-              }}
-            >
-              {" "}
-              (ไม่สามารถจองสินค้าได้)
-            </Typography>
-          )}
-          <Typography>
-            คาดว่าจะได้รับสินค้าในเดือน{" "}
-            {new Date(product.forecastDate).toLocaleDateString("th-TH", {
-              month: "long",
-            })}
+          <Typography
+            sx={{
+              marginTop: 1,
+            }}
+          >
+            {product.product_description}
           </Typography>
+          <Divider
+            sx={{
+              marginBottom: 2,
+              marginTop: 1,
+            }}
+          />{" "}
         </>
       )}
-      <Typography
-        sx={{
-          marginTop: 1,
-        }}
-      >
-        {product.product_description}
-      </Typography>
-      <Divider
-        sx={{
-          marginBottom: 2,
-          marginTop: 1,
-        }}
-      />
       {product.selectedType == "จองสินค้าผ่านเว็บไซต์" &&
         prop.jwt_token &&
         (jwtDecode(prop.jwt_token) as { ID: string }).ID == product.farmer_id &&
@@ -999,8 +1006,17 @@ const SigleProduct = (prop: {
                         }
                         Swal.fire({
                           title: "จองสินค้า",
-                          html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${product.unit}
-                                  <br/>Line ID <input type="text" id="lineid">`,
+                          html: `จำนวน <input type="number" id="quantity" min="1" value="1"> ${
+                            product.unit
+                          }
+                                  <br/>Line ID <input type="text" id="lineid"
+                                  value="${
+                                    (
+                                      jwtDecode(prop.jwt_token) as {
+                                        lineid: string;
+                                      }
+                                    ).lineid
+                                  }">`,
                           showCancelButton: true,
                           confirmButtonText: "จอง",
                           cancelButtonText: "ยกเลิก",
@@ -1134,7 +1150,7 @@ const SigleProduct = (prop: {
                           Swal.fire({
                             icon: "question",
                             title: "คุณต้องการเปลี่ยนร้านค้าหรือไม่",
-                            text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในตะกร้าจะถูกลบทิ้ง",
+                            text: "หากต้องการเปลี่ยนร้านค้า รายการสินค้าในรถเข็นจะถูกลบทิ้ง",
                             showDenyButton: true,
                             confirmButtonText: "ใช่",
                             denyButtonText: "ไม่",
@@ -1181,7 +1197,7 @@ const SigleProduct = (prop: {
                         }
                       }}
                     >
-                      หยิบใส่ตะกร้า
+                      หยิบใส่รถเข็น
                       {prop.jwt_token !== "" &&
                       (jwtDecode(prop.jwt_token) as { activate: boolean })
                         .activate

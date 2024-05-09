@@ -412,23 +412,25 @@ const AddProduct = (prop: { jwt_token: string }) => {
         </Box>
         <form>
           <Grid container spacing={2} sx={{ marginBottom: 1 }}>
-            <Grid item xs={12} textAlign="right">
-              <Typography color="textSecondary">
-                แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username}{" "}
-                วันที่{" "}
-                {editor_info &&
-                  new Date(editor_info?.lastmodified).toLocaleDateString(
-                    "th-TH",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      minute: "numeric",
-                      hour: "numeric",
-                    }
-                  )}
-              </Typography>
-            </Grid>
+            {editor_info && editor_info.editor_username && (
+              <Grid item xs={12} textAlign="right">
+                <Typography color="textSecondary">
+                  แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username}{" "}
+                  วันที่{" "}
+                  {editor_info &&
+                    new Date(editor_info?.lastmodified).toLocaleDateString(
+                      "th-TH",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        minute: "numeric",
+                        hour: "numeric",
+                      }
+                    )}
+                </Typography>
+              </Grid>
+            )}
             <Grid xs={12}>
               <Divider textAlign="left">
                 <Typography>ตรวจสอบราคากลาง</Typography>

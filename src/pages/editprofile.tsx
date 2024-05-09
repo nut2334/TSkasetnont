@@ -283,6 +283,8 @@ const EditProfile = (prop: {
               console.log(JSON.parse(res.data.shippingcost));
               setShippingCost(JSON.parse(res.data.shippingcost));
             }
+            console.log(res.data.shippingcost);
+            console.log(JSON.parse(res.data.shippingcost));
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
             setStoreName(res.data.farmerstorename);
@@ -301,6 +303,7 @@ const EditProfile = (prop: {
               amphure_name_th: res.data.amphure,
               tambon_name_th: res.data.tambon,
             });
+            setPayment(res.data.payment);
           })
           .catch((err) => {
             console.log(err);
@@ -435,7 +438,6 @@ const EditProfile = (prop: {
       }
       formData.append("address", address);
       formData.append("farmerstorename", storeName);
-
       formData.append("province", "นนทบุรี");
       formData.append("amphure", selected.amphure_name_th);
       formData.append("tambon", selected.tambon_name_th);
@@ -451,9 +453,11 @@ const EditProfile = (prop: {
       } else {
         console.log("no qrCode");
       }
+      formData.append("payment", payment);
     }
     if (role == "members" || prop.admin?.role == "members") {
       formData.append("address", address);
+      formData.append("lineid", lineId);
     }
     if (role == "tambons" || prop.admin?.role == "tambons") {
       formData.append("amphure", selected.amphure_name_th);
@@ -603,22 +607,25 @@ const EditProfile = (prop: {
           แก้ไขข้อมูล
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Grid item xs={12} textAlign="right">
-            <Typography color="textSecondary">
-              แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username} วันที่{" "}
-              {editor_info &&
-                new Date(editor_info?.lastmodified).toLocaleDateString(
-                  "th-TH",
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    minute: "numeric",
-                    hour: "numeric",
-                  }
-                )}
-            </Typography>
-          </Grid>
+          {editor_info && editor_info.editor_username && (
+            <Grid item xs={12} textAlign="right">
+              <Typography color="textSecondary">
+                แก้ไขล่าสุดโดย {editor_info && editor_info.editor_username}{" "}
+                วันที่{" "}
+                {editor_info &&
+                  new Date(editor_info?.lastmodified).toLocaleDateString(
+                    "th-TH",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      minute: "numeric",
+                      hour: "numeric",
+                    }
+                  )}
+              </Typography>
+            </Grid>
+          )}
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Divider textAlign="left">
@@ -703,7 +710,7 @@ const EditProfile = (prop: {
                 required
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <TextField
                 value={tel}
                 onChange={(event) => setTel(event.target.value)}
@@ -731,6 +738,22 @@ const EditProfile = (prop: {
                 required
               />
             </Grid>
+            {(role == "farmers" ||
+              role == "members" ||
+              prop.admin?.role == "farmers" ||
+              prop.admin?.role == "members") && (
+              <>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Line ID"
+                    fullWidth
+                    placeholder="@HelloWorld หรือ 0912345678"
+                    value={lineId}
+                    onChange={(event) => setLineId(event.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
             {(role == "farmers" || prop.admin?.role == "farmers") && (
               <>
                 <Grid item xs={12}>
@@ -746,14 +769,16 @@ const EditProfile = (prop: {
                     onChange={(event) => setStoreName(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="ช่องทางการชำระเงิน"
-                    fullWidth
-                    value={payment}
-                    onChange={(event) => setPayment(event.target.value)}
-                  />
-                </Grid>
+                {role == "farmers" && (
+                  <Grid item xs={12}>
+                    <TextField
+                      label="ช่องทางการชำระเงิน"
+                      fullWidth
+                      value={payment}
+                      onChange={(event) => setPayment(event.target.value)}
+                    />
+                  </Grid>
+                )}
                 {role == "farmers" && (
                   <Grid item xs={12}>
                     <Button
@@ -788,23 +813,18 @@ const EditProfile = (prop: {
                     onChange={(event) => setFacebookLink(event.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Line ID"
-                    fullWidth
-                    placeholder="@HelloWorld หรือ 0912345678"
-                    value={lineId}
-                    onChange={(event) => setLineId(event.target.value)}
-                  />
-                </Grid>
-
-                <SetDataCarriage
-                  unit="กรัม"
-                  dataCarriage={shippingcost}
-                  setDataCarriage={setShippingCost}
-                />
               </>
             )}
+
+            <Grid item xs={12}></Grid>
+            {(role == "farmers" || prop.admin?.role == "farmers") && (
+              <SetDataCarriage
+                unit="กรัม"
+                dataCarriage={shippingcost}
+                setDataCarriage={setShippingCost}
+              />
+            )}
+
             {(role == "tambons" ||
               prop.admin?.role == "tambons" ||
               role == "farmers" ||
@@ -905,10 +925,6 @@ const EditProfile = (prop: {
                     scrollWheelZoom={true}
                     style={{ height: "250px", width: "100%" }}
                   >
-                    {/* 
-                    <TileLayer url="https://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png" />
-                 */}
-
                     <TileLayer
                       attribution="Google Maps Satellite"
                       url="https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"

@@ -75,10 +75,12 @@ const EachDataCarriage = (prop: {
                 </div>
               ),
             }}
+            fullWidth
           />
         </Grid>
         <Grid item lg={2} xs={3}>
           <TextField
+            fullWidth
             label="ค่าส่ง"
             type="number"
             inputProps={{ min: 0 }}

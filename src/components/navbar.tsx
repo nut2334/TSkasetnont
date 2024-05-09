@@ -378,97 +378,103 @@ const Navbar = (prop: {
                   color="primary"
                 >
                   {prop.notification.length > 0 ? (
-                    <NotificationsActiveIcon />
+                    <NotificationsActiveIcon
+                      sx={{
+                        cursor: "pointer",
+                      }}
+                    />
                   ) : (
                     <NotificationsIcon />
                   )}
                 </Badge>
-                <Menu
-                  anchorEl={notification}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(notification)}
-                  onClose={() => {
-                    setNotification(null);
-                  }}
-                  sx={{
-                    marginTop: "40px",
-                  }}
-                >
-                  {prop.notification.length > 0 &&
-                    prop.notification.map((noti, index) => (
-                      <NavLink
-                        to={noti.link}
-                        style={{ textDecoration: "none" }}
-                      >
-                        <MenuItem
-                          key={index}
-                          onClick={() => {
-                            const apiNotification = config.getApiEndpoint(
-                              "notification",
-                              "post"
-                            );
-                            axios
-                              .post(
-                                apiNotification,
-                                {
-                                  id: noti.id,
-                                },
-                                {
-                                  headers: {
-                                    Authorization: `Bearer ${prop.jwt_token}`,
-                                  },
-                                }
-                              )
-                              .then(() => {
-                                let tmp = JSON.parse(
-                                  JSON.stringify(prop.notification)
-                                );
-                                tmp.splice(index, 1);
-                                prop.setNotification(tmp);
-                                setAnchorEl(null);
-                              })
-                              .catch((err) => {
-                                console.log(err);
-                              });
-                          }}
+                {prop.notification.length > 0 && (
+                  <Menu
+                    anchorEl={notification}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(notification)}
+                    onClose={() => {
+                      setNotification(null);
+                    }}
+                    sx={{
+                      marginTop: "40px",
+                    }}
+                  >
+                    {prop.notification.length > 0 &&
+                      prop.notification.map((noti, index) => (
+                        <NavLink
+                          to={noti.link}
+                          style={{ textDecoration: "none" }}
                         >
-                          <Stack direction="column" spacing={1}>
-                            <Stack>
-                              <Typography
-                                sx={{ color: "black", fontWeight: "bold" }}
-                              >
-                                {noti.message}
-                              </Typography>
-                            </Stack>
-                            <Stack>
-                              <Typography
-                                sx={{ color: "gray", textAlign: "right" }}
-                              >
-                                {new Date(noti.timesent).toLocaleString(
-                                  "th-TH",
+                          <MenuItem
+                            key={index}
+                            onClick={() => {
+                              const apiNotification = config.getApiEndpoint(
+                                "notification",
+                                "post"
+                              );
+                              axios
+                                .post(
+                                  apiNotification,
                                   {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                    hour: "numeric",
-                                    minute: "numeric",
+                                    id: noti.id,
+                                  },
+                                  {
+                                    headers: {
+                                      Authorization: `Bearer ${prop.jwt_token}`,
+                                    },
                                   }
-                                )}
-                              </Typography>
+                                )
+                                .then(() => {
+                                  let tmp = JSON.parse(
+                                    JSON.stringify(prop.notification)
+                                  );
+                                  tmp.splice(index, 1);
+                                  prop.setNotification(tmp);
+                                  setAnchorEl(null);
+                                })
+                                .catch((err) => {
+                                  console.log(err);
+                                });
+                            }}
+                          >
+                            <Stack direction="column" spacing={1}>
+                              <Stack>
+                                <Typography
+                                  sx={{ color: "black", fontWeight: "bold" }}
+                                >
+                                  {noti.message}
+                                </Typography>
+                              </Stack>
+                              <Stack>
+                                <Typography
+                                  sx={{ color: "gray", textAlign: "right" }}
+                                >
+                                  {new Date(noti.timesent).toLocaleString(
+                                    "th-TH",
+                                    {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                      hour: "numeric",
+                                      minute: "numeric",
+                                    }
+                                  )}
+                                </Typography>
+                              </Stack>
                             </Stack>
-                          </Stack>
-                        </MenuItem>
-                      </NavLink>
-                    ))}
-                </Menu>
+                          </MenuItem>
+                        </NavLink>
+                      ))}
+                  </Menu>
+                )}
               </>
             ) : null}
             <Box sx={{ flexGrow: 0 }}>

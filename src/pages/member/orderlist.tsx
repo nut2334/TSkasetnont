@@ -153,7 +153,7 @@ const EachOrder = (prop: {
                           "POST"
                         );
                         const data = new FormData();
-                        data.append("productSlip", files);
+                        data.append("image", files);
                         data.append("order_id", order.id);
 
                         axios
@@ -325,6 +325,7 @@ const Orderlist = (prop: { jwt_token: string }) => {
             display: "flex",
             justifyContent: "center",
             marginTop: "20px",
+            marginBottom: "20px",
           }}
         >
           <Pagination
