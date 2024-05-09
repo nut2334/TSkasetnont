@@ -38,6 +38,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import Cookies from "universal-cookie";
 import Path from "../components/path";
+import { fi } from "date-fns/locale";
 
 const iconMarker = new Icon({
   iconUrl: require("../assets/icon.svg").default,
@@ -279,12 +280,8 @@ const EditProfile = (prop: {
             console.log(res.data);
 
             if (res.data.shippingcost) {
-              console.log(res.data.shippingcost);
-              console.log(JSON.parse(res.data.shippingcost));
               setShippingCost(JSON.parse(res.data.shippingcost));
             }
-            console.log(res.data.shippingcost);
-            console.log(JSON.parse(res.data.shippingcost));
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
             setStoreName(res.data.farmerstorename);
@@ -333,13 +330,7 @@ const EditProfile = (prop: {
               tambon_name_th: res.data.tambon,
             });
 
-            console.log(res.data);
-            console.log("res.data.shippingcost", res.data.shippingcost);
-
             if (res.data.shippingcost) {
-              console.log(res.data.shippingcost);
-              console.log(JSON.parse(res.data.shippingcost));
-
               setShippingCost(JSON.parse(res.data.shippingcost));
             }
             setProvinces(provinces);
@@ -419,7 +410,9 @@ const EditProfile = (prop: {
     }
     const formData = new FormData();
     formData.append("username", username);
-    formData.append("email", email);
+    if (emailCheck == true && emailReg == true) {
+      formData.append("email", email);
+    }
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
     formData.append("phone", tel);
@@ -653,8 +646,10 @@ const EditProfile = (prop: {
                 label="Email"
                 name="email"
                 autoComplete="email"
-                error={!emailReg}
-                helperText={!emailReg ? "กรุณากรอก Email ให้ถูกต้อง" : ""}
+                error={!emailReg && emailCheck}
+                helperText={
+                  !emailReg && emailCheck ? "กรุณากรอก Email ให้ถูกต้อง" : ""
+                }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
                   onBlurEmail(event)
@@ -1028,7 +1023,7 @@ const EditProfile = (prop: {
                 disabled={
                   (role !== "farmers" || prop.admin?.role !== "farmers") &&
                   (role !== "tambons" || prop.admin?.role !== "tambons")
-                    ? !emailReg
+                    ? firstName == ""
                     : !selected.amphure_name_th
                 }
               >
