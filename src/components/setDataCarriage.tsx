@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Button, Grid, TextField } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const EachDataCarriage = (prop: {
@@ -8,6 +8,10 @@ const EachDataCarriage = (prop: {
     weight: number;
     price: number;
   }[];
+  data: {
+    weight: number;
+    price: number;
+  };
   setDataCarriage: React.Dispatch<
     React.SetStateAction<
       {
@@ -21,24 +25,30 @@ const EachDataCarriage = (prop: {
     prop.index == 0 ? 0 : prop.dataCarriage[prop.index - 1].weight + 1
   );
   const [price, setPrice] = useState<number>(0);
-
-  useEffect(() => {
+  const ref = React.useRef(false);
+  useLayoutEffect(() => {
     //chnage by index
-    let temp = prop.dataCarriage;
+    if (!ref.current) return;
+    let temp = JSON.parse(JSON.stringify(prop.dataCarriage));
+    console.log(temp, prop.index, weight, price);
     temp[prop.index].weight = weight;
     temp[prop.index].price = price;
     prop.setDataCarriage(temp);
-  }, [weight, price]);
+  }, [weight, price, ref.current]);
+
+  // useEffect(() => {
+  //   console.log(prop.dataCarriage);
+  //   setWeight(prop.dataCarriage[prop.index].weight);
+  //   setPrice(prop.dataCarriage[prop.index].price);
+  // }, [prop.dataCarriage]);
 
   useEffect(() => {
-    setWeight(prop.dataCarriage[prop.index].weight);
-    setPrice(prop.dataCarriage[prop.index].price);
-  }, [prop.dataCarriage]);
+    ref.current = true;
+    console.log(prop.data, prop.index);
 
-  useEffect(() => {
-    setWeight(prop.dataCarriage[prop.index].weight);
-    setPrice(prop.dataCarriage[prop.index].price);
-  }, []);
+    setWeight(prop.data.weight);
+    setPrice(prop.data.price);
+  }, [prop.data]);
 
   return (
     <>
@@ -133,6 +143,10 @@ const SetDataCarriage = (prop: {
     >
   >;
 }) => {
+  useEffect(() => {
+    console.log(prop.dataCarriage);
+  }, [prop.dataCarriage]);
+
   return (
     <>
       {prop.dataCarriage.map((data, index) => {
@@ -142,6 +156,7 @@ const SetDataCarriage = (prop: {
               <EachDataCarriage
                 unit={prop.unit}
                 index={index}
+                data={data}
                 dataCarriage={prop.dataCarriage}
                 setDataCarriage={prop.setDataCarriage}
               />

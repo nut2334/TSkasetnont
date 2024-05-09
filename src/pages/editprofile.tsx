@@ -276,11 +276,12 @@ const EditProfile = (prop: {
                 )[0].tambon
               );
             }
+            console.log(res.data);
 
             if (res.data.shippingcost) {
-              setShippingCost(
-                JSON.parse(res.data.shippingcost.replace("'", ""))
-              );
+              console.log(res.data.shippingcost);
+              console.log(JSON.parse(res.data.shippingcost));
+              setShippingCost(JSON.parse(res.data.shippingcost));
             }
             setAddress(res.data.address);
             setZipCode(res.data.zipcode);
@@ -330,8 +331,12 @@ const EditProfile = (prop: {
             });
 
             console.log(res.data);
+            console.log("res.data.shippingcost", res.data.shippingcost);
 
             if (res.data.shippingcost) {
+              console.log(res.data.shippingcost);
+              console.log(JSON.parse(res.data.shippingcost));
+
               setShippingCost(JSON.parse(res.data.shippingcost));
             }
             setProvinces(provinces);
