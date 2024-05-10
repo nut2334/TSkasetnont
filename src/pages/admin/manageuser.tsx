@@ -289,14 +289,10 @@ const ManageUser = (prop: {
           <span
             style={{
               color:
-                daysAgo === 0 ? "green" : daysAgo === 30 ? "red" : "inherit",
+                daysAgo === 0 ? "green" : daysAgo >= 30 ? "red" : "inherit",
             }}
           >
-            {daysAgo === 0
-              ? "วันนี้"
-              : daysAgo === 30
-              ? "30" + " วันที่แล้ว"
-              : daysAgo + " วันที่แล้ว"}
+            {daysAgo === 0 ? "วันนี้" : daysAgo + " วันที่แล้ว"}
           </span>
         );
       },
