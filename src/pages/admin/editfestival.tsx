@@ -50,10 +50,6 @@ const Editfestival = (prop: { jwt_token: string }) => {
   const [keywordError, setKeywordError] = useState<boolean>(false);
   const [startError, setStartError] = useState<boolean>(false);
   const [endError, setEndError] = useState<boolean>(false);
-  const [editor_info, setEditor_info] = useState<{
-    editor_username: string;
-    lastmodified: string;
-  }>();
 
   useEffect(() => {
     if (prop.jwt_token) {
@@ -116,22 +112,24 @@ const Editfestival = (prop: { jwt_token: string }) => {
     }
     axios.get(config.getApiEndpoint("festival", "GET")).then((res) => {
       console.log(res.data);
-      res.data.map((e: any) => {
-        setEvents((prev) => [
-          ...prev,
-          {
-            event_id: e.id,
-            description: JSON.parse(e.keywords).join(", "),
-            title: e.name,
-            start: new Date(e.start_date),
-            end: new Date(e.end_date),
-            color: e.color,
-            admin_id: 1,
-            editable: true,
-            everyYear: true,
+      let data = res.data.map((e: any) => {
+        return {
+          event_id: e.id,
+          description: JSON.parse(e.keywords).join(", "),
+          title: e.name,
+          start: new Date(e.start_date),
+          end: new Date(e.end_date),
+          color: e.color,
+          admin_id: 1,
+          editable: true,
+          everyYear: e.everyYear,
+          editor_info: {
+            editor_username: e.editor_info?.editor_username,
+            lastmodified: e.editor_info?.lastmodified,
           },
-        ]);
+        };
       });
+      setEvents(data);
     });
     // Simulate http request: return the deleted id
     return new Promise((res, rej) => {
@@ -195,15 +193,41 @@ const Editfestival = (prop: { jwt_token: string }) => {
         let event_id = "";
         if (event) {
           /** PUT event to remote DB */
-          await axios.patch(
-            config.getApiEndpoint(`festival/${event.event_id}`, "patch"),
-            data,
-            {
-              headers: {
-                Authorization: `Bearer ${prop.jwt_token}`,
-              },
-            }
-          );
+          await axios
+            .patch(
+              config.getApiEndpoint(`festival/${event.event_id}`, "patch"),
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${prop.jwt_token}`,
+                },
+              }
+            )
+            .then((res) => {
+              axios
+                .get(config.getApiEndpoint("festival", "GET"))
+                .then((res) => {
+                  console.log(res.data);
+                  let data = res.data.map((e: any) => {
+                    return {
+                      event_id: e.id,
+                      description: JSON.parse(e.keywords).join(", "),
+                      title: e.name,
+                      start: new Date(e.start_date),
+                      end: new Date(e.end_date),
+                      color: e.color,
+                      admin_id: 1,
+                      editable: true,
+                      everyYear: e.everyYear,
+                      editor_info: {
+                        editor_username: e.editor_info?.editor_username,
+                        lastmodified: e.editor_info?.lastmodified,
+                      },
+                    };
+                  });
+                  setEvents(data);
+                });
+            });
           if (prop.jwt_token) {
             let role = (jwtDecode(prop.jwt_token) as { role: string }).role;
             if (role == "admins") {
@@ -293,6 +317,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
         scheduler.close();
       } finally {
         scheduler.loading(false);
+        window.location.reload();
       }
     };
 
@@ -347,6 +372,7 @@ const Editfestival = (prop: { jwt_token: string }) => {
                 rows={2}
                 error={keywordError}
                 helperText={keywordError ? "กรุณากรอกคำค้นหา" : ""}
+                disabled={event?.description ? true : false}
               />
             </Grid>
             {/* เวลาวันที่ */}

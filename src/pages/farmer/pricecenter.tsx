@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Container,
-  Grid,
-  Menu,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Grid, MenuItem, TextField, Typography, Divider } from "@mui/material";
 import { Button } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import { SearchOutlined } from "@mui/icons-material";
@@ -97,24 +90,33 @@ const Pricecenter = () => {
 
   return (
     <>
-      <Grid item xs={12} md={6}>
-        <TextField
-          select
-          label="หมวดหมู่"
-          fullWidth
-          onChange={(e) => {
-            setSelectedCategory(e.target.value);
-            setSelectedProduct("");
-            setSelectedSellType("");
-          }}
-        >
-          {category.map((item, index) => (
-            <MenuItem key={index} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
+      {category.length > 0 && (
+        <>
+          <Grid xs={12}>
+            <Divider textAlign="left">
+              <Typography>ตรวจสอบราคากลาง</Typography>
+            </Divider>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              select
+              label="หมวดหมู่"
+              fullWidth
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setSelectedProduct("");
+                setSelectedSellType("");
+              }}
+            >
+              {category.map((item, index) => (
+                <MenuItem key={index} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </>
+      )}
       {selectedCategory !== "" && (
         <Grid item xs={12} md={6}>
           <TextField

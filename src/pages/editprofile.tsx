@@ -399,6 +399,25 @@ const EditProfile = (prop: {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const emailRegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const telRegExp = /^[0-9]{10}$/;
+
+    if (email && emailRegExp.test(email)) {
+      console.log("email: have");
+      setEmailReg(true);
+    }
+    if (email && !emailRegExp.test(email)) {
+      console.log("email: error");
+      setEmailReg(false);
+      return;
+    }
+    if (tel && telRegExp.test(tel)) {
+      setTelValidate(true);
+    }
+    if (tel && !telRegExp.test(tel)) {
+      setTelValidate(false);
+      return;
+    }
 
     if (role == "tambons" || prop.admin?.role == "tambons") {
       console.log(selected.amphure_name_th);
@@ -410,12 +429,12 @@ const EditProfile = (prop: {
     }
     const formData = new FormData();
     formData.append("username", username);
-    if (emailCheck == true && emailReg == true) {
-      formData.append("email", email);
-    }
+    formData.append("email", email);
     formData.append("firstname", firstName);
     formData.append("lastname", lastName);
+
     formData.append("phone", tel);
+
     if (prop.admin) {
       formData.append("role", prop.admin.role);
     }
@@ -646,9 +665,9 @@ const EditProfile = (prop: {
                 label="Email"
                 name="email"
                 autoComplete="email"
-                error={!emailReg && emailCheck}
+                error={!emailReg && email != ""}
                 helperText={
-                  !emailReg && emailCheck ? "กรุณากรอก Email ให้ถูกต้อง" : ""
+                  !emailReg && email != "" ? "กรุณากรอก Email ให้ถูกต้อง" : ""
                 }
                 onChange={(event) => setEmail(event.target.value)}
                 onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
@@ -722,11 +741,11 @@ const EditProfile = (prop: {
                 label="เบอร์โทรศัพท์"
                 id="tel"
                 autoComplete="tel"
-                error={!telValidate}
+                error={!telValidate && tel != ""}
                 helperText={
-                  tel == "" && telValidate == false
+                  tel == "" && telValidate == false && role == "members"
                     ? "กรุณากรอกเบอร์โทรศัพท์"
-                    : "" || !telValidate
+                    : "" || (!telValidate && tel)
                     ? "เบอร์โทรศัพท์ไม่ถูกต้อง"
                     : ""
                 }

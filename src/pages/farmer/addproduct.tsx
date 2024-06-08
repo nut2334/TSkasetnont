@@ -431,11 +431,6 @@ const AddProduct = (prop: { jwt_token: string }) => {
                 </Typography>
               </Grid>
             )}
-            <Grid xs={12}>
-              <Divider textAlign="left">
-                <Typography>ตรวจสอบราคากลาง</Typography>
-              </Divider>
-            </Grid>
 
             <Pricecenter />
             <Grid item xs={12}>
@@ -1057,25 +1052,28 @@ const AddProduct = (prop: { jwt_token: string }) => {
                     </Grid>
                   </React.Fragment>
                 )}
+                {(selectedStatus == "เปิดรับจองตามช่วงเวลา" ||
+                  selectedStatus == "เปิดรับจองตลอด") && (
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle1">
+                      คาดการณ์เดือนที่ได้รับสินค้า
+                    </Typography>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        sx={{ width: "100%" }}
+                        defaultValue={
+                          monthreceived ? dayjs(monthreceived) : null
+                        }
+                        onChange={(e: any) =>
+                          setMonthreceived(e.format("YYYY-MM-DD"))
+                        }
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                )}
               </React.Fragment>
             )}
-            {(selectedStatus == "เปิดรับจองตามช่วงเวลา" ||
-              selectedStatus == "เปิดรับจองตลอด") && (
-              <Grid item xs={6}>
-                <Typography variant="subtitle1">
-                  คาดการณ์เดือนที่ได้รับสินค้า
-                </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    sx={{ width: "100%" }}
-                    defaultValue={monthreceived ? dayjs(monthreceived) : null}
-                    onChange={(e: any) =>
-                      setMonthreceived(e.format("YYYY-MM-DD"))
-                    }
-                  />
-                </LocalizationProvider>
-              </Grid>
-            )}
+
             {selectedType == "สินค้าจัดส่งพัสดุ" && (
               <>
                 <Grid item xs={8} lg={6}>

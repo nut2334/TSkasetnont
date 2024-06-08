@@ -130,8 +130,10 @@ const Festival = (prop: { jwt_token: string }) => {
               (product) => product.selectedType === "จองสินค้าผ่านเว็บไซต์"
             )
             .map((product) => {
+              console.log(product);
               return {
                 ...product,
+                product_id: product.id,
                 id: cur.id + product.id,
                 title: cur.title,
               };
@@ -149,6 +151,7 @@ const Festival = (prop: { jwt_token: string }) => {
             .map((product) => {
               return {
                 ...product,
+                product_id: product.id,
                 id: cur.id + product.id,
                 title: cur.title,
               };
